@@ -4,10 +4,10 @@ WeLearn -  Its Not Just About You Anymore
 
 1. Montar servidor ubuntu com Apache + PHP + Cassandra Nodes no VirtualBox.
 
-2. Editar classe do PHPCassa para integração ao codeigniter.
+2. Editar classe do PHPCassa para integraÃ§Ã£o ao codeigniter.
 
-3. Acertar erros na documentação do projeto.
+3. Acertar erros na documentaÃ§Ã£o do projeto.
 
-4. Criar schema do cassandra para o serviço, focando nas DAOS encontradas.
+4. Criar schema do cassandra para o serviÃ§o, focando nas DAOS encontradas.
 
 5. Encontrar e delegar mais tarefas.
