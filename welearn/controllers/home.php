@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Index extends CI_Controller {
+class Home extends CI_Controller {
 
     /**
      * Construtor carrega configurações da classes base CI_Controller
@@ -15,9 +15,9 @@ class Index extends CI_Controller {
 	 * Index Page for this controller.
 	 *
 	 * Maps to the following URL
-	 * 		http://example.com/index.php/index
+	 * 		http://example.com/index.php/home
 	 *	- or -  
-	 * 		http://example.com/index.php/index/index
+	 * 		http://example.com/index.php/home/index
 	 *	- or -
 	 * Since this controller is set as the default controller in 
 	 * config/routes.php, it's displayed at http://example.com/
@@ -32,5 +32,5 @@ class Index extends CI_Controller {
 	}
 }
 
-/* End of file index.php */
-/* Location: ./application/controllers/index.php */
+/* End of file home.php */
+/* Location: ./application/controllers/home.php */
