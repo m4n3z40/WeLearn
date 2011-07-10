@@ -2,7 +2,7 @@ WeLearn -  Its Not Just About You Anymore
 
 #TODO:
 
-1. Montar servidor ubuntu com Apache + PHP + Cassandra Nodes no VirtualBox.
+1. Montar servidor ubuntu com Apache + PHP + Cassandra Nodes no VirtualBox. (Feito)
 
 2. Editar classe do PHPCassa para integração ao codeigniter.
 
