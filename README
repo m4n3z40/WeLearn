@@ -1,13 +1,15 @@
-WeLearn -  Its Not Just About You Anymore
+﻿WeLearn -  Its Not Just About You Anymore
 
 #TODO:
 
 1. Montar servidor ubuntu com Apache + PHP + Cassandra Nodes no VirtualBox. (Feito)
 
-2. Editar classe do PHPCassa para integração ao codeigniter.
+2. Acertar erros na documentação do projeto.
 
-3. Acertar erros na documentação do projeto.
+3. Criar schema do cassandra para o serviço, focando nas DAOS encontradas.
 
-4. Criar schema do cassandra para o serviço, focando nas DAOS encontradas.
+4. Editar classe do PHPCassa para integração ao codeigniter.
 
-5. Encontrar e delegar mais tarefas.
+5. Desenvolver classes de projeto do welearn de acordo com a modelagem feita na análise. (Documentação)
+
+6. Encontrar e delegar mais tarefas.
