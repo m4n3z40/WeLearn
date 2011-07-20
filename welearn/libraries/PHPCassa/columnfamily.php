@@ -1,6 +1,9 @@
 <?php
+/* Not needed because de loader for CodeIgniter loads the files below automatically
+
 require_once('connection.php');
 require_once('uuid.php');
+*/
 
 /**
  * @package phpcassa

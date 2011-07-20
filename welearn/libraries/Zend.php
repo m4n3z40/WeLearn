@@ -1,4 +1,5 @@
-<?php if (!defined('BASEPATH')) {exit('No direct script access allowed');}
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+
 /**
  * Zend Framework Loader
  *
@@ -15,7 +16,7 @@
  * * the second usage is useful for autoloading the Zend Framework library
  * * Zend/Package/Name does not need the '.php' at the end
  */
-class WL_Zend
+class Zend
 {
 	/**
 	 * Constructor
@@ -31,8 +32,7 @@ class WL_Zend
 
 		if ($class)
 		{
-			require_once (string) $class . EXT;
-			log_message('debug', "Zend Class $class Loaded");
+			$this->load($class);
 		}
 		else
 		{
@@ -47,6 +47,8 @@ class WL_Zend
 	 */
 	function load($class)
 	{
+        $class = str_replace('_','/', $class);
+
 		require_once (string) $class . EXT;
 		log_message('debug', "Zend Class $class Loaded");
 	}
