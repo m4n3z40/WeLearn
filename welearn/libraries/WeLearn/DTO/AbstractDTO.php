@@ -45,7 +45,7 @@ abstract class WeLearn_DTO_AbstractDTO implements WeLearn_DTO_IDTO {
 
                 $metodoSet = 'set'.ucfirst( (string) $campo );
 
-                if( method_exists(self, $metodoSet) ) {
+                if( method_exists($this, $metodoSet) ) {
 
                     $this->$metodoSet( $valor );
 

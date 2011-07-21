@@ -20,4 +20,12 @@ interface WeLearn_DTO_IDTO {
      * @return boolean
      */
     public function isPersistido();
+
+    /**
+     * Seta se o objeto é ou não persistido no Banco de Dados.
+     *
+     * @param $persistido boolean O indicador se o objeto é persistido ou não.
+     * @return void
+     */
+    public function setPersistido( $persistido );
 }
