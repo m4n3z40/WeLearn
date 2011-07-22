@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 18:14
- * 
+ *
  * Description:
  *
  */
- 
-class WeLearn_Cursos_VotoSugestaoCurso extends  WeLearn_DTO_AbstractDTO {
+
+class WeLearn_Cursos_VotoSugestaoCurso extends WeLearn_DTO_AbstractDTO
+{
 
     /**
      * @var string
@@ -30,9 +31,9 @@ class WeLearn_Cursos_VotoSugestaoCurso extends  WeLearn_DTO_AbstractDTO {
      * @param null|WeLearn_Usuarios_Usuario $votante
      * @param null|WeLearn_Cursos_SugestaoCurso $sugestaoCurso
      */
-    public function __construct( $dataVoto = '',
-                                 WeLearn_Usuarios_Usuario $votante = null,
-                                 WeLearn_Cursos_SugestaoCurso $sugestaoCurso = null )
+    public function __construct($dataVoto = '',
+        WeLearn_Usuarios_Usuario $votante = null,
+        WeLearn_Cursos_SugestaoCurso $sugestaoCurso = null)
     {
         $dados = array(
             'dataVoto' => $dataVoto,
@@ -40,15 +41,15 @@ class WeLearn_Cursos_VotoSugestaoCurso extends  WeLearn_DTO_AbstractDTO {
             'sugestaoCurso' => $sugestaoCurso
         );
 
-        parent::__construct( $dados );
+        parent::__construct($dados);
     }
 
     /**
      * @param string $dataVoto
      */
-    public function setDataVoto( $dataVoto )
+    public function setDataVoto($dataVoto)
     {
-        $this->_dataVoto = (string) $dataVoto;
+        $this->_dataVoto = (string)$dataVoto;
     }
 
     /**
@@ -62,7 +63,7 @@ class WeLearn_Cursos_VotoSugestaoCurso extends  WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Cursos_SugestaoCurso $sugestaoCurso
      */
-    public function setSugestaoCurso( WeLearn_Cursos_SugestaoCurso $sugestaoCurso )
+    public function setSugestaoCurso(WeLearn_Cursos_SugestaoCurso $sugestaoCurso)
     {
         $this->_sugestaoCurso = $sugestaoCurso;
     }
@@ -78,7 +79,7 @@ class WeLearn_Cursos_VotoSugestaoCurso extends  WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_Usuario $votante
      */
-    public function setVotante( WeLearn_Usuarios_Usuario $votante )
+    public function setVotante(WeLearn_Usuarios_Usuario $votante)
     {
         $this->_votante = $votante;
     }

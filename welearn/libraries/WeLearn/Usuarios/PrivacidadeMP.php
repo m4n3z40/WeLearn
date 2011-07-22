@@ -3,7 +3,7 @@
  * Created by Allan Marques
  * Date: 20/07/11
  * Time: 12:58
- * 
+ *
  * Description:
  *
  */
@@ -11,7 +11,8 @@
 /**
  * @throws WeLearn_Base_CodigoEnumIncorretoException
  */
-abstract class WeLearn_Usuarios_PrivacidadeMP implements WeLearn_Base_IEnum{
+abstract class WeLearn_Usuarios_PrivacidadeMP implements WeLearn_Base_IEnum
+{
 
     /**
      * Indicador de Mensagens Pessoais Livres
@@ -43,7 +44,7 @@ abstract class WeLearn_Usuarios_PrivacidadeMP implements WeLearn_Base_IEnum{
      */
     public static function getDescricao($codigo)
     {
-        switch($codigo) {
+        switch ($codigo) {
             case self::LIVRE:
                 return 'Mensagens Pessoais Livres';
             case self::SO_AMIGOS;

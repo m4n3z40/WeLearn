@@ -3,7 +3,7 @@
  * Created by Allan Marques
  * Date: 20/07/11
  * Time: 03:43
- * 
+ *
  * Description:
  *
  */
@@ -11,7 +11,8 @@
 /**
  *
  */
-interface WeLearn_Base_IEnum {
+interface WeLearn_Base_IEnum
+{
 
     /**
      * Retorna a descrição do Enum passado por parametru.
@@ -21,5 +22,5 @@ interface WeLearn_Base_IEnum {
      * @return string
      * @throws WeLearn_Base_CodigoEnumIncorretoException
      */
-    public static function getDescricao( $codigo );
+    public static function getDescricao($codigo);
 }

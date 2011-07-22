@@ -1,32 +1,30 @@
 <?php
 /**
  * Created by Allan Marques
- * Date: 20/07/11
- * Time: 14:18
+ * Date: 21/07/11
+ * Time: 23:04
  *
  * Description:
  *
  */
 
-/**
- * @throws WeLearn_Base_CodigoEnumIncorretoException
- */
-abstract class WeLearn_Usuarios_StatusMP implements WeLearn_Base_IEnum
+abstract class WeLearn_Cursos_Avaliacoes_StatusAvaliacao implements WeLearn_Base_IEnum
 {
 
     /**
-     * Indicador do Status da Mensagem Pessoal Nova
-     *
      * @constant
      */
-    const NOVO = 0;
+    const LIBERADA = 0;
 
     /**
-     * Indicador do Status da Menaagem Pessoal Lida
-     *
      * @constant
      */
-    const LIDO = 1;
+    const BLOQUEADA = 1;
+
+    /**
+     * @constant
+     */
+    const DESATIVADA = 2;
 
     /**
      * Retorna a descrição do Enum passado por parametru.
@@ -38,10 +36,12 @@ abstract class WeLearn_Usuarios_StatusMP implements WeLearn_Base_IEnum
     public static function getDescricao($codigo)
     {
         switch ($codigo) {
-            case self::NOVO:
-                return 'Mensagem Pessoal Nova';
-            case self::LIDO:
-                return 'Mensagem Pessoal Lida';
+            case self::LIBERADA:
+                return 'Avaliação Liberada';
+            case self::BLOQUEADA:
+                return 'Avaliação Bloqueada';
+            case self::DESATIVADA:
+                return 'Avaliação Desativada';
             default:
                 throw new WeLearn_Base_CodigoEnumIncorretoException();
         }

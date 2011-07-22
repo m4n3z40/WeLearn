@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 19:02
- * 
+ *
  * Description:
  *
  */
- 
-class WeLearn_Cursos_UsuarioBackEndCurso extends WeLearn_DTO_AbstractDTO {
+
+class WeLearn_Cursos_UsuarioBackEndCurso extends WeLearn_DTO_AbstractDTO
+{
 
     /**
      * @var string
@@ -36,10 +37,10 @@ class WeLearn_Cursos_UsuarioBackEndCurso extends WeLearn_DTO_AbstractDTO {
      * @param null|WeLearn_Usuario_UsuarioBackEnd $usuarioBackEnd
      * @param null|WeLearn_Cursos_Curso $curso
      */
-    public function __construct( $membroDesde = '',
-                                 $nivelAcesso = WeLearn_Usuarios_NivelAcesso::MODERADOR,
-                                 WeLearn_Usuario_UsuarioBackEnd $usuarioBackEnd = null,
-                                 WeLearn_Cursos_Curso $curso = null )
+    public function __construct($membroDesde = '',
+        $nivelAcesso = WeLearn_Usuarios_NivelAcesso::MODERADOR,
+        WeLearn_Usuario_UsuarioBackEnd $usuarioBackEnd = null,
+        WeLearn_Cursos_Curso $curso = null)
     {
         $dados = array(
             'membroDesde' => $membroDesde,
@@ -48,13 +49,13 @@ class WeLearn_Cursos_UsuarioBackEndCurso extends WeLearn_DTO_AbstractDTO {
             'curso' => $curso
         );
 
-        parent::__construct( $dados );
+        parent::__construct($dados);
     }
 
     /**
      * @param \WeLearn_Cursos_Curso $curso
      */
-    public function setCurso( WeLearn_Cursos_Curso $curso )
+    public function setCurso(WeLearn_Cursos_Curso $curso)
     {
         $this->_curso = $curso;
     }
@@ -70,9 +71,9 @@ class WeLearn_Cursos_UsuarioBackEndCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $membroDesde
      */
-    public function setMembroDesde( $membroDesde )
+    public function setMembroDesde($membroDesde)
     {
-        $this->_membroDesde = (string) $membroDesde;
+        $this->_membroDesde = (string)$membroDesde;
     }
 
     /**
@@ -86,9 +87,9 @@ class WeLearn_Cursos_UsuarioBackEndCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $nivelAcesso
      */
-    public function setNivelAcesso( $nivelAcesso )
+    public function setNivelAcesso($nivelAcesso)
     {
-        $this->_nivelAcesso = (int) $nivelAcesso;
+        $this->_nivelAcesso = (int)$nivelAcesso;
     }
 
     /**
@@ -102,7 +103,7 @@ class WeLearn_Cursos_UsuarioBackEndCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuario_UsuarioBackEnd $usuarioBackEnd
      */
-    public function setUsuarioBackEnd( WeLearn_Usuario_UsuarioBackEnd $usuarioBackEnd )
+    public function setUsuarioBackEnd(WeLearn_Usuario_UsuarioBackEnd $usuarioBackEnd)
     {
         $this->_usuarioBackEnd = $usuarioBackEnd;
     }

@@ -3,15 +3,16 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 15:10
- * 
+ *
  * Description:
  *
  */
 
 /**
- * 
+ *
  */
-class WeLearn_Usuarios_ImagemUsuario extends WeLearn_DTO_AbstractDTO {
+class WeLearn_Usuarios_ImagemUsuario extends WeLearn_DTO_AbstractDTO
+{
     /**
      * @var string
      */
@@ -22,22 +23,22 @@ class WeLearn_Usuarios_ImagemUsuario extends WeLearn_DTO_AbstractDTO {
      */
     private $_usuario;
 
-    public function __construct( $url = '', WeLearn_Usuarios_Usuario $usuario = null )
+    public function __construct($url = '', WeLearn_Usuarios_Usuario $usuario = null)
     {
         $dados = array(
             'url' => $url,
             'usuario' => $usuario
         );
 
-        parent::__construct( $dados );
+        parent::__construct($dados);
     }
 
     /**
      * @param string $url
      */
-    public function setUrl( $url )
+    public function setUrl($url)
     {
-        $this->_url = (string) $url;
+        $this->_url = (string)$url;
     }
 
     /**
@@ -51,7 +52,7 @@ class WeLearn_Usuarios_ImagemUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_Usuario $usuario
      */
-    public function setUsuario( WeLearn_Usuarios_Usuario $usuario )
+    public function setUsuario(WeLearn_Usuarios_Usuario $usuario)
     {
         $this->_usuario = $usuario;
     }

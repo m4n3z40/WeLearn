@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 18:51
- * 
+ *
  * Description:
  *
  */
- 
-class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico {
+
+class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
+{
 
     /**
      * @var string
@@ -43,7 +44,7 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico {
     /**
      * @param \WeLearn_Cursos_ConfiguracaoCurso $configuracao
      */
-    public function setConfiguracao( WeLearn_Cursos_ConfiguracaoCurso $configuracao )
+    public function setConfiguracao(WeLearn_Cursos_ConfiguracaoCurso $configuracao)
     {
         $this->_configuracao = $configuracao;
     }
@@ -59,9 +60,9 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico {
     /**
      * @param string $conteudoProposto
      */
-    public function setConteudoProposto( $conteudoProposto )
+    public function setConteudoProposto($conteudoProposto)
     {
-        $this->_conteudoProposto = (string) $conteudoProposto;
+        $this->_conteudoProposto = (string)$conteudoProposto;
     }
 
     /**
@@ -75,7 +76,7 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico {
     /**
      * @param \WeLearn_Usuarios_GerenciadorPrincipal $criador
      */
-    public function setCriador( WeLearn_Usuarios_GerenciadorPrincipal $criador )
+    public function setCriador(WeLearn_Usuarios_GerenciadorPrincipal $criador)
     {
         $this->_criador = $criador;
     }
@@ -91,7 +92,7 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico {
     /**
      * @param \WeLearn_Cursos_ImagemCurso $imagem
      */
-    public function setImagem( WeLearn_Cursos_ImagemCurso $imagem )
+    public function setImagem(WeLearn_Cursos_ImagemCurso $imagem)
     {
         $this->_imagem = $imagem;
     }
@@ -107,9 +108,9 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico {
     /**
      * @param string $objetivos
      */
-    public function setObjetivos( $objetivos )
+    public function setObjetivos($objetivos)
     {
-        $this->_objetivos = (string) $objetivos;
+        $this->_objetivos = (string)$objetivos;
     }
 
     /**
@@ -123,9 +124,9 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico {
     /**
      * @param float $tempoDuracaoMax
      */
-    public function setTempoDuracaoMax( $tempoDuracaoMax )
+    public function setTempoDuracaoMax($tempoDuracaoMax)
     {
-        $this->_tempoDuracaoMax = (float) $tempoDuracaoMax;
+        $this->_tempoDuracaoMax = (float)$tempoDuracaoMax;
     }
 
     /**
@@ -140,7 +141,7 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico {
      * @param array $opcoes
      * @return void
      */
-    public function alterarOpcoesPrivacidade( array $opcoes )
+    public function alterarOpcoesPrivacidade(array $opcoes)
     {
         //@TODO: Implementar este método!!
     }
@@ -149,7 +150,7 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico {
      * @param array $opcoes
      * @return void
      */
-    public function alterarOpcoesEnquete( array $opcoes )
+    public function alterarOpcoesEnquete(array $opcoes)
     {
         //@TODO: Implementar este método!!
     }
@@ -158,7 +159,7 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico {
      * @param array $opcoes
      * @return void
      */
-    public function alterarOpcoesForum( array $opcoes )
+    public function alterarOpcoesForum(array $opcoes)
     {
         //@TODO: Implementar este método!!
     }

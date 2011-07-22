@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 18:08
- * 
+ *
  * Description:
  *
  */
- 
-class WeLearn_Cursos_SugestaoCurso extends WeLearn_Cursos_CursoBasico {
+
+class WeLearn_Cursos_SugestaoCurso extends WeLearn_Cursos_CursoBasico
+{
 
     /**
      * @var WeLearn_Usuarios_Usuario
@@ -18,7 +19,7 @@ class WeLearn_Cursos_SugestaoCurso extends WeLearn_Cursos_CursoBasico {
     /**
      * @param \WeLearn_Usuarios_Usuario $criador
      */
-    public function setCriador( WeLearn_Usuarios_Usuario $criador )
+    public function setCriador(WeLearn_Usuarios_Usuario $criador)
     {
         $this->_criador = $criador;
     }
@@ -35,7 +36,7 @@ class WeLearn_Cursos_SugestaoCurso extends WeLearn_Cursos_CursoBasico {
      * @param WeLearn_Cursos_Curso $curso
      * @return void
      */
-    public function registrarCriacaoCurso( WeLearn_Cursos_Curso $curso )
+    public function registrarCriacaoCurso(WeLearn_Cursos_Curso $curso)
     {
         //@TODO: Implementar este método!
     }

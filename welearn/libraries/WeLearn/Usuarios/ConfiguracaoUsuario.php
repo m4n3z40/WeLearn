@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 15:28
- * 
+ *
  * Description:
  *
  */
- 
-class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO {
+
+class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO
+{
     /**
      * @var WeLearn_Usuarios_Usuario
      */
@@ -52,9 +53,9 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $privacidadeCompartilhamento
      */
-    public function setPrivacidadeCompartilhamento( $privacidadeCompartilhamento )
+    public function setPrivacidadeCompartilhamento($privacidadeCompartilhamento)
     {
-        $this->_privacidadeCompartilhamento = (int) $privacidadeCompartilhamento;
+        $this->_privacidadeCompartilhamento = (int)$privacidadeCompartilhamento;
     }
 
     /**
@@ -68,9 +69,9 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $privacidadeConvites
      */
-    public function setPrivacidadeConvites( $privacidadeConvites )
+    public function setPrivacidadeConvites($privacidadeConvites)
     {
-        $this->_privacidadeConvites = (int) $privacidadeConvites;
+        $this->_privacidadeConvites = (int)$privacidadeConvites;
     }
 
     /**
@@ -84,9 +85,9 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $privacidadeMP
      */
-    public function setPrivacidadeMP( $privacidadeMP )
+    public function setPrivacidadeMP($privacidadeMP)
     {
-        $this->_privacidadeMP = (int) $privacidadeMP;
+        $this->_privacidadeMP = (int)$privacidadeMP;
     }
 
     /**
@@ -100,9 +101,9 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $privacidadeNotificacoes
      */
-    public function setPrivacidadeNotificacoes( $privacidadeNotificacoes )
+    public function setPrivacidadeNotificacoes($privacidadeNotificacoes)
     {
-        $this->_privacidadeNotificacoes = (int) $privacidadeNotificacoes;
+        $this->_privacidadeNotificacoes = (int)$privacidadeNotificacoes;
     }
 
     /**
@@ -116,9 +117,9 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $privacidadePerfil
      */
-    public function setPrivacidadePerfil( $privacidadePerfil )
+    public function setPrivacidadePerfil($privacidadePerfil)
     {
-        $this->_privacidadePerfil = (int) $privacidadePerfil;
+        $this->_privacidadePerfil = (int)$privacidadePerfil;
     }
 
     /**
@@ -132,9 +133,9 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $statusCompartilhamento
      */
-    public function setStatusCompartilhamento( $statusCompartilhamento )
+    public function setStatusCompartilhamento($statusCompartilhamento)
     {
-        $this->_statusCompartilhamento = (int) $statusCompartilhamento;
+        $this->_statusCompartilhamento = (int)$statusCompartilhamento;
     }
 
     /**
@@ -148,7 +149,7 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_Usuario $usuario
      */
-    public function setUsuario( WeLearn_Usuarios_Usuario $usuario )
+    public function setUsuario(WeLearn_Usuarios_Usuario $usuario)
     {
         $this->_usuario = $usuario;
     }
@@ -164,7 +165,7 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param array $notificacoesHabilitadas
      */
-    public function setNotificacoesHabilitadas( array $notificacoesHabilitadas )
+    public function setNotificacoesHabilitadas(array $notificacoesHabilitadas)
     {
         $this->_notificacoesHabilitadas = $notificacoesHabilitadas;
     }

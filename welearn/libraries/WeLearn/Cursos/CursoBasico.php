@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 17:57
- * 
+ *
  * Description:
  *
  */
- 
-abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO {
+
+abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO
+{
 
     /**
      * @var int
@@ -48,9 +49,9 @@ abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $dataCriacao
      */
-    public function setDataCriacao( $dataCriacao )
+    public function setDataCriacao($dataCriacao)
     {
-        $this->_dataCriacao = (string) $dataCriacao;
+        $this->_dataCriacao = (string)$dataCriacao;
     }
 
     /**
@@ -64,9 +65,9 @@ abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $desscricao
      */
-    public function setDesscricao( $desscricao )
+    public function setDesscricao($desscricao)
     {
-        $this->_desscricao = (string) $desscricao;
+        $this->_desscricao = (string)$desscricao;
     }
 
     /**
@@ -82,7 +83,7 @@ abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO {
      */
     public function setId($id)
     {
-        $this->_id = (int) $id;
+        $this->_id = (int)$id;
     }
 
     /**
@@ -98,7 +99,7 @@ abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO {
      */
     public function setNome($nome)
     {
-        $this->_nome = (string) $nome;
+        $this->_nome = (string)$nome;
     }
 
     /**
@@ -112,7 +113,7 @@ abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Cursos_Segmento $segmento
      */
-    public function setSegmento( WeLearn_Cursos_Segmento $segmento )
+    public function setSegmento(WeLearn_Cursos_Segmento $segmento)
     {
         $this->_segmento = $segmento;
     }
@@ -128,9 +129,9 @@ abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $status
      */
-    public function setStatus( $status )
+    public function setStatus($status)
     {
-        $this->_status = (int) $status;
+        $this->_status = (int)$status;
     }
 
     /**
@@ -144,9 +145,9 @@ abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $tema
      */
-    public function setTema( $tema )
+    public function setTema($tema)
     {
-        $this->_tema = (string) $tema;
+        $this->_tema = (string)$tema;
     }
 
     /**

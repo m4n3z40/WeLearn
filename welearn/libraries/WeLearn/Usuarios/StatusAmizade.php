@@ -3,7 +3,7 @@
  * Created by Allan Marques
  * Date: 20/07/11
  * Time: 14:20
- * 
+ *
  * Description:
  *
  */
@@ -11,7 +11,8 @@
 /**
  * @throws WeLearn_Base_CodigoEnumIncorretoException
  */
-abstract class WeLearn_Usuarios_StatusAmizade implements WeLearn_Base_IEnum {
+abstract class WeLearn_Usuarios_StatusAmizade implements WeLearn_Base_IEnum
+{
 
     /**
      * Indicador do Status da Amizade com Requisição em Espera
@@ -34,9 +35,9 @@ abstract class WeLearn_Usuarios_StatusAmizade implements WeLearn_Base_IEnum {
      * @return string
      * @throws WeLearn_Base_CodigoEnumIncorretoException
      */
-    public static function getDescricao( $codigo )
+    public static function getDescricao($codigo)
     {
-        switch( $codigo ) {
+        switch ($codigo) {
             case self::REQUISICAO_EM_ESPERA:
                 return 'Requisição de Amizade em Espera de Aprovação';
             case self::ATIVO:

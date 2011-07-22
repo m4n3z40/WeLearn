@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 18:26
- * 
+ *
  * Description:
  *
  */
- 
-class WeLearn_Cursos_ConfiguracaoCurso extends WeLearn_DTO_AbstractDTO {
+
+class WeLearn_Cursos_ConfiguracaoCurso extends WeLearn_DTO_AbstractDTO
+{
 
     /**
      * @var WeLearn_Cursos_Curso
@@ -38,7 +39,7 @@ class WeLearn_Cursos_ConfiguracaoCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Cursos_Curso $curso
      */
-    public function setCurso( WeLearn_Cursos_Curso $curso )
+    public function setCurso(WeLearn_Cursos_Curso $curso)
     {
         $this->_curso = $curso;
     }
@@ -54,9 +55,9 @@ class WeLearn_Cursos_ConfiguracaoCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $permissaoCriacaoEnquete
      */
-    public function setPermissaoCriacaoEnquete( $permissaoCriacaoEnquete )
+    public function setPermissaoCriacaoEnquete($permissaoCriacaoEnquete)
     {
-        $this->_permissaoCriacaoEnquete = (int) $permissaoCriacaoEnquete;
+        $this->_permissaoCriacaoEnquete = (int)$permissaoCriacaoEnquete;
     }
 
     /**
@@ -70,9 +71,9 @@ class WeLearn_Cursos_ConfiguracaoCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $permissaoCriacaoForum
      */
-    public function setPermissaoCriacaoForum( $permissaoCriacaoForum )
+    public function setPermissaoCriacaoForum($permissaoCriacaoForum)
     {
-        $this->_permissaoCriacaoForum = (int) $permissaoCriacaoForum;
+        $this->_permissaoCriacaoForum = (int)$permissaoCriacaoForum;
     }
 
     /**
@@ -86,9 +87,9 @@ class WeLearn_Cursos_ConfiguracaoCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $privacidadeConteudo
      */
-    public function setPrivacidadeConteudo( $privacidadeConteudo )
+    public function setPrivacidadeConteudo($privacidadeConteudo)
     {
-        $this->_privacidadeConteudo = (int) $privacidadeConteudo;
+        $this->_privacidadeConteudo = (int)$privacidadeConteudo;
     }
 
     /**
@@ -102,7 +103,7 @@ class WeLearn_Cursos_ConfiguracaoCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $privacidadeInscricao
      */
-    public function setPrivacidadeInscricao( $privacidadeInscricao )
+    public function setPrivacidadeInscricao($privacidadeInscricao)
     {
         $this->_privacidadeInscricao = $privacidadeInscricao;
     }

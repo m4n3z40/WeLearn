@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 18:34
- * 
+ *
  * Description:
  *
  */
- 
-class WeLearn_Cursos_ImagemCurso extends WeLearn_DTO_AbstractDTO {
+
+class WeLearn_Cursos_ImagemCurso extends WeLearn_DTO_AbstractDTO
+{
 
     /**
      * @var string
@@ -31,13 +32,13 @@ class WeLearn_Cursos_ImagemCurso extends WeLearn_DTO_AbstractDTO {
             'curso' => $curso
         );
 
-        parent::__construct( $dados );
+        parent::__construct($dados);
     }
 
     /**
      * @param \WeLearn_Cursos_Curso $curso
      */
-    public function setCurso( WeLearn_Cursos_Curso $curso )
+    public function setCurso(WeLearn_Cursos_Curso $curso)
     {
         $this->_curso = $curso;
     }
@@ -53,9 +54,9 @@ class WeLearn_Cursos_ImagemCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $url
      */
-    public function setUrl( $url )
+    public function setUrl($url)
     {
-        $this->_url =(string) $url;
+        $this->_url = (string)$url;
     }
 
     /**

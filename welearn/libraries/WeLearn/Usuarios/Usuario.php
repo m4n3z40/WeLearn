@@ -3,15 +3,16 @@
  * Created by Allan Marques
  * Date: 20/07/11
  * Time: 15:14
- * 
+ *
  * Description:
  *
  */
 
 /**
- * 
+ *
  */
-class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO {
+class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
+{
     /**
      * @var int
      */
@@ -70,7 +71,7 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_ConfiguracaoUsuario $configuracao
      */
-    public function setConfiguracao( WeLearn_Usuarios_ConfiguracaoUsuario $configuracao )
+    public function setConfiguracao(WeLearn_Usuarios_ConfiguracaoUsuario $configuracao)
     {
         $this->_configuracao = $configuracao;
     }
@@ -86,7 +87,7 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais
      */
-    public function setDadosPessoais( WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais )
+    public function setDadosPessoais(WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais)
     {
         $this->_dadosPessoais = $dadosPessoais;
     }
@@ -102,7 +103,7 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_DadosProfissionaisUsuario $dadosProfissionais
      */
-    public function setDadosProfissionais( WeLearn_Usuarios_DadosProfissionaisUsuario $dadosProfissionais )
+    public function setDadosProfissionais(WeLearn_Usuarios_DadosProfissionaisUsuario $dadosProfissionais)
     {
         $this->_dadosProfissionais = $dadosProfissionais;
     }
@@ -118,9 +119,9 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $dataCadastro
      */
-    public function setDataCadastro( $dataCadastro )
+    public function setDataCadastro($dataCadastro)
     {
-        $this->_dataCadastro = (string) $dataCadastro;
+        $this->_dataCadastro = (string)$dataCadastro;
     }
 
     /**
@@ -134,9 +135,9 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $email
      */
-    public function setEmail( $email )
+    public function setEmail($email)
     {
-        $this->_email = (string) $email;
+        $this->_email = (string)$email;
     }
 
     /**
@@ -150,9 +151,9 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $id
      */
-    public function setId( $id )
+    public function setId($id)
     {
-        $this->_id = (int) $id;
+        $this->_id = (int)$id;
     }
 
     /**
@@ -166,7 +167,7 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_ImagemUsuario $imagem
      */
-    public function setImagem( WeLearn_Usuarios_ImagemUsuario $imagem )
+    public function setImagem(WeLearn_Usuarios_ImagemUsuario $imagem)
     {
         $this->_imagem = $imagem;
     }
@@ -182,9 +183,9 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $nome
      */
-    public function setNome( $nome )
+    public function setNome($nome)
     {
-        $this->_nome = (string) $nome;
+        $this->_nome = (string)$nome;
     }
 
     /**
@@ -198,7 +199,7 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Cursos_Segmento $segmentoInteresse
      */
-    public function setSegmentoInteresse( WeLearn_Cursos_Segmento $segmentoInteresse )
+    public function setSegmentoInteresse(WeLearn_Cursos_Segmento $segmentoInteresse)
     {
         $this->_segmentoInteresse = $segmentoInteresse;
     }
@@ -214,9 +215,9 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $senha
      */
-    public function setSenha( $senha )
+    public function setSenha($senha)
     {
-        $this->_senha = (string) $senha;
+        $this->_senha = (string)$senha;
     }
 
     /**
@@ -230,9 +231,9 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $sobrenome
      */
-    public function setSobrenome( $sobrenome )
+    public function setSobrenome($sobrenome)
     {
-        $this->_sobrenome = (string) $sobrenome;
+        $this->_sobrenome = (string)$sobrenome;
     }
 
     /**

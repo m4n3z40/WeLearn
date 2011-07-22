@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 17:34
- * 
+ *
  * Description:
  *
  */
- 
-abstract class WeLearn_Cursos_PermissaoCurso implements WeLearn_Base_IEnum {
+
+abstract class WeLearn_Cursos_PermissaoCurso implements WeLearn_Base_IEnum
+{
 
     /**
      * @constant
@@ -29,7 +30,7 @@ abstract class WeLearn_Cursos_PermissaoCurso implements WeLearn_Base_IEnum {
      */
     public static function getDescricao($codigo)
     {
-        switch ( $codigo ) {
+        switch ($codigo) {
             case self::LIVRE:
                 return 'Livre';
             case self::RESTRITO;

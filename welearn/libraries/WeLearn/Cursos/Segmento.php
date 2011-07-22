@@ -3,7 +3,7 @@
  * Created by Allan Marques
  * Date: 20/07/11
  * Time: 14:40
- * 
+ *
  * Description:
  *
  */
@@ -11,7 +11,8 @@
 /**
  *
  */
-class WeLearn_Cursos_Segmento extends WeLearn_DTO_AbstractDTO {
+class WeLearn_Cursos_Segmento extends WeLearn_DTO_AbstractDTO
+{
 
     /**
      * @var int
@@ -41,16 +42,16 @@ class WeLearn_Cursos_Segmento extends WeLearn_DTO_AbstractDTO {
             'area' => $area
         );
 
-        parent::__construct( $dados );
+        parent::__construct($dados);
     }
 
     /**
      * @param $id
      * @return void
      */
-    public function setId( $id )
+    public function setId($id)
     {
-        $this->_id = (int) $id;
+        $this->_id = (int)$id;
     }
 
     /**
@@ -65,9 +66,9 @@ class WeLearn_Cursos_Segmento extends WeLearn_DTO_AbstractDTO {
      * @param $descricao
      * @return void
      */
-    public function setDescricao( $descricao )
+    public function setDescricao($descricao)
     {
-        $this->_descricao = (string) $descricao;
+        $this->_descricao = (string)$descricao;
     }
 
     /**
@@ -82,7 +83,7 @@ class WeLearn_Cursos_Segmento extends WeLearn_DTO_AbstractDTO {
      * @param WeLearn_Cursos_Area $area
      * @return void
      */
-    public function setArea( WeLearn_Cursos_Area $area )
+    public function setArea(WeLearn_Cursos_Area $area)
     {
         $this->_area = $area;
     }

@@ -3,15 +3,16 @@
  * Created by Allan Marques
  * Date: 20/07/11
  * Time: 15:15
- * 
+ *
  * Description:
  *
  */
 
 /**
- * 
+ *
  */
-class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO {
+class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
+{
 
     /**
      * @var WeLearn_Usuarios_Usuario
@@ -92,9 +93,9 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param $ano int
      * @return void
      */
-    public function setAno( $ano )
+    public function setAno($ano)
     {
-        $this->_ano = (int) $ano;
+        $this->_ano = (int)$ano;
     }
 
     /**
@@ -109,9 +110,9 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param $cargo string
      * @return void
      */
-    public function setCargo( $cargo )
+    public function setCargo($cargo)
     {
-        $this->_cargo = (string) $cargo;
+        $this->_cargo = (string)$cargo;
     }
 
     /**
@@ -126,9 +127,9 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param $curso string
      * @return void
      */
-    public function setCurso( $curso )
+    public function setCurso($curso)
     {
-        $this->_curso = (string) $curso;
+        $this->_curso = (string)$curso;
     }
 
     /**
@@ -143,9 +144,9 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param $descricaoTrabalho string
      * @return void
      */
-    public function setDescricaoTrabalho( $descricaoTrabalho )
+    public function setDescricaoTrabalho($descricaoTrabalho)
     {
-        $this->_descricaoTrabalho = (string) $descricaoTrabalho;
+        $this->_descricaoTrabalho = (string)$descricaoTrabalho;
     }
 
     /**
@@ -160,9 +161,9 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param $diploma string
      * @return void
      */
-    public function setDiploma( $diploma )
+    public function setDiploma($diploma)
     {
-        $this->_diploma = (string) $diploma;
+        $this->_diploma = (string)$diploma;
     }
 
     /**
@@ -177,9 +178,9 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param $empresa string
      * @return void
      */
-    public function setEmpresa( $empresa )
+    public function setEmpresa($empresa)
     {
-        $this->_empresa = (string) $empresa;
+        $this->_empresa = (string)$empresa;
     }
 
     /**
@@ -194,9 +195,9 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param $escola string
      * @return void
      */
-    public function setEscola( $escola )
+    public function setEscola($escola)
     {
-        $this->_escola = (string) $escola;
+        $this->_escola = (string)$escola;
     }
 
     /**
@@ -211,9 +212,9 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param $escolaridade string
      * @return void
      */
-    public function setEscolaridade( $escolaridade )
+    public function setEscolaridade($escolaridade)
     {
-        $this->_escolaridade = (string) $escolaridade;
+        $this->_escolaridade = (string)$escolaridade;
     }
 
     /**
@@ -228,9 +229,9 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param $faculdade string
      * @return void
      */
-    public function setFaculdade( $faculdade )
+    public function setFaculdade($faculdade)
     {
-        $this->_faculdade = (string) $faculdade;
+        $this->_faculdade = (string)$faculdade;
     }
 
     /**
@@ -245,9 +246,9 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param $habilidadesProfissionais string
      * @return void
      */
-    public function setHabilidadesProfissionais( $habilidadesProfissionais )
+    public function setHabilidadesProfissionais($habilidadesProfissionais)
     {
-        $this->_habilidadesProfissionais = (string) $habilidadesProfissionais;
+        $this->_habilidadesProfissionais = (string)$habilidadesProfissionais;
     }
 
     /**
@@ -262,9 +263,9 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param $interessesProfissionais string
      * @return void
      */
-    public function setInteressesProfissionais( $interessesProfissionais )
+    public function setInteressesProfissionais($interessesProfissionais)
     {
-        $this->_interessesProfissionais = (string) $interessesProfissionais;
+        $this->_interessesProfissionais = (string)$interessesProfissionais;
     }
 
     /**
@@ -279,9 +280,9 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param $profissao string
      * @return void
      */
-    public function setProfissao( $profissao )
+    public function setProfissao($profissao)
     {
-        $this->_profissao = (string) $profissao;
+        $this->_profissao = (string)$profissao;
     }
 
     /**
@@ -296,7 +297,7 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param WeLearn_Cursos_Segmento $segmentoTrabalho
      * @return void
      */
-    public function setSegmentoTrabalho( WeLearn_Cursos_Segmento $segmentoTrabalho)
+    public function setSegmentoTrabalho(WeLearn_Cursos_Segmento $segmentoTrabalho)
     {
         $this->_segmentoTrabalho = $segmentoTrabalho;
     }
@@ -313,9 +314,9 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param string $siteEmpresa
      * @return void
      */
-    public function setSiteEmpresa( $siteEmpresa )
+    public function setSiteEmpresa($siteEmpresa)
     {
-        $this->_siteEmpresa = (string) $siteEmpresa;
+        $this->_siteEmpresa = (string)$siteEmpresa;
     }
 
     /**
@@ -330,7 +331,7 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
      * @param WeLearn_Usuarios_Usuario $usuario
      * @return void
      */
-    public function setUsuario( WeLearn_Usuarios_Usuario $usuario )
+    public function setUsuario(WeLearn_Usuarios_Usuario $usuario)
     {
         $this->_usuario = $usuario;
     }

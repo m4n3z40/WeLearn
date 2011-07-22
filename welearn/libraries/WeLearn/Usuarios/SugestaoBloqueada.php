@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 15:43
- * 
+ *
  * Description:
  *
  */
- 
-class WeLearn_Usuarios_SugestaoBloqueada extends WeLearn_DTO_AbstractDTO {
+
+class WeLearn_Usuarios_SugestaoBloqueada extends WeLearn_DTO_AbstractDTO
+{
     /**
      * @var WeLearn_Usuarios_Usuario
      */
@@ -23,21 +24,21 @@ class WeLearn_Usuarios_SugestaoBloqueada extends WeLearn_DTO_AbstractDTO {
      * @param null|WeLearn_Usuarios_Usuario $dono
      * @param null|WeLearn_Usuarios_Usuario $bloqueado
      */
-    public function __construct( WeLearn_Usuarios_Usuario $dono = null,
-                                 WeLearn_Usuarios_Usuario $bloqueado = null )
+    public function __construct(WeLearn_Usuarios_Usuario $dono = null,
+        WeLearn_Usuarios_Usuario $bloqueado = null)
     {
         $dados = array(
             'dono' => $dono,
             'bloqueado' => $bloqueado
         );
 
-        parent::__construct( $dados );
+        parent::__construct($dados);
     }
 
     /**
      * @param \WeLearn_Usuarios_Usuario $bloqueado
      */
-    public function setBloqueado( WeLearn_Usuarios_Usuario $bloqueado )
+    public function setBloqueado(WeLearn_Usuarios_Usuario $bloqueado)
     {
         $this->_bloqueado = $bloqueado;
     }
@@ -53,7 +54,7 @@ class WeLearn_Usuarios_SugestaoBloqueada extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_Usuario $dono
      */
-    public function setDono( WeLearn_Usuarios_Usuario $dono )
+    public function setDono(WeLearn_Usuarios_Usuario $dono)
     {
         $this->_dono = $dono;
     }

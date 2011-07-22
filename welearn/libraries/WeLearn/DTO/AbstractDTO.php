@@ -3,7 +3,7 @@
  * Created by Allan Marques
  * Date: 20/07/11
  * Time: 03:12
- * 
+ *
  * Description:
  *
  */
@@ -11,10 +11,11 @@
 /**
  *
  */
-abstract class WeLearn_DTO_AbstractDTO implements WeLearn_DTO_IDTO {
+abstract class WeLearn_DTO_AbstractDTO implements WeLearn_DTO_IDTO
+{
 
     /**
-     * @var _persistido boolean Indica se a o DTO foi ou não persistido no BD
+     * @var boolean Indica se a o DTO foi ou não persistido no BD
      */
     protected $_persistido;
 
@@ -26,7 +27,7 @@ abstract class WeLearn_DTO_AbstractDTO implements WeLearn_DTO_IDTO {
     public function __construct(array $dados = null)
     {
         $this->_persistido = false;
-        $this->preencherPropriedades( $dados );
+        $this->preencherPropriedades($dados);
     }
 
     /**
@@ -38,16 +39,16 @@ abstract class WeLearn_DTO_AbstractDTO implements WeLearn_DTO_IDTO {
      *
      * @param array|null $dados Array que representa os valores das propriedades do objeto DTO
      */
-    public function preencherPropriedades( array $dados = null )
+    public function preencherPropriedades(array $dados = null)
     {
-        if( ! is_null($dados) ) {
-            foreach($dados as $campo => $valor) {
+        if (!is_null($dados)) {
+            foreach ($dados as $campo => $valor) {
 
-                $metodoSet = 'set'.ucfirst( (string) $campo );
+                $metodoSet = 'set' . ucfirst((string)$campo);
 
-                if( method_exists($this, $metodoSet) ) {
+                if (method_exists($this, $metodoSet)) {
 
-                    $this->$metodoSet( $valor );
+                    $this->$metodoSet($valor);
 
                 }
             }
@@ -70,8 +71,8 @@ abstract class WeLearn_DTO_AbstractDTO implements WeLearn_DTO_IDTO {
      * @param $persistido boolean O indicador se o objeto é persistido ou não.
      * @return void
      */
-    public function setPersistido( $persistido )
+    public function setPersistido($persistido)
     {
-        $this->_persistido = (boolean) $persistido;
+        $this->_persistido = (boolean)$persistido;
     }
 }

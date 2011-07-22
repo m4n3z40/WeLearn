@@ -3,15 +3,16 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 14:31
- * 
+ *
  * Description:
  *
  */
 
 /**
- * 
+ *
  */
-class WeLearn_Usuarios_ListaDeIM extends WeLearn_DTO_AbstractDTO {
+class WeLearn_Usuarios_ListaDeIM extends WeLearn_DTO_AbstractDTO
+{
     /**
      * @var string
      */
@@ -32,9 +33,9 @@ class WeLearn_Usuarios_ListaDeIM extends WeLearn_DTO_AbstractDTO {
      * @param null|WeLearn_Usuarios_InstantMessenger $messenger
      * @param null|WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais
      */
-    public function __construct( $idIM = '',
-                                WeLearn_Usuarios_InstantMessenger $messenger = null,
-                                WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais = null )
+    public function __construct($idIM = '',
+        WeLearn_Usuarios_InstantMessenger $messenger = null,
+        WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais = null)
     {
         $dados = array(
             'idIM' => $idIM,
@@ -42,13 +43,13 @@ class WeLearn_Usuarios_ListaDeIM extends WeLearn_DTO_AbstractDTO {
             'dadosPessoais' => $dadosPessoais
         );
 
-        parent::__construct( $dados );
+        parent::__construct($dados);
     }
 
     /**
      * @param \WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais
      */
-    public function setDadosPessoais( WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais )
+    public function setDadosPessoais(WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais)
     {
         $this->_dadosPessoais = $dadosPessoais;
     }
@@ -64,9 +65,9 @@ class WeLearn_Usuarios_ListaDeIM extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $idIM
      */
-    public function setIdIM( $idIM )
+    public function setIdIM($idIM)
     {
-        $this->_idIM = (string) $idIM;
+        $this->_idIM = (string)$idIM;
     }
 
     /**
@@ -80,7 +81,7 @@ class WeLearn_Usuarios_ListaDeIM extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_InstantMessenger $messenger
      */
-    public function setMessenger( WeLearn_Usuarios_InstantMessenger $messenger )
+    public function setMessenger(WeLearn_Usuarios_InstantMessenger $messenger)
     {
         $this->_messenger = $messenger;
     }

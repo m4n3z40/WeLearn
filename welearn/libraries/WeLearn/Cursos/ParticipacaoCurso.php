@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 19:33
- * 
+ *
  * Description:
  *
  */
- 
-class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO {
+
+class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
+{
 
     /**
      * @var string
@@ -58,7 +59,7 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_Aluno $aluno
      */
-    public function setAluno( WeLearn_Usuarios_Aluno $aluno )
+    public function setAluno(WeLearn_Usuarios_Aluno $aluno)
     {
         $this->_aluno = $aluno;
     }
@@ -74,7 +75,7 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Cursos_Certificado $certificado
      */
-    public function setCertificado( WeLearn_Cursos_Certificado $certificado )
+    public function setCertificado(WeLearn_Cursos_Certificado $certificado)
     {
         $this->_certificado = $certificado;
     }
@@ -90,9 +91,9 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \double $crFinal
      */
-    public function setCrFinal( $crFinal )
+    public function setCrFinal($crFinal)
     {
-        $this->_crFinal = (double) $crFinal;
+        $this->_crFinal = (double)$crFinal;
     }
 
     /**
@@ -106,7 +107,7 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Cursos_Curso $curso
      */
-    public function setCurso( WeLearn_Cursos_Curso $curso )
+    public function setCurso(WeLearn_Cursos_Curso $curso)
     {
         $this->_curso = $curso;
     }
@@ -122,9 +123,9 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $dataInscricao
      */
-    public function setDataInscricao( $dataInscricao )
+    public function setDataInscricao($dataInscricao)
     {
-        $this->_dataInscricao = (string) $dataInscricao;
+        $this->_dataInscricao = (string)$dataInscricao;
     }
 
     /**
@@ -138,9 +139,9 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $dataUltimoAcesso
      */
-    public function setDataUltimoAcesso( $dataUltimoAcesso )
+    public function setDataUltimoAcesso($dataUltimoAcesso)
     {
-        $this->_dataUltimoAcesso = (string) $dataUltimoAcesso;
+        $this->_dataUltimoAcesso = (string)$dataUltimoAcesso;
     }
 
     /**
@@ -154,9 +155,9 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param float $frequenciaTotal
      */
-    public function setFrequenciaTotal( $frequenciaTotal )
+    public function setFrequenciaTotal($frequenciaTotal)
     {
-        $this->_frequenciaTotal = (float) $frequenciaTotal;
+        $this->_frequenciaTotal = (float)$frequenciaTotal;
     }
 
     /**
@@ -170,7 +171,7 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Cursos_Conteudo_Pagina $paginaAtual
      */
-    public function setPaginaAtual( WeLearn_Cursos_Conteudo_Pagina $paginaAtual )
+    public function setPaginaAtual(WeLearn_Cursos_Conteudo_Pagina $paginaAtual)
     {
         $this->_paginaAtual = $paginaAtual;
     }
@@ -186,9 +187,9 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $situacao
      */
-    public function setSituacao( $situacao )
+    public function setSituacao($situacao)
     {
-        $this->_situacao = (int) $situacao;
+        $this->_situacao = (int)$situacao;
     }
 
     /**
@@ -220,7 +221,7 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO {
      * @param WeLearn_Cursos_Curso $curso
      * @return void
      */
-    public function inscrever( WeLearn_Usuarios_Aluno $aluno, WeLearn_Cursos_Curso $curso )
+    public function inscrever(WeLearn_Usuarios_Aluno $aluno, WeLearn_Cursos_Curso $curso)
     {
         //@TODO: implementar este médodo!!
     }

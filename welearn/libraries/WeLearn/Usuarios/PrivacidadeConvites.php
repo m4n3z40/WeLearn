@@ -3,7 +3,7 @@
  * Created by Allan Marques
  * Date: 20/07/11
  * Time: 13:17
- * 
+ *
  * Description:
  *
  */
@@ -11,7 +11,8 @@
 /**
  * @throws WeLearn_Base_CodigoEnumIncorretoException
  */
-abstract class WeLearn_Usuarios_PrivacidadeConvites implements WeLearn_Base_IEnum {
+abstract class WeLearn_Usuarios_PrivacidadeConvites implements WeLearn_Base_IEnum
+{
 
     /**
      * Indicador de Convites Livres
@@ -43,7 +44,7 @@ abstract class WeLearn_Usuarios_PrivacidadeConvites implements WeLearn_Base_IEnu
      */
     public static function getDescricao($codigo)
     {
-        switch($codigo) {
+        switch ($codigo) {
             case self::LIVRE:
                 return 'Convites Livres';
             case self::SO_AMIGOS;

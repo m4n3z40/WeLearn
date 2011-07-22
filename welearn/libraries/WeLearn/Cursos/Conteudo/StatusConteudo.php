@@ -1,30 +1,35 @@
 <?php
 /**
  * Created by Allan Marques
- * Date: 21/07/11
- * Time: 17:38
+ * Date: 22/07/11
+ * Time: 00:11
  *
  * Description:
  *
  */
 
-abstract class WeLearn_Cursos_SituacaoParticipacaoCurso implements WeLearn_Base_IEnum
+abstract class WeLearn_Cursos_Conteudo_StatusConteudo implements WeLearn_Base_IEnum
 {
 
     /**
      * @constant
      */
-    const INSCRICAO_EM_ESPERA = 0;
+    const BLOQUEADO = 0;
 
     /**
      * @constant
      */
-    const PARTICIPACAO_ATIVA = 1;
+    const ACESSANDO = 1;
 
     /**
      * @constant
      */
-    const CURSO_CONCLUIDO = 2;
+    const ACESSADO = 2;
+
+    /**
+     * @constant
+     */
+    const FINALIZADO = 3;
 
     /**
      * Retorna a descrição do Enum passado por parametru.
@@ -36,12 +41,14 @@ abstract class WeLearn_Cursos_SituacaoParticipacaoCurso implements WeLearn_Base_
     public static function getDescricao($codigo)
     {
         switch ($codigo) {
-            case self::INSCRICAO_EM_ESPERA:
-                return 'Inscrição em Espera';
-            case self::PARTICIPACAO_ATIVA:
-                return 'Participação Ativa no Curso';
-            case self::CURSO_CONCLUIDO:
-                return 'Curso Concluído';
+            case self::BLOQUEADO:
+                return 'Bloqueado';
+            case self::ACESSANDO:
+                return 'Acessando';
+            case self::ACESSADO:
+                return 'Acessado';
+            case self::FINALIZADO:
+                return 'Finalizado';
             default:
                 throw new WeLearn_Base_CodigoEnumIncorretoException();
         }

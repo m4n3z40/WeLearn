@@ -3,15 +3,16 @@
  * Created by Allan Marques
  * Date: 20/07/11
  * Time: 13:23
- * 
+ *
  * Description:
  *
  */
- 
+
 /**
  * @throws WeLearn_Base_CodigoEnumIncorretoException
  */
-abstract class WeLearn_Usuarios_PrivacidadeCompartilhamento implements WeLearn_Base_IEnum {
+abstract class WeLearn_Usuarios_PrivacidadeCompartilhamento implements WeLearn_Base_IEnum
+{
 
     /**
      * Indicador de privacidade de Compartilhamento Habilitado
@@ -36,13 +37,13 @@ abstract class WeLearn_Usuarios_PrivacidadeCompartilhamento implements WeLearn_B
      */
     public static function getDescricao($codigo)
     {
-       switch( $codigo ) {
-           case self::HABILITADO:
-               return 'Compartilhamento de Conteúdos Habilitado';
-           case self::DESABILITADO:
-               return 'Compartilhamento de Conteúdos Desabilitado';
-           default:
-               throw new WeLearn_Base_CodigoEnumIncorretoException();
-       }
+        switch ($codigo) {
+            case self::HABILITADO:
+                return 'Compartilhamento de Conteúdos Habilitado';
+            case self::DESABILITADO:
+                return 'Compartilhamento de Conteúdos Desabilitado';
+            default:
+                throw new WeLearn_Base_CodigoEnumIncorretoException();
+        }
     }
 }

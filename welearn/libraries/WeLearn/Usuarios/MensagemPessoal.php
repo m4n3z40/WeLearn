@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 16:06
- * 
+ *
  * Description:
  *
  */
- 
-class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO {
+
+class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO
+{
 
     /**
      * @var int
@@ -43,9 +44,9 @@ class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $status
      */
-    public function setStatus( $status )
+    public function setStatus($status)
     {
-        $this->_status = (int) $status;
+        $this->_status = (int)$status;
     }
 
     /**
@@ -59,7 +60,7 @@ class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_Usuario $remetente
      */
-    public function setRemetente( WeLearn_Usuarios_Usuario $remetente )
+    public function setRemetente(WeLearn_Usuarios_Usuario $remetente)
     {
         $this->_remetente = $remetente;
     }
@@ -75,9 +76,9 @@ class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $mensagem
      */
-    public function setMensagem( $mensagem )
+    public function setMensagem($mensagem)
     {
-        $this->_mensagem = (string) $mensagem;
+        $this->_mensagem = (string)$mensagem;
     }
 
     /**
@@ -91,9 +92,9 @@ class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $id
      */
-    public function setId( $id )
+    public function setId($id)
     {
-        $this->_id = (int) $id;
+        $this->_id = (int)$id;
     }
 
     /**
@@ -107,7 +108,7 @@ class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_Usuario $destinatario
      */
-    public function setDestinatario( WeLearn_Usuarios_Usuario $destinatario )
+    public function setDestinatario(WeLearn_Usuarios_Usuario $destinatario)
     {
         $this->_destinatario = $destinatario;
     }
@@ -123,9 +124,9 @@ class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $dataEnvio
      */
-    public function setDataEnvio( $dataEnvio )
+    public function setDataEnvio($dataEnvio)
     {
-        $this->_dataEnvio = (string) $dataEnvio;
+        $this->_dataEnvio = (string)$dataEnvio;
     }
 
     /**

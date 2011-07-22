@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 19:16
- * 
+ *
  * Description:
  *
  */
- 
-class WeLearn_Cursos_ListaVisitas extends WeLearn_DTO_AbstractDTO {
+
+class WeLearn_Cursos_ListaVisitas extends WeLearn_DTO_AbstractDTO
+{
 
     /**
      * @var string
@@ -30,9 +31,9 @@ class WeLearn_Cursos_ListaVisitas extends WeLearn_DTO_AbstractDTO {
      * @param null|WeLearn_Cursos_Curso $curso
      * @param null|WeLearn_Usuarios_Usuario $visitante
      */
-    public function __construct( $dataVisita = '',
-                                 WeLearn_Cursos_Curso $curso = null,
-                                 WeLearn_Usuarios_Usuario $visitante = null )
+    public function __construct($dataVisita = '',
+        WeLearn_Cursos_Curso $curso = null,
+        WeLearn_Usuarios_Usuario $visitante = null)
     {
         $dados = array(
             'dataVisita' => $dataVisita,
@@ -40,13 +41,13 @@ class WeLearn_Cursos_ListaVisitas extends WeLearn_DTO_AbstractDTO {
             'visitante' => $visitante
         );
 
-        parent::__construct( $dados );
+        parent::__construct($dados);
     }
 
     /**
      * @param \WeLearn_Cursos_Curso $curso
      */
-    public function setCurso( WeLearn_Cursos_Curso $curso )
+    public function setCurso(WeLearn_Cursos_Curso $curso)
     {
         $this->_curso = $curso;
     }
@@ -62,9 +63,9 @@ class WeLearn_Cursos_ListaVisitas extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $dataVisita
      */
-    public function setDataVisita( $dataVisita )
+    public function setDataVisita($dataVisita)
     {
-        $this->_dataVisita = (string) $dataVisita;
+        $this->_dataVisita = (string)$dataVisita;
     }
 
     /**
@@ -78,7 +79,7 @@ class WeLearn_Cursos_ListaVisitas extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_Usuario $visitante
      */
-    public function setVisitante( WeLearn_Usuarios_Usuario $visitante )
+    public function setVisitante(WeLearn_Usuarios_Usuario $visitante)
     {
         $this->_visitante = $visitante;
     }

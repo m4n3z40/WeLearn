@@ -3,15 +3,16 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 14:37
- * 
+ *
  * Description:
  *
  */
 
 /**
- * 
+ *
  */
-class WeLearn_Usuarios_ListaDeRS extends  WeLearn_DTO_AbstractDTO {
+class WeLearn_Usuarios_ListaDeRS extends WeLearn_DTO_AbstractDTO
+{
     /**
      * @var string
      */
@@ -32,9 +33,9 @@ class WeLearn_Usuarios_ListaDeRS extends  WeLearn_DTO_AbstractDTO {
      * @param null|WeLearn_Usuarios_RedeSocial $redeSocial
      * @param null|WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais
      */
-    public function __construct( $linkRS = '',
-                                 WeLearn_Usuarios_RedeSocial $redeSocial = null,
-                                 WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais = null )
+    public function __construct($linkRS = '',
+        WeLearn_Usuarios_RedeSocial $redeSocial = null,
+        WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais = null)
     {
         $dados = array(
             'linkRS' => $linkRS,
@@ -42,13 +43,13 @@ class WeLearn_Usuarios_ListaDeRS extends  WeLearn_DTO_AbstractDTO {
             'dadosPessoais' => $dadosPessoais
         );
 
-        parent::__construct( $dados );
+        parent::__construct($dados);
     }
 
     /**
      * @param \WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais
      */
-    public function setDadosPessoais( WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais )
+    public function setDadosPessoais(WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais)
     {
         $this->_dadosPessoais = $dadosPessoais;
     }
@@ -64,9 +65,9 @@ class WeLearn_Usuarios_ListaDeRS extends  WeLearn_DTO_AbstractDTO {
     /**
      * @param string $linkRS
      */
-    public function setLinkRS( $linkRS )
+    public function setLinkRS($linkRS)
     {
-        $this->_linkRS = (string) $linkRS;
+        $this->_linkRS = (string)$linkRS;
     }
 
     /**
@@ -80,7 +81,7 @@ class WeLearn_Usuarios_ListaDeRS extends  WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_RedeSocial $redeSocial
      */
-    public function setRedeSocial( WeLearn_Usuarios_RedeSocial $redeSocial )
+    public function setRedeSocial(WeLearn_Usuarios_RedeSocial $redeSocial)
     {
         $this->_redeSocial = $redeSocial;
     }

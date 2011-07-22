@@ -3,7 +3,7 @@
  * Created by Allan Marques
  * Date: 20/07/11
  * Time: 13:24
- * 
+ *
  * Description:
  *
  */
@@ -11,7 +11,8 @@
 /**
  * @throws WeLearn_Base_CodigoEnumIncorretoException
  */
-abstract class WeLearn_Usuarios_PrivacidadeNotificacoes implements WeLearn_Base_IEnum {
+abstract class WeLearn_Usuarios_PrivacidadeNotificacoes implements WeLearn_Base_IEnum
+{
 
     /**
      * Indicador da Privacidade de Notificações Habilitadas
@@ -26,7 +27,7 @@ abstract class WeLearn_Usuarios_PrivacidadeNotificacoes implements WeLearn_Base_
      * @constant
      */
     const DESABILITADO = 1;
-    
+
     /**
      * Retorna a descrição do Enum passado por parametru.
      *
@@ -34,9 +35,9 @@ abstract class WeLearn_Usuarios_PrivacidadeNotificacoes implements WeLearn_Base_
      * @return string
      * @throws WeLearn_Base_CodigoEnumIncorretoException
      */
-    public static function getDescricao( $codigo )
+    public static function getDescricao($codigo)
     {
-        switch( $codigo ) {
+        switch ($codigo) {
             case self::HABILITADO:
                 return 'Notificações Habilitadas';
             case self::DESABILITADO:

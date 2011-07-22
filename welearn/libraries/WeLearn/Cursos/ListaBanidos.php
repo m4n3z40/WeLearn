@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 19:16
- * 
+ *
  * Description:
  *
  */
- 
-class WeLearn_Cursos_ListaBanidos extends WeLearn_DTO_AbstractDTO {
+
+class WeLearn_Cursos_ListaBanidos extends WeLearn_DTO_AbstractDTO
+{
 
     /**
      * @var string
@@ -30,9 +31,9 @@ class WeLearn_Cursos_ListaBanidos extends WeLearn_DTO_AbstractDTO {
      * @param null|WeLearn_Cursos_Curso $curso
      * @param null|WeLearn_Usuarios_Usuario $banido
      */
-    public function __construct( $dataInclusao = '',
-                                 WeLearn_Cursos_Curso $curso = null,
-                                 WeLearn_Usuarios_Usuario $banido = null)
+    public function __construct($dataInclusao = '',
+        WeLearn_Cursos_Curso $curso = null,
+        WeLearn_Usuarios_Usuario $banido = null)
     {
         $dados = array(
             'dataInclusao' => $dataInclusao,
@@ -40,13 +41,13 @@ class WeLearn_Cursos_ListaBanidos extends WeLearn_DTO_AbstractDTO {
             'banido' => $banido
         );
 
-        parent::__construct( $dados );
+        parent::__construct($dados);
     }
 
     /**
      * @param \WeLearn_Usuarios_Usuario $banido
      */
-    public function setBanido( WeLearn_Usuarios_Usuario $banido )
+    public function setBanido(WeLearn_Usuarios_Usuario $banido)
     {
         $this->_banido = $banido;
     }
@@ -62,7 +63,7 @@ class WeLearn_Cursos_ListaBanidos extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Cursos_Curso $curso
      */
-    public function setCurso( WeLearn_Cursos_Curso $curso )
+    public function setCurso(WeLearn_Cursos_Curso $curso)
     {
         $this->_curso = $curso;
     }
@@ -78,9 +79,9 @@ class WeLearn_Cursos_ListaBanidos extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $dataInclusao
      */
-    public function setDataInclusao( $dataInclusao )
+    public function setDataInclusao($dataInclusao)
     {
-        $this->_dataInclusao = (string) $dataInclusao;
+        $this->_dataInclusao = (string)$dataInclusao;
     }
 
     /**

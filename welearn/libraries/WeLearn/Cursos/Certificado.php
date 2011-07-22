@@ -3,12 +3,13 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 18:44
- * 
+ *
  * Description:
  *
  */
- 
-class WeLearn_Cursos_Certificado extends WeLearn_DTO_AbstractDTO {
+
+class WeLearn_Cursos_Certificado extends WeLearn_DTO_AbstractDTO
+{
 
     /**
      * @var int
@@ -38,9 +39,9 @@ class WeLearn_Cursos_Certificado extends WeLearn_DTO_AbstractDTO {
     /**
      * @param boolean $ativo
      */
-    public function setAtivo( $ativo )
+    public function setAtivo($ativo)
     {
-        $this->_ativo = (boolean) $ativo;
+        $this->_ativo = (boolean)$ativo;
     }
 
     /**
@@ -54,7 +55,7 @@ class WeLearn_Cursos_Certificado extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Cursos_Curso $curso
      */
-    public function setCurso( WeLearn_Cursos_Curso $curso )
+    public function setCurso(WeLearn_Cursos_Curso $curso)
     {
         $this->_curso = $curso;
     }
@@ -70,9 +71,9 @@ class WeLearn_Cursos_Certificado extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $descricao
      */
-    public function setDescricao( $descricao )
+    public function setDescricao($descricao)
     {
-        $this->_descricao = (string) $descricao;
+        $this->_descricao = (string)$descricao;
     }
 
     /**
@@ -86,9 +87,9 @@ class WeLearn_Cursos_Certificado extends WeLearn_DTO_AbstractDTO {
     /**
      * @param int $id
      */
-    public function setId( $id )
+    public function setId($id)
     {
-        $this->_id = (int) $id;
+        $this->_id = (int)$id;
     }
 
     /**
@@ -102,9 +103,9 @@ class WeLearn_Cursos_Certificado extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $urlCertificado
      */
-    public function setUrlCertificado( $urlCertificado )
+    public function setUrlCertificado($urlCertificado)
     {
-        $this->_urlCertificado = (string) $urlCertificado;
+        $this->_urlCertificado = (string)$urlCertificado;
     }
 
     /**

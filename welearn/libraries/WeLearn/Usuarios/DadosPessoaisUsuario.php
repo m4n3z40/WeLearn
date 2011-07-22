@@ -3,15 +3,16 @@
  * Created by Allan Marques
  * Date: 21/07/11
  * Time: 14:04
- * 
+ *
  * Description:
  *
  */
 
 /**
- * 
+ *
  */
-class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO {
+class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO
+{
     /**
      * @var WeLearn_Usuarios_Usuario
      */
@@ -75,9 +76,9 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $cidade
      */
-    public function setCidade( $cidade )
+    public function setCidade($cidade)
     {
-        $this->_cidade = (string) $cidade;
+        $this->_cidade = (string)$cidade;
     }
 
     /**
@@ -91,9 +92,9 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $dataNascimento
      */
-    public function setDataNascimento( $dataNascimento )
+    public function setDataNascimento($dataNascimento)
     {
-        $this->_dataNascimento = (string) $dataNascimento;
+        $this->_dataNascimento = (string)$dataNascimento;
     }
 
     /**
@@ -107,9 +108,9 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $descricaoPessoal
      */
-    public function setDescricaoPessoal( $descricaoPessoal )
+    public function setDescricaoPessoal($descricaoPessoal)
     {
-        $this->_descricaoPessoal = (string) $descricaoPessoal;
+        $this->_descricaoPessoal = (string)$descricaoPessoal;
     }
 
     /**
@@ -123,9 +124,9 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $endereco
      */
-    public function setEndereco( $endereco )
+    public function setEndereco($endereco)
     {
-        $this->_endereco = (string) $endereco;
+        $this->_endereco = (string)$endereco;
     }
 
     /**
@@ -139,9 +140,9 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $homePage
      */
-    public function setHomePage( $homePage )
+    public function setHomePage($homePage)
     {
-        $this->_homePage = (string) $homePage;
+        $this->_homePage = (string)$homePage;
     }
 
     /**
@@ -155,7 +156,7 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param array $listaDeIM
      */
-    public function setListaDeIM( array $listaDeIM )
+    public function setListaDeIM(array $listaDeIM)
     {
         $this->_listaDeIM = $listaDeIM;
     }
@@ -171,7 +172,7 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param array $listaDeRS
      */
-    public function setListaDeRS( array $listaDeRS )
+    public function setListaDeRS(array $listaDeRS)
     {
         $this->_listaDeRS = $listaDeRS;
     }
@@ -187,9 +188,9 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $pais
      */
-    public function setPais( $pais )
+    public function setPais($pais)
     {
-        $this->_pais = (string) $pais;
+        $this->_pais = (string)$pais;
     }
 
     /**
@@ -203,9 +204,9 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $sexo
      */
-    public function setSexo( $sexo )
+    public function setSexo($sexo)
     {
-        $this->_sexo = (string) $sexo;
+        $this->_sexo = (string)$sexo;
     }
 
     /**
@@ -219,9 +220,9 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $tel
      */
-    public function setTel( $tel )
+    public function setTel($tel)
     {
-        $this->_tel = (string) $tel;
+        $this->_tel = (string)$tel;
     }
 
     /**
@@ -235,9 +236,9 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param string $telAlternativo
      */
-    public function setTelAlternativo( $telAlternativo )
+    public function setTelAlternativo($telAlternativo)
     {
-        $this->_telAlternativo = (string) $telAlternativo;
+        $this->_telAlternativo = (string)$telAlternativo;
     }
 
     /**
@@ -251,7 +252,7 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO {
     /**
      * @param \WeLearn_Usuarios_Usuario $usuario
      */
-    public function setUsuario( WeLearn_Usuarios_Usuario $usuario )
+    public function setUsuario(WeLearn_Usuarios_Usuario $usuario)
     {
         $this->_usuario = $usuario;
     }
