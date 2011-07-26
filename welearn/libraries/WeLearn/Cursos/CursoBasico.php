@@ -29,7 +29,7 @@ abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO
     /**
      * @var string
      */
-    protected $_desscricao;
+    protected $_descricao;
 
     /**
      * @var string
@@ -63,19 +63,19 @@ abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param string $desscricao
+     * @param string $descricao
      */
-    public function setDesscricao($desscricao)
+    public function setDescricao($descricao)
     {
-        $this->_desscricao = (string)$desscricao;
+        $this->_descricao = (string)$descricao;
     }
 
     /**
      * @return string
      */
-    public function getDesscricao()
+    public function getDescricao()
     {
-        return $this->_desscricao;
+        return $this->_descricao;
     }
 
     /**

@@ -8,7 +8,7 @@
  * Description:
  * PHPCassa Loader Class for Code Igniter.
  */
-class Phpcassa {
+class WL_Phpcassa {
     private $_connectionPool;
     private $_ci;
 

@@ -8,15 +8,20 @@
  * Description:
  * Loader Welearn para as classes da biblioteca WeLearn
  */
-class Welearn {
 
-    public function __construct( $classe = NULL )
-    {
-        //@TODO Desenvolver loader para as classes da biblioteca WeLearn
-    }
+define('LIBSPATH', APPPATH . 'libraries/');
 
-    public function load( $classe )
+require_once LIBSPATH.'/WeLearn/Base/AutoLoader.php';
+
+class WL_Welearn {
+
+    public function __construct()
     {
-        
+        try {
+            WeLearn_Base_AutoLoader::init(LIBSPATH);
+            log_message('debug', 'WeLearn autoloader iniciado com sucesso!');
+        } catch ( Exception $e ) {
+            log_message('error', $e->getMessage());
+        }
     }
 }
