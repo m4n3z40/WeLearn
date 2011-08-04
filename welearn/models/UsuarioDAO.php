@@ -75,6 +75,6 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     public function criarNovo(array $dados = null)
     {
-        // TODO: Implement criarNovo() method.
+        return new WeLearn_Usuarios_Usuario($dados);
     }
 }
