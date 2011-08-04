@@ -10,7 +10,6 @@
 
 class WeLearn_Cursos_ListaVisitas extends WeLearn_DTO_AbstractDTO
 {
-
     /**
      * @var string
      */
@@ -90,5 +89,21 @@ class WeLearn_Cursos_ListaVisitas extends WeLearn_DTO_AbstractDTO
     public function getVisitante()
     {
         return $this->_visitante;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'dataVisita' => $this->getDataVisita(),
+            'curso' => $this->getCurso()->toArray(),
+            'visitante' => $this->getVisitante()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

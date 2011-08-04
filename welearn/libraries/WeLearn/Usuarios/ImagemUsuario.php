@@ -19,15 +19,15 @@ class WeLearn_Usuarios_ImagemUsuario extends WeLearn_DTO_AbstractDTO
     private $_url;
 
     /**
-     * @var WeLearn_Usuarios_Usuario
+     * @var string
      */
-    private $_usuario;
+    private $_usuarioId;
 
-    public function __construct($url = '', WeLearn_Usuarios_Usuario $usuario = null)
+    public function __construct($url = '', $usuarioId = '')
     {
         $dados = array(
             'url' => $url,
-            'usuario' => $usuario
+            'usuarioId' => $usuario
         );
 
         parent::__construct($dados);
@@ -50,18 +50,33 @@ class WeLearn_Usuarios_ImagemUsuario extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param \WeLearn_Usuarios_Usuario $usuario
+     * @param string $usuarioId
      */
-    public function setUsuario(WeLearn_Usuarios_Usuario $usuario)
+    public function setUsuarioId($usuarioId)
     {
-        $this->_usuario = $usuario;
+        $this->_usuarioId = (string)$usuarioId;
     }
 
     /**
-     * @return \WeLearn_Usuarios_Usuario
+     * @return string
      */
-    public function getUsuario()
+    public function getUsuarioId()
     {
-        return $this->_usuario;
+        return $this->_usuarioId;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'url' => $this->getUrl(),
+            'usuarioId' => $this->getUsuarioId(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

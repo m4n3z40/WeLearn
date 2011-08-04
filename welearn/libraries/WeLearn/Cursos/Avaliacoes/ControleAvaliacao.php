@@ -10,6 +10,10 @@
 
 class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDTO
 {
+    /**
+     * @var string
+     */
+    private $_id;
 
     /**
      * @var string
@@ -86,6 +90,22 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
     public function getDataAplicacao()
     {
         return $this->_dataAplicacao;
+    }
+
+    /**
+     * @param string $id
+     */
+    public function setId($id)
+    {
+        $this->_id = (string)$id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->_id;
     }
 
     /**
@@ -272,5 +292,34 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
     {
         //@TODO: Implementar este método!!
     }
-}
 
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        $respostas = array();
+        if (!is_null($this->_respostas)) {
+            foreach ($this->getRespostas() as $resposta) {
+                $respostas[] = $resposta->toArray();
+            }
+        }
+
+        return array(
+            'id' => $this->getId(),
+            'dataAplicacao' => $this->getDataAplicacao(),
+            'tempoDecorrido' => $this->getTempoDecorrido(),
+            'nota' => $this->getNota(),
+            'qtdTentativas' => $this->getQtdTentativas(),
+            'avaliacao' => $this->getAvaliacao()->toArray(),
+            'participacaoCurso' => $this->getParticipacaoCurso()->toArray(),
+            'status' => $this->getStatus(),
+            'situacao' => $this->getSituacao(),
+            'respostas' => $resposta,
+            'persistido' => $this->isPersistido()
+        );
+    }
+}

@@ -24,42 +24,26 @@ class WeLearn_Usuarios_ListaDeRS extends WeLearn_DTO_AbstractDTO
     private $_redeSocial;
 
     /**
-     * @var WeLearn_Usuarios_DadosPessoaisUsuario
+     * @var string
      */
-    private $_dadosPessoais;
+    private $_usuarioId;
 
     /**
      * @param string $linkRS
      * @param null|WeLearn_Usuarios_RedeSocial $redeSocial
-     * @param null|WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais
+     * @param string $usuarioId
      */
     public function __construct($linkRS = '',
         WeLearn_Usuarios_RedeSocial $redeSocial = null,
-        WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais = null)
+        $usuarioId = '')
     {
         $dados = array(
             'linkRS' => $linkRS,
             'redeSocial' => $redeSocial,
-            'dadosPessoais' => $dadosPessoais
+            'usuarioId' => $usuarioId
         );
 
         parent::__construct($dados);
-    }
-
-    /**
-     * @param \WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais
-     */
-    public function setDadosPessoais(WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais)
-    {
-        $this->_dadosPessoais = $dadosPessoais;
-    }
-
-    /**
-     * @return \WeLearn_Usuarios_DadosPessoaisUsuario
-     */
-    public function getDadosPessoais()
-    {
-        return $this->_dadosPessoais;
     }
 
     /**
@@ -93,4 +77,38 @@ class WeLearn_Usuarios_ListaDeRS extends WeLearn_DTO_AbstractDTO
     {
         return $this->_redeSocial;
     }
+
+    /**
+     * @param string $usuarioId
+     */
+    public function setUsuarioId($usuarioId)
+    {
+        $this->_usuarioId = (string)$usuarioId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsuarioId()
+    {
+        return $this->_usuarioId;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'linkRS' => $this->getLinkRS(),
+            'redeSocial' => $this->getRedeSocial()->toArray(),
+            'usuarioId' => $this->getUsuarioId(),
+            'persistido' => $this->isPersistido()
+        );
+    }
+
+
 }

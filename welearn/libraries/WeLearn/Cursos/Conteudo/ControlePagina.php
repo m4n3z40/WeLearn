@@ -154,4 +154,21 @@ class WeLearn_Cursos_Conteudo_ControlePagina extends WeLearn_DTO_AbstractDTO
     {
         //@TODO: Implementar este método!!
     }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'tempoVisualizacao' => $this->getTempoVisualizacao(),
+            'participacaoCurso' => $this->getParticipacaoCurso()->toArray(),
+            'pagina' => $this->getPagina()->toArray(),
+            'status' => $this->getStatus(),
+            'persistido' => $this->isPersistido()
+        );
+    }
 }

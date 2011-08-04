@@ -10,45 +10,28 @@
 
 class WeLearn_Cursos_ImagemCurso extends WeLearn_DTO_AbstractDTO
 {
-
     /**
      * @var string
      */
     private $_url;
 
     /**
-     * @var WeLearn_Cursos_Curso
+     * @var string
      */
-    private $_curso;
+    private $_cursoId;
 
     /**
      * @param string $url
-     * @param null|WeLearn_Cursos_Curso $curso
+     * @param string $cursoId
      */
-    public function __construct($url = '', WeLearn_Cursos_Curso $curso = null)
+    public function __construct($url = '', $cursoId = '')
     {
         $dados = array(
             'url' => $url,
-            'curso' => $curso
+            'cursoId' => $cursoId
         );
 
         parent::__construct($dados);
-    }
-
-    /**
-     * @param \WeLearn_Cursos_Curso $curso
-     */
-    public function setCurso(WeLearn_Cursos_Curso $curso)
-    {
-        $this->_curso = $curso;
-    }
-
-    /**
-     * @return \WeLearn_Cursos_Curso
-     */
-    public function getCurso()
-    {
-        return $this->_curso;
     }
 
     /**
@@ -65,5 +48,36 @@ class WeLearn_Cursos_ImagemCurso extends WeLearn_DTO_AbstractDTO
     public function getUrl()
     {
         return $this->_url;
+    }
+
+    /**
+     * @param string $cursoId
+     */
+    public function setCursoId($cursoId)
+    {
+        $this->_cursoId = $cursoId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCursoId()
+    {
+        return $this->_cursoId;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'url' => $this->getUrl(),
+            'cursoId' => $this->getCursoId(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

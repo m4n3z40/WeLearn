@@ -10,7 +10,6 @@
 
 class WeLearn_Cursos_ListaBanidos extends WeLearn_DTO_AbstractDTO
 {
-
     /**
      * @var string
      */
@@ -90,5 +89,21 @@ class WeLearn_Cursos_ListaBanidos extends WeLearn_DTO_AbstractDTO
     public function getDataInclusao()
     {
         return $this->_dataInclusao;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'dataInclusao' => $this->getDataInclusao(),
+            'curso' => $this->getCurso()->toArray(),
+            'banido' => $this->getBanido()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

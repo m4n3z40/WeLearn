@@ -12,9 +12,9 @@ class WeLearn_Cursos_ConfiguracaoCurso extends WeLearn_DTO_AbstractDTO
 {
 
     /**
-     * @var WeLearn_Cursos_Curso
+     * @var string
      */
-    private $_curso;
+    private $_cursoId;
 
     /**
      * @var int
@@ -35,22 +35,6 @@ class WeLearn_Cursos_ConfiguracaoCurso extends WeLearn_DTO_AbstractDTO
      * @var int
      */
     private $_permissaoCriacaoForum;
-
-    /**
-     * @param \WeLearn_Cursos_Curso $curso
-     */
-    public function setCurso(WeLearn_Cursos_Curso $curso)
-    {
-        $this->_curso = $curso;
-    }
-
-    /**
-     * @return \WeLearn_Cursos_Curso
-     */
-    public function getCurso()
-    {
-        return $this->_curso;
-    }
 
     /**
      * @param int $permissaoCriacaoEnquete
@@ -114,5 +98,39 @@ class WeLearn_Cursos_ConfiguracaoCurso extends WeLearn_DTO_AbstractDTO
     public function getPrivacidadeInscricao()
     {
         return $this->_privacidadeInscricao;
+    }
+
+    /**
+     * @param string $cursoId
+     */
+    public function setCursoId($cursoId)
+    {
+        $this->_cursoId = (string)$cursoId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCursoId()
+    {
+        return $this->_cursoId;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'cursoId' => $this->getCursoId(),
+            'privacidadeConteudo' => $this->getPrivacidadeConteudo(),
+            'privacidadeInscricao' => $this->getPrivacidadeInscricao(),
+            'permissaoCriacaoEnquete' => $this->getPermissaoCriacaoEnquete(),
+            'permissaoCriacaoForum' => $this->getPermissaoCriacaoForum(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

@@ -66,4 +66,19 @@ class WeLearn_Usuarios_SugestaoBloqueada extends WeLearn_DTO_AbstractDTO
     {
         return $this->_dono;
     }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'dono' => $this->getDono(),
+            'bloqueado' => $this->getBloqueado(),
+            'persistido' => $this->isPersistido()
+        );
+    }
 }

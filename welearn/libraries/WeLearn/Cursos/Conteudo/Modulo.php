@@ -37,6 +37,11 @@ class WeLearn_Cursos_Conteudo_Modulo extends WeLearn_DTO_AbstractDTO
     private $_nroOrdem;
 
     /**
+     * @var WeLearn_Cursos_Curso
+     */
+    private $_curso;
+
+    /**
      * @param string $descricao
      */
     public function setDescricao($descricao)
@@ -114,5 +119,40 @@ class WeLearn_Cursos_Conteudo_Modulo extends WeLearn_DTO_AbstractDTO
     public function getObjetivos()
     {
         return $this->_objetivos;
+    }
+
+    /**
+     * @param \WeLearn_Cursos_Curso $curso
+     */
+    public function setCurso($curso)
+    {
+        $this->_curso = $curso;
+    }
+
+    /**
+     * @return \WeLearn_Cursos_Curso
+     */
+    public function getCurso()
+    {
+        return $this->_curso;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'descricao' => $this->getDescricao(),
+            'objetivos' => $this->getObjetivos(),
+            'nroOrdem' => $this->getNroOrdem(),
+            'curso' => $this->getCurso()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

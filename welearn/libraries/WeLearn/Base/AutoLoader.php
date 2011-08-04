@@ -73,9 +73,20 @@ abstract class WeLearn_Base_AutoLoader
                 . DIRECTORY_SEPARATOR
             );
         }
-        self::$_loader = WeLearn_Base_Loader::getInstance();
+        self::$_loader =& WeLearn_Base_Loader::getInstance();
         self::$_loader->addIncludePath($includePath);
         return self::registerAutoLoader(__CLASS__.'::Autoload');
+    }
+
+    /**
+     * Returns true if the Autoloader has already been initiated and false otherwise.
+     *
+     * @static
+     * @return bool
+     */
+    public static function hasInitiated()
+    {
+        return !is_null(self::$_loader);
     }
 
     /**
@@ -88,7 +99,7 @@ abstract class WeLearn_Base_AutoLoader
      */
     public static function Autoload($className)
     {
-        if(!is_null(self::$_loader))
+        if(self::hasInitiated())
             return self::$_loader->loadClass($className);
         else
             throw new WeLearn_Base_LoaderNaoIniciadoException();

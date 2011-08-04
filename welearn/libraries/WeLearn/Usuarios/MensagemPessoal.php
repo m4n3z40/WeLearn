@@ -152,4 +152,23 @@ class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO
     {
         //TODO: Implementar este método!
     }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'id' => $this->getId(),
+            'mensagem' => $this->getMensagem(),
+            'dataEnvio' => $this->getDataEnvio(),
+            'remetente' => $this->getRemetente()->toArray(),
+            'destinatario' => $this->getDestinatario()->toArray(),
+            'status' => $this->getStatus(),
+            'persistido' => $this->isPersistido()
+        );
+    }
 }

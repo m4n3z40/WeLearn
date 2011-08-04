@@ -10,7 +10,6 @@
 
 class WeLearn_Cursos_Avaliacoes_Avaliacao extends WeLearn_DTO_AbstractDTO
 {
-
     /**
      * @var int
      */
@@ -219,5 +218,35 @@ class WeLearn_Cursos_Avaliacoes_Avaliacao extends WeLearn_DTO_AbstractDTO
     public function getTempoDuracaoMax()
     {
         return $this->_tempoDuracaoMax;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        $questoes = array();
+        if (!is_null($this->_questoes)) {
+            foreach ($this->getQuestoes() as $questao) {
+                $questoes[] = $questao->toArray();
+            }
+        }
+
+        return array(
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'qtdQuestoes' => $this->getQtdQuestoes(),
+            'qtdQuestoesExibir' => $this->getQtdQuestoesExibir(),
+            'notaMinima' => $this->getNotaMinima(),
+            'tempoDuracaoMax' => $this->getTempoDuracaoMax(),
+            'qtdTentativasPermitidas' => $this->getQtdTentativasPermitidas(),
+            'nroOrdem' => $this->getNroOrdem(),
+            'modulo' => $this->getModulo()->toArray(),
+            'questoes' => $questoes,
+            'persistido' => $this->isPersistido()
+        );
     }
 }

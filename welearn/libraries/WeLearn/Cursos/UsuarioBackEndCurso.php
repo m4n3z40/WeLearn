@@ -10,7 +10,6 @@
 
 class WeLearn_Cursos_UsuarioBackEndCurso extends WeLearn_DTO_AbstractDTO
 {
-
     /**
      * @var string
      */
@@ -22,7 +21,7 @@ class WeLearn_Cursos_UsuarioBackEndCurso extends WeLearn_DTO_AbstractDTO
     private $_nivelAcesso;
 
     /**
-     * @var WeLearn_Usuario_UsuarioBackEnd
+     * @var WeLearn_Usuarios_UsuarioBackEnd
      */
     private $_usuarioBackEnd;
 
@@ -34,12 +33,12 @@ class WeLearn_Cursos_UsuarioBackEndCurso extends WeLearn_DTO_AbstractDTO
     /**
      * @param string $membroDesde
      * @param int $nivelAcesso
-     * @param null|WeLearn_Usuario_UsuarioBackEnd $usuarioBackEnd
+     * @param null|WeLearn_Usuarios_UsuarioBackEnd $usuarioBackEnd
      * @param null|WeLearn_Cursos_Curso $curso
      */
     public function __construct($membroDesde = '',
         $nivelAcesso = WeLearn_Usuarios_NivelAcesso::MODERADOR,
-        WeLearn_Usuario_UsuarioBackEnd $usuarioBackEnd = null,
+        WeLearn_Usuarios_UsuarioBackEnd $usuarioBackEnd = null,
         WeLearn_Cursos_Curso $curso = null)
     {
         $dados = array(
@@ -101,18 +100,35 @@ class WeLearn_Cursos_UsuarioBackEndCurso extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param \WeLearn_Usuario_UsuarioBackEnd $usuarioBackEnd
+     * @param \WeLearn_Usuarios_UsuarioBackEnd $usuarioBackEnd
      */
-    public function setUsuarioBackEnd(WeLearn_Usuario_UsuarioBackEnd $usuarioBackEnd)
+    public function setUsuarioBackEnd(WeLearn_Usuarios_UsuarioBackEnd $usuarioBackEnd)
     {
         $this->_usuarioBackEnd = $usuarioBackEnd;
     }
 
     /**
-     * @return \WeLearn_Usuario_UsuarioBackEnd
+     * @return \WeLearn_Usuarios_UsuarioBackEnd
      */
     public function getUsuarioBackEnd()
     {
         return $this->_usuarioBackEnd;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'menbroDesde' => $this->getMembroDesde(),
+            'nivelAcesso' => $this->getNivelAcesso(),
+            'usuarioBackEnd' => $this->getUsuarioBackEnd()->toArray(),
+            'curso' => $this->getCurso()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

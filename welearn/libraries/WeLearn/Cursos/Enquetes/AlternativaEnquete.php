@@ -21,9 +21,9 @@ class WeLearn_Cursos_Enquetes_AlternativaEnquete extends WeLearn_DTO_AbstractDTO
     private $_txtAlternativa;
 
     /**
-     * @var WeLearn_Cursos_Enquetes_Enquete
+     * @var string
      */
-    private $_enquete;
+    private $_enqueteId;
 
     /**
      * @var int
@@ -33,33 +33,33 @@ class WeLearn_Cursos_Enquetes_AlternativaEnquete extends WeLearn_DTO_AbstractDTO
     /**
      * @param int $id
      * @param string $txtAlternativa
-     * @param null|WeLearn_Cursos_Enquetes_ $enquete
+     * @param string_ $enqueteId
      */
-    public function __construct($id = 0, $txtAlternativa = '', WeLearn_Cursos_Enquetes_ $enquete = null)
+    public function __construct($id = 0, $txtAlternativa = '', $enqueteId = null)
     {
         $dados = array(
             'id' => $id,
             'txtAlternativa' => $txtAlternativa,
-            'enquete' => $enquete
+            'enqueteId' => $enqueteId
         );
 
         parent::__construct($dados);
     }
 
     /**
-     * @param \WeLearn_Cursos_Enquetes_Enquete $enquete
+     * @param string $enqueteId
      */
-    public function setEnquete(WeLearn_Cursos_Enquetes_Enquete $enquete)
+    public function setEnqueteId($enqueteId)
     {
-        $this->_enquete = $enquete;
+        $this->_enqueteId = $enqueteId;
     }
 
     /**
-     * @return \WeLearn_Cursos_Enquetes_Enquete
+     * @return string
      */
-    public function getEnquete()
+    public function getEnqueteId()
     {
-        return $this->_enquete;
+        return $this->_enqueteId;
     }
 
     /**
@@ -108,5 +108,22 @@ class WeLearn_Cursos_Enquetes_AlternativaEnquete extends WeLearn_DTO_AbstractDTO
     public function recuperarQtdTotalVotos()
     {
         //@TODO: Implementar este método!!
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'id' => $this->getId(),
+            'txtAlternativa' => $this->getTxtAlternativa(),
+            'enqueteId' => $this->getEnqueteId(),
+            'totalVotos' => $this->getTotalVotos(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

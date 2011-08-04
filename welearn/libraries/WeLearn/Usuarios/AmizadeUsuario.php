@@ -147,4 +147,21 @@ class WeLearn_Usuarios_AmizadeUsuario extends WeLearn_DTO_AbstractDTO
     {
         //TODO: Implementar este método!
     }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'usuario' => $this->getUsuario()->toArray(),
+            'amigo' => $this->getAmigo()->toArray(),
+            'comecouEm' => $this->getComecouEm(),
+            'status' => $this->getStatus(),
+            'persistido' => $this->isPersistido()
+        );
+    }
 }

@@ -14,7 +14,7 @@
 class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var int
+     * @var string
      */
     private $_id;
 
@@ -149,15 +149,15 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param int $id
+     * @param string $id
      */
     public function setId($id)
     {
-        $this->_id = (int)$id;
+        $this->_id = (string)$id;
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
@@ -242,5 +242,29 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
     public function getSobrenome()
     {
         return $this->_sobrenome;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'sobrenome' => $this->getSobrenome(),
+            'email' => $this->getEmail(),
+            'senha' => $this-> getSenha(),
+            'dataCadastro' => $this->getDataCadastro(),
+            'imagem' => $this->getImagem(),
+            'dadosPessoais' => $this->getDadosPessoais()->toArray(),
+            'dadosProfissionais' => $this->getDadosProfissionais()->toArray(),
+            'segmentoInteresse' => $this->getSegmentoInteresse()->toArray(),
+            'configuracao' => $this->getConfiguracao()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

@@ -24,42 +24,26 @@ class WeLearn_Usuarios_ListaDeIM extends WeLearn_DTO_AbstractDTO
     private $_messenger;
 
     /**
-     * @var WeLearn_Usuarios_DadosPessoaisUsuario
+     * @var string
      */
-    private $_dadosPessoais;
+    private $_usuarioId;
 
     /**
      * @param string $idIM
      * @param null|WeLearn_Usuarios_InstantMessenger $messenger
-     * @param null|WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais
+     * @param string $usuarioId
      */
     public function __construct($idIM = '',
         WeLearn_Usuarios_InstantMessenger $messenger = null,
-        WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais = null)
+        $usuarioId = '')
     {
         $dados = array(
             'idIM' => $idIM,
             'messenger' => $messenger,
-            'dadosPessoais' => $dadosPessoais
+            'usuarioId' => $usuarioId
         );
 
         parent::__construct($dados);
-    }
-
-    /**
-     * @param \WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais
-     */
-    public function setDadosPessoais(WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais)
-    {
-        $this->_dadosPessoais = $dadosPessoais;
-    }
-
-    /**
-     * @return \WeLearn_Usuarios_DadosPessoaisUsuario
-     */
-    public function getDadosPessoais()
-    {
-        return $this->_dadosPessoais;
     }
 
     /**
@@ -93,4 +77,38 @@ class WeLearn_Usuarios_ListaDeIM extends WeLearn_DTO_AbstractDTO
     {
         return $this->_messenger;
     }
+
+    /**
+     * @param string $usuarioId
+     */
+    public function setUsuarioId($usuarioId)
+    {
+        $this->_usuarioId = (string)$usuarioId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsuarioId()
+    {
+        return $this->_usuarioId;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'idIM' => $this->getIdIM(),
+            'messenger' => $this->getMessenger()->toArray(),
+            'usuarioId' => $this->getUsuarioId(),
+            'persistido' => $this->isPersistido()
+        );
+    }
+
+
 }

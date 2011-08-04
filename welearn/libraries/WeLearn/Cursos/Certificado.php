@@ -115,4 +115,22 @@ class WeLearn_Cursos_Certificado extends WeLearn_DTO_AbstractDTO
     {
         return $this->_urlCertificado;
     }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'id' => $this->getId(),
+            'descricao' => $this->getDescricao(),
+            'urlCertificado' => $this->getUrlCertificado(),
+            'ativo' => $this->isAtivo(),
+            'curso' => $this->getCurso()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
+    }
 }

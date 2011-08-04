@@ -8,9 +8,9 @@
  *
  */
 
-require_once LIBSPATH.'WeLearn/Base/ClasseNaoEncontradaException.php';
-require_once LIBSPATH.'WeLearn/Base/IncludePathInexistenteException.php';
-require_once LIBSPATH.'WeLearn/Base/ParametroInvalidoException.php';
+require_once LIBSPATH . 'WeLearn/Base/ClasseNaoEncontradaException.php';
+require_once LIBSPATH . 'WeLearn/Base/IncludePathInexistenteException.php';
+require_once LIBSPATH . 'WeLearn/Base/ParametroInvalidoException.php';
 
 /**
  * @throws WeLearn_Base_ClasseNaoEncontradaException|WeLearn_Base_IncludePathInexistenteException|WeLearn_Base_ParametroInvalidoException
@@ -63,7 +63,7 @@ class WeLearn_Base_Loader
      */
     private function __wakeup()
     {
-        
+
     }
 
     /**
@@ -72,7 +72,7 @@ class WeLearn_Base_Loader
      * @static
      * @return null|WeLearn_Base_Loader
      */
-    public static function getInstance()
+    public static function &getInstance()
     {
         if (is_null(self::$_instance)) {
             $className = __CLASS__;
@@ -90,11 +90,19 @@ class WeLearn_Base_Loader
      */
     public function fileExists($file)
     {
+        if (substr($file, 0, 1) === DIRECTORY_SEPARATOR) {
+            if (file_exists($file))
+                return true;
+
+            $file = ltrim($file, DIRECTORY_SEPARATOR);
+        }
+
         foreach ($this->_includePaths as $aPath) {
-            $fullFilePath = $aPath.DIRECTORY_SEPARATOR.$file;
+            $fullFilePath = $aPath . DIRECTORY_SEPARATOR . $file;
             if (file_exists($fullFilePath))
                 return true;
         }
+
         return false;
     }
 
@@ -109,13 +117,13 @@ class WeLearn_Base_Loader
     {
         $className = (string)$className;
         $pathAndFile = str_replace($this->_namespaceSeparator, DIRECTORY_SEPARATOR, $className)
-                       .$this->_fileSuffix;
+                       . $this->_fileSuffix;
 
-        if($this->fileExists($pathAndFile)) {
+        if ($this->fileExists($pathAndFile)) {
             require_once $pathAndFile;
 
             if (class_exists($className) || interface_exists($className)) {
-               return true;
+                return true;
             } else {
                 throw new WeLearn_Base_ClasseNaoEncontradaException($className);
             }
@@ -142,19 +150,19 @@ class WeLearn_Base_Loader
             }
         } elseif (is_string($path)) {
             $path = rtrim($path, PATH_SEPARATOR);
-            
+
             if (is_dir($path)) {
                 if (!in_array($path, $this->_includePaths)) {
                     $this->_includePaths[] = $path;
                 }
-                
+
                 $atLeastOneAdded = true;
             } else {
                 throw new WeLearn_Base_IncludePathInexistenteException($path);
             }
         }
 
-        if($atLeastOneAdded) {
+        if ($atLeastOneAdded) {
             $this->_registerIncludePaths();
             return;
         }
@@ -221,7 +229,7 @@ class WeLearn_Base_Loader
      */
     public function showIncludePaths()
     {
-        echo '<pre>'.print_r($this->_includePaths).'</pre>';
+        echo '<pre>' . print_r($this->_includePaths) . '</pre>';
     }
 
     /**

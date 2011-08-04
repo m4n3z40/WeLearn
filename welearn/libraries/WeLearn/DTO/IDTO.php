@@ -13,7 +13,6 @@
  */
 interface WeLearn_DTO_IDTO
 {
-
     /**
      * Retorna se o Data Transfer Object já foi persistido ou não no Banco de Dados.
      *
@@ -29,4 +28,21 @@ interface WeLearn_DTO_IDTO
      * @return void
      */
     public function setPersistido($persistido);
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @abstract
+     * @return array
+     */
+    public function toArray();
+
+    /**
+     * Converte os dados das propriedades do objeto para uma string representando
+     * um objeto JSON.
+     *
+     * @return string
+     */
+    public function toJSON();
 }

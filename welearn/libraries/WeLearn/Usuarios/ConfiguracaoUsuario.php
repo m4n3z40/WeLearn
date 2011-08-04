@@ -11,9 +11,9 @@
 class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var WeLearn_Usuarios_Usuario
+     * @var string
      */
-    private $_usuario;
+    private $_usuarioId;
 
     /**
      * @var int
@@ -147,22 +147,6 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param \WeLearn_Usuarios_Usuario $usuario
-     */
-    public function setUsuario(WeLearn_Usuarios_Usuario $usuario)
-    {
-        $this->_usuario = $usuario;
-    }
-
-    /**
-     * @return \WeLearn_Usuarios_Usuario
-     */
-    public function getUsuario()
-    {
-        return $this->_usuario;
-    }
-
-    /**
      * @param array $notificacoesHabilitadas
      */
     public function setNotificacoesHabilitadas(array $notificacoesHabilitadas)
@@ -176,5 +160,36 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO
     public function getNotificacoesHabilitadas()
     {
         return $this->_notificacoesHabilitadas;
+    }
+
+    /**
+     * @param string $usuarioId
+     */
+    public function setUsuarioId($usuarioId)
+    {
+        $this->_usuarioId = (string)$usuarioId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsuarioId()
+    {
+        return $this->_usuarioId;
+    }
+
+    public function toArray()
+    {
+        return array(
+            'usuarioId' => $this->getUsuarioId(),
+            'privacidadePerfil' => $this->getPrivacidadePerfil(),
+            'privacidadeMP' => $this->getPrivacidadeMP(),
+            'privacidadeConvites' => $this->getPrivacidadeConvites(),
+            'privacidadeCompartilhamento' => $this->getPrivacidadeCompartilhamento(),
+            'statusCompartilhamento' => $this->getStatusCompartilhamento(),
+            'privacidadeNotificacoes' => $this->getPrivacidadeConvites(),
+            'notificacoesHabilitadas' => $this->getNotificacoesHabilitadas(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

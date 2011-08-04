@@ -267,4 +267,35 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
     {
         //@TODO: Implementar este método!!
     }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        $alternativas = array();
+        if (!is_null($this->_alternativas)) {
+            foreach ($this->getAlternativas() as $alternativa) {
+                $alternativas[] = $alternativa->toArray();
+            }
+        }
+
+        return array(
+            'id' => $this->getId(),
+            'questao' => $this->getQuestao(),
+            'qtdAlternativas' => $this->getQtdAlternativas(),
+            'dataCriacao' => $this->getDataCriacao(),
+            'dataExpiracao' => $this->getDataExpiracao(),
+            'curso' => $this->getCurso()->toArray(),
+            'criador' => $this->getCriador()->toArray(),
+            'status' => $this->getStatus(),
+            'situacao' => $this->getSituacao(),
+            'alternativas' => $alternativas,
+            'totalVotos' => $this->getTotalVotos(),
+            'persistido' => $this->isPersistido()
+        );
+    }
 }

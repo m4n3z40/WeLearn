@@ -10,7 +10,6 @@
 
 class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
 {
-
     /**
      * @var string
      */
@@ -232,5 +231,27 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
     public function recusarInscricao()
     {
         //@TODO: implementar este médodo!!
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'dataInscricao' => $this->getDataInscricao(),
+            'frequenciaTotal' => $this->getFrequenciaTotal(),
+            'dataUltimoAcesso' => $this->getDataUltimoAcesso(),
+            'crFinal' => $this->getCrFinal(),
+            'curso' => $this->getCurso()->toArray(),
+            'aluno' => $this->getAluno()->toArray(),
+            'certificado' => (is_null($this->_certificado)) ? '' : $this->getCertificado()->toArray(),
+            'situacao' => $this->getSituacao(),
+            'paginaAtual' => (is_null($this->_paginaAtual)) ? '' : $this->getPaginaAtual()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

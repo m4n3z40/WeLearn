@@ -13,11 +13,10 @@
  */
 class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
 {
-
     /**
-     * @var WeLearn_Usuarios_Usuario
+     * @var string
      */
-    private $_usuario;
+    private $_usuarioId;
 
     /**
      * @var string
@@ -328,19 +327,40 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param WeLearn_Usuarios_Usuario $usuario
-     * @return void
+     * @param string $usuarioId
      */
-    public function setUsuario(WeLearn_Usuarios_Usuario $usuario)
+    public function setUsuarioId($usuarioId)
     {
-        $this->_usuario = $usuario;
+        $this->_usuarioId = (string)$usuarioId;
     }
 
     /**
-     * @return WeLearn_Usuarios_Usuario
+     * @return string
      */
-    public function getUsuario()
+    public function getUsuarioId()
     {
-        return $this->_usuario;
+        return $this->_usuarioId;
+    }
+
+    public function toArray()
+    {
+        return array(
+            'usuarioId' => $this->getUsuarioId(),
+            'escolaridade' => $this->getEscolaridade(),
+            'escola' => $this->getEscola(),
+            'faculdade' => $this->getFaculdade(),
+            'curso' => $this->getCurso(),
+            'diploma' => $this->getDiploma(),
+            'ano' => $this->getAno(),
+            'profissao' => $this->getProfissao(),
+            'empresa' => $this->getEmpresa(),
+            'siteEmpresa' => $this->getSiteEmpresa(),
+            'cargo' => $this->getCargo(),
+            'descricaoTrabalho' => $this->getDescricaoTrabalho(),
+            'habilidadesProfissionais' => $this->getHabilidadesProfissionais(),
+            'interessesProfissionais' => $this->getInteressesProfissionais(),
+            'segmentoTrabalho' => $this->getSegmentoTrabalho()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

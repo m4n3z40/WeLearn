@@ -14,9 +14,9 @@
 class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var WeLearn_Usuarios_Usuario
+     * @var string
      */
-    private $_usuario;
+    private $_usuarioId;
 
     /**
      * @var string
@@ -250,18 +250,47 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param \WeLearn_Usuarios_Usuario $usuario
+     * @param string $usuarioId
      */
-    public function setUsuario(WeLearn_Usuarios_Usuario $usuario)
+    public function setUsuarioId($usuarioId)
     {
-        $this->_usuario = $usuario;
+        $this->_usuarioId = (string)$usuarioId;
     }
 
     /**
-     * @return \WeLearn_Usuarios_Usuario
+     * @return string
      */
-    public function getUsuario()
+    public function getUsuarioId()
     {
-        return $this->_usuario;
+        return $this->_usuarioId;
+    }
+
+    public function toArray()
+    {
+        $listaDeIM = array();
+        foreach ($this->getListaDeIM() as $IM) {
+            $listaDeIM[] = $IM->toArray();
+        }
+
+        $listaDeRS = array();
+        foreach ($this->getListaDeRS() as $RS) {
+            $listaDeRS[] = $RS->toArray();
+        }
+
+        return array(
+            'usuarioId' => $this->getUsuarioId(),
+            'sexo' => $this->getSexo(),
+            'pais' => $this->getPais(),
+            'cidade' => $this->getCidade(),
+            'endereco' => $this->getEndereco(),
+            'dataNascimento' => $this->getDataNascimento(),
+            'tel' => $this->getTel(),
+            'telAlternativo' => $this->getTelAlternativo(),
+            'descricaoPessoal' => $this->getDescricaoPessoal(),
+            'homePage' => $this->getHomePage(),
+            'listaDeIM' => $this->getListaDeIM(),
+            'listaDeRS' => $this->getListaDeRS(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

@@ -15,7 +15,7 @@ interface WeLearn_Base_IEnum
 {
 
     /**
-     * Retorna a descrição do Enum passado por parametru.
+     * Retorna a descrição do Enum passado por parametro.
      *
      * @abstract
      * @param $codigo int Codigo da descrição do Enum a ser retornada.

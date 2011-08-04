@@ -219,4 +219,34 @@ class WeLearn_Cursos_Conteudo_Comentario extends WeLearn_DTO_AbstractDTO
     {
         return $this->_txtComentario;
     }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        $respostas = array();
+        if (!is_null($this->_respostas)) {
+            foreach ($respostas as $resposta) {
+                $respostas[] = $resposta->toArray();
+            }
+        }
+
+        return array(
+            'id' => $this->getId(),
+            'assunto' => $this->getAssunto(),
+            'txtComentario' => $this->getTxtComentario(),
+            'dataEnvio' => $this->getDataEnvio(),
+            'dataAlteracao' => $this->getDataAlteracao(),
+            'aula' => is_null($this->_aula) ? '' : $this->getAula()->toArray(),
+            'pagina' => is_null($this->_pagina) ? '' : $this->getPagina()->toArray(),
+            'criador' => $this->getCriador()->toArray(),
+            'respostaDe' => $this->getRespostaDe()->getId(),
+            'respostas' => $respostas,
+            'persistido' => $this->isPersistido()
+        );
+    }
 }

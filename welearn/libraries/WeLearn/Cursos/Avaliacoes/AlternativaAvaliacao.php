@@ -10,7 +10,6 @@
 
 class WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao extends WeLearn_DTO_AbstractDTO
 {
-
     /**
      * @var int
      */
@@ -27,9 +26,9 @@ class WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao extends WeLearn_DTO_Abstrac
     private $_txtAlternativa;
 
     /**
-     * @var WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao
+     * @var string
      */
-    private $_questao;
+    private $_questaoId;
 
     /**
      * @param int $id
@@ -37,16 +36,13 @@ class WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao extends WeLearn_DTO_Abstrac
      * @param string $txtAlternativa
      * @param null|WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao $questao
      */
-    public function __construct($id = 0,
-        $correta = false,
-        $txtAlternativa = '',
-        WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao $questao = null)
+    public function __construct($id = 0, $correta = false, $txtAlternativa = '', $questaoId = '')
     {
         $dados = array(
             'id' => $id,
             'correta' => $correta,
             'txtAlternativa' => $txtAlternativa,
-            'questao' => $questao
+            'questaoId' => $questaoId
         );
 
         parent::__construct($dados);
@@ -85,22 +81,6 @@ class WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao extends WeLearn_DTO_Abstrac
     }
 
     /**
-     * @param \WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao $questao
-     */
-    public function setQuestao(WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao $questao)
-    {
-        $this->_questao = $questao;
-    }
-
-    /**
-     * @return \WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao
-     */
-    public function getQuestao()
-    {
-        return $this->_questao;
-    }
-
-    /**
      * @param string $txtAlternativa
      */
     public function setTxtAlternativa($txtAlternativa)
@@ -114,5 +94,38 @@ class WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao extends WeLearn_DTO_Abstrac
     public function getTxtAlternativa()
     {
         return $this->_txtAlternativa;
+    }
+
+    /**
+     * @param string $questaoId
+     */
+    public function setQuestaoId($questaoId)
+    {
+        $this->_questaoId = (string)$questaoId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getQuestaoId()
+    {
+        return $this->_questaoId;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'id' => $this->getId(),
+            'correta' => $this->isCorreta(),
+            'txtAlternativa' => $this->getTxtAlternativa(),
+            'questaoId' => $this->getQuestaoId(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

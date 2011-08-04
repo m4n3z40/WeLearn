@@ -48,11 +48,6 @@ class WeLearn_Cursos_Recursos_Recurso extends WeLearn_DTO_AbstractDTO
     /**
      * @var int
      */
-    private $_totalRecursos;
-
-    /**
-     * @var int
-     */
     private $_tipo;
 
     /**
@@ -168,14 +163,6 @@ class WeLearn_Cursos_Recursos_Recurso extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @return int
-     */
-    public function getTotalRecursos()
-    {
-        return $this->_totalRecursos;
-    }
-
-    /**
      * @param string $urlArquivo
      */
     public function setUrlArquivo($urlArquivo)
@@ -192,7 +179,7 @@ class WeLearn_Cursos_Recursos_Recurso extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @return void
+     * @return int
      */
     public function recuperarQtdTotalRecursos()
     {
@@ -206,5 +193,26 @@ class WeLearn_Cursos_Recursos_Recurso extends WeLearn_DTO_AbstractDTO
     public function isVisualizavel(array $dadosNavegador)
     {
         //@TODO: Implementar este método!
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'descricao' => $this->getDescricao(),
+            'dataInclusao' => $this->getDataInclusao(),
+            'urlArquivo' => $this->getUrlArquivo(),
+            'criador' => $this->getCriador()->toArray(),
+            'aula' => $this->getAula()->toArray(),
+            'tipo' => $this->getTipo(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

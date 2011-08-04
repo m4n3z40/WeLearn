@@ -114,4 +114,21 @@ class WeLearn_Cursos_Enquetes_VotoEnquete extends WeLearn_DTO_AbstractDTO
     {
         return $this->_votante;
     }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'dataVoto' => $this->getDataVoto(),
+            'enquete' => $this->getEnquete()->toArray(),
+            'votante' => $this->getVotante()->toArray(),
+            'alternativa' => $this->getAlternativa()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
+    }
 }

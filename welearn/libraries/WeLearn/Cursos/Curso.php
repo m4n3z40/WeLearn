@@ -10,7 +10,6 @@
 
 class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
 {
-
     /**
      * @var string
      */
@@ -162,5 +161,24 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
     public function alterarOpcoesForum(array $opcoes)
     {
         //@TODO: Implementar este método!!
+    }
+
+    public function toArray()
+    {
+        $selfArray = parent::toArray();
+
+        $selfArray = array_merge(
+            $selfArray,
+            array(
+                'objetivos' => $this->getObjetivos(),
+                'conteudoProposto' => $this->getConteudoProposto(),
+                'tempoDuracaoMax' => $this->getTempoDuracaoMax(),
+                'criador' => $this->getCriador()->toArray(),
+                'imagem' => $this->getImagem()->toArray(),
+                'configuracao' => $this->getConfiguracao()->toArray()
+            )
+        );
+        
+        return $selfArray;
     }
 }

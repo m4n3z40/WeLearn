@@ -135,4 +135,23 @@ class WeLearn_Cursos_Foruns_Categoria extends WeLearn_DTO_AbstractDTO
     {
         return $this->_nome;
     }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'descricao' => $this->getDescricao(),
+            'dataCriacao' => $this->getDataCriacao(),
+            'criador' => $this->getCriador()->toArray(),
+            'curso' => $this->getCurso()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
+    }
 }

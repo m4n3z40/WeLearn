@@ -13,7 +13,6 @@
  */
 class WeLearn_Cursos_Segmento extends WeLearn_DTO_AbstractDTO
 {
-
     /**
      * @var int
      */
@@ -94,5 +93,21 @@ class WeLearn_Cursos_Segmento extends WeLearn_DTO_AbstractDTO
     public function getArea()
     {
         return $this->_area;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'id' => $this->getId(),
+            'descricao' => $this->getDescricao(),
+            'area' => $this->getArea()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

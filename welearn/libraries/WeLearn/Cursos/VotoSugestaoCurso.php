@@ -10,7 +10,6 @@
 
 class WeLearn_Cursos_VotoSugestaoCurso extends WeLearn_DTO_AbstractDTO
 {
-
     /**
      * @var string
      */
@@ -90,5 +89,21 @@ class WeLearn_Cursos_VotoSugestaoCurso extends WeLearn_DTO_AbstractDTO
     public function getVotante()
     {
         return $this->_votante;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'dataVoto' => $this->getDataVoto(),
+            'votante' => $this->getVotante()->toArray(),
+            'sugestaoCurso' => $this->getSugestaoCurso()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }

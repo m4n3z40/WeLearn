@@ -30,6 +30,29 @@ abstract class WeLearn_DTO_AbstractDTO implements WeLearn_DTO_IDTO
         $this->preencherPropriedades($dados);
     }
 
+    function __get($name)
+    {
+        $prefixos = array('is', 'get');
+        $nome = ucfirst($name);
+
+        foreach ($prefixos as $prefixo ) {
+            $propriedade = $prefixo . $nome;
+            if (method_exists($this, $propriedade)) {
+                return $this->$propriedade();
+            }
+        }
+        throw new WeLearn_DTO_PropriedadeInvalidaException($name);
+    }
+
+    function __set($name, $value)
+    {
+        $propriedade = 'set' . ucfirst($name);
+        if (method_exists($this, $propriedade)) {
+            $this->$propriedade($value);
+        }
+        throw new WeLearn_DTO_PropriedadeInvalidaException($name);
+    }
+
     /**
      * Atribui os valores das propriedades do objeto de acordo com a relação chave => valor do array
      * Ex.:
@@ -74,5 +97,16 @@ abstract class WeLearn_DTO_AbstractDTO implements WeLearn_DTO_IDTO
     public function setPersistido($persistido)
     {
         $this->_persistido = (boolean)$persistido;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma string representando
+     * um objeto JSON.
+     *
+     * @return string
+     */
+    public function toJSON()
+    {
+        return Zend_Json::encode($this->toArray(), true);
     }
 }

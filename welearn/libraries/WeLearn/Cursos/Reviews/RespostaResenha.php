@@ -114,4 +114,22 @@ class WeLearn_Cursos_Reviews_RespostaResenha extends WeLearn_DTO_AbstractDTO
     {
         return $this->_resenha;
     }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'id' => $this->getId(),
+            'conteudo' => $this->getConteudo(),
+            'dataEnvio' => $this->getDataEnvio(),
+            'resenha' => $this->getResenha()->toArray(),
+            'criador' => $this->getCriador()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
+    }
 }

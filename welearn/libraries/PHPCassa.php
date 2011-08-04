@@ -24,7 +24,7 @@ class WL_Phpcassa {
         require_once 'PHPCassa/uuid'.EXT;
         require_once 'PHPCassa/columnfamily'.EXT;
 
-        $this->_ci = get_instance();
+        $this->_ci =& get_instance();
         $this->_connect();
     }
 
@@ -58,14 +58,16 @@ class WL_Phpcassa {
     {
         $cf_name = (string)$cf_name;
         $cf = NULL;
+        
         if( !($cf_name === '') ) {
             try {
                 $cf = new ColumnFamily($this->_connectionPool, $cf_name);
                 log_message('debug','CollumnFamily '.$cf_name.' loaded successfully');
             } catch( Exception $e ) {
-                log_message('error', $e->getMessage());
+                log_message('error', 'Erro ao carregar a collumn family "' . $cf_name . '" :' . $e->getMessage());
             }
         }
+        
         return $cf;
     }
 

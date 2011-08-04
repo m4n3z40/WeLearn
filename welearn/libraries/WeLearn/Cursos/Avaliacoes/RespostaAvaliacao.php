@@ -10,11 +10,10 @@
 
 class WeLearn_Cursos_Avaliacoes_RespostaAvaliacao extends WeLearn_DTO_AbstractDTO
 {
-
     /**
-     * @var WeLearn_Cursos_Avaliacoes_ControleAvaliacao
+     * @var string
      */
-    private $_controleAvaliacao;
+    private $_controleAvaliacaoId;
 
     /**
      * @var WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao
@@ -22,14 +21,14 @@ class WeLearn_Cursos_Avaliacoes_RespostaAvaliacao extends WeLearn_DTO_AbstractDT
     private $_alternativa;
 
     /**
-     * @param null|WeLearn_Cursos_Avaliacoes_ControleAvaliacao $controleAvaliacao
+     * @param string $controleAvaliacaoId
      * @param null|WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao $alternativa
      */
-    public function __construct(WeLearn_Cursos_Avaliacoes_ControleAvaliacao $controleAvaliacao = null,
+    public function __construct($controleAvaliacaoId = '',
         WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao $alternativa = null)
     {
         $dados = array(
-            'controleAvaliacao' => $controleAvaliacao,
+            'controleAvaliacaoId' => $controleAvaliacaoId,
             'alternativa' => $alternativa
         );
 
@@ -53,20 +52,33 @@ class WeLearn_Cursos_Avaliacoes_RespostaAvaliacao extends WeLearn_DTO_AbstractDT
     }
 
     /**
-     * @param \WeLearn_Cursos_Avaliacoes_ControleAvaliacao $controleAvaliacao
+     * @param string $controleAvaliacaoId
      */
-    public function setControleAvaliacao(WeLearn_Cursos_Avaliacoes_ControleAvaliacao $controleAvaliacao)
+    public function setControleAvaliacaoId($controleAvaliacaoId)
     {
-        $this->_controleAvaliacao = $controleAvaliacao;
+        $this->_controleAvaliacaoId = (string)$controleAvaliacaoId;
     }
 
     /**
-     * @return \WeLearn_Cursos_Avaliacoes_ControleAvaliacao
+     * @return string
      */
-    public function getControleAvaliacao()
+    public function getControleAvaliacaoId()
     {
-        return $this->_controleAvaliacao;
+        return $this->_controleAvaliacaoId;
     }
 
-
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'controleAvaliacao' => $this->getControleAvaliacaoId(),
+            'alternativa' => $this->getAlternativa()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
+    }
 }

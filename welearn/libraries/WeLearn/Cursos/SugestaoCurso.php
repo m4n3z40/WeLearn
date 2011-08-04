@@ -40,4 +40,18 @@ class WeLearn_Cursos_SugestaoCurso extends WeLearn_Cursos_CursoBasico
     {
         //@TODO: Implementar este método!
     }
+
+    public function toArray()
+    {
+        $selfArray = parent::toArray();
+
+        $selfArray = array_merge(
+            $selfArray,
+            array(
+                'criador' => $this->getCriador()->toArray()
+            )
+        );
+
+        return $selfArray;
+    }
 }

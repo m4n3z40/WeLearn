@@ -10,7 +10,6 @@
 
 class WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao extends WeLearn_DTO_AbstractDTO
 {
-
     /**
      * @var int
      */
@@ -32,9 +31,9 @@ class WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao extends WeLearn_DTO_AbstractDTO
     private $_qtdAlternativasExibir;
 
     /**
-     * @var WeLearn_Cursos_Avaliacoes_Avaliacao
+     * @var string
      */
-    private $_avaliacao;
+    private $_avaliacaoId;
 
     /**
      * @var array
@@ -58,19 +57,19 @@ class WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param \WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacao
+     * @param string $avaliacaoId
      */
-    public function setAvaliacao(WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacao)
+    public function setAvaliacaoId($avaliacaoId)
     {
-        $this->_avaliacao = $avaliacao;
+        $this->_avaliacaoId = (string)$avaliacaoId;
     }
 
     /**
-     * @return \WeLearn_Cursos_Avaliacoes_Avaliacao
+     * @return string
      */
-    public function getAvaliacao()
+    public function getAvaliacaoId()
     {
-        return $this->_avaliacao;
+        return $this->_avaliacaoId;
     }
 
     /**
@@ -143,5 +142,31 @@ class WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao extends WeLearn_DTO_AbstractDTO
     public function recuperarAlternativas()
     {
         //@TODO: implementar este médodo!!
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        $alternativas = array();
+        if  (!is_null($this->_alternativas)) {
+            foreach ($this->getAlternativas() as $alternativa) {
+                $alternativas[] = $alternativa->toArray();
+            }
+        }
+
+        return array(
+            'id' => $this->getId(),
+            'enunciado' => $this->getEnunciado(),
+            'qtdAlternativas' => $this->getQtdAlternativas(),
+            'qtdAlternativasExibir' => $this->getQtdAlternativasExibir(),
+            'avaliacaoId' => $this->getAvaliacaoId(),
+            'alternativas' => $alternativas,
+            'persistido' => $this->isPersistido()
+        );
     }
 }

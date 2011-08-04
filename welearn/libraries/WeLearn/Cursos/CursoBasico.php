@@ -165,4 +165,24 @@ abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO
     {
         //@TODO: Implementar este método!!
     }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'tema' => $this->getTema(),
+            'descricao' => $this->getDescricao(),
+            'dataCriacao' => $this->getDataCriacao(),
+            'status' => $this->getStatus(),
+            'segmento' => $this->getSegmento()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
+    }
 }

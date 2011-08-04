@@ -36,7 +36,10 @@ class WeLearn_Cursos_Conteudo_Anotacao extends WeLearn_DTO_AbstractDTO
      * @param null $pagina
      * @param null $participacaoCurso
      */
-    public function __construct($id = 0, $conteudo = '', $pagina = null, $participacaoCurso = null)
+    public function __construct($id = 0,
+                                $conteudo = '',
+                                WeLearn_Cursos_Conteudo_Pagina $pagina = null,
+                                WeLearn_Cursos_ParticipacaoCurso $participacaoCurso = null)
     {
         $dados = array(
             'id' => $id,
@@ -110,5 +113,22 @@ class WeLearn_Cursos_Conteudo_Anotacao extends WeLearn_DTO_AbstractDTO
     public function getParticipacaoCurso()
     {
         return $this->_participacaoCurso;
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
+     * em um array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'id' => $this->getId(),
+            'conteudo' => $this->getConteudo(),
+            'pagina' => $this->getPagina()->toArray(),
+            'participacaoCurso' => $this->getParticipacaoCurso()->toArray(),
+            'persistido' => $this->isPersistido()
+        );
     }
 }
