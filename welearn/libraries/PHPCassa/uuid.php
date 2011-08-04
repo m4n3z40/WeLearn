@@ -35,7 +35,10 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/* Not needed because de loader for CodeIgniter loads the file below automatically
+
 require_once('columnfamily.php');
+*/
 
 /**
  * @package phpcassa

@@ -4,12 +4,14 @@
 
 1. Montar servidor ubuntu com Apache + PHP + Cassandra Nodes no VirtualBox. (Feito)
 
-2. Acertar erros na documentação do projeto.
+2. Acertar erros na documentação do projeto. (Fazendo... )
 
 3. Criar schema do cassandra para o serviço, focando nas DAOS encontradas.
 
-4. Editar classe do PHPCassa para integração ao codeigniter.
+4. Editar classe do PHPCassa para integração ao codeigniter. (Feito)
 
-5. Desenvolver classes de projeto do welearn de acordo com a modelagem feita na análise. (Documentação)
+5. Desenvolver classes de projeto do welearn de acordo com a modelagem feita na análise. (Documentação) (Fazendo... )
 
-6. Encontrar e delegar mais tarefas.
+6. Documentar Classes de Projeto do WeLearn. (Fazendo...)
+
+7. Encontrar e delegar mais tarefas.

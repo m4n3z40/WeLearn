@@ -174,11 +174,18 @@ if (defined('ENVIRONMENT'))
 	// Name of the "system folder"
 	define('SYSDIR', trim(strrchr(trim(BASEPATH, '/'), '/'), '/'));
 
+    // The path to the "application" folder
+    if (realpath($application_folder) !== FALSE)
+	{
+		$application_folder = realpath($application_folder).'/';
+	}
 
-	// The path to the "application" folder
+	// ensure there's a trailing slash
+	$application_folder = rtrim($application_folder, '/').'/';
+
 	if (is_dir($application_folder))
 	{
-		define('APPPATH', $application_folder.'/');
+		define('APPPATH', str_replace("\\", "/", $application_folder));
 	}
 	else
 	{

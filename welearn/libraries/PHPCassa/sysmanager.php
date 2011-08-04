@@ -1,6 +1,9 @@
 <?php
 
+/* Not needed because de loader for CodeIgniter loads the file below automatically
+
 require_once 'connection.php';
+*/
 
 class IndexType {
     const KEYS = cassandra_IndexType::KEYS;
