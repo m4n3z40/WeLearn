@@ -47,7 +47,8 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperar($id)
     {
-        // TODO: Implement recuperar() method.
+        $dados_usuario = $this->_cf->get($id);
+        return new WeLearn_Usuarios_Usuario($dados_usuario);
     }
 
     /**
