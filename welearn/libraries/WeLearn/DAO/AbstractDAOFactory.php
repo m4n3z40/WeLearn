@@ -18,8 +18,9 @@ abstract class WeLearn_DAO_AbstractDAOFactory implements WeLearn_DAO_IDAOFactory
      *         |WeLearn_DAO_DAOInvalidaException
      *         |WeLearn_DAO_DAONaoEncontradaException
      *         |WeLearn_DAO_CFNaoDefinidaException
-     * @param string $nomeDao
-     * @param array|null $opcoes
+     * @param string $nomeDao Nome da classe DAO
+     * @param array|null $opcoes Opções que serão passadas como parâmetro
+     *                           na inicialização da classe DAO e sua Column Family
      * @return null|WeLearn_DAO_AbstractDAO
      */
     public static function create($nomeDao, array $opcoes = null)
@@ -76,9 +77,7 @@ abstract class WeLearn_DAO_AbstractDAOFactory implements WeLearn_DAO_IDAOFactory
         }
 
         //Rotina para criar o objeto que representa a Column Family (pode ser modificado)
-        $CF = get_instance()
-              ->phpcassa
-              ->getColumnFamily($DAOObject->getNomeCF());
+        $CF = WL_Phpcassa::getInstance()->getColumnFamily($DAOObject->getNomeCF(), $opcoes);
 
         $DAOObject->setCF($CF);
 
