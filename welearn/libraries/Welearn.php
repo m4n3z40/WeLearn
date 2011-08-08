@@ -34,3 +34,6 @@ class WL_Welearn
         }
     }
 }
+
+/* End of file Welearn.php */
+/* Location: ./application/libraries/Welearn.php */
