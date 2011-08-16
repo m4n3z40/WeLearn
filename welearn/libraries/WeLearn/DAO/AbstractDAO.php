@@ -21,40 +21,29 @@ abstract class WeLearn_DAO_AbstractDAO implements WeLearn_DAO_IDAO
     protected $_nomeCF;
 
     /**
-     * @var array
-     */
-    protected $_infoColunas;
-
-
-    public function __construct()
-    {
-
-    }
-
-    /**
      * @abstract
      * @param WeLearn_DTO_IDTO $dto
-     * @return boolean
+     * @return void
      */
     abstract protected function _adicionar(WeLearn_DTO_IDTO &$dto);
 
     /**
      * @abstract
      * @param WeLearn_DTO_IDTO $dto
-     * @return boolean
+     * @return void
      */
     abstract protected function _atualizar(WeLearn_DTO_IDTO $dto);
 
     /**
      * @param WeLearn_DTO_IDTO $dto
-     * @return boolean
+     * @return void
      */
     public function salvar(WeLearn_DTO_IDTO &$dto)
     {
         if ($dto->isPersistido()) {
-            return $this->_atualizar($dto);
+            $this->_atualizar($dto);
         } else {
-            return $this->_adicionar($dto);
+            $this->_adicionar($dto);
         }
     }
 
@@ -73,15 +62,7 @@ abstract class WeLearn_DAO_AbstractDAO implements WeLearn_DAO_IDAO
     {
         return $this->_cf;
     }
-
-    /**
-     * @return array
-     */
-    public function getInfoColunas()
-    {
-        return $this->_infoColunas;
-    }
-
+    
     /**
      * @return string
      */

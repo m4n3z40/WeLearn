@@ -64,7 +64,7 @@ abstract class WeLearn_DTO_AbstractDTO implements WeLearn_DTO_IDTO
      */
     public function preencherPropriedades(array $dados = null)
     {
-        if (!is_null($dados)) {
+        if (!empty($dados)) {
             foreach ($dados as $campo => $valor) {
 
                 $metodoSet = 'set' . ucfirst((string)$campo);
@@ -108,5 +108,16 @@ abstract class WeLearn_DTO_AbstractDTO implements WeLearn_DTO_IDTO
     public function toJSON()
     {
         return Zend_Json::encode($this->toArray(), true);
+    }
+
+    /**
+     * Preenche os dados das propriedades do objeto com um array de dados criado pelo PHPCassa
+     *
+     * @param array $dados
+     * @return void
+     */
+    public function fromCassandra(array $dados)
+    {
+        $this->preencherPropriedades($dados);
     }
 }

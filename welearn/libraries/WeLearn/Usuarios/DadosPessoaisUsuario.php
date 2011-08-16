@@ -288,9 +288,42 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO
             'telAlternativo' => $this->getTelAlternativo(),
             'descricaoPessoal' => $this->getDescricaoPessoal(),
             'homePage' => $this->getHomePage(),
-            'listaDeIM' => $this->getListaDeIM(),
-            'listaDeRS' => $this->getListaDeRS(),
+            'listaDeIM' => $listaDeIM,
+            'listaDeRS' => $listaDeRS,
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        $listaDeIM = array();
+        foreach ($this->getListaDeIM() as $IM) {
+            $listaDeIM[$IM->getID()] = $IM->toCassandra();
+        }
+
+        $listaDeRS = array();
+        foreach ($this->getListaDeRS() as $RS) {
+            $listaDeRS[$RS->getId()] = $RS->toCassandra();
+        }
+
+        return array(
+            'usuarioId' => (string) $this->getUsuarioId(),
+            'sexo' => (string) $this->getSexo(),
+            'pais' => (string) $this->getPais(),
+            'cidade' => (string) $this->getCidade(),
+            'endereco' => (string) $this->getEndereco(),
+            'dataNascimento' => (string) $this->getDataNascimento(),
+            'tel' => (string) $this->getTel(),
+            'telAlternativo' => (string) $this->getTelAlternativo(),
+            'descricaoPessoal' => (string) $this->getDescricaoPessoal(),
+            'homePage' => (string) $this->getHomePage(),
+            'listaDeIM' => empty($listaDeIM) ? '' : $listaDeIM,
+            'listaDeRS' => empty($listaDeRS) ? '' : $listaDeRS
         );
     }
 }

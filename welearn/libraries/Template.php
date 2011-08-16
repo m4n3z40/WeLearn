@@ -14,6 +14,7 @@ class WL_Template
     private $_jsImports = array();
     private $_jsScripts = array();
     private $_title = '';
+    private $_base_url;
     private $_ci;
 
     public function __construct()
@@ -22,6 +23,7 @@ class WL_Template
 
         $this->_templatePath = $this->_ci->config->item('template_dir');
         $this->_template = $this->_ci->config->item('default_template');
+        $this->_base_url = base_url();
     }
 
     public function setTemplate($template)
@@ -85,9 +87,16 @@ class WL_Template
         return $this;
     }
 
-    public function loadPartial($partial, array $data = null)
+    public function loadPartial($partial, array $data = null, $module = '')
     {
-        return $this->_ci->load->view('partials/' . $partial, $data, TRUE);
+        $partialDir = 'partials';
+
+        if ($module != '') {
+            $module = trim($module, '/');
+            $partialDir = $module . '/' . $partialDir;
+        }
+
+        return $this->_ci->load->view($partialDir . '/_' . $partial, $data, TRUE);
     }
 
     public function render($view = '', array $data = null)
@@ -101,6 +110,9 @@ class WL_Template
             'template.cssLinks' => $this->_compileCSS(),
             'template.jsImports' => $this->_compileJSImports(),
             'template.jsScripts' => $this->_compileJSScripts(),
+            'base_url' => $this->_base_url,
+            'formLoginOpen' => form_open(),
+            'formLoginClose' => form_close(),
             'content' => $this->_ci->output->get_output()
         );
 
@@ -114,7 +126,7 @@ class WL_Template
         $cssLinks = '';
 
         foreach ($this->_cssLinks as $css) {
-            $cssLinks .= '<link rel="stylesheet" type="text/css" href="css/' . $css . '" />';
+            $cssLinks .= '<link rel="stylesheet" type="text/css" href="' . $this->_base_url .'css/' . $css . '" />';
         }
 
         return $cssLinks;
@@ -125,7 +137,7 @@ class WL_Template
         $jsImports = '';
 
         foreach ($this->_jsImports as $js) {
-            $jsImports .= '<script type="text/javascript" src="js/' . $js . '"></script>';
+            $jsImports .= '<script type="text/javascript" src="' . $this->_base_url .'js/' . $js . '"></script>';
         }
 
         return $jsImports;
@@ -144,8 +156,6 @@ class WL_Template
 
     private function _loadTemplate(array $data)
     {
-        $this->_ci->load->helper('file');
-
         $replaceThis = array_keys($data);
 
         foreach ($replaceThis as $key => $value) {

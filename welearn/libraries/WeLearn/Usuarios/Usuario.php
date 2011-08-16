@@ -11,7 +11,7 @@
 /**
  *
  */
-class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
+class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO implements Serializable
 {
     /**
      * @var string
@@ -32,6 +32,11 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
      * @var string
      */
     private $_email;
+
+    /**
+     * @var string
+     */
+    private $_nomeUsuario;
 
     /**
      * @var string
@@ -197,6 +202,22 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
     }
 
     /**
+     * @param string $nomeUsuario
+     */
+    public function setNomeUsuario($nomeUsuario)
+    {
+        $this->_nomeUsuario = (string)$nomeUsuario;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNomeUsuario()
+    {
+        return $this->_nomeUsuario;
+    }
+
+    /**
      * @param \WeLearn_Cursos_Segmento $segmentoInteresse
      */
     public function setSegmentoInteresse(WeLearn_Cursos_Segmento $segmentoInteresse)
@@ -257,14 +278,85 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
             'nome' => $this->getNome(),
             'sobrenome' => $this->getSobrenome(),
             'email' => $this->getEmail(),
+            'nomeUsuario' => $this->getNomeUsuario(),
             'senha' => $this-> getSenha(),
             'dataCadastro' => $this->getDataCadastro(),
-            'imagem' => $this->getImagem(),
-            'dadosPessoais' => $this->getDadosPessoais()->toArray(),
-            'dadosProfissionais' => $this->getDadosProfissionais()->toArray(),
-            'segmentoInteresse' => $this->getSegmentoInteresse()->toArray(),
-            'configuracao' => $this->getConfiguracao()->toArray(),
+            'imagem' => empty($this->_imagem) ? '' : $this->getImagem()->toArray(),
+            'dadosPessoais' => empty($this->_dadosPessoais) ? '' : $this->getDadosPessoais()->toArray(),
+            'dadosProfissionais' => empty($this->_dadosProfissionais) ? '' : $this->getDadosProfissionais()->toArray(),
+            'segmentoInteresse' => empty($this->_segmentoInteresse) ? '' : $this->getSegmentoInteresse()->toArray(),
+            'configuracao' => empty($this->_configuracao) ? '' : $this->getConfiguracao()->toArray(),
             'persistido' => $this->isPersistido()
         );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'sobrenome' => $this->getSobrenome(),
+            'email' => $this->getEmail(),
+            'nomeUsuario' => $this->getNomeUsuario(),
+            'senha' => $this->getSenha(),
+            'dataCadastro' => $this->getDataCadastro(),
+            'segmentoInteresse' => empty($this->_segmentoInteresse) ? '' : $this->getSegmentoInteresse()->getId()
+        );
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or &null;
+     */
+    public function serialize()
+    {
+        $arrayUsuario = array(
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'sobrenome' => $this->getSobrenome(),
+            'email' => $this->getEmail(),
+            'nomeUsuario' => $this->getNomeUsuario(),
+            'senha' => $this->getSenha(),
+            'dataCadastro' => $this->getDataCadastro(),
+            'configuracao' => empty($this->_configuracao) ? '' : $this->getConfiguracao()->toArray(),
+            'segmentoInteresse' => empty($this->_segmentoInteresse) ? '' : $this->getSegmentoInteresse()->toArray(),
+            'persistido' => $this->isPersistido(),
+        );
+
+        return serialize($arrayUsuario);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return mixed the original value unserialized.
+     */
+    public function unserialize($serialized)
+    {
+        $arrayUsuario = unserialize($serialized);
+
+        $area = new WeLearn_Cursos_Area();
+        $area->preencherPropriedades($arrayUsuario['segmentoInteresse']['area']);
+        $arrayUsuario['segmentoInteresse']['area'] = $area;
+
+        $segmento = new WeLearn_Cursos_Segmento();
+        $segmento->preencherPropriedades($arrayUsuario['segmentoInteresse']);
+        $arrayUsuario['segmentoInteresse'] = $segmento;
+
+        $configuracao = new WeLearn_Usuarios_ConfiguracaoUsuario($arrayUsuario['configuracao']);
+        $arrayUsuario['configuracao'] = $configuracao;
+
+        $this->__construct($arrayUsuario);
     }
 }

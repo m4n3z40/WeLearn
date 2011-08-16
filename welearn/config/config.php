@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= 'http://www.welearn.com/';
+$config['base_url']	= 'http://welearn.com/';
 
 /*
 |--------------------------------------------------------------------------

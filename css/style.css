@@ -200,12 +200,66 @@ table { border-collapse: collapse; border-spacing: 0; }
    Primary styles
    Author: 
    ========================================================================== */
+header {
+    margin-bottom: 20px;
+    border-bottom: 1px #000 dashed;
+}
 
+footer {
+    margin-top: 20px;
+    border-top: 1px #000 dashed;
+}
 
+aside {
+    float: left;
+}
 
+button, .button {
+    height: 30px;
+    padding: 5px;
+    border: #000 solid 1px;
+    border-radius: 5px;
+}
 
+.center-container {
+    width: 960px;
+    margin: 0 auto;
+}
 
+#about {
+    width: 650px;
+    margin-right: 10px;
+}
 
+#signup-form {
+    margin-left: 10px;
+    width: 290px;
+}
+
+    #signup-form dd, #signup-form dt {
+        margin: 5px 0 0 0;
+    }
+
+    #signup-form input[type=text], #signup-form input[type=password] {
+        width: 290px;
+        height: 30px;
+        border: #000 solid 1px;
+        border-radius: 5px;
+        font-size: 20px;
+    }
+
+.validation-error {
+    font-style: italic;
+}
+
+.validation-error, .error {
+    background: #f3a3a3;
+    border: 1px #9f1c25 solid;
+    color: #9f1c25;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 1px;
+}
 
 
 /* =============================================================================

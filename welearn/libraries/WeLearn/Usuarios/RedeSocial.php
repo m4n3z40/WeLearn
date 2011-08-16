@@ -85,4 +85,17 @@ class WeLearn_Usuarios_RedeSocial extends WeLearn_DTO_AbstractDTO
             'persistido' => $this->isPersistido()
         );
     }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'id' => (string) $this->getId(),
+            'descricao' => (string) $this->getDescricao()
+        );
+    }
 }

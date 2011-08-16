@@ -18,37 +18,37 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO
     /**
      * @var int
      */
-    private $_privacidadePerfil;
+    private $_privacidadePerfil = WeLearn_Usuarios_PrivacidadePerfil::PUBLICO;
 
     /**
      * @var int
      */
-    private $_privacidadeMP;
+    private $_privacidadeMP = WeLearn_Usuarios_PrivacidadeMP::LIVRE;
 
     /**
      * @var int
      */
-    private $_privacidadeConvites;
+    private $_privacidadeConvites = WeLearn_Usuarios_PrivacidadeConvites::LIVRE;
 
     /**
      * @var int
      */
-    private $_privacidadeCompartilhamento;
+    private $_privacidadeCompartilhamento = WeLearn_Usuarios_PrivacidadeCompartilhamento::HABILITADO;
 
     /**
      * @var int
      */
-    private $_statusCompartilhamento;
+    private $_statusCompartilhamento = WeLearn_Usuarios_PrivacidadeCompartilhamento::HABILITADO;
 
     /**
      * @var int
      */
-    private $_privacidadeNotificacoes;
+    private $_privacidadeNotificacoes = WeLearn_Usuarios_PrivacidadeNotificacoes::HABILITADO;
 
     /**
      * @var array
      */
-    private $_notificacoesHabilitadas;
+    private $_notificacoesHabilitadas = array();
 
     /**
      * @param int $privacidadeCompartilhamento
@@ -191,5 +191,37 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO
             'notificacoesHabilitadas' => $this->getNotificacoesHabilitadas(),
             'persistido' => $this->isPersistido()
         );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        $arrayConfiguracao = array(
+            'usuarioId' => (string) $this->getUsuarioId(),
+            'privacidadePerfil' => $this->getPrivacidadePerfil(),
+            'privacidadeMP' => $this->getPrivacidadeMP(),
+            'privacidadeConvites' => $this->getPrivacidadeConvites(),
+            'privacidadeCompartilhamento' => $this->getPrivacidadeCompartilhamento(),
+            'statusCompartilhamento' => $this->getStatusCompartilhamento(),
+            'privacidadeNotificacoes' => $this->getPrivacidadeConvites()
+        );
+        $arrayConfiguracao['notificacoesHabilitadas'] = !empty($this->_notificacoesHabilitadas)
+                                                        ? implode(',', $this->_notificacoesHabilitadas)
+                                                        : '';
+
+        return $arrayConfiguracao;
+    }
+
+    public function fromCassandra(array $dados)
+    {
+        $dados['notificacoesHabilitadas'] = !empty($dados['notificacoesHabilitadas'])
+                                            ? explode(',', $dados['notificacoesHabilitadas'])
+                                            : array();
+
+        parent::fromCassandra($dados);
     }
 }

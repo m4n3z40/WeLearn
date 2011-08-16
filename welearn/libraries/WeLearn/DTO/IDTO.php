@@ -45,4 +45,21 @@ interface WeLearn_DTO_IDTO
      * @return string
      */
     public function toJSON();
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @abstract
+     * @return array
+     */
+    public function toCassandra();
+
+    /**
+     * Preenche os dados das propriedades do objeto com um array de dados criado pelo PHPCassa
+     *
+     * @abstract
+     * @param array $dados
+     * @return void
+     */
+    public function fromCassandra(array $dados);
 }

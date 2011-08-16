@@ -28,8 +28,12 @@ class Home extends CI_Controller {
 	 */
 	public function index()
 	{
-		$this->template->setTitle('Welcome to CodeIgniter')
-                       ->render('welcome_message');
+        $this->template->appendJSImport('logout_usuario.js');
+        echo '<a href="#" class="button logoutButton">Logout</a>';
+        echo '<pre>';
+        var_dump(unserialize($this->session->userdata('usuario')));
+		echo '</pre>';
+        $this->template->render();
     }
 }
 

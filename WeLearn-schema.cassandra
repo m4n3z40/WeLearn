@@ -9,6 +9,10 @@ create column family usuarios_usuario
 with comparator = 'UTF8Type'
 and column_type = 'Standard';
 
+create column family usuarios_email_usuario
+with comparator = 'UTF8Type'
+and column_type = 'Standard';
+
 create column family usuarios_dados_pessoais
 with comparator = 'UTF8Type'
 and column_type = 'Super'

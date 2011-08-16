@@ -13,31 +13,50 @@
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="{$base_url}css/style.css?v1">
     {$template.cssLinks}
 
-	<script src="js/libs/modernizr-2.0.6.min.js"></script>
+	<script src="{$base_url}js/libs/modernizr-2.0.6.min.js"></script>
 </head>
 <body>
 
 <div id="container">
 	<header>
-
+        <div class="center-container">
+            <section id="logo">
+                <h1>WeLearn</h1>
+                <blockquote>It's not just about you anymore.</blockquote>
+            </section>
+            {$formLoginOpen}
+                <fieldset>
+                    <legend>Log in</legend>
+                    <label for="login">Nome de usuário ou email</label>
+                    <input type="text" name="login" id="login" placeholder="login" />
+                    <label for="password">Senha</label>
+                    <input type="password" name="password" id="password" placeholder="password" />
+                    <button type="submit" name="submitLogin">Entrar</button>
+                </fieldset>
+            {$formLoginClose}
+        </div>
 	</header>
-	<div id="main" role="main">
+	<div id="main" role="main" class="center-container clearfix">
         {$content}
 	</div>
 	<footer>
-
+        <section class="center-container">
+            <p>
+                <span>WeLearn &copy;</span> - Copyright 2011. All rights reserved.
+            </p>
+        </section>
 	</footer>
 </div> <!--! end of #container -->
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="js/libs/jquery-1.6.2.min.js"><\/script>')</script>
+<script>window.jQuery || document.write('<script src="{$base_url}js/libs/jquery-1.6.2.min.js"><\/script>')</script>
 
 <!-- scripts concatenated and minified via ant build script-->
-<script src="js/plugins.js"></script>
-<script src="js/script.js"></script>
+<script src="{$base_url}js/plugins.js"></script>
+<script src="{$base_url}js/script.js"></script>
 <!-- end scripts-->
 
 {$template.jsImports}

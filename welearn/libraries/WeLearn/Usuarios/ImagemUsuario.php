@@ -27,7 +27,7 @@ class WeLearn_Usuarios_ImagemUsuario extends WeLearn_DTO_AbstractDTO
     {
         $dados = array(
             'url' => $url,
-            'usuarioId' => $usuario
+            'usuarioId' => $usuarioId
         );
 
         parent::__construct($dados);
@@ -77,6 +77,19 @@ class WeLearn_Usuarios_ImagemUsuario extends WeLearn_DTO_AbstractDTO
             'url' => $this->getUrl(),
             'usuarioId' => $this->getUsuarioId(),
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'url' => (string) $this->getUrl(),
+            'usuarioId' => (string) $this->getUsuarioId()
         );
     }
 }

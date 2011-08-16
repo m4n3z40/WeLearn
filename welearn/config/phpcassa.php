@@ -8,10 +8,7 @@
 | The array list of the cassandra servers IPs that will be available for connection in the Phpcassa library.
 */
 $config['cassandra_servers'] = array(
-                                  '10.0.0.1:9160',
-                                  '10.0.0.2:9160',
-                                  '10.0.0.3:9160',
-                                  '10.0.0.4:9160',
+                                  'localhost:9160'
                               );
 
 /**
@@ -39,7 +36,7 @@ $config['keyspace'] = 'welearn';
 | TWO = 7;
 | THREE = 8;
 */
-$config['default_read_cl'] = 2;
+$config['default_read_cl'] = 1;
 
 /**
 | -------------------------------------------------------------------
@@ -57,7 +54,7 @@ $config['default_read_cl'] = 2;
 | TWO = 7;
 | THREE = 8;
 */
-$config['default_write_cl'] = 2;
+$config['default_write_cl'] = 1;
 
 /**
 | -------------------------------------------------------------------

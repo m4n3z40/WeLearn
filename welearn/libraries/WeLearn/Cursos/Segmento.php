@@ -14,7 +14,7 @@
 class WeLearn_Cursos_Segmento extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var int
+     * @var string
      */
     private $_id;
 
@@ -29,32 +29,35 @@ class WeLearn_Cursos_Segmento extends WeLearn_DTO_AbstractDTO
     private $_area;
 
     /**
-     * @param int $id
+     * @param string $id
      * @param string $descricao
      * @param null|WeLearn_Cursos_Area $area
      */
-    public function __construct($id = 0, $descricao = '', WeLearn_Cursos_Area $area = null)
+    public function __construct($id = '', $descricao = '', WeLearn_Cursos_Area $area = null)
     {
         $dados = array(
             'id' => $id,
             'descricao' => $descricao,
-            'area' => $area
         );
 
         parent::__construct($dados);
+
+        if ( !is_null($area) ) {
+            $this->setArea($area);
+        }
     }
 
     /**
-     * @param $id
+     * @param string $id
      * @return void
      */
     public function setId($id)
     {
-        $this->_id = (int)$id;
+        $this->_id = (string)$id;
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
@@ -108,6 +111,20 @@ class WeLearn_Cursos_Segmento extends WeLearn_DTO_AbstractDTO
             'descricao' => $this->getDescricao(),
             'area' => $this->getArea()->toArray(),
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'id' => (string) $this->getId(),
+            'descricao' => (string) $this->getDescricao(),
+            'area' => (string) $this->getArea()->getId()
         );
     }
 }

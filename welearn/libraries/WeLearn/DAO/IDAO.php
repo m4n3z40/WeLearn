@@ -37,7 +37,7 @@ interface WeLearn_DAO_IDAO
     /**
      * @abstract
      * @param WeLearn_DTO_IDTO $dto
-     * @return boolean
+     * @return void
      */
     public function salvar(WeLearn_DTO_IDTO &$dto);
 

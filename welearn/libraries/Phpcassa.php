@@ -146,7 +146,7 @@ class WL_Phpcassa {
     {
         $ci =& get_instance();
 
-        return isset($ci->phpcassa) ? $ci->phpcassa : null;
+        return $ci->phpcassa;
     }
 
     /**
