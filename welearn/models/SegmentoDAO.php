@@ -36,7 +36,7 @@ class SegmentoDAO extends WeLearn_DAO_AbstractDAO
         $dto->setId(urlencode($dto->getDescricao()));
 
         $this->_cf->insert($dto->getId(), $dto->toCassandra());
-        $this->_segmentosEmAreaCF->insert($dto->getArea()->getId(), array('segmentoId' => $dto->getId()));
+        $this->_segmentosEmAreaCF->insert($dto->getArea()->getId(), array($dto->getId() => ''));
         $dto->setPersistido(true);
     }
 

@@ -52,7 +52,7 @@ $autoload['packages'] = array(APPPATH.'third_party');
 |	$autoload['libraries'] = array('database', 'session', 'xmlrpc');
 */
 
-$autoload['libraries'] = array('template','welearn','phpcassa','session');
+$autoload['libraries'] = array('template','welearn','phpcassa','session','autenticacao');
 
 
 /*
@@ -64,7 +64,7 @@ $autoload['libraries'] = array('template','welearn','phpcassa','session');
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('session','url','file','form','json','exception');
+$autoload['helper'] = array('url','file','form','json','exception');
 
 
 /*

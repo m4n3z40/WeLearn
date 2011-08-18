@@ -1,4 +1,4 @@
-<?php echo form_open('usuario/validar_cadastro') ?>
+<?php echo form_open() ?>
     <fieldset>
         <legend>Novo por aqui? Cadastre-se!</legend>
         <dl>

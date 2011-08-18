@@ -1,6 +1,7 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Usuario extends CI_Controller {
+class Usuario extends CI_Controller
+{
 
     /**
      * Construtor carrega configurações da classes base CI_Controller
@@ -17,8 +18,7 @@ class Usuario extends CI_Controller {
             'form_cadastro' => $this->template->loadPartial('form_cadastro', null, 'usuario')
         );
 
-        $this->template->appendJSImport('login_usuario.js')
-                       ->appendJSImport('cadastro_usuario.js');
+        $this->template->appendJSImport('cadastro_usuario.js');
 
         $this->template->render('usuario/cadastrar', $partial_cadastro);
     }
@@ -131,10 +131,7 @@ class Usuario extends CI_Controller {
             $login = $this->input->post('login');
             $senha = $this->input->post('password');
 
-            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-            $usuario = $usuarioDao->autenticar($login, $senha);
-
-            $this->session->set_userdata('usuario', serialize($usuario));
+            $this->autenticacao->autenticar($login, $senha);
 
             $json = create_json_feedback(true);
         } catch (WeLearn_Usuarios_AutenticacaoLoginInvalidoException $e) {

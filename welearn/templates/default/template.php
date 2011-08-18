@@ -58,6 +58,7 @@
 <script src="{$base_url}js/plugins.js"></script>
 <script src="{$base_url}js/script.js"></script>
 <!-- end scripts-->
+<script src="{$base_url}js/login_usuario.js"></script>
 
 {$template.jsImports}
 {$template.jsScripts}

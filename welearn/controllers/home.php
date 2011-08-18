@@ -31,7 +31,10 @@ class Home extends CI_Controller {
         $this->template->appendJSImport('logout_usuario.js');
         echo '<a href="#" class="button logoutButton">Logout</a>';
         echo '<pre>';
-        var_dump(unserialize($this->session->userdata('usuario')));
+        var_dump($this->autenticacao->getUsuarioAutenticado());
+        var_dump($this->autenticacao->isAutenticado());
+        var_dump($this->session->userdata('usuario'));
+        var_dump($this->session);
 		echo '</pre>';
         $this->template->render();
     }
