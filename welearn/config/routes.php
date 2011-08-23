@@ -38,7 +38,7 @@
 |
 */
 
-$route['default_controller'] = "Home";
+$route['default_controller'] = "Bem_vindo";
 $route['404_override'] = '';
 
 

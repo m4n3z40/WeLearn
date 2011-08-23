@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Home extends CI_Controller {
+class Home extends WL_Controller {
 
     /**
      * Construtor carrega configurações da classes base CI_Controller
@@ -11,31 +11,10 @@ class Home extends CI_Controller {
         parent::__construct();
     }
 
-	/**
-	 * Index Page for this controller.
-	 *
-	 * Maps to the following URL
-	 * 		http://example.com/index.php/home
-	 *	- or -  
-	 * 		http://example.com/index.php/home/index
-	 *	- or -
-	 * Since this controller is set as the default controller in 
-	 * config/routes.php, it's displayed at http://example.com/
-	 *
-	 * So any other public methods not prefixed with an underscore will
-	 * map to /index.php/index/<method_name>
-	 * @see http://codeigniter.com/user_guide/general/urls.html
-	 */
-	public function index()
-	{
+    public function index()
+    {
+        echo '<a class="logoutButton button" href="#">Logout</a>';
         $this->template->appendJSImport('logout_usuario.js');
-        echo '<a href="#" class="button logoutButton">Logout</a>';
-        echo '<pre>';
-        var_dump($this->autenticacao->getUsuarioAutenticado());
-        var_dump($this->autenticacao->isAutenticado());
-        var_dump($this->session->userdata('usuario'));
-        var_dump($this->session);
-		echo '</pre>';
         $this->template->render();
     }
 }

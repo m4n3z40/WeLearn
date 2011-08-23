@@ -17,9 +17,10 @@ class AreaDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        $dto->setId(urlencode($dto->getDescricao()));
+        $dto->setId($this->_createAreaId($dto->getDescricao()));
 
         $this->_cf->insert($dto->getId(), $dto->toCassandra());
+        
         $dto->setPersistido(true);
     }
 
@@ -44,7 +45,14 @@ class AreaDAO extends WeLearn_DAO_AbstractDAO
                  ? $filtros['count']
                  : ColumnFamily::DEFAULT_ROW_COUNT;
 
-        $encontrados = $this->_cf->get_range($de, $ate, $count);
+        if (is_string($de)) {
+            $de = $this->_createAreaId($de);
+            $ate = is_string($ate) ? $this->_createAreaId($ate) : null;
+
+            $encontrados = $this->_cf->get_range($de, $ate, $count);
+        } else {
+            $encontrados = $this->_cf->get_range('', '', $count);
+        }
 
         if ( ! empty($encontrados) ) {
             $listaAreas = array();
@@ -106,4 +114,12 @@ class AreaDAO extends WeLearn_DAO_AbstractDAO
         // TODO: Implement criarNovo() method.
     }
 
+    private function _createAreaId($str)
+    {
+        if ( ! function_exists('convert_accented_characters') ) {
+           get_instance()->load->helper('text');
+        }
+
+        return url_title(convert_accented_characters($str), 'underscore', true);
+    }
 }

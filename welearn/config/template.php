@@ -10,5 +10,18 @@ $config['template_dir'] = APPPATH . 'templates/';
 
 $config['default_template'] = 'default';
 
+$config['template_data'] = array(
+    'default' => array(
+        'formLoginOpen' => form_open(),
+        'formLoginClose' => form_close(),
+    ),
+    'perfil' => array(
+
+    ),
+    'curso' => array(
+
+    )
+);
+
 /* End of file template.php */
 /* Location: ./application/config/template.php */

@@ -33,7 +33,7 @@ class SegmentoDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        $dto->setId(urlencode($dto->getDescricao()));
+        $dto->setId($this->_createSegmentoId($dto->getDescricao()));
 
         $this->_cf->insert($dto->getId(), $dto->toCassandra());
         $this->_segmentosEmAreaCF->insert($dto->getArea()->getId(), array($dto->getId() => ''));
@@ -55,18 +55,18 @@ class SegmentoDAO extends WeLearn_DAO_AbstractDAO
      * @param array|null $filtros
      * @return array
      */
-    public function recuperarTodos($de = null, $ate = null, array $filtros = null)
+    public function recuperarTodos($de = '', $ate = '', array $filtros = null)
     {
-        //Todos os segmentos em uma área específfica
-        if (is_array($filtros) && isset($filtros['areaId'])) {
-            $count = (isset($filtros['count']) && is_int($filtros['count']))
+        $count = (isset($filtros['count']) && is_int($filtros['count']))
                      ? $filtros['count']
                      : ColumnFamily::DEFAULT_COLUMN_COUNT;
 
+        //Todos os segmentos em uma área específfica
+        if (is_array($filtros) && isset($filtros['areaId'])) {
             $segmentos_em_area = $this->_segmentosEmAreaCF->get($filtros['areaId'], null, $de, $ate, false, $count);
 
             if (!empty($segmentos_em_area)) {
-                $dados_segmentos = $this->_cf->multiget($segmentos_em_area);
+                $dados_segmentos = $this->_cf->multiget(array_keys($segmentos_em_area));
 
                 if (!empty($dados_segmentos)) {
                     $area = $this->_areaDAO->recuperar($filtros['areaId']);
@@ -86,9 +86,6 @@ class SegmentoDAO extends WeLearn_DAO_AbstractDAO
                 }
             }
         } else {//Todos os segmentos cadastrados no serviço.
-            $count = (isset($filtros['count']) && is_int($filtros['count']))
-                     ? $filtros['count']
-                     : ColumnFamily::DEFAULT_ROW_COUNT;
 
             $dados_segmentos = $this->_cf->get_range($de, $ate, $count);
 
@@ -157,4 +154,12 @@ class SegmentoDAO extends WeLearn_DAO_AbstractDAO
         return $segmento;
     }
 
+    private function _createSegmentoId($str)
+    {
+        if ( ! function_exists('convert_accented_characters') ) {
+           get_instance()->load->helper('text');
+        }
+
+        return url_title(convert_accented_characters($str), 'underscore', true);
+    }
 }

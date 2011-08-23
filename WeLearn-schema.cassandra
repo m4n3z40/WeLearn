@@ -1,61 +1,85 @@
 create keyspace welearn
 with placement_strategy = 'SimpleStrategy'
-and strategy_options = [{replication_factor:4}];
+and strategy_options = [{replication_factor:2}];
 
 use welearn;
 
 
 create column family usuarios_usuario
 with comparator = 'UTF8Type'
-and column_type = 'Standard';
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
 
 create column family usuarios_email_usuario
 with comparator = 'UTF8Type'
-and column_type = 'Standard';
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
 
 create column family usuarios_dados_pessoais
 with comparator = 'UTF8Type'
 and column_type = 'Super'
-and subcomparator = 'UTF8Type';
+and subcomparator = 'UTF8Type'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
 
 create column family usuarios_dados_profissionais
 with comparator = 'UTF8Type'
-and column_type = 'Standard';
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
 
 create column family usuarios_configuracao
 with comparator = 'UTF8Type'
-and column_type = 'Standard';
+and column_type = 'Standard'
+and default_validation_class = 'IntegerType'
+and key_validation_class = 'UTF8Type';
 
 create column family usuarios_imagem
 with comparator = 'UTF8Type'
-and column_type = 'Standard';
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
 
 create column family usuarios_im
 with comparator = 'UTF8Type'
-and column_type = 'Standard';
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
 
 create column family usuarios_rs
 with comparator = 'UTF8Type'
-and column_type = 'Standard';
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
 
 create column family usuarios_por_interesse
 with comparator = 'UTF8Type'
-and column_type = 'Standard';
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
 
 create column family usuarios_por_trabalho
 with comparator = 'UTF8Type'
-and column_type = 'Standard';
-
-
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
 
 create column family cursos_area
 with comparator = 'UTF8Type'
-and column_type = 'Standard';
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
 
 create column family cursos_segmento
 with comparator = 'UTF8Type'
-and column_type = 'Standard';
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
 
 create column family cursos_segmento_em_area
 with comparator = 'UTF8Type'
-and column_type = 'Standard';
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';

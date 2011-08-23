@@ -240,7 +240,7 @@ button, .button {
         margin: 5px 0 0 0;
     }
 
-    #signup-form input[type=text], #signup-form input[type=password] {
+    #signup-form input[type=text], #signup-form input[type=password], #signup-form select {
         width: 290px;
         height: 30px;
         border: #000 solid 1px;

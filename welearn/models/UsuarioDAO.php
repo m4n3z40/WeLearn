@@ -166,8 +166,11 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
             } else {
                 $objUsuario = $this->recuperar($usuario);
             }
+
+            //Caso a senha for menor que 24 caracteres não é md5, necessário encriptar.
+            $senha = (strlen($senha) <= 24) ? md5($senha) : $senha;
             
-            if ($objUsuario->getSenha() == md5($senha)) {
+            if ($objUsuario->getSenha() == $senha) {
                 return $objUsuario;
             } else {
                 throw new WeLearn_Usuarios_AutenticacaoSenhaInvalidaException($senha);

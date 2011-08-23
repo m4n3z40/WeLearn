@@ -20,6 +20,7 @@ class WL_Template
     public function __construct()
     {
         $this->_ci =& get_instance();
+        $this->_ci->config->load('template');
 
         $this->_templatePath = $this->_ci->config->item('template_dir');
         $this->_template = $this->_ci->config->item('default_template');
@@ -105,16 +106,16 @@ class WL_Template
             $this->_ci->load->view($view, $data);
         }
 
-        $templateData = array(
+        $defaultTemplateData = array(
             'template.title' => empty($this->_title) ? '' : '| ' . $this->_title,
             'template.cssLinks' => $this->_compileCSS(),
             'template.jsImports' => $this->_compileJSImports(),
             'template.jsScripts' => $this->_compileJSScripts(),
             'base_url' => $this->_base_url,
-            'formLoginOpen' => form_open(),
-            'formLoginClose' => form_close(),
             'content' => $this->_ci->output->get_output()
         );
+
+        $templateData = array_merge($defaultTemplateData, $this->_getTemplateData());
 
         $final_output = $this->_loadTemplate($templateData);
 
@@ -175,6 +176,10 @@ class WL_Template
         }
 
         return str_replace($replaceThis, $withThis, $inThisFile);
+    }
+
+    private function _getTemplateData() {
+        return $this->_ci->config->item($this->_template, 'template_data');
     }
 }
 

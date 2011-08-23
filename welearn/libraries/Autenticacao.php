@@ -62,4 +62,13 @@ class WL_Autenticacao
 
         return $this->_usuario;
     }
+    
+    public function limparSessao()
+    {
+    	if ( ! $this->_sessaoHabilitada ) {
+    		throw new WeLearn_Base_SessaoDesabilitadaException();
+    	} else {
+    		$this->_ci->session->sess_destroy();
+    	}
+    }
 }

@@ -80,7 +80,7 @@ $autoload['helper'] = array('url','file','form','json','exception');
 |
 */
 
-$autoload['config'] = array('template','phpcassa');
+$autoload['config'] = array('phpcassa');
 
 
 /*

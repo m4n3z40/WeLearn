@@ -54,6 +54,9 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="{$base_url}js/libs/jquery-1.6.2.min.js"><\/script>')</script>
 
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
+<script>window.jQuery.ui || document.write('<script src="{$base_url}js/libs/jquery-ui-1.8.16.min.js"><\/script>')</script>
+
 <!-- scripts concatenated and minified via ant build script-->
 <script src="{$base_url}js/plugins.js"></script>
 <script src="{$base_url}js/script.js"></script>

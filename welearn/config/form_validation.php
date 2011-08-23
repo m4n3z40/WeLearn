@@ -66,14 +66,14 @@ $config = array(
         array(
             'field' => 'descricao',
             'label' => 'Descrição',
-            'rules' => 'required|trim'
+            'rules' => 'required|min_length[3]|max_length[80]|trim'
         )
     ),
     'area/adicionar' => array(
         array(
             'field' => 'descricao',
             'label' => 'Descrição',
-            'rules' => 'required|trim'
+            'rules' => 'required|min_length[3]|max_length[80]|trim'
         )
     ),
 );

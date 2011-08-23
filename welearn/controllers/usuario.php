@@ -14,8 +14,28 @@ class Usuario extends CI_Controller
 
     public function cadastrar()
     {
+        
+        if ( $this->autenticacao->isAutenticado() ) {
+            redirect('/home');
+        }
+        
+        $areaDao = WeLearn_DAO_DAOFactory::create('AreaDAO');
+        $listaAreasObjs = $areaDao->recuperarTodos();
+
+        $this->load->helper('area');
+        $listaAreas = lista_areas_para_dados_dropdown($listaAreasObjs);
+
+        $dadosPartial = array(
+            'listaAreas' => $listaAreas
+        );
+
         $partial_cadastro = array(
-            'form_cadastro' => $this->template->loadPartial('form_cadastro', null, 'usuario')
+            'form_cadastro' => $this->template
+                                    ->loadPartial(
+                                            'form_cadastro', 
+                                            $dadosPartial, 
+                                            'usuario'
+                                    )
         );
 
         $this->template->appendJSImport('cadastro_usuario.js');
@@ -31,7 +51,7 @@ class Usuario extends CI_Controller
         }
 
         //O retorno será em JSON.
-        header('Content-type: applcation/json');
+        set_json_header();
 
         //Faz a validação dos dados do formulário.
         $this->load->library('form_validation');
@@ -83,6 +103,8 @@ class Usuario extends CI_Controller
 
             $usuarioDao->salvar($novoUsuario);
 
+            $this->autenticacao->autenticar($novoUsuario->getNomeUsuario(), $novoUsuario->getSenha());
+
             $json = create_json_feedback(true);
 
         } catch (Exception $e) {//Caso haja um erro não esperado, o erro é logado e uma mensagem generica é retornada
@@ -97,12 +119,7 @@ class Usuario extends CI_Controller
         }
 
         //Retorna o resultado!
-        exit($json);
-    }
-
-    public function quickstart()
-    {
-
+        echo $json;
     }
 
     public function login()
@@ -110,6 +127,9 @@ class Usuario extends CI_Controller
         if ( ! $this->input->is_ajax_request() ) {
            show_404();
         }
+        
+        //O retorno será em JSON.
+        set_json_header();
 
         $this->load->library('form_validation');
         if ($this->form_validation->run() === FALSE) {
@@ -117,9 +137,6 @@ class Usuario extends CI_Controller
 
             exit($json);
         }
-
-        //O retorno será em JSON.
-        header('Content-type: applcation/json');
 
         $this->load->library('form_validation');
         if ($this->form_validation->run() === FALSE) {
@@ -160,7 +177,7 @@ class Usuario extends CI_Controller
         }
 
         //Retorna o resultado!
-        exit($json);
+        echo $json;
     }
 
     public function logout()
@@ -170,19 +187,19 @@ class Usuario extends CI_Controller
         }
 
         //O retorno será em JSON.
-        header('Content-type: applcation/json');
+        set_json_header();
 
-        $this->session->sess_destroy();
+        $this->autenticacao->limparSessao();
 
         $json = create_json_feedback(true);
 
-        exit($json);
+        echo $json;
     }
 
-	public function index()
-	{
-		$this->template->setTitle('Welcome to CodeIgniter')
-                       ->render('welcome_message');
+    public function index()
+    {
+        $this->template->setTitle('Welcome to CodeIgniter')
+               ->render('welcome_message');
     }
 }
 

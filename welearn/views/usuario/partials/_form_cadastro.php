@@ -15,9 +15,9 @@
             <dt><label for="txt-senha-confirm">Coonfirme a senha</label></dt>
                 <dd><input type="password" name="senhaConfirm" id="txt-senha-confirm" maxlength="24" placeholder="Confirme a senha" /></dd>
             <dt><label for="txt-area">Área de interesse</label></dt>
-                <dd><input type="text" name="area" id="txt-area" placeholder="Em qual área você se interessa?" /></dd>
-            <dt><label for="txt-segmento">Segmento de interesse</label></dt>
-                <dd><input type="text" name="segmento" id="txt-segmento" placeholder="Qual segmento desta área te atrai mais?" /></dd>
+                <dd><?php echo form_dropdown('area', $listaAreas, '0', 'id="txt-area"') ?></dd>
+            <dt class="hidden"><label for="txt-segmento">Segmento de interesse</label></dt>
+                <dd class="hidden"><?php echo form_dropdown('segmento', array(), '0', 'id="txt-segmento"') ?></dd>
         </dl>
         <button type="submit" name="cadastrar" value="1">Cadastrar!</button>
     </fieldset>
