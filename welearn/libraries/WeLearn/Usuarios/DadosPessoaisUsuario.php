@@ -21,57 +21,62 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO
     /**
      * @var string
      */
-    private $_sexo;
+    private $_sexo = WeLearn_Usuarios_Sexo::NAO_EXIBIR;
 
     /**
      * @var string
      */
-    private $_pais;
+    private $_pais = '';
+
+    /**
+     * @var int
+     */
+    private $_estado = 0;
 
     /**
      * @var string
      */
-    private $_cidade;
+    private $_cidade = '';
 
     /**
      * @var string
      */
-    private $_endereco;
+    private $_endereco = '';
 
     /**
      * @var string
      */
-    private $_dataNascimento;
+    private $_dataNascimento = '';
 
     /**
      * @var string
      */
-    private $_tel;
+    private $_tel = '';
 
     /**
      * @var string
      */
-    private $_telAlternativo;
+    private $_telAlternativo = '';
 
     /**
      * @var string
      */
-    private $_descricaoPessoal;
+    private $_descricaoPessoal = '';
 
     /**
      * @var string
      */
-    private $_homePage;
+    private $_homePage = '';
 
     /**
      * @var array
      */
-    private $_listaDeIM;
+    private $_listaDeIM = array();
 
     /**
      * @var array
      */
-    private $_listaDeRS;
+    private $_listaDeRS = array();
 
     /**
      * @param string $cidade
@@ -135,6 +140,22 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO
     public function getEndereco()
     {
         return $this->_endereco;
+    }
+
+    /**
+     * @param int $estado
+     */
+    public function setEstado($estado)
+    {
+        $this->_estado = (int)$estado;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEstado()
+    {
+        return $this->_estado;
     }
 
     /**

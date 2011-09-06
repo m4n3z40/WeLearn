@@ -36,8 +36,8 @@
 $GLOBALS['THRIFT_AUTOLOAD'] = array();
 $GLOBALS['AUTOLOAD_HOOKS'] = array();
 
-if (!function_exists('__thrift_autoload')) {
-  function __thrift_autoload($class) {
+if (!function_exists('__autoload')) {
+  function __autoload($class) {
     global $THRIFT_AUTOLOAD;
     $classl = strtolower($class);
     if (isset($THRIFT_AUTOLOAD[$classl])) {
@@ -49,5 +49,3 @@ if (!function_exists('__thrift_autoload')) {
     }
   }
 }
-
-spl_autoload_register('__thrift_autoload');

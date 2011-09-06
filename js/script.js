@@ -56,5 +56,17 @@ window.WeLearn = {
             processarResultado,
             'json'
         );
+    },
+    segmento : {
+        gerarOpcoesHTML : function(segmentosJSON) {
+            var html = '';
+
+            for(var i = 0; i < segmentosJSON.length; i++) {
+                html = html + '<option value="' + segmentosJSON[i].id + '">' + segmentosJSON[i].descricao + '</option>';
+            }
+            html = html + '<option value="0" selected="selected">Selecione um segmento desta área</option>';
+
+            return html;
+        }
     }
 };

@@ -13,9 +13,8 @@ class Bem_vindo extends CI_Controller {
         if ( $this->autenticacao->isAutenticado() ) {
             redirect('/home');
         }
-        
-        $this->template->appendJSImport('login_usuario.js');
-        $this->template->appendJSImport('cadastro_usuario.js');
+        $this->template->setTemplate('default')
+                       ->appendJSImport('cadastro_usuario.js');
     }
 
     public function index()

@@ -10,5 +10,9 @@ class WL_Controller extends CI_Controller
 		if( ! $this->autenticacao->isAutenticado() ) {
 			redirect('/');
 		}
+
+        $nomeUsuario = $this->autenticacao->getUsuarioAutenticado()->getNomeUsuario();
+
+        $this->template->setDefaultPartialVar('perfil/barra_usuario', array('nomeUsuario' => $nomeUsuario));
 	}
 }

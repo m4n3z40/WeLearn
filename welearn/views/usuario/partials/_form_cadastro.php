@@ -14,10 +14,10 @@
                 <dd><input type="password" name="senha" id="txt-senha" maxlength="24" placeholder="Sua senha" /></dd>
             <dt><label for="txt-senha-confirm">Coonfirme a senha</label></dt>
                 <dd><input type="password" name="senhaConfirm" id="txt-senha-confirm" maxlength="24" placeholder="Confirme a senha" /></dd>
-            <dt><label for="txt-area">Área de interesse</label></dt>
-                <dd><?php echo form_dropdown('area', $listaAreas, '0', 'id="txt-area"') ?></dd>
-            <dt class="hidden"><label for="txt-segmento">Segmento de interesse</label></dt>
-                <dd class="hidden"><?php echo form_dropdown('segmento', array(), '0', 'id="txt-segmento"') ?></dd>
+            <dt><label for="slt-area">Área de interesse</label></dt>
+                <dd><?php echo form_dropdown('area', $listaAreas, '0', 'id="slt-area"') ?></dd>
+            <dt class="hidden"><label for="slt-segmento">Segmento de interesse</label></dt>
+                <dd class="hidden"><?php echo form_dropdown('segmento', array(), '0', 'id="slt-segmento"') ?></dd>
         </dl>
         <button type="submit" name="cadastrar" value="1">Cadastrar!</button>
     </fieldset>

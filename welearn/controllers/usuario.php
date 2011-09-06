@@ -38,9 +38,9 @@ class Usuario extends CI_Controller
                                     )
         );
 
-        $this->template->appendJSImport('cadastro_usuario.js');
-
-        $this->template->render('usuario/cadastrar', $partial_cadastro);
+        $this->template->setTemplate('default')
+                       ->appendJSImport('cadastro_usuario.js')
+                       ->render('usuario/cadastrar', $partial_cadastro);
     }
 
     public function validar_cadastro()
@@ -138,12 +138,6 @@ class Usuario extends CI_Controller
             exit($json);
         }
 
-        $this->load->library('form_validation');
-        if ($this->form_validation->run() === FALSE) {
-            $json = create_json_feedback(false, validation_errors_json());
-            exit($json);
-        }
-
         try {
             $login = $this->input->post('login');
             $senha = $this->input->post('password');
@@ -198,8 +192,7 @@ class Usuario extends CI_Controller
 
     public function index()
     {
-        $this->template->setTitle('Welcome to CodeIgniter')
-               ->render('welcome_message');
+        $this->template->render();
     }
 }
 

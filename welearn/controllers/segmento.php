@@ -13,8 +13,7 @@ class Segmento extends CI_Controller {
 
 	public function index()
 	{
-		$this->template->setTitle('Welcome to CodeIgniter')
-                       ->render('welcome_message');
+		$this->template->render();
     }
 
     public function adicionar()
@@ -23,7 +22,7 @@ class Segmento extends CI_Controller {
             show_404();
         }
 
-        header('Content-type: applcation/json');
+        set_json_header();
 
         $this->load->library('form_validation');
         if ($this->form_validation->run() === FALSE) {

@@ -13,9 +13,7 @@ class Home extends WL_Controller {
 
     public function index()
     {
-        echo '<a class="logoutButton button" href="#">Logout</a>';
-        $this->template->appendJSImport('logout_usuario.js');
-        $this->template->render();
+        
     }
 }
 

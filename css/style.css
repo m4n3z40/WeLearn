@@ -215,14 +215,14 @@ aside {
 }
 
 button, .button {
-    height: 30px;
+    background: #fff;
     padding: 5px;
     border: #000 solid 1px;
     border-radius: 5px;
 }
 
 .center-container {
-    width: 960px;
+    width: 965px;
     margin: 0 auto;
 }
 
@@ -247,6 +247,40 @@ button, .button {
         border-radius: 5px;
         font-size: 20px;
     }
+
+
+/**************************************
+************ Template Perfil *********
+**************************************/
+
+#user-bar {
+    box-shadow: 0 -3px 5px #327e04;
+    margin: 0 auto;
+    background: #459e00;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    width: 99.8%;
+    position: fixed;
+    z-index: 999;
+    bottom: 0;
+    overflow: hidden;
+}
+
+    #user-bar > h3 {
+        margin: 5px;
+        width: 100px;
+        float: left;
+    }
+
+    #user-bar > .logoutButton {
+        float:left;
+    }
+
+#user-info {
+    color: #ddccdd;
+    font-weight: bold;
+    float: right;
+}
 
 .validation-error {
     font-style: italic;

@@ -16,6 +16,7 @@ class WL_Template
     private $_title = '';
     private $_base_url;
     private $_ci;
+    private $_partialsVars = array();
 
     public function __construct()
     {
@@ -97,7 +98,20 @@ class WL_Template
             $partialDir = $module . '/' . $partialDir;
         }
 
-        return $this->_ci->load->view($partialDir . '/_' . $partial, $data, TRUE);
+        if (preg_match('/\//', $partial)) {
+            $explodedPartial = explode('/', $partial);
+
+            $lastIndex = count($explodedPartial) - 1;
+            $finalPartial = '_' . $explodedPartial[$lastIndex];
+
+            $explodedPartial[$lastIndex] = $finalPartial;
+
+            $partial = implode('/', $explodedPartial);
+        } else {
+            $partial = '_' . $partial;
+        }
+
+        return $this->_ci->load->view($partialDir . '/' . $partial, $data, TRUE);
     }
 
     public function render($view = '', array $data = null)
@@ -117,9 +131,19 @@ class WL_Template
 
         $templateData = array_merge($defaultTemplateData, $this->_getTemplateData());
 
+        $defaultPartials = $this->_loadDefaultPartials();
+        if ($defaultPartials !== false) {
+            $templateData = array_merge($templateData, $defaultPartials);
+        }
+
         $final_output = $this->_loadTemplate($templateData);
 
         $this->_ci->output->set_output($final_output);
+    }
+
+    public function setDefaultPartialVar($partial, array $varAndValue)
+    {
+        $this->_partialsVars[(string)$partial] = $varAndValue;
     }
 
     private function _compileCSS()
@@ -174,12 +198,38 @@ class WL_Template
 
             show_error('Template Error, refer to log.');
         }
-
+        
         return str_replace($replaceThis, $withThis, $inThisFile);
     }
 
+    private function _loadDefaultPartials()
+    {
+        $templateData = $this->_ci->config->item($this->_template, 'template_data');
+
+        if (isset($templateData['_defaultPartials']) && is_array($templateData['_defaultPartials'])) {
+            $partialData = array();
+            foreach ($templateData['_defaultPartials'] as $partial) {
+                $templateData = (isset($this->_partialsVars[$partial])) ? $this->_partialsVars[$partial] : null;
+                $partialData['partial:' . trim($partial)] = $this->loadPartial($partial, $templateData);
+            }
+
+            return $partialData;
+        }
+
+        return false;
+    }
+
     private function _getTemplateData() {
-        return $this->_ci->config->item($this->_template, 'template_data');
+        $templateData = $this->_ci->config->item($this->_template, 'template_data');
+
+        $realTemplateData = array();
+        foreach ($templateData as $key => $value) {
+            if ( ! preg_match('/^_/', $key) ) {
+                $realTemplateData[$key] = $value;
+            }
+        }
+
+        return $realTemplateData;
     }
 }
 

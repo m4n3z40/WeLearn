@@ -8,7 +8,7 @@
  
 $config['template_dir'] = APPPATH . 'templates/';
 
-$config['default_template'] = 'default';
+$config['default_template'] = 'perfil';
 
 $config['template_data'] = array(
     'default' => array(
@@ -16,7 +16,7 @@ $config['template_data'] = array(
         'formLoginClose' => form_close(),
     ),
     'perfil' => array(
-
+        '_defaultPartials' => array('perfil/barra_usuario')
     ),
     'curso' => array(
 

@@ -7,11 +7,11 @@
  */
 $(document).ready(function(){
     var $btnCadastrar = $('button[name=cadastrar]'),
-        $sltArea = $('#txt-area');
+        $sltArea = $('#slt-area');
 
     $sltArea.change(function(e){
         var $lblSegmento = $('label[for=txt-segmento]').parent(),
-            $sltSegmento = $('#txt-segmento'),
+            $sltSegmento = $('#slt-segmento'),
             $ddSegmento = $sltSegmento.parent();
             
         $sltSegmento.html('');
@@ -27,20 +27,13 @@ $(document).ready(function(){
             return false;
         }
 
-        $.post(
+        $.get(
             'http://welearn.com/segmento/recuperar_lista/' + $(this).val(),
             null,
             function(res){
-                
                 if (res.success) {
-                    var html = '',
-                        segmentos = res.segmentos;
+                    var html = WeLearn.segmento.gerarOpcoesHTML(res.segmentos);
                     
-                    for(var i = 0; i < segmentos.length; i++) {
-                        html = html + '<option value="' + segmentos[i].id + '">' + segmentos[i].descricao + '</option>';
-                    }
-                    html = html + '<option value="" selected="selected">Selecione um segmento desta área...</option>';
-
                     $sltSegmento.html(html);
                     $lblSegmento.removeClass('hidden');
                     $ddSegmento.removeClass('hidden');

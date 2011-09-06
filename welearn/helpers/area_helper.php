@@ -4,7 +4,7 @@ function lista_areas_para_dados_dropdown(array $areas)
 {
     $dropdownAreas = array();
     
-    $dropdownAreas[''] = 'Selecione uma área de segmento';
+    $dropdownAreas['0'] = 'Selecione uma área de segmento';
     
     foreach ($areas as $area) {
         $dropdownAreas[$area->getId()] = $area->getDescricao();

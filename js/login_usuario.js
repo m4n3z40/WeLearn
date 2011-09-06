@@ -7,7 +7,6 @@
  */
 $(document).ready(function(){
     var $btnLogin = $('button[name=submitLogin]');
-
     $btnLogin.click(function(e){
         e.preventDefault();
 
