@@ -22,11 +22,23 @@ class Sugestao extends WL_Controller {
     public function listar()
     {
         try {
+            $count = 10;
+
             $sugestaoDao = WeLearn_DAO_DAOFactory::create('SugestaoCursoDAO');
-            $sugestoesRecentes = $sugestaoDao->recuperarTodos();
+            $sugestoesRecentes = $sugestaoDao->recuperarTodos('','', array('count' => $count + 1));
+
+            $haProximos = false; $primeiroProximos = null;
+            if (count($sugestoesRecentes) == $count + 1) {
+                $haProximos = true;
+                $primeiroProximos = $sugestoesRecentes[$count];
+
+                unset($sugestoesRecentes[$count]);
+            }
 
             $dadosView = array(
-                'sugestoes' => $sugestoesRecentes
+                'sugestoes' => $sugestoesRecentes,
+                'haProximos' => $haProximos,
+                'primeiroProximos' => $primeiroProximos
             );
 
             $this->template->render('curso/sugestao/lista', $dadosView);

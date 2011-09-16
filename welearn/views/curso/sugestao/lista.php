@@ -68,6 +68,12 @@
             <?php endforeach ?>
         <?php endif ?>
         </div>
-        <footer></footer>
+        <footer>
+            <?php if($haProximos): ?>
+                Proximo: <?php echo $primeiroProximos->id ?>
+            <?php else: ?>
+                Não há mais Sugestões a serem exibidas.
+            <?php endif; ?>
+        </footer>
     </div>
 </div>

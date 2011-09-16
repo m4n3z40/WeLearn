@@ -90,10 +90,6 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
     {
         $count = isset($filtros['count']) ? $filtros['count'] : 10;
 
-        if (empty($filtros) || !is_array($filtros)) {
-            return $this->recuperarTodosRecentes($de, $ate, $count);
-        }
-
         if (isset($filtros['area']) && ($filtros['area'] instanceof WeLearn_Cursos_Area)) {
             return $this->recuperarTodosPorArea($filtros['area'], $de, $ate, $count);
         }
@@ -106,12 +102,12 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
             return $this->recuperarTodosPorUsuario($filtros['usuario'], $de, $ate, $count);
         }
 
-        return false;
+        return $this->recuperarTodosRecentes($de, $ate, $count);
     }
 
     public function recuperarTodosRecentes($de = '', $ate = '', $count = 10)
     {
-        $sugestoesArray = $this->_cf->get_range($de, $ate, $count + 1);
+        $sugestoesArray = $this->_cf->get_range($de, $ate, $count);
 
         $sugestoesObjs = array();
         foreach ($sugestoesArray as $key => $column) {
@@ -134,7 +130,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
                                            $de,
                                            $ate,
                                            false,
-                                           $count + 1)
+                                           $count)
         );
 
         $sugestoesArray = $this->_cf->multiget($idsSugestoes);
@@ -160,7 +156,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
                                                $de,
                                                $ate,
                                                false,
-                                               $count + 1)
+                                               $count)
         );
 
         $sugestoesArray = $this->_cf->multiget($idsSugestoes);
@@ -186,7 +182,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
                                               $de,
                                               $ate,
                                               false,
-                                              $count + 1)
+                                              $count)
         );
 
         $sugestoesArray = $this->_cf->multiget($idsSugestoes);
