@@ -1,9 +1,11 @@
-<?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Administrador
- * Date: 08/09/11
- * Time: 12:12
- * To change this template use File | Settings | File Templates.
- */
- 
+<div>
+    <header>
+        <hgroup>
+            <h1>Sugerir um Curso</h1>
+            <h3>Enviar uma sugestão de curso para o serviço</h3>
+        </hgroup>
+    </header>
+    <div>
+        <?php echo $formCriar ?>
+    </div>
+</div>

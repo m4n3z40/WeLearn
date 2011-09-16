@@ -9,9 +9,15 @@ $(document).ready(function(){
     var $sltArea = $('#slt-area');
 
     $sltArea.change(function(e){
-        var $sltSegmento = $('#slt-segmento');
+        var $sltSegmento = $('#slt-segmento'),
+            vazio = '<option value="0">Selecione uma área de segmento</option>';
 
         $(this).next('p.error').remove();
+
+        if($(this).val() == '0') {
+            $sltSegmento.val(vazio);
+            return;
+        }
 
         $.get(
             'http://welearn.com/segmento/recuperar_lista/' + $(this).val(),
@@ -22,8 +28,7 @@ $(document).ready(function(){
 
                     $sltSegmento.html(html);
                 } else {
-                    html = '<option value="0">Selecione uma área de segmento</option>';
-                    $sltSegmento.html(html);
+                    $sltSegmento.html(vazio);
 
                     var errors = res.errors;
 

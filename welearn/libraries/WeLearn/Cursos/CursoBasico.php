@@ -12,7 +12,7 @@ abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO
 {
 
     /**
-     * @var int
+     * @var string
      */
     protected $_id;
 
@@ -79,15 +79,15 @@ abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param int $id
+     * @param string $id
      */
     public function setId($id)
     {
-        $this->_id = (int)$id;
+        $this->_id = (string)$id;
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
@@ -183,6 +183,24 @@ abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO
             'status' => $this->getStatus(),
             'segmento' => $this->getSegmento()->toArray(),
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'tema' => $this->getTema(),
+            'descricao' => $this->getDescricao(),
+            'dataCriacao' => $this->getDataCriacao(),
+            'status' => $this->getStatus(),
+            'segmento' => empty($this->_segmento) ? '' : $this->getSegmento()->getId()
         );
     }
 }

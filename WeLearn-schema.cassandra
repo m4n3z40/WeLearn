@@ -83,3 +83,51 @@ with comparator = 'UTF8Type'
 and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'UTF8Type';
+
+create column family cursos_sugestao_curso
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_sugestao_por_area
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
+create column family cursos_sugestao_por_segmento
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
+create column family cursos_sugestao_por_usuario
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
+create column family cursos_sugestao_por_status
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'IntegerType';
+
+create column family cursos_sugestao_aceita_por_area
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
+create column family cursos_sugestao_aceita_por_segmento
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
+create column family cursos_sugestao_aceita_por_usuario
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';

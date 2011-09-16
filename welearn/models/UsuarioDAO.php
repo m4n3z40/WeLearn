@@ -42,7 +42,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     {
         $dto->setId($dto->getNomeUsuario()); //Id = Nome de usuário
         $dto->setSenha(md5($dto->getSenha())); //Senha necessita ser encriptada.
-        $dto->setDataCadastro(date('d/m/Y H:m:s'));
+        $dto->setDataCadastro(time());
 
         $this->_cf->insert($dto->getId(), $dto->toCassandra());
 

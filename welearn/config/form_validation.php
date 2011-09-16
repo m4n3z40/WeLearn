@@ -24,17 +24,17 @@ $config = array(
         array(
             'field' => 'nome',
             'label' => 'Nome',
-            'rules' => 'required|min_length[5]|max_length[45]'
+            'rules' => 'required|min_length[5]|max_length[45]|strip_tags'
         ),
         array(
             'field' => 'sobrenome',
             'label' => 'Sobrenome',
-            'rules' => 'max_length[60]'
+            'rules' => 'max_length[60]|strip_tags'
         ),
         array(
             'field' => 'email',
             'label' => 'Email',
-            'rules' => 'required|max_length[80]|valid_email'
+            'rules' => 'required|max_length[80]|valid_email|strip_tags'
         ),
         array(
             'field' => 'nomeUsuario',
@@ -66,14 +66,41 @@ $config = array(
         array(
             'field' => 'descricao',
             'label' => 'Descrição',
-            'rules' => 'required|min_length[3]|max_length[80]|trim'
+            'rules' => 'required|min_length[3]|max_length[80]|trim|strip_tags'
         )
     ),
     'area/adicionar' => array(
         array(
             'field' => 'descricao',
             'label' => 'Descrição',
-            'rules' => 'required|min_length[3]|max_length[80]|trim'
+            'rules' => 'required|min_length[3]|max_length[80]|trim|strip_tags'
+        )
+    ),
+    'sugestao/salvar' => array(
+        array(
+            'field' => 'nome',
+            'label' => 'Nome do Curso',
+            'rules' => 'required|min_length[5]|max_length[80]|trim|strip_tags'
+        ),
+        array(
+            'field' => 'tema',
+            'label' => 'Tema do Curso',
+            'rules' => 'required|min_length[5]|max_length[256]|trim|strip_tags'
+        ),
+        array(
+            'field' => 'descricao',
+            'label' => 'Descrição',
+            'rules' => 'max_length[2048]|strip_tags'
+        ),
+        array(
+            'field' => 'area',
+            'label' => 'Área de Segmento',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'segmento',
+            'label' => 'Segmento do Curso',
+            'rules' => 'required'
         )
     ),
 );

@@ -74,7 +74,7 @@ $config['autopack_column_names'] = true;
 | Whether or not to automatically convert column values
 | to and from their binary representation in Cassandra
 */
-$config['autopack_column_values'] = false;
+$config['autopack_column_values'] = true;
 
 /* End of file phpcassa.php */
 /* Location: ./application/config/phpcassa.php */

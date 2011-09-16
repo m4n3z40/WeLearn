@@ -68,5 +68,30 @@ window.WeLearn = {
 
             return html;
         }
+    },
+    initAjax : function () {
+        var loaderHTML = '<div id="ajax-loading">' +
+                         '<img src="http://welearn.com/img/ajax_loading.gif" alt="Carregando..." />' +
+                         '</div>';
+
+        var $loader = $(loaderHTML);
+
+        $loader.bind({
+            ajaxStart: function(){
+                $(this).show('slide', {direction: 'up'}, 250);
+            },
+            ajaxStop: function(){
+                $(this).hide('slide', {direction: 'up'}, 250);
+            }
+        });
+
+        $('body').append($loader);
+    },
+    init : function(){
+        this.initAjax();
     }
 };
+
+$(document).ready(function(){
+   WeLearn.init();
+});

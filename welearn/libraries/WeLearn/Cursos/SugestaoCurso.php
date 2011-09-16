@@ -10,11 +10,15 @@
 
 class WeLearn_Cursos_SugestaoCurso extends WeLearn_Cursos_CursoBasico
 {
-
     /**
      * @var WeLearn_Usuarios_Usuario
      */
     private $_criador;
+
+    /**
+     * @var WeLearn_Cursos_Curso
+     */
+    private $_cursoCriado;
 
     /**
      * @param \WeLearn_Usuarios_Usuario $criador
@@ -30,6 +34,22 @@ class WeLearn_Cursos_SugestaoCurso extends WeLearn_Cursos_CursoBasico
     public function getCriador()
     {
         return $this->_criador;
+    }
+
+    /**
+     * @param \WeLearn_Cursos_Curso $cursoCriado
+     */
+    public function setCursoCriado($cursoCriado)
+    {
+        $this->_cursoCriado = $cursoCriado;
+    }
+
+    /**
+     * @return \WeLearn_Cursos_Curso
+     */
+    public function getCursoCriado()
+    {
+        return $this->_cursoCriado;
     }
 
     /**
@@ -51,6 +71,18 @@ class WeLearn_Cursos_SugestaoCurso extends WeLearn_Cursos_CursoBasico
                 'criador' => $this->getCriador()->toArray()
             )
         );
+
+        return $selfArray;
+    }
+
+    public function toCassandra()
+    {
+        $sugestao = array(
+            'criador' => empty($this->_criador) ? '' : $this->getCriador()->getId(),
+            'cursoCriado' => empty($this->_cursoCriado) ? '' : $this->getCursoCriado()->getId()
+        );
+
+        $selfArray = array_merge(parent::toCassandra(), $sugestao);
 
         return $selfArray;
     }

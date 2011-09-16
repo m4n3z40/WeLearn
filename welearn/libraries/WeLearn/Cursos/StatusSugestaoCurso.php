@@ -8,18 +8,18 @@
  *
  */
 
-abstract class WeLearn_Cursos_StatusCurso implements WeLearn_Base_IEnum
+abstract class WeLearn_Cursos_StatusSugestaoCurso implements WeLearn_Base_IEnum
 {
 
     /**
      * @constant
      */
-    const CONTEUDO_BLOQUEADO = 0;
+    const EM_ESPERA = 0;
 
     /**
      * @constant
      */
-    const CONTEUDO_ABERTO = 1;
+    const GEROU_CURSO = 1;
 
     /**
      * Retorna a descrição do Enum passado por parametru.
@@ -31,10 +31,10 @@ abstract class WeLearn_Cursos_StatusCurso implements WeLearn_Base_IEnum
     public static function getDescricao($codigo)
     {
         switch ($codigo) {
-            case self::CONTEUDO_BLOQUEADO:
-                return 'Conteúdo do Curso Bloqueado';
-            case self::CONTEUDO_ABERTO:
-                return 'Conteúdo do Curso Aberto';
+            case self::EM_ESPERA:
+                return 'Sugestão em Espera';
+            case self::GEROU_CURSO:
+                return 'Curso foi criado a partir desta sugestão';
             default:
                 throw new WeLearn_Base_CodigoEnumIncorretoException();
         }

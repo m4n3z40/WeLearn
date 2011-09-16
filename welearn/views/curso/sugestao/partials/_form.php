@@ -9,10 +9,10 @@
             <dt><label for="txt-descricao">Descrição</label></dt>
                 <dd><textarea rows="5" cols="50" name="descricao" id="txt-descricao"><?php echo $descricaoAtual ?></textarea></dd>
             <dt><label for="slt-area">Área de Segmento</label></dt>
-                <dd><?php form_dropdown('area', $listaAreas, $areaAtual, 'id="slt-area"') ?></dd>
+                <dd><?php echo form_dropdown('area', $listaAreas, $areaAtual, 'id="slt-area"') ?></dd>
             <dt><label for="slt-segmento">Segmento do Curso</label></dt>
-                <dd><?php form_dropdown('segmento', $listaSegmentos, $segmentoAtual, 'id="slt-segmento"') ?></dd>
+                <dd><?php echo form_dropdown('segmento', $listaSegmentos, $segmentoAtual, 'id="slt-segmento"') ?></dd>
         </dl>
-        <button type="submit" name="sugerir" id="btn-sugerir">Enviar Sugestão</button>
+        <button type="submit" name="acao" value="criar" id="btn-sugerir">Enviar Sugestão</button>
     </fieldset>
 <?php echo form_close() ?>
