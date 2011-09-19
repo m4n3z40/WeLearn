@@ -181,7 +181,7 @@ abstract class WeLearn_Cursos_CursoBasico extends WeLearn_DTO_AbstractDTO
             'descricao' => $this->getDescricao(),
             'dataCriacao' => $this->getDataCriacao(),
             'status' => $this->getStatus(),
-            'segmento' => $this->getSegmento()->toArray(),
+            'segmento' => empty($this->_segmento) ? null : $this->getSegmento()->toArray(),
             'persistido' => $this->isPersistido()
         );
     }

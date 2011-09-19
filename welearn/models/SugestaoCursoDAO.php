@@ -107,6 +107,14 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
     public function recuperarTodosRecentes($de = '', $ate = '', $count = 10)
     {
+        if (is_string($de) && $de != '') {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+
+        if (is_string($ate) && $ate != '') {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
         $sugestoesArray = $this->_cf->get_range($de, $ate, $count);
 
         $sugestoesObjs = array();
@@ -124,6 +132,14 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
     public function recuperarTodosPorArea(WeLearn_Cursos_Area $area, $de = '', $ate = '', $count = 10)
     {
+        if (is_string($de) && $de != '') {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+
+        if (is_string($ate) && $ate != '') {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
         $idsSugestoes = array_keys(
             $this->_sugestaoPorAreaCF->get($area->getId(),
                                            null,
@@ -150,6 +166,14 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
     public function recuperarTodosPorSegmento(WeLearn_Cursos_Segmento $segmento, $de = '', $ate = '', $count = 10)
     {
+        if (is_string($de) && $de != '') {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+
+        if (is_string($ate) && $ate != '') {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
         $idsSugestoes = array_keys(
             $this->_sugestaoPorSegmentoCF->get($segmento->getId(),
                                                null,
@@ -176,6 +200,14 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
     public function recuperarTodosPorUsuario(WeLearn_Usuarios_Usuario $usuario, $de = '', $ate = '', $count = 10)
     {
+        if (is_string($de) && $de != '') {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+
+        if (is_string($ate) && $ate != '') {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
         $idsSugestoes = array_keys(
             $this->_sugestaoPorUsuarioCF->get($usuario->getId(),
                                               null,

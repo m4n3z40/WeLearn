@@ -68,7 +68,8 @@ class WeLearn_Cursos_SugestaoCurso extends WeLearn_Cursos_CursoBasico
         $selfArray = array_merge(
             $selfArray,
             array(
-                'criador' => $this->getCriador()->toArray()
+                'criador' => empty($this->_criador) ? null : $this->getCriador()->toArray(),
+                'cursoCriado' => empty($this->_cursoCriado) ? null : $this->getCriador()->toArray()
             )
         );
 

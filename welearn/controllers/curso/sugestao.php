@@ -27,21 +27,53 @@ class Sugestao extends WL_Controller {
             $sugestaoDao = WeLearn_DAO_DAOFactory::create('SugestaoCursoDAO');
             $sugestoesRecentes = $sugestaoDao->recuperarTodos('','', array('count' => $count + 1));
 
-            $haProximos = false; $primeiroProximos = null;
-            if (count($sugestoesRecentes) == $count + 1) {
-                $haProximos = true;
-                $primeiroProximos = $sugestoesRecentes[$count];
-
-                unset($sugestoesRecentes[$count]);
-            }
+            $this->load->helper('paginacao_cassandra');
+            $paginacao = create_paginacao_cassandra($sugestoesRecentes, $count);
 
             $dadosView = array(
                 'sugestoes' => $sugestoesRecentes,
-                'haProximos' => $haProximos,
-                'primeiroProximos' => $primeiroProximos
+                'haProximos' => $paginacao['proxima_pagina'],
+                'primeiroProximos' => $paginacao['inicio_proxima_pagina']
             );
 
             $this->template->render('curso/sugestao/lista', $dadosView);
+        } catch (Exception $e) {
+            echo create_exception_description($e);
+        }
+    }
+
+    public function proxima_pagina($inicio)
+    {
+        if( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $count = 10;
+
+            $sugestaoDao = WeLearn_DAO_DAOFactory::create('SugestaoCursoDAO');
+            $listaSugestoes = $sugestaoDao->recuperarTodos($inicio, '', array('count' => $count + 1));
+
+            $this->load->helper('paginacao_cassandra');
+            $paginacao = create_paginacao_cassandra($listaSugestoes, $count);
+            if ($paginacao['proxima_pagina']) {
+                $paginacao['inicio_proxima_pagina'] = $paginacao['inicio_proxima_pagina']->getId();
+            }
+
+            $listaSugestoesArr = array();
+            foreach ($listaSugestoes as $sugestao) {
+                $listaSugestoesArr[] = $sugestao->toArray();
+            }
+
+            $arrResultado = array(
+                'success' => true,
+                'sugestoes' => $listaSugestoesArr,
+                'paginacao' => $paginacao
+            );
+
+            echo Zend_Json::encode($arrResultado);
         } catch (Exception $e) {
             echo create_exception_description($e);
         }

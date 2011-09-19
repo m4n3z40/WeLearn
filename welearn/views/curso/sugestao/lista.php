@@ -22,7 +22,7 @@
                 </ul>
             </nav>
         </header>
-        <div>
+        <div id="lista-sugestoes">
         <?php if(empty($sugestoes)): ?>
             <p>Nenhuma sugestão de curso para ser listada.</p>
         <?php else: ?>
@@ -60,7 +60,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <a href="#">Criar curso à partir desta sugestão.</a>
+                            <a href="#">Criar curso à partir desta sugestão</a>
                         </td>
                     </tr>
                 </table>
@@ -69,11 +69,13 @@
         <?php endif ?>
         </div>
         <footer>
+            <p id="prox-pagina">
             <?php if($haProximos): ?>
-                Proximo: <?php echo $primeiroProximos->id ?>
+                <a href="#" data-proximo="<?php echo $primeiroProximos->id ?>">Mais sugestões</a>
             <?php else: ?>
                 Não há mais Sugestões a serem exibidas.
             <?php endif; ?>
+            </p>
         </footer>
     </div>
 </div>
