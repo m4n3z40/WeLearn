@@ -10,20 +10,20 @@ $(document).ready(function(){
         $sltArea = $('#slt-area');
 
     $sltArea.change(function(e){
-        var $lblSegmento = $('label[for=txt-segmento]').parent(),
+        var $lblSegmento = $('label[for=slt-segmento]').parent(),
             $sltSegmento = $('#slt-segmento'),
             $ddSegmento = $sltSegmento.parent();
             
         $sltSegmento.html('');
-        $lblSegmento.addClass('hidden');
-        $ddSegmento.addClass('hidden');
+        $lblSegmento.hide();
+        $ddSegmento.hide();
         
         var $error = $(this).next('p.error');
         if ($error) {
             $error.remove();
         }
         
-        if ( $(this).val() == "" ) {
+        if ( $(this).val() == "0" ) {
             return false;
         }
 
@@ -35,8 +35,8 @@ $(document).ready(function(){
                     var html = WeLearn.segmento.gerarOpcoesHTML(res.segmentos);
                     
                     $sltSegmento.html(html);
-                    $lblSegmento.removeClass('hidden');
-                    $ddSegmento.removeClass('hidden');
+                    $lblSegmento.show('fast');
+                    $ddSegmento.show('fast');
                 } else {                    
                     var errors = res.errors;
                     

@@ -22,6 +22,12 @@ class Sugestao extends WL_Controller {
     public function listar()
     {
         try {
+            $filtro = $this->input->get('f');
+
+            $this->load->helper(array('area', 'segmento'));
+            $listaAreas = lista_areas_para_dados_dropdown();
+            $listaSegmentos = lista_segmentos_para_dados_dropdown();
+
             $count = 10;
 
             $sugestaoDao = WeLearn_DAO_DAOFactory::create('SugestaoCursoDAO');
@@ -31,6 +37,10 @@ class Sugestao extends WL_Controller {
             $paginacao = create_paginacao_cassandra($sugestoesRecentes, $count);
 
             $dadosView = array(
+                'listaAreas' => $listaAreas,
+                'areaAtual' => '0',
+                'listaSegmentos' => $listaSegmentos,
+                'segmentoAtual' => '0',
                 'sugestoes' => $sugestoesRecentes,
                 'haProximos' => $paginacao['proxima_pagina'],
                 'primeiroProximos' => $paginacao['inicio_proxima_pagina']
@@ -38,7 +48,10 @@ class Sugestao extends WL_Controller {
 
             $this->template->render('curso/sugestao/lista', $dadosView);
         } catch (Exception $e) {
-            echo create_exception_description($e);
+            log_message('error', 'Erro ao retornar outra página de sugestões de curso: '
+                                 . create_exception_description($e));
+
+
         }
     }
 
@@ -75,17 +88,20 @@ class Sugestao extends WL_Controller {
 
             echo Zend_Json::encode($arrResultado);
         } catch (Exception $e) {
-            echo create_exception_description($e);
+            log_message('error', 'Erro ao retornar outra página de sugestões de curso: '
+                                 . create_exception_description($e));
+
+            $erro = create_json_feedback_error_json('Algo deu errado ao retornar a'
+                                                    . ' próxima página, tente novamente mais tarde.');
+
+            echo create_json_feedback(false, $erro);
         }
     }
 
     public function criar()
     {
-        $areaDao = WeLearn_DAO_DAOFactory::create('AreaDAO');
-        $listaAreasObjs = $areaDao->recuperarTodos();
-
         $this->load->helper('area');
-        $listaAreas = lista_areas_para_dados_dropdown($listaAreasObjs);
+        $listaAreas = lista_areas_para_dados_dropdown();
 
         $listaSegmentos = array(
             '0' => 'Selecione uma área de segmento'

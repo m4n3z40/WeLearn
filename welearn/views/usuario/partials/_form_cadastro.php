@@ -16,8 +16,8 @@
                 <dd><input type="password" name="senhaConfirm" id="txt-senha-confirm" maxlength="24" placeholder="Confirme a senha" /></dd>
             <dt><label for="slt-area">Área de interesse</label></dt>
                 <dd><?php echo form_dropdown('area', $listaAreas, '0', 'id="slt-area"') ?></dd>
-            <dt class="hidden"><label for="slt-segmento">Segmento de interesse</label></dt>
-                <dd class="hidden"><?php echo form_dropdown('segmento', array(), '0', 'id="slt-segmento"') ?></dd>
+            <dt style="display: none;"><label for="slt-segmento">Segmento de interesse</label></dt>
+                <dd style="display: none;"><?php echo form_dropdown('segmento', array(), '0', 'id="slt-segmento"') ?></dd>
         </dl>
         <button type="submit" name="cadastrar" value="1">Cadastrar!</button>
     </fieldset>

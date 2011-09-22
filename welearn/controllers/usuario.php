@@ -18,12 +18,9 @@ class Usuario extends CI_Controller
         if ( $this->autenticacao->isAutenticado() ) {
             redirect('/home');
         }
-        
-        $areaDao = WeLearn_DAO_DAOFactory::create('AreaDAO');
-        $listaAreasObjs = $areaDao->recuperarTodos();
 
         $this->load->helper('area');
-        $listaAreas = lista_areas_para_dados_dropdown($listaAreasObjs);
+        $listaAreas = lista_areas_para_dados_dropdown();
 
         $dadosPartial = array(
             'listaAreas' => $listaAreas

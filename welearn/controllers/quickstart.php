@@ -120,14 +120,10 @@ class Quickstart extends WL_Controller {
 
     private function _etapa2()
     {
-        $areaDao = WeLearn_DAO_DAOFactory::create('AreaDAO');
-        $listaAreaObjs = $areaDao->recuperarTodos();
+        $this->load->helper(array('area', 'segmento'));
+        $listaAreas = lista_areas_para_dados_dropdown();
 
-        $this->load->helper('area');
-        $listaAreas = lista_areas_para_dados_dropdown($listaAreaObjs);
-
-        $listaSegmentos = array();
-        $listaSegmentos['0'] = 'Selecione uma área de segmento';
+        $listaSegmentos = lista_segmentos_para_dados_dropdown();
 
         $dadosEtapa2 = array(
             'extraOpenForm' => 'id="form-etapa-2" class="quickstart-form"',

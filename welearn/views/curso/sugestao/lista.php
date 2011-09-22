@@ -8,18 +8,24 @@
     <div>
         <header>
             <h4>Filtros</h4>
-            <nav>
+            <nav id="tab-filtro">
                 <ul>
-                    <li><a href="">Mais Recentes</a></li>
-                    <li><a href="">Populares</a></li>
-                    <li>
-                        <a href="">Por área ou segmento</a>
-                        <?php echo form_open() ?>
-                        <?php echo form_close() ?>
-                    </li>
-                    <li><a href="">Recomendados</a></li>
-                    <li><a href="">Sugestões Aceitas</a></li>
+                    <li><a href="<?php echo site_url('/curso/sugestao/listar?f=new') ?>">Mais Recentes</a></li>
+                    <li><a href="<?php echo site_url('/curso/sugestao/listar?f=pop') ?>">Populares</a></li>
+                    <li><a href="#form-segmentos">Por área ou segmento</a></li>
+                    <li><a href="<?php echo site_url('/curso/sugestao/listar?f=rec') ?>">Recomendados</a></li>
+                    <li><a href="<?php echo site_url('/curso/sugestao/listar?f=acc') ?>">Sugestões Aceitas</a></li>
                 </ul>
+                <div id="form-segmentos" style="display: none;">
+                    <?php echo form_open() ?>
+                        <dl>
+                            <dt><label for="slt-area">Área de Segmento</label></dt>
+                                <dd><?php echo form_dropdown('area', $listaAreas, $areaAtual, 'id="slt-area"') ?></dd>
+                            <dt><label for="slt-segmento">Segmento do Curso</label></dt>
+                                <dd><?php echo form_dropdown('segmento', $listaSegmentos, $segmentoAtual, 'id="slt-segmento"') ?></dd>
+                        </dl>
+                    <?php echo form_close() ?>
+                </div>
             </nav>
         </header>
         <div id="lista-sugestoes">
@@ -66,16 +72,16 @@
                 </table>
             </div>
             <?php endforeach ?>
+            </div>
+            <footer>
+                <p id="prox-pagina">
+                <?php if($haProximos): ?>
+                    <a href="#" data-proximo="<?php echo $primeiroProximos->id ?>">Mais sugestões</a>
+                <?php else: ?>
+                    <span>Não há mais Sugestões a serem exibidas.</span>
+                <?php endif; ?>
+                </p>
+            </footer>
         <?php endif ?>
-        </div>
-        <footer>
-            <p id="prox-pagina">
-            <?php if($haProximos): ?>
-                <a href="#" data-proximo="<?php echo $primeiroProximos->id ?>">Mais sugestões</a>
-            <?php else: ?>
-                Não há mais Sugestões a serem exibidas.
-            <?php endif; ?>
-            </p>
-        </footer>
     </div>
 </div>

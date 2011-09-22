@@ -19,11 +19,8 @@ class Bem_vindo extends CI_Controller {
 
     public function index()
     {
-        $areaDao = WeLearn_DAO_DAOFactory::create('AreaDAO');
-        $listaAreaObjs = $areaDao->recuperarTodos();
-        
         $this->load->helper('area');
-        $listaAreas = lista_areas_para_dados_dropdown($listaAreaObjs);
+        $listaAreas = lista_areas_para_dados_dropdown();
         
         $dadosPartial = array(
             'listaAreas' => $listaAreas
