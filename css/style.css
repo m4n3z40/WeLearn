@@ -249,6 +249,55 @@ button, .button {
         margin-top: 5px;
     }
 
+#container-notificacoes {
+    width: 100%;
+    position: fixed;
+    top: 0;
+}
+
+    #container-notificacoes .barra-notificacao-erro,
+    #container-notificacoes .barra-notificacao-sucesso,
+    #container-notificacoes .barra-notificacao-aviso {
+        padding: 5px 10px;
+        overflow: hidden;
+    }
+
+    .barra-notificacao-erro .msg-notificacao,
+    .barra-notificacao-sucesso .msg-notificacao,
+    .barra-notificacao-aviso .msg-notificacao {
+        width: 90%;
+        text-align: center;
+        margin: 0 auto;
+        float: left;
+    }
+
+    #container-notificacoes .barra-notificacao-erro {
+        background: #f3a3a3;
+        border: 1px #9f1c25 solid;
+        color: #9f1c25;
+    }
+
+    #container-notificacoes .barra-notificacao-sucesso {
+        background: #99ff99;
+        border: 1px #327e04 solid;
+        color: #006600;
+    }
+
+    #container-notificacoes .barra-notificacao-aviso {
+        background: #fcf0ba;
+        border: 1px #e8e1b5 solid;
+        color: #363636;
+    }
+
+    .barra-notificacao-fechar-habilitado {
+        float: right;
+    }
+
+    .barra-notificacao-fechar-desabilitado {
+        display: none;
+        visibility: hidden;
+    }
+
 #about {
     width: 650px;
     margin-right: 10px;

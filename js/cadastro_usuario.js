@@ -23,7 +23,7 @@ $(document).ready(function(){
             $error.remove();
         }
         
-        if ( $(this).val() == "0" ) {
+        if ( $(this).val() == '0' || $(this).val() == '' ) {
             return false;
         }
 
@@ -52,6 +52,14 @@ $(document).ready(function(){
 
     $btnCadastrar.click(function(e){
         e.preventDefault();
+
+        var $sltsSegmentos = $('#slt-area option:selected,#slt-segmento option:selected');
+
+        $sltsSegmentos.each(function(){
+            if( $(this).val() == '0' || $(this).val() == '' ) {
+                $(this).val('');
+            }
+        });
 
         var form = document.forms[1];
 

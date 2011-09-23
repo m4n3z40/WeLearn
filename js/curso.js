@@ -11,7 +11,7 @@ $(document).ready(function(){
 
         $(this).next('p.error').remove();
 
-        if ($(this).val() == '0') {
+        if ($(this).val() == '0' || $(this).val() == '' ) {
             $('#slt-segmento').html(vazio);
             return;
         }

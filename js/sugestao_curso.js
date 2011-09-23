@@ -18,7 +18,7 @@ $(document).ready(function(){
                 $sltsSegmentos = $form.find('#slt-area option:selected,#slt-segmento option:selected');
 
             $sltsSegmentos.each(function(){
-                if($(this).val() == 0) {
+                if( $(this).val() == '0' || $(this).val() == '' ) {
                     $(this).val('');
                 }
             });

@@ -3,6 +3,67 @@
 */
 
 window.WeLearn = {
+    notificar : function(opcoes) {
+        var classeBarra,
+            opcoesPadrao,
+            divContainerNotificacoes,
+            $divContainerNotificacoes,
+            $divNotificacao;
+
+        opcoesPadrao = {
+            msg: 'Isto é uma barra de notificação, uma mensagem deveria aparecer aqui.',
+            nivel: 'aviso',
+            fechavel: true,
+            textoFechar: 'X',
+            tempo: false
+        };
+
+        opcoes = $.extend(opcoesPadrao, opcoes);
+
+        divContainerNotificacoes = document.getElementById('container-notificacoes');
+        if (divContainerNotificacoes == null) {
+            divContainerNotificacoes = document.createElement('div');
+            divContainerNotificacoes.setAttribute('id', 'container-notificacoes');
+            $('body').prepend(divContainerNotificacoes);
+        }
+        $divContainerNotificacoes = $(divContainerNotificacoes);
+
+        switch ( opcoes.nivel ) {
+            case 'erro': classeBarra = 'barra-notificacao-erro'; break;
+            case 'sucesso': classeBarra = 'barra-notificacao-sucesso'; break;
+            case 'aviso': classeBarra = 'barra-notificacao-aviso'; break;
+            default: classeBarra = 'barra-notificacao-aviso';
+        }
+
+        var fechar = function(notificacao) {
+            notificacao.slideUp(function(){$(this).remove()});
+        };
+
+        $divNotificacao = $(document.createElement('div'));
+
+        var $botaoFechar = $('<span />');
+        if ( opcoes.fechavel ) {
+            $botaoFechar.addClass('barra-notificacao-fechar-habilitado')
+                        .html('<a href="#">' + opcoes.textoFechar + '</a>')
+                        .find('a')
+                            .bind('click', function(){ fechar($divNotificacao) });
+        } else {
+            $botaoFechar.addClass('barra-notificacao-fechar-desabilitado');
+        }
+
+        $divNotificacao.css({display: 'none'})
+                       .addClass(classeBarra)
+                       .html('<div class="msg-notificacao">' + opcoes.msg + '</div>')
+                       .append($botaoFechar)
+                       .appendTo($divContainerNotificacoes)
+                       .slideDown();
+
+        if( opcoes.tempo ) {
+            setTimeout(function(){
+                fechar($divNotificacao);
+            }, opcoes.tempo)
+        }
+    },
     validarForm : function(form, url_validacao, onValidationPass, onValidationFail) {
         var $form = $(form);
         var processarResultado = function(result) {
