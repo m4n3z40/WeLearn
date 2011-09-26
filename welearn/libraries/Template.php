@@ -123,6 +123,9 @@ class WL_Template
         $defaultTemplateData = array(
             'template.title' => empty($this->_title) ? '' : '| ' . $this->_title,
             'template.cssLinks' => $this->_compileCSS(),
+            'template.jsNotificacoes' => ($notificacoesFlash = $this->_ci->session->flashdata('notificacoesFlash')) ?
+                                          $notificacoesFlash :
+                                          'false',
             'template.jsImports' => $this->_compileJSImports(),
             'template.jsScripts' => $this->_compileJSScripts(),
             'base_url' => $this->_base_url,

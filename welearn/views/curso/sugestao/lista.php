@@ -15,6 +15,7 @@
                     <li><a href="#form-segmentos">Por área ou segmento</a></li>
                     <li><a href="<?php echo site_url('/curso/sugestao/listar?f=rec') ?>">Recomendados</a></li>
                     <li><a href="<?php echo site_url('/curso/sugestao/listar?f=acc') ?>">Sugestões Aceitas</a></li>
+                    <li><a href="<?php echo site_url('/curso/sugestao/listar?f=meu') ?>">Minhas Sugestões</a></li>
                 </ul>
                 <div id="form-segmentos" style="display: none;">
                     <?php echo form_open() ?>

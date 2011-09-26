@@ -255,20 +255,21 @@ button, .button {
     top: 0;
 }
 
+    #container-notificacoes .wrapper-notificacao {
+        position: relative;
+    }
+
     #container-notificacoes .barra-notificacao-erro,
     #container-notificacoes .barra-notificacao-sucesso,
     #container-notificacoes .barra-notificacao-aviso {
-        padding: 5px 10px;
-        overflow: hidden;
+        padding: 10px;
     }
 
     .barra-notificacao-erro .msg-notificacao,
     .barra-notificacao-sucesso .msg-notificacao,
     .barra-notificacao-aviso .msg-notificacao {
-        width: 90%;
         text-align: center;
         margin: 0 auto;
-        float: left;
     }
 
     #container-notificacoes .barra-notificacao-erro {
@@ -290,8 +291,15 @@ button, .button {
     }
 
     .barra-notificacao-fechar-habilitado {
-        float: right;
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding: 10px;
     }
+
+        .barra-notificacao-fechar-habilitado a {
+            text-decoration: none;
+        }
 
     .barra-notificacao-fechar-desabilitado {
         display: none;

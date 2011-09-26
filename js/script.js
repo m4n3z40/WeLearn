@@ -52,6 +52,7 @@ window.WeLearn = {
         }
 
         $divNotificacao.css({display: 'none'})
+                       .addClass('wrapper-notificacao')
                        .addClass(classeBarra)
                        .html('<div class="msg-notificacao">' + opcoes.msg + '</div>')
                        .append($botaoFechar)
@@ -75,9 +76,7 @@ window.WeLearn = {
                     erro = result.errors[i];
 
                     if (erro.field_name == "noField") {
-                        $form.before(
-                            '<p class="error"><span>' + erro.error_msg + '</span></p>'
-                        );
+                        this.notificar(erro.error_msg);
                         continue;
                     }
 
@@ -85,7 +84,7 @@ window.WeLearn = {
                             'select[name=' + erro.field_name + '],' +
                             'textarea[name=' + erro.field_name + ']';
 
-                    $campos = $(elems);
+                    var $campos = $(elems);
 
                     $campos.after(
                         '<p class="validation-error">' + erro.error_msg + '</p>'
@@ -146,10 +145,22 @@ window.WeLearn = {
             }
         });
 
-        $('body').append($loader);
+        $('body').prepend($loader);
+    },
+    initNotificacoes: function () {
+        if (typeof flashData != 'undefined' && flashData != false) {
+            if ($.isArray(flashData)) {
+                for(var i = 0; i < flashData.length; i++) {
+                    this.notificar(flashData[i]);
+                }
+            } else {
+                    this.notificar(flashData);
+            }
+        }
     },
     init : function(){
         this.initAjax();
+        this.initNotificacoes();
     }
 };
 

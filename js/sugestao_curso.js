@@ -27,33 +27,15 @@ $(document).ready(function(){
                 $form,
                 urlValidacao,
                 function(res) {
-                    var $dialogo =  $('<p class="success">A sugestão foi salva com sucesso.</p>');
-
-                    $dialogo.dialog({
-                        title: 'Criar Sugestão',
-                        modal: true,
-                        resizable: false,
-                        close: function() {
-                            window.location = 'http://welearn.com/curso/sugestao';
-                        },
-                        buttons: {
-                            Ok: function() {
-                                $(this).dialog('close');
-                            }
-                        }
-                    });
+                    window.location = 'http://welearn.com/curso/sugestao';
                 },
                 function(res) {
-                    var $dialogo = $('<p class="error ui-state-error">Ocorreram erros ao salvar sua sugestão, verifique o formulário.</p>');
+                    var msg = 'Ocorreram erros ao salvar sua sugestão, verifique o formulário.';
 
-                    $dialogo.dialog({
-                        title: 'Criar Sugestão',
-                        resizable: false,
-                        buttons: {
-                            Ok: function() {
-                                $(this).dialog('close');
-                            }
-                        }
+                    WeLearn.notificar({
+                        msg: msg,
+                        nivel: 'erro',
+                        tempo: 10000
                     });
                 }
             )
@@ -113,17 +95,12 @@ $(document).ready(function(){
                             $aBtnProxPagina.remove();
                         }
                     } else {
-                        var $dialogo = $('<p class="error ui-state-error">Ocorreram erros ao retornar a' +
-                                         ' próxima página, Tente nova mais tarde.</p>');
+                        var msg = 'Ocorreram erros ao retornar a próxima página, Tente nova mais tarde.';
 
-                        $dialogo.dialog({
-                            title: 'Próxima Página',
-                            resizable: false,
-                            buttons: {
-                                Ok: function() {
-                                    $(this).dialog('close');
-                                }
-                            }
+                        WeLearn.notificar({
+                            msg: msg,
+                            nivel: 'erro',
+                            tempo: 10000
                         });
                     }
                 }

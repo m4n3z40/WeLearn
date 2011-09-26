@@ -61,6 +61,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
         $this->_cf->insert($uuidObj->bytes, $dto->toCassandra());
 
+        $this->_sugestaoPorAreaCF->insert('_todos', array($uuidObj->bytes => ''));
         $this->_sugestaoPorAreaCF->insert($dto->getSegmento()->getArea()->getId(), array($uuidObj->bytes => ''));
         $this->_sugestaoPorSegmentoCF->insert($dto->getSegmento()->getId(), array($uuidObj->bytes => ''));
         $this->_sugestaoPorUsuarioCF->insert($dto->getCriador()->getId(), array($uuidObj->bytes => ''));
@@ -115,7 +116,11 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
             $ate = CassandraUtil::import($ate)->bytes;
         }
 
-        $sugestoesArray = $this->_cf->get_range($de, $ate, $count);
+        $sugestoesArrayKeys = array_keys(
+            $this->_sugestaoPorAreaCF->get('_todos', null, $de, $ate, true, $count)
+        );
+
+        $sugestoesArray = $this->_cf->multiget($sugestoesArrayKeys);
 
         $sugestoesObjs = array();
         foreach ($sugestoesArray as $key => $column) {
@@ -145,7 +150,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
                                            null,
                                            $de,
                                            $ate,
-                                           false,
+                                           true,
                                            $count)
         );
 
@@ -179,7 +184,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
                                                null,
                                                $de,
                                                $ate,
-                                               false,
+                                               true,
                                                $count)
         );
 
@@ -213,7 +218,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
                                               null,
                                               $de,
                                               $ate,
-                                              false,
+                                              true,
                                               $count)
         );
 
