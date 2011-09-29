@@ -44,49 +44,26 @@ $(document).ready(function(){
 
     var divListaSugestoes = document.getElementById('lista-sugestoes');
     if(divListaSugestoes != null) {
-        var $divListaSugestoes = $(divListaSugestoes);
-        $divListaSugestoes.accordion({collapsible: true, active: false});
+        var $divListaSugestoes = $(divListaSugestoes),
+            accordionOptions = {collapsible: true, active: false, autoHeight: false};
+        $divListaSugestoes.accordion(accordionOptions);
 
         $('#prox-pagina > a').click(function(e){
             e.preventDefault();
 
-            var $aBtnProxPagina = $(this);
+
+            var filtros = WeLearn.url.queryString,
+                $aBtnProxPagina = $(this);
 
             $.get(
                 'http://welearn.com/curso/sugestao/proxima_pagina/' + $aBtnProxPagina.data('proximo'),
-                null,
+                (filtros !== '') ? filtros : null,
                 function(res){
                     if (res.success) {
-                        var htmlListaSugestoes = '';
-                        for (var i = 0, sugestoes = res.sugestoes; i < sugestoes.length; i++) {
-                            htmlListaSugestoes += '<h3><a href="#">' + sugestoes[i].nome + '</a></h3>' +
-                                '<div>' +
-                                    '<table>' +
-                                        '<tr><td>Nome</td><td>' + sugestoes[i].nome + '</td></tr>' +
-                                        '<tr><td>Tema</td><td>' + sugestoes[i].tema + '</td></tr>' +
-                                        '<tr><td>Descrição</td><td>' + sugestoes[i].descricao + '</td></tr>' +
-                                        '<tr><td>Área de Segmento</td><td>' + sugestoes[i].segmento.area.descricao + '</td></tr>' +
-                                        '<tr><td>Segmento</td><td>' + sugestoes[i].segmento.descricao + '</td></tr>' +
-                                        '<tr><td>Data de Criação</td><td>' + sugestoes[i].dataCriacao + '</td></tr>' +
-                                        '<tr><td>Criador da Sugestão</td>' +
-                                            '<td>' +
-                                                '<a href="http://welearn.com/usuario/perfil/' +
-                                                sugestoes[i].criador.id + '">' + sugestoes[i].criador.nome + '</a>' +
-                                            '</td>' +
-                                        '</tr>' +
-                                        '<tr>' +
-                                            '<td colspan="2">' +
-                                                '<a href="#">Criar curso à partir desta sugestão</a>' +
-                                            '</td>' +
-                                        '</tr>' +
-                                    '</table>' +
-                                '</div>';
-                        }
-
-                        var $retorno = $(htmlListaSugestoes);
+                        var $retorno = $(res.sugestoesHtml);
                         $divListaSugestoes.append($retorno)
                                           .accordion('destroy')
-                                          .accordion({collapsible: true, active: false});
+                                          .accordion(accordionOptions);
 
                         if (res.paginacao.proxima_pagina) {
                             $aBtnProxPagina.data('proximo', res.paginacao.inicio_proxima_pagina);
@@ -125,12 +102,14 @@ $(document).ready(function(){
         var url = window.location.toString().split('?')[0];
         $sltArea.unbind('change')
                 .change(function(e){
-                    window.location = url + '?f=are&a=' + $(this).val();
+                    if ( $(this).val() != '0' )
+                        window.location = url + '?f=are&a=' + $(this).val();
                 });
 
         $sltSegmento.unbind('change')
                 .change(function(e){
-                    window.location = url + '?f=seg&s=' + $(this).val();
+                    if ( $sltArea.val() != '0' && $(this).val() != '0' )
+                        window.location = url + '?f=seg&a=' + $sltArea.val() + '&s=' + $(this).val();
                 });
     }
 });

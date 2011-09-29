@@ -33,7 +33,7 @@ class SegmentoDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        $dto->setId($this->_createSegmentoId($dto->getDescricao()));
+        $dto->setId($this->_createSegmentoId($dto->getArea()->getId() . '__' . $dto->getDescricao()));
 
         $this->_cf->insert($dto->getId(), $dto->toCassandra());
         $this->_segmentosEmAreaCF->insert($dto->getArea()->getId(), array($dto->getId() => ''));

@@ -17,7 +17,7 @@
                     <li><a href="<?php echo site_url('/curso/sugestao/listar?f=acc') ?>">Sugestões Aceitas</a></li>
                     <li><a href="<?php echo site_url('/curso/sugestao/listar?f=meu') ?>">Minhas Sugestões</a></li>
                 </ul>
-                <div id="form-segmentos" style="display: none;">
+                <div id="form-segmentos" <?php if($areaAtual == '0') echo 'style="display: none;"' ?>>
                     <?php echo form_open() ?>
                         <dl>
                             <dt><label for="slt-area">Área de Segmento</label></dt>
@@ -29,60 +29,21 @@
                 </div>
             </nav>
         </header>
-        <div id="lista-sugestoes">
-        <?php if(empty($sugestoes)): ?>
-            <p>Nenhuma sugestão de curso para ser listada.</p>
+        <?php if( ! $haSugestoes ): ?>
+        <div><h4>Nenhuma sugestão de curso para ser listada.</h4></div>
         <?php else: ?>
-            <?php foreach ($sugestoes as $sugestao): ?>
-            <h3><a href="#"><?php echo $sugestao->nome ?></a></h3>
-            <div>
-                <table>
-                    <tr>
-                        <td>Nome</td>
-                        <td><?php echo $sugestao->nome ?></td>
-                    </tr>
-                    <tr>
-                        <td>Tema</td>
-                        <td><?php echo $sugestao->tema ?></td>
-                    </tr>
-                    <tr>
-                        <td>Descrição</td>
-                        <td><?php echo $sugestao->descricao ?></td>
-                    </tr>
-                    <tr>
-                        <td>Área de segmento</td>
-                        <td><?php echo $sugestao->segmento->area->descricao ?></td>
-                    </tr>
-                    <tr>
-                        <td>Segmento</td>
-                        <td><?php echo $sugestao->segmento->descricao ?></td>
-                    </tr>
-                    <tr>
-                        <td>Data de Criação</td>
-                        <td><?php echo date('d/m/Y à\s H:m', $sugestao->dataCriacao) ?></td>
-                    </tr>
-                    <tr>
-                        <td>Criador da Sugestão</td>
-                        <td><?php echo anchor('usuario/perfil/' . $sugestao->criador->id, $sugestao->criador->nome) ?></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <a href="#">Criar curso à partir desta sugestão</a>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <?php endforeach ?>
-            </div>
-            <footer>
-                <p id="prox-pagina">
-                <?php if($haProximos): ?>
-                    <a href="#" data-proximo="<?php echo $primeiroProximos->id ?>">Mais sugestões</a>
-                <?php else: ?>
-                    <span>Não há mais Sugestões a serem exibidas.</span>
-                <?php endif; ?>
-                </p>
-            </footer>
+        <div id="lista-sugestoes">
+            <?php echo $listaSugestoes ?>
+        </div>
+        <footer>
+            <p id="prox-pagina">
+            <?php if($haProximos): ?>
+                <a href="#" data-proximo="<?php echo $primeiroProximos->id ?>">Mais sugestões</a>
+            <?php else: ?>
+                <span>Não há mais Sugestões a serem exibidas.</span>
+            <?php endif; ?>
+            </p>
+        </footer>
         <?php endif ?>
     </div>
 </div>

@@ -131,3 +131,15 @@ with comparator = 'TimeUUIDType'
 and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'UTF8Type';
+
+create column family cursos_sugestao_usuarios_votantes
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family contadores_timeuuid
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'CounterColumnType'
+and key_validation_class = 'UTF8Type';

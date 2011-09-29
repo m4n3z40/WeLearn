@@ -16,35 +16,69 @@ class Sugestao extends WL_Controller {
 
 	public function index()
 	{
-        $indexCF = WL_Phpcassa::getInstance()->getColumnFamily('cursos_sugestao_por_area');
-
-        print_r(array_keys($indexCF->get('_todos', null, '', '', true, 11)));
-
         $this->template->render();
     }
 
     public function listar()
     {
         try {
+            $areaAtual = '0';
+            $segmentoAtual = '0';
+            $areaAtualObj = null;
+
             $filtro = $this->input->get('f');
+            $areaId = $this->input->get('a');
+            $segmentoId = $this->input->get('s');
+
+            $areaDao = WeLearn_DAO_DAOFactory::create('AreaDAO');
+            $listaAreasObjs = $areaDao->recuperarTodos();
 
             $this->load->helper(array('area', 'segmento'));
-            $listaAreas = lista_areas_para_dados_dropdown();
-            $listaSegmentos = lista_segmentos_para_dados_dropdown();
+            $listaAreas = lista_areas_para_dados_dropdown($listaAreasObjs);
+            $listaSegmentos = array('0' => 'Selecione uma área de segmento');
+
+            if ( ! empty($areaId) ) {
+                try {
+                    $areaAtualObj = $areaDao->recuperar($areaId);
+                    $areaAtual = $areaAtualObj->getId();
+
+                    try {
+                        $segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
+                        $listaSegmentosObjs = $segmentoDao->recuperarTodos('','', array('areaId' => $areaAtualObj->getId()));
+                    } catch(cassandra_NotFoundException $e) {//Area requisitada não possui segmentos se chegar aqui.
+                        $listaSegmentosObjs = null;
+                    }
+                } catch (cassandra_NotFoundException $e) { //Area requisitada não existe se chegar aqui.
+                    $listaSegmentosObjs = null;
+                } catch (cassandra_InvalidRequestException $e) { //Codigo da área vazio se chegar aqui.
+                    $listaSegmentosObjs = null;
+                }
+
+                $listaSegmentos = lista_segmentos_para_dados_dropdown($listaSegmentosObjs);
+            }
+
+            if ( ! empty($segmentoId) && in_array( $segmentoId, array_keys($listaSegmentos) ) ) {
+                $segmentoAtual = $segmentoId;
+            }
 
             $count = 10;
 
-            $sugestoesRecentes = $this->_recuperar_lista($filtro);
+            try {
+                $sugestoes = $this->_recuperar_lista($filtro, '', '', $count, $areaAtualObj);
+            } catch (cassandra_NotFoundException $e) {
+                $sugestoes = array();
+            }
 
             $this->load->helper('paginacao_cassandra');
-            $paginacao = create_paginacao_cassandra($sugestoesRecentes, $count);
+            $paginacao = create_paginacao_cassandra($sugestoes, $count);
 
             $dadosView = array(
                 'listaAreas' => $listaAreas,
-                'areaAtual' => '0',
+                'areaAtual' => $areaAtual,
                 'listaSegmentos' => $listaSegmentos,
-                'segmentoAtual' => '0',
-                'sugestoes' => $sugestoesRecentes,
+                'segmentoAtual' => $segmentoAtual,
+                'haSugestoes' => !empty($sugestoes),
+                'listaSugestoes' => $this->template->loadPartial('lista', array('sugestoes'=>$sugestoes), 'curso/sugestao'),
                 'haProximos' => $paginacao['proxima_pagina'],
                 'primeiroProximos' => $paginacao['inicio_proxima_pagina']
             );
@@ -54,20 +88,32 @@ class Sugestao extends WL_Controller {
             log_message('error', 'Erro ao retornar outra página de sugestões de curso: '
                                  . create_exception_description($e));
 
-            echo create_exception_description($e);
+            echo '<pre>' . create_exception_description($e) . '</pre>';
         }
     }
 
-    private function _recuperar_lista($filtro = '', $de = '', $ate = '', $count = 10)
+    private function _recuperar_lista($filtro = '', $de = '', $ate = '', $count = 10, $area = null)
     {
         $sugestaoDao = WeLearn_DAO_DAOFactory::create('SugestaoCursoDAO');
         switch ($filtro) {
             case 'pop':
 
             case 'are':
-                $area = WeLearn_DAO_DAOFactory::create('AreaDAO')->recuperar(
-                    $this->input->get('a')
-                );
+                if ( !($area instanceof WeLearn_Cursos_Area) ) {
+                    $area = $this->input->get('a');
+                    if ( ! empty($area) ) {
+                        try {
+                            $area = WeLearn_DAO_DAOFactory::create('AreaDAO')->recuperar($area);
+                        } catch (cassandra_NotFoundException $e) {
+                            return array();
+                        } catch (cassandra_InvalidRequestException $e) {
+                            return array();
+                        }
+                    } else {
+                        return array();
+                    }
+                }
+
                 return $sugestaoDao->recuperarTodosPorArea(
                     $area,
                     $de,
@@ -75,6 +121,12 @@ class Sugestao extends WL_Controller {
                     $count + 1
                 );
             case 'seg':
+                $segmento = $this->input->get('s');
+
+                if ( empty( $segmento ) ) {
+                    return array();
+                }
+
                 $segmento = WeLearn_DAO_DAOFactory::create('SegmentoDAO')->recuperar(
                     $this->input->get('s')
                 );
@@ -85,12 +137,21 @@ class Sugestao extends WL_Controller {
                     $count + 1
                 );
             case 'rec':
-                return $sugestaoDao->recuperarTodosPorSegmento(
-                    $this->autenticacao->getUsuarioAutenticado()->getSegmentoInteresse(),
-                    $de,
-                    $ate,
-                    $count + 1
-                );
+                try {
+                    return $sugestaoDao->recuperarTodosPorSegmento(
+                        $this->autenticacao->getUsuarioAutenticado()->getSegmentoInteresse(),
+                        $de,
+                        $ate,
+                        $count + 1
+                    );
+                } catch (cassandra_NotFoundException $e) {
+                    return $sugestaoDao->recuperarTodosPorArea(
+                        $this->autenticacao->getUsuarioAutenticado()->getSegmentoInteresse()->getArea(),
+                        $de,
+                        $ate,
+                        $count + 1
+                    );
+                }
             case 'acc':
 
             case 'meu':
@@ -127,14 +188,9 @@ class Sugestao extends WL_Controller {
                 $paginacao['inicio_proxima_pagina'] = $paginacao['inicio_proxima_pagina']->getId();
             }
 
-            $listaSugestoesArr = array();
-            foreach ($listaSugestoes as $sugestao) {
-                $listaSugestoesArr[] = $sugestao->toArray();
-            }
-
             $arrResultado = array(
                 'success' => true,
-                'sugestoes' => $listaSugestoesArr,
+                'sugestoesHtml' => $this->template->loadPartial('lista', array('sugestoes'=>$listaSugestoes), 'curso/sugestao'),
                 'paginacao' => $paginacao
             );
 
@@ -175,6 +231,13 @@ class Sugestao extends WL_Controller {
         $formCriar = $this->template->loadPartial('form', $dadosFormPartial, 'curso/sugestao');
 
         $this->template->render('curso/sugestao/criar', array('formCriar' => $formCriar));
+    }
+
+    public function votar($sugestaoId)
+    {
+        $sugestaoDao = WeLearn_DAO_DAOFactory::create('SugestaoCursoDAO');
+        $sugestao = $sugestaoDao->recuperar($sugestaoId);
+        $sugestaoDao->votar($sugestao);
     }
 
     public function salvar()

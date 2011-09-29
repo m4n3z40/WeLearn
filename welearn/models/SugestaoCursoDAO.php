@@ -18,6 +18,9 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
     private $_nomeSugestaoAceitaPorAreaCF = 'cursos_sugestao_aceita_por_area';
     private $_nomeSugestaoAceitaPorSegmentoCF = 'cursos_sugestao_aceita_por_segmento';
     private $_nomeSugestaoAceitaPorUsuarioCF = 'cursos_sugestao_aceita_por_usuario';
+    private $_nomeSugestaoUsuariosVotantes = 'cursos_sugestao_usuarios_votantes';
+    private $_nomeContador = 'contadores_timeuuid';
+    private $_keyContador = 'cursos_sugestao_votos';
 
     private $_sugestaoPorAreaCF;
     private $_sugestaoPorSegmentoCF;
@@ -26,6 +29,10 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
     private $_sugestaoAceitaPorAreaCF;
     private $_sugestaoAceitaPorSegmentoCF;
     private $_sugestaoAceitaPorUsuarioCF;
+    private $_sugestaoUsuariosVotantesCF;
+    private $_contadorCF;
+
+    private $_mysql_tbl_name = 'cursos_sugestao';
 
     private $_usuarioDao;
     private $_segmentoDao;
@@ -42,6 +49,8 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
         $this->_sugestaoAceitaPorAreaCF = $phpCassa->getColumnFamily($this->_nomeSugestaoAceitaPorAreaCF);
         $this->_sugestaoAceitaPorSegmentoCF = $phpCassa->getColumnFamily($this->_nomeSugestaoAceitaPorSegmentoCF);
         $this->_sugestaoAceitaPorUsuarioCF = $phpCassa->getColumnFamily($this->_nomeSugestaoAceitaPorUsuarioCF);
+        $this->_sugestaoUsuariosVotantesCF = $phpCassa->getColumnFamily($this->_nomeSugestaoUsuariosVotantes);
+        $this->_contadorCF = $phpCassa->getColumnFamily($this->_nomeContador);
 
         $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
         $this->_segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
@@ -66,6 +75,15 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
         $this->_sugestaoPorSegmentoCF->insert($dto->getSegmento()->getId(), array($uuidObj->bytes => ''));
         $this->_sugestaoPorUsuarioCF->insert($dto->getCriador()->getId(), array($uuidObj->bytes => ''));
         $this->_sugestaoPorStatusCF->insert($dto->getStatus(), array($uuidObj->bytes => ''));
+
+        $indexMySqlVotos = array(
+            'id' => $dto->getId(),
+            'votos' => 0,
+            'area_id' => $dto->getSegmento()->getArea()->getId(),
+            'segmento_id' => $dto->getSegmento()->getId()
+        );
+
+        get_instance()->db->insert($this->_mysql_tbl_name, $indexMySqlVotos);
 
         $dto->setPersistido(true);
     }
@@ -123,7 +141,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
         $sugestoesArray = $this->_cf->multiget($sugestoesArrayKeys);
 
         $sugestoesObjs = array();
-        foreach ($sugestoesArray as $key => $column) {
+        foreach ($sugestoesArray as $column) {
             $column['segmento'] = $this->_segmentoDao->recuperar($column['segmento']);
             $column['criador'] = $this->_usuarioDao->recuperar($column['criador']);
 
@@ -242,13 +260,37 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
         
     }
 
+    public function votar(WeLearn_Cursos_SugestaoCurso $sugestao)
+    {
+        $sugestaoUUID = CassandraUtil::import($sugestao->getId());
+
+        $this->_contadorCF->add($this->_keyContador, $sugestaoUUID->bytes);
+        $votos = array_values(
+            $this->_contadorCF->get($this->_keyContador, array($sugestaoUUID->bytes))
+        );
+
+        $votos = $votos[0];
+
+        $this->_cf->insert($sugestaoUUID->bytes, array('votos' => $votos));
+
+        get_instance()->db->where('id', $sugestaoUUID->string)
+                          ->update($this->_mysql_tbl_name, array('votos'=>$votos));
+    }
+
     /**
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
      */
     public function recuperar($id)
     {
-        // TODO: Implement recuperar() method.
+        $sugestaoUUID = CassandraUtil::import($id);
+
+        $column = $this->_cf->get($sugestaoUUID->bytes);
+        $column['segmento'] = $this->_segmentoDao->recuperar($column['segmento']);
+        $column['criador'] = $this->_usuarioDao->recuperar($column['criador']);
+        $sugestao = new WeLearn_Cursos_SugestaoCurso();
+        $sugestao->fromCassandra($column);
+        return $sugestao;
     }
 
     /**

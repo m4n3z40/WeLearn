@@ -3,6 +3,18 @@
 */
 
 window.WeLearn = {
+    url: {
+        params: {},
+        queryString: '',
+        baseURL: 'http://welearn.com',
+        siteURL: function (uri) {
+            if ( ! uri ) {
+                uri = '';
+            }
+            uri = uri.replace(/(^\/)|(\/$)/, '');
+            return this.baseURL + '/' + uri;
+        }
+    },
     notificar : function(opcoes) {
         var classeBarra,
             opcoesPadrao,
@@ -158,7 +170,24 @@ window.WeLearn = {
             }
         }
     },
+    initUrl: function () {
+        var e,
+            a = /\+/g,
+            r = /([^&=]+)=?([^&]*)/g,
+            d = function (s) { return decodeURIComponent(s.replace(a, " ")); },
+            q = window.location.search.substring(1),
+            url = window.location.href,
+            queryString = url.split('?')[1];
+
+        while (e = r.exec(q))
+           this.url.params[d(e[1])] = d(e[2]);
+
+        if (queryString) {
+            this.url.queryString = queryString;
+        }
+    },
     init : function(){
+        this.initUrl();
         this.initAjax();
         this.initNotificacoes();
     }
