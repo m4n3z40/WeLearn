@@ -58,7 +58,7 @@ window.WeLearn = {
             $botaoFechar.addClass('barra-notificacao-fechar-habilitado')
                         .html('<a href="#">' + opcoes.textoFechar + '</a>')
                         .find('a')
-                            .bind('click', function(){ fechar($divNotificacao) });
+                            .bind('click', function(e){ e.preventDefault(); fechar($divNotificacao); });
         } else {
             $botaoFechar.addClass('barra-notificacao-fechar-desabilitado');
         }

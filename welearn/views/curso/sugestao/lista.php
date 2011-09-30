@@ -38,7 +38,7 @@
         <footer>
             <p id="prox-pagina">
             <?php if($haProximos): ?>
-                <a href="#" data-proximo="<?php echo $primeiroProximos->id ?>">Mais sugestões</a>
+                <a href="#" data-proximo="<?php echo $primeiroProximos ?>">Mais sugestões</a>
             <?php else: ?>
                 <span>Não há mais Sugestões a serem exibidas.</span>
             <?php endif; ?>

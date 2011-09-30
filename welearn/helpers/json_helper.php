@@ -16,7 +16,7 @@ function set_json_header()
 	header("Content-type: application/json; charset=utf-8");
 }
 
-function create_json_feedback($success = false, $errors = '')
+function create_json_feedback($success = false, $errors = '', $extra = '')
 {
     if (!empty($errors) && is_array($errors)) {
         if(!isset($errors['field_name']) || !isset($errors['error_msg'])) {
@@ -32,11 +32,19 @@ function create_json_feedback($success = false, $errors = '')
     }
 
     $errors = '[' . trim($errors, '[]') . ']';
+
+    if ($extra != '') {
+        if (is_array($extra)) {
+            $extra = Zend_Json::encode($extra);
+        }
+        $extra = trim($extra, '{}');
+        $extra = ', '.$extra;
+    }
     
     if ($success) {
-        return '{"success":true, "errors":' . $errors . '}';
+        return '{"success":true, "errors":' . $errors . $extra . '}';
     } else {
-        return '{"success":false, "errors":' . $errors . '}';
+        return '{"success":false, "errors":' . $errors . $extra . '}';
     }
 }
 

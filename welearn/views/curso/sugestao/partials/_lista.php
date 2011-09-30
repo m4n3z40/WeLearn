@@ -35,9 +35,8 @@
         <div>
             <h4>Popularidade</h4>
             <ul>
-                <li><span><?php echo $sugestao->votos ?> Votos</span></li>
-                <!--<li><a href="#" id="votar-sugestao" data-id-sugestao="<?php echo $sugestao->id ?>">Votar</a></li>-->
-                <li><?php echo anchor('curso/sugestao/votar/' . $sugestao->id, 'Votar') ?></li>
+                <li class="qtd-votos"><span><?php echo $sugestao->votos ?></span> Votos</li>
+                <li class="votar-sugestao"><a href="#" data-id-sugestao="<?php echo $sugestao->id ?>">Votar</a></li>
             </ul>
         </div>
         <h4>

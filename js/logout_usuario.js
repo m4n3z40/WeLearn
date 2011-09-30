@@ -7,7 +7,7 @@
  */
 
 $(document).ready(function(){
-    $btnLogout = $('.logoutButton');
+    var $btnLogout = $('.logoutButton');
 
     $btnLogout.click(function(e){
         e.preventDefault();

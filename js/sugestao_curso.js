@@ -42,6 +42,34 @@ $(document).ready(function(){
         });
     }
 
+    var tabFiltros = document.getElementById('tab-filtro');
+    if (tabFiltros != null) {
+        var $tabFiltros = $(tabFiltros),
+            $tabSegmentos = $tabFiltros.find('a[href="#form-segmentos"]'),
+            $divSegmentos = $('#form-segmentos'),
+            $sltArea = $('#slt-area'),
+            $sltSegmento = $('#slt-segmento');
+
+        $tabSegmentos.click(function(e){
+            e.preventDefault();
+
+            $divSegmentos.toggle('fast');
+        });
+
+        var url = window.location.toString().split('?')[0];
+        $sltArea.unbind('change')
+                .change(function(e){
+                    if ( $(this).val() != '0' )
+                        window.location = url + '?f=are&a=' + $(this).val();
+                });
+
+        $sltSegmento.unbind('change')
+                .change(function(e){
+                    if ( $sltArea.val() != '0' && $(this).val() != '0' )
+                        window.location = url + '?f=seg&a=' + $sltArea.val() + '&s=' + $(this).val();
+                });
+    }
+
     var divListaSugestoes = document.getElementById('lista-sugestoes');
     if(divListaSugestoes != null) {
         var $divListaSugestoes = $(divListaSugestoes),
@@ -50,7 +78,6 @@ $(document).ready(function(){
 
         $('#prox-pagina > a').click(function(e){
             e.preventDefault();
-
 
             var filtros = WeLearn.url.queryString,
                 $aBtnProxPagina = $(this);
@@ -85,31 +112,34 @@ $(document).ready(function(){
         });
     }
 
-    var tabFiltros = document.getElementById('tab-filtro');
-    if (tabFiltros != null) {
-        var $tabFiltros = $(tabFiltros),
-            $tabSegmentos = $tabFiltros.find('a[href="#form-segmentos"]'),
-            $divSegmentos = $('#form-segmentos'),
-            $sltArea = $('#slt-area'),
-            $sltSegmento = $('#slt-segmento');
-
-        $tabSegmentos.click(function(e){
+    var $aVotarSugestao = $('.votar-sugestao > a');
+    if ($aVotarSugestao != []) {
+        $aVotarSugestao.live('click', function(e){
             e.preventDefault();
 
-            $divSegmentos.toggle('fast');
+            var $spnQtdVotos = $(this).parent().parent().find('.qtd-votos > span'),
+                idSugestao = $(this).data('id-sugestao'),
+                url = WeLearn.url.siteURL('curso/sugestao/votar/' + idSugestao),
+                processar = function (res) {
+                    if (res.success) {
+                        WeLearn.notificar({
+                            msg: 'Seu voto foi registrado com sucesso! Aguarde, quando esta sugestão gerar um curso, <br/>' +
+                                 'Você será avisado!',
+                            tempo: 10000,
+                            nivel: 'sucesso'
+                        });
+
+                        $spnQtdVotos.text(res.qtdVotos);
+                    } else {
+                        WeLearn.notificar({
+                            msg: res.errors[0].error_msg,
+                            tempo: 10000,
+                            nivel: 'erro'
+                        });
+                    }
+                };
+
+            $.get(url, {}, processar);
         });
-
-        var url = window.location.toString().split('?')[0];
-        $sltArea.unbind('change')
-                .change(function(e){
-                    if ( $(this).val() != '0' )
-                        window.location = url + '?f=are&a=' + $(this).val();
-                });
-
-        $sltSegmento.unbind('change')
-                .change(function(e){
-                    if ( $sltArea.val() != '0' && $(this).val() != '0' )
-                        window.location = url + '?f=seg&a=' + $sltArea.val() + '&s=' + $(this).val();
-                });
     }
 });

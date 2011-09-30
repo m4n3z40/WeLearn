@@ -69,8 +69,13 @@ class Sugestao extends WL_Controller {
                 $sugestoes = array();
             }
 
-            $this->load->helper('paginacao_cassandra');
-            $paginacao = create_paginacao_cassandra($sugestoes, $count);
+            if ($filtro == 'pop') {
+                $this->load->helper('paginacao_mysql');
+                $paginacao = create_paginacao_mysql($sugestoes, 0, $count);
+            } else {
+                $this->load->helper('paginacao_cassandra');
+                $paginacao = create_paginacao_cassandra($sugestoes, $count);
+            }
 
             $dadosView = array(
                 'listaAreas' => $listaAreas,
@@ -97,6 +102,9 @@ class Sugestao extends WL_Controller {
         $sugestaoDao = WeLearn_DAO_DAOFactory::create('SugestaoCursoDAO');
         switch ($filtro) {
             case 'pop':
+                return $sugestaoDao->recuperarTodosPorPopularidade(
+                    $de, $count + 1
+                );
 
             case 'are':
                 if ( !($area instanceof WeLearn_Cursos_Area) ) {
@@ -182,10 +190,12 @@ class Sugestao extends WL_Controller {
 
             $listaSugestoes = $this->_recuperar_lista($filtro, $inicio, '', $count);
 
-            $this->load->helper('paginacao_cassandra');
-            $paginacao = create_paginacao_cassandra($listaSugestoes, $count);
-            if ($paginacao['proxima_pagina']) {
-                $paginacao['inicio_proxima_pagina'] = $paginacao['inicio_proxima_pagina']->getId();
+            if ($filtro == 'pop') {
+                $this->load->helper('paginacao_mysql');
+                $paginacao = create_paginacao_mysql($listaSugestoes, $inicio, $count);
+            } else {
+                $this->load->helper('paginacao_cassandra');
+                $paginacao = create_paginacao_cassandra($listaSugestoes, $count);
             }
 
             $arrResultado = array(
@@ -235,9 +245,33 @@ class Sugestao extends WL_Controller {
 
     public function votar($sugestaoId)
     {
-        $sugestaoDao = WeLearn_DAO_DAOFactory::create('SugestaoCursoDAO');
-        $sugestao = $sugestaoDao->recuperar($sugestaoId);
-        $sugestaoDao->votar($sugestao);
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $sugestaoDao = WeLearn_DAO_DAOFactory::create('SugestaoCursoDAO');
+            $sugestao = $sugestaoDao->recuperar($sugestaoId);
+            $qtdVotos = $sugestaoDao->votar($sugestao, $this->autenticacao->getUsuarioAutenticado());
+
+            $json = create_json_feedback(true, '', array('qtdVotos' => $qtdVotos));
+        } catch (WeLearn_Cursos_UsuarioJaVotouException $e) {
+            $error = create_json_feedback_error_json('Você já votou nesta sugestão. Não é possível votar novamente.'
+                                                    .'<br/>Aguarde um pouco, quando esta sugestão gerar um curso, nós lhe avisamos!');
+
+            $json = create_json_feedback(false, $error);
+        } catch (Exception $e) {
+            log_message('error', 'Ocorreu um erro ao salvar um voto de sugestão de curso: '
+                                 . create_exception_description($e));
+            $error = create_json_feedback_error_json('Ocorreu um erro desconhecido ao registrar seu voto. Já estamos averiguando.'
+                                                    .'<br/>Tente novamente em breve!');
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
     }
 
     public function salvar()

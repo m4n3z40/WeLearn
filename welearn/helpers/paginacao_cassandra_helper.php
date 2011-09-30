@@ -9,7 +9,7 @@ function create_paginacao_cassandra(array &$dataset, $por_pagina = 10)
 
     if (count($dataset) == $por_pagina + 1) {
         $resultado['proxima_pagina'] = true;
-        $resultado['inicio_proxima_pagina'] = $dataset[$por_pagina];
+        $resultado['inicio_proxima_pagina'] = $dataset[$por_pagina]->getId();
 
         unset($dataset[$por_pagina]);
     }

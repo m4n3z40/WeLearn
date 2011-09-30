@@ -62,7 +62,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        $uuidObj = UUID::mint(1);
+        $uuidObj = UUID::mint();
 
         $dto->setId($uuidObj->string);
         $dto->setDataCriacao(time());
@@ -94,7 +94,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _atualizar(WeLearn_DTO_IDTO $dto)
     {
-        $uuidObj = UUID::import($dto->getId());
+        $uuidObj = CassandraUtil::import($dto->getId());
 
         $this->_cf->insert($uuidObj->bytes, $dto->toCassandra());
     }
@@ -140,15 +140,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
         $sugestoesArray = $this->_cf->multiget($sugestoesArrayKeys);
 
-        $sugestoesObjs = array();
-        foreach ($sugestoesArray as $column) {
-            $column['segmento'] = $this->_segmentoDao->recuperar($column['segmento']);
-            $column['criador'] = $this->_usuarioDao->recuperar($column['criador']);
-
-            $tempObj = new WeLearn_Cursos_SugestaoCurso();
-            $tempObj->fromCassandra($column);
-            $sugestoesObjs[] = $tempObj;
-        }
+        $sugestoesObjs = $this->_criarVariosFromCassandra($sugestoesArray);
 
         return $sugestoesObjs;
     }
@@ -174,15 +166,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
         $sugestoesArray = $this->_cf->multiget($idsSugestoes);
 
-        $sugestoesObjs = array();
-        foreach ($sugestoesArray as $column) {
-            $column['segmento'] = $this->_segmentoDao->recuperar($column['segmento']);
-            $column['criador'] = $this->_usuarioDao->recuperar($column['criador']);
-
-            $tempObj = new WeLearn_Cursos_SugestaoCurso();
-            $tempObj->fromCassandra($column);
-            $sugestoesObjs[] = $tempObj;
-        }
+        $sugestoesObjs = $this->_criarVariosFromCassandra($sugestoesArray);
 
         return $sugestoesObjs;
     }
@@ -208,15 +192,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
         $sugestoesArray = $this->_cf->multiget($idsSugestoes);
 
-        $sugestoesObjs = array();
-        foreach ($sugestoesArray as $column) {
-            $column['segmento'] = $segmento;
-            $column['criador'] = $this->_usuarioDao->recuperar($column['criador']);
-
-            $tempObj = new WeLearn_Cursos_SugestaoCurso();
-            $tempObj->fromCassandra($column);
-            $sugestoesObjs[] = $tempObj;
-        }
+        $sugestoesObjs = $this->_criarVariosFromCassandra($sugestoesArray, null, $segmento);
 
         return $sugestoesObjs;
     }
@@ -242,15 +218,38 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
         $sugestoesArray = $this->_cf->multiget($idsSugestoes);
 
-        $sugestoesObjs = array();
-        foreach ($sugestoesArray as $column) {
-            $column['segmento'] = $this->_segmentoDao->recuperar($column['segmento']);
-            $column['criador'] = $usuario;
+        $sugestoesObjs = $this->_criarVariosFromCassandra($sugestoesArray, $usuario);
 
-            $tempObj = new WeLearn_Cursos_SugestaoCurso();
-            $tempObj->fromCassandra($column);
-            $sugestoesObjs[] = $tempObj;
+        return $sugestoesObjs;
+    }
+
+    public function recuperarTodosPorPopularidade($de = 0, $count = 10, array $filtros = null)
+    {
+        $db = get_instance()->db;
+
+        $db->select('id')
+           ->from('cursos_sugestao')
+           ->order_by('votos', 'desc')
+           ->limit($count, $de);
+
+        if (isset($filtros['area']) && $filtros['area'] instanceof WeLearn_Cursos_Area) {
+            $db->where('area_id', $filtros['area']->getId());
         }
+
+        if (isset($filtros['segmento']) && $filtros['segmento'] instanceof WeLearn_Cursos_Segmento) {
+            $db->where('segmento_id', $filtros['segmento']->getId());
+        }
+
+        $sugestoesIds = $db->get()->result();
+
+        $sugestoesUUIDs = array();
+        foreach ($sugestoesIds as $sugestaoId) {
+            $sugestoesUUIDs[] = CassandraUtil::import($sugestaoId->id)->bytes;
+        }
+
+        $sugestoesArray = $this->_cf->multiget($sugestoesUUIDs);
+
+        $sugestoesObjs = $this->_criarVariosFromCassandra($sugestoesArray);
 
         return $sugestoesObjs;
     }
@@ -260,21 +259,30 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
         
     }
 
-    public function votar(WeLearn_Cursos_SugestaoCurso $sugestao)
+    public function votar(WeLearn_Cursos_SugestaoCurso $sugestao, WeLearn_Usuarios_Usuario $votante)
     {
         $sugestaoUUID = CassandraUtil::import($sugestao->getId());
 
-        $this->_contadorCF->add($this->_keyContador, $sugestaoUUID->bytes);
-        $votos = array_values(
-            $this->_contadorCF->get($this->_keyContador, array($sugestaoUUID->bytes))
-        );
+        try {
+            $this->_sugestaoUsuariosVotantesCF->get($sugestaoUUID->bytes, array($votante->getId()));
+            throw new WeLearn_Cursos_UsuarioJaVotouException();
+        } catch (cassandra_NotFoundException $e) {
+            $this->_contadorCF->add($this->_keyContador, $sugestaoUUID->bytes);
 
-        $votos = $votos[0];
+            $votos = array_values(
+                $this->_contadorCF->get($this->_keyContador, array($sugestaoUUID->bytes))
+            );
+            $votos = $votos[0];
 
-        $this->_cf->insert($sugestaoUUID->bytes, array('votos' => $votos));
+            $this->_cf->insert($sugestaoUUID->bytes, array('votos' => $votos));
 
-        get_instance()->db->where('id', $sugestaoUUID->string)
-                          ->update($this->_mysql_tbl_name, array('votos'=>$votos));
+            get_instance()->db->where('id', $sugestaoUUID->string)
+                              ->update($this->_mysql_tbl_name, array('votos'=>$votos));
+
+            $this->_sugestaoUsuariosVotantesCF->insert($sugestaoUUID->bytes, array($votante->getId()=>''));
+
+            return $votos;
+        }
     }
 
     /**
@@ -284,13 +292,9 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
     public function recuperar($id)
     {
         $sugestaoUUID = CassandraUtil::import($id);
-
         $column = $this->_cf->get($sugestaoUUID->bytes);
-        $column['segmento'] = $this->_segmentoDao->recuperar($column['segmento']);
-        $column['criador'] = $this->_usuarioDao->recuperar($column['criador']);
-        $sugestao = new WeLearn_Cursos_SugestaoCurso();
-        $sugestao->fromCassandra($column);
-        return $sugestao;
+
+        return $this->_criarFromCassandra($column);
     }
 
     /**
@@ -319,5 +323,35 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
     public function criarNovo(array $dados = null)
     {
         return new WeLearn_Cursos_SugestaoCurso($dados);
+    }
+
+    private function _criarFromCassandra(array $column,
+                                         WeLearn_Usuarios_Usuario $criadorPadrao = null,
+                                         WeLearn_Cursos_Segmento $segmentoPadrao = null)
+    {
+        $column['criador'] = ($criadorPadrao instanceof WeLearn_Usuarios_Usuario)
+                             ? $criadorPadrao
+                             : $this->_usuarioDao->recuperar($column['criador']);
+
+        $column['segmento'] = ($segmentoPadrao instanceof WeLearn_Cursos_Segmento)
+                             ? $segmentoPadrao
+                             : $this->_segmentoDao->recuperar($column['segmento']);
+
+        $sugestao = new WeLearn_Cursos_SugestaoCurso();
+        $sugestao->fromCassandra($column);
+        return $sugestao;
+    }
+
+    private function _criarVariosFromCassandra(array $columns = null,
+                                               WeLearn_Usuarios_Usuario $criadorPadrao = null,
+                                               WeLearn_Cursos_Segmento $segmentoPadrao = null)
+    {
+        $sugestoes = array();
+
+        foreach ($columns as $column) {
+            $sugestoes[] = $this->_criarFromCassandra($column, $criadorPadrao, $segmentoPadrao);
+        }
+
+        return $sugestoes;
     }
 }
