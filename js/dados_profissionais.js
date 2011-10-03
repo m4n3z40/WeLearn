@@ -20,7 +20,7 @@ $(document).ready(function(){
         }
 
         $.get(
-            'http://welearn.com/segmento/recuperar_lista/' + $(this).val(),
+            WeLearn.url.siteURL('segmento/recuperar_lista/' + $(this).val()),
             null,
             function(res){
                 if (res.success) {

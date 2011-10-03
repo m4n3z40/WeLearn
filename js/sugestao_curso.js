@@ -27,7 +27,7 @@ $(document).ready(function(){
                 $form,
                 urlValidacao,
                 function(res) {
-                    window.location = 'http://welearn.com/curso/sugestao';
+                    window.location = WeLearn.url.siteURL('curso/sugestao');
                 },
                 function(res) {
                     var msg = 'Ocorreram erros ao salvar sua sugestão, verifique o formulário.';
@@ -56,17 +56,43 @@ $(document).ready(function(){
             $divSegmentos.toggle('fast');
         });
 
-        var url = window.location.toString().split('?')[0];
+        var url = WeLearn.url.siteURL('curso/sugestao/listar'), //window.location.toString().split('?')[0];
+            filtro = WeLearn.url.params.f,
+            queryString;
         $sltArea.unbind('change')
                 .change(function(e){
-                    if ( $(this).val() != '0' )
-                        window.location = url + '?f=are&a=' + $(this).val();
+                    if ( $(this).val() != '0' ) {
+                        switch(filtro) {
+                            case 'pop':
+                                queryString = '?f=pop';
+                            break;
+                            case 'acc':
+                                queryString = '?f=acc';
+                            break;
+                            default:
+                                queryString = '?f=are';
+                        }
+
+                        window.location = url + queryString + '&a=' + $(this).val();
+                    }
                 });
 
         $sltSegmento.unbind('change')
                 .change(function(e){
-                    if ( $sltArea.val() != '0' && $(this).val() != '0' )
-                        window.location = url + '?f=seg&a=' + $sltArea.val() + '&s=' + $(this).val();
+                    if ( $sltArea.val() != '0' && $(this).val() != '0' ) {
+                        switch(filtro) {
+                            case 'pop':
+                                queryString = '?f=pop';
+                            break;
+                            case 'acc':
+                                queryString = '?f=acc';
+                            break;
+                            default:
+                                queryString = '?f=seg';
+                        }
+
+                        window.location = url + queryString + '&a=' + $sltArea.val() + '&s=' + $(this).val();
+                    }
                 });
     }
 
@@ -83,7 +109,7 @@ $(document).ready(function(){
                 $aBtnProxPagina = $(this);
 
             $.get(
-                'http://welearn.com/curso/sugestao/proxima_pagina/' + $aBtnProxPagina.data('proximo'),
+                WeLearn.url.siteURL('curso/sugestao/proxima_pagina/' + $aBtnProxPagina.data('proximo')),
                 (filtros !== '') ? filtros : null,
                 function(res){
                     if (res.success) {

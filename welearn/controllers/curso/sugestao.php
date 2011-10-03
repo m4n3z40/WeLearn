@@ -16,7 +16,7 @@ class Sugestao extends WL_Controller {
 
 	public function index()
 	{
-        $this->template->render();
+        $this->listar();
     }
 
     public function listar()
@@ -77,12 +77,24 @@ class Sugestao extends WL_Controller {
                 $paginacao = create_paginacao_cassandra($sugestoes, $count);
             }
 
+            $filtravelPorAreaOuSegmento = ($filtro == 'meu' || $filtro == 'rec') ? false : true;
+
+            $minhasSugestoes = $filtro == 'meu';
+            $minhasSugestoesEmEspera = ($minhasSugestoes && $this->input->get('st') != 'acc') ? true : false;
+            $minhasSugestoesAceitas = ($minhasSugestoes && $this->input->get('st') == 'acc') ? true : false;
+
+            $tituloLista = $this->_gerar_titulo_lista($filtro);
+
             $dadosView = array(
+                'filtravelPorAreaOuSegmento' => $filtravelPorAreaOuSegmento,
+                'minhasSugestoesEmEspera' => $minhasSugestoesEmEspera,
+                'minhasSugestoesAceitas' => $minhasSugestoesAceitas,
                 'listaAreas' => $listaAreas,
                 'areaAtual' => $areaAtual,
                 'listaSegmentos' => $listaSegmentos,
                 'segmentoAtual' => $segmentoAtual,
                 'haSugestoes' => !empty($sugestoes),
+                'tituloLista' => $tituloLista,
                 'listaSugestoes' => $this->template->loadPartial('lista', array('sugestoes'=>$sugestoes), 'curso/sugestao'),
                 'haProximos' => $paginacao['proxima_pagina'],
                 'primeiroProximos' => $paginacao['inicio_proxima_pagina']
@@ -97,13 +109,65 @@ class Sugestao extends WL_Controller {
         }
     }
 
+    private function _gerar_titulo_lista($filtro)
+    {
+        switch($filtro)
+        {
+            case 'pop':
+                if ( $this->input->get('a') && !$this->input->get('s') ) {
+                    return 'Sugestões da área por popularidade';
+                }
+
+                if ( $this->input->get('a') && $this->input->get('s') ) {
+                    return 'Sugestões do segmento por popularidade';
+                }
+
+                return 'Sugestões por popularidade';
+
+            case 'are':
+                return 'Sugestões da área recentes';
+            case 'seg':
+                return 'Sugestões do segmento recentes';
+            case 'rec':
+                return 'Sugestões recomendadas a você';
+            case 'acc':
+                $idArea = $this->input->get('a');
+                $idSegmento = $this->input->get('s');
+                if ( ! empty($idArea) && empty($idSegmento) ) {
+                    return 'Sugestões da área que geraram cursos';
+                } elseif ( ! empty($idArea) && ! empty($idSegmento) ) {
+                    return 'Sugestões do segmento que geraram cursos';
+                }
+
+                return 'Sugestões recentes que geraram cursos';
+            case 'meu':
+                if ($this->input->get('st') == 'acc') {
+                    return 'Suas sugestões que geraram cursos';
+                }
+
+                return 'Suas sugestões';
+            case 'new':
+            default:
+                return 'Sugestões recentes';
+        }
+    }
+
     private function _recuperar_lista($filtro = '', $de = '', $ate = '', $count = 10, $area = null)
     {
         $sugestaoDao = WeLearn_DAO_DAOFactory::create('SugestaoCursoDAO');
         switch ($filtro) {
             case 'pop':
+                $popFiltros = array();
+                if ( $idArea = $this->input->get('a') ) {
+                    $popFiltros['area_id'] = $idArea;
+                }
+
+                if ( $idSegmento = $this->input->get('s') ) {
+                    $popFiltros['segmento_id'] = $idSegmento;
+                }
+
                 return $sugestaoDao->recuperarTodosPorPopularidade(
-                    $de, $count + 1
+                    $de, $count + 1, $popFiltros
                 );
 
             case 'are':
@@ -112,8 +176,6 @@ class Sugestao extends WL_Controller {
                     if ( ! empty($area) ) {
                         try {
                             $area = WeLearn_DAO_DAOFactory::create('AreaDAO')->recuperar($area);
-                        } catch (cassandra_NotFoundException $e) {
-                            return array();
                         } catch (cassandra_InvalidRequestException $e) {
                             return array();
                         }
@@ -161,8 +223,39 @@ class Sugestao extends WL_Controller {
                     );
                 }
             case 'acc':
+                $idArea = $this->input->get('a');
+                $idSegmento = $this->input->get('s');
+                if ( ! empty($idArea) && empty($idSegmento) ) {
+                    return $sugestaoDao->recuperarTodosAceitosPorArea(
+                        WeLearn_DAO_DAOFactory::create('AreaDAO')->recuperar($idArea),
+                        $de,
+                        $ate,
+                        $count + 1
+                    );
+                } elseif ( ! empty($idArea) && ! empty($idSegmento) ) {
+                    return $sugestaoDao->recuperarTodosAceitosPorSegmento(
+                        WeLearn_DAO_DAOFactory::create('SegmentoDAO')->recuperar($idSegmento),
+                        $de,
+                        $ate,
+                        $count + 1
+                    );
+                }
 
+                return $sugestaoDao->recuperarTodosAceitosRecentes(
+                    $de,
+                    $ate,
+                    $count + 1
+                );
             case 'meu':
+                if ($this->input->get('st') == 'acc') {
+                    return $sugestaoDao->recuperarTodosAceitosPorUsuario(
+                        $this->autenticacao->getUsuarioAutenticado(),
+                        $de,
+                        $ate,
+                        $count + 1
+                    );
+                }
+
                 return $sugestaoDao->recuperarTodosPorUsuario(
                     $this->autenticacao->getUsuarioAutenticado(),
                     $de,

@@ -13,7 +13,7 @@ $(document).ready(function(){
         e.preventDefault();
 
         $.post(
-            'http://welearn.com/usuario/logout',
+            WeLearn.url.siteURL('usuario/logout'),
             function(result) {
                 if (result.success) {
                    location.reload();

@@ -44,7 +44,7 @@ class WeLearn_Cursos_SugestaoCurso extends WeLearn_Cursos_CursoBasico
     /**
      * @param \WeLearn_Cursos_Curso $cursoCriado
      */
-    public function setCursoCriado($cursoCriado)
+    public function setCursoCriado(WeLearn_Cursos_Curso $cursoCriado)
     {
         $this->_cursoCriado = $cursoCriado;
     }
@@ -79,7 +79,7 @@ class WeLearn_Cursos_SugestaoCurso extends WeLearn_Cursos_CursoBasico
      */
     public function registrarCriacaoCurso(WeLearn_Cursos_Curso $curso)
     {
-        //@TODO: Implementar este método!
+        WeLearn_DAO_DAOFactory::create($this)->registrarCriacaoCurso($this, $curso);
     }
 
     public function toArray()

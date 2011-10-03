@@ -28,7 +28,7 @@ $(document).ready(function(){
         }
 
         $.get(
-            'http://welearn.com/segmento/recuperar_lista/' + $(this).val(),
+            WeLearn.url.siteURL('segmento/recuperar_lista/' + $(this).val()),
             null,
             function(res){
                 if (res.success) {
@@ -56,7 +56,7 @@ $(document).ready(function(){
         var $sltsSegmentos = $('#slt-area option:selected,#slt-segmento option:selected');
 
         $sltsSegmentos.each(function(){
-            if( $(this).val() == '0' || $(this).val() == '' ) {
+            if( $(this).val() == '0' ) {
                 $(this).val('');
             }
         });
@@ -65,9 +65,9 @@ $(document).ready(function(){
 
         WeLearn.validarForm(
             form,
-            'http://welearn.com/usuario/validar_cadastro',
+            WeLearn.url.siteURL('usuario/validar_cadastro'),
             function(result) {
-                window.location = 'http://welearn.com/quickstart';
+                window.location = WeLearn.url.siteURL('quickstart');
             }
         );
     });

@@ -13,7 +13,7 @@ $(document).ready(function(){
 
     function carregarEtapa (etapa) {
         $.get(
-            'http://welearn.com/quickstart/carregar_etapa/' + etapa,
+            WeLearn.url.siteURL('quickstart/carregar_etapa/' + etapa),
             null,
             function(res) {
                 exibirEtapa(etapa, res);
@@ -24,7 +24,7 @@ $(document).ready(function(){
 
     function salvarEtapa (etapa, dados) {
         $.post(
-            'http://welearn.com/quickstart/salvar_etapa/' + etapa,
+            WeLearn.url.siteURL('quickstart/salvar_etapa/' + etapa),
             dados,
             function(res) {
                 if(res.success) {
@@ -46,7 +46,7 @@ $(document).ready(function(){
 
     function finalizarQuickstart() {
         alert('Quickstart Finalizado!');
-        window.location = 'http://welearn.com/home';
+        window.location = WeLearn.url.siteURL('home');
     }
 
     function exibirEtapa (etapa, conteudoEtapa) {
@@ -103,7 +103,8 @@ $(document).ready(function(){
         }
 
         if(js !== false) {
-            $('body').append('<script src="http://welearn.com/js/' + js + '" id="js-etapa-' + etapa + '"></script> ');
+            var baseURL = WeLearn.url.baseURL;
+            $('body').append('<script src="' + baseURL + '/js/' + js + '" id="js-etapa-' + etapa + '"></script> ');
         }
     }
 

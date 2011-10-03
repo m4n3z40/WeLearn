@@ -25,7 +25,7 @@ $(document).ready(function(){
             $sltEstado.html('<option value="0">Selecione um País</option>');
         } else {
             $.get(
-                'http://welearn.com/pais_estado/recuperar_lista_estados/' + paisId,
+                WeLearn.url.siteURL('pais_estado/recuperar_lista_estados/' + paisId),
                 null,
                 function(res) {
                     if (res.success) {

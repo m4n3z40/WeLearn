@@ -28,10 +28,11 @@
         </tr>
         <tr>
             <td>Criador da Sugestão</td>
-            <td><?php echo anchor('usuario/perfil/' . $sugestao->criador->id, $sugestao->criador->nome) ?></td>
+            <td><?php echo anchor('usuario/' . $sugestao->criador->id, $sugestao->criador->nome) ?></td>
         </tr>
     </table>
     <footer>
+        <?php if($sugestao->status === WeLearn_Cursos_StatusSugestaoCurso::EM_ESPERA): ?>
         <div>
             <h4>Popularidade</h4>
             <ul>
@@ -40,9 +41,16 @@
             </ul>
         </div>
         <h4>
-            <a href="#" id="criar-curso" data-id-sugestao="<?php echo $sugestao->id ?>">
-            Criar curso à partir desta sugestão</a>
+            <?php echo anchor('/curso/criar?s=' . $sugestao->id, 'Criar curso à partir desta sugestão') ?>
         </h4>
+        <?php elseif($sugestao->status === WeLearn_Cursos_StatusSugestaoCurso::GEROU_CURSO): ?>
+        <div>
+            <h4>Um curso foi gerado a partir desta sugestão</h4>
+            <ul>
+                <li><?php echo anchor('/curso/' . $sugestao->cursoCriado->id, 'Clique aqui para acessá-lo') ?></li>
+            </ul>
+        </div>
+        <?php endif; ?>
     </footer>
 </div>
 <?php endforeach ?>

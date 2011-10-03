@@ -70,7 +70,6 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
         $this->_cf->insert($uuidObj->bytes, $dto->toCassandra());
 
-        $this->_sugestaoPorAreaCF->insert('_todos', array($uuidObj->bytes => ''));
         $this->_sugestaoPorAreaCF->insert($dto->getSegmento()->getArea()->getId(), array($uuidObj->bytes => ''));
         $this->_sugestaoPorSegmentoCF->insert($dto->getSegmento()->getId(), array($uuidObj->bytes => ''));
         $this->_sugestaoPorUsuarioCF->insert($dto->getCriador()->getId(), array($uuidObj->bytes => ''));
@@ -107,6 +106,10 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperarTodos($de = '', $ate = '', array $filtros = null)
     {
+        if (isset($filtros['status']) && $filtros['status'] == WeLearn_Cursos_StatusSugestaoCurso::GEROU_CURSO) {
+            return $this->recuperarTodosAceitos($de, $ate, $filtros);
+        }
+
         $count = isset($filtros['count']) ? $filtros['count'] : 10;
 
         if (isset($filtros['area']) && ($filtros['area'] instanceof WeLearn_Cursos_Area)) {
@@ -126,34 +129,25 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
     public function recuperarTodosRecentes($de = '', $ate = '', $count = 10)
     {
-        if (is_string($de) && $de != '') {
-            $de = CassandraUtil::import($de)->bytes;
-        }
+        if ( $de != '' ) { $de = CassandraUtil::import($de)->bytes; }
+        if ( $ate != '' ) { $ate = CassandraUtil::import($ate)->bytes; }
 
-        if (is_string($ate) && $ate != '') {
-            $ate = CassandraUtil::import($ate)->bytes;
-        }
-
-        $sugestoesArrayKeys = array_keys(
-            $this->_sugestaoPorAreaCF->get('_todos', null, $de, $ate, true, $count)
+        $idsSugestoes = array_keys(
+            $this->_sugestaoPorStatusCF->get(WeLearn_Cursos_StatusSugestaoCurso::EM_ESPERA,
+                                             null,
+                                             $de,
+                                             $ate,
+                                             true,
+                                             $count)
         );
 
-        $sugestoesArray = $this->_cf->multiget($sugestoesArrayKeys);
-
-        $sugestoesObjs = $this->_criarVariosFromCassandra($sugestoesArray);
-
-        return $sugestoesObjs;
+        return $this->_recuperarPorIds($idsSugestoes);
     }
 
     public function recuperarTodosPorArea(WeLearn_Cursos_Area $area, $de = '', $ate = '', $count = 10)
     {
-        if (is_string($de) && $de != '') {
-            $de = CassandraUtil::import($de)->bytes;
-        }
-
-        if (is_string($ate) && $ate != '') {
-            $ate = CassandraUtil::import($ate)->bytes;
-        }
+        if ( $de != '' ) { $de = CassandraUtil::import($de)->bytes; }
+        if ( $ate != '' ) { $ate = CassandraUtil::import($ate)->bytes; }
 
         $idsSugestoes = array_keys(
             $this->_sugestaoPorAreaCF->get($area->getId(),
@@ -164,22 +158,13 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
                                            $count)
         );
 
-        $sugestoesArray = $this->_cf->multiget($idsSugestoes);
-
-        $sugestoesObjs = $this->_criarVariosFromCassandra($sugestoesArray);
-
-        return $sugestoesObjs;
+        return $this->_recuperarPorIds($idsSugestoes);
     }
 
     public function recuperarTodosPorSegmento(WeLearn_Cursos_Segmento $segmento, $de = '', $ate = '', $count = 10)
     {
-        if (is_string($de) && $de != '') {
-            $de = CassandraUtil::import($de)->bytes;
-        }
-
-        if (is_string($ate) && $ate != '') {
-            $ate = CassandraUtil::import($ate)->bytes;
-        }
+        if ( $de != '' ) { $de = CassandraUtil::import($de)->bytes; }
+        if ( $ate != '' ) { $ate = CassandraUtil::import($ate)->bytes; }
 
         $idsSugestoes = array_keys(
             $this->_sugestaoPorSegmentoCF->get($segmento->getId(),
@@ -190,22 +175,13 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
                                                $count)
         );
 
-        $sugestoesArray = $this->_cf->multiget($idsSugestoes);
-
-        $sugestoesObjs = $this->_criarVariosFromCassandra($sugestoesArray, null, $segmento);
-
-        return $sugestoesObjs;
+        return $this->_recuperarPorIds($idsSugestoes, null, $segmento);
     }
 
     public function recuperarTodosPorUsuario(WeLearn_Usuarios_Usuario $usuario, $de = '', $ate = '', $count = 10)
     {
-        if (is_string($de) && $de != '') {
-            $de = CassandraUtil::import($de)->bytes;
-        }
-
-        if (is_string($ate) && $ate != '') {
-            $ate = CassandraUtil::import($ate)->bytes;
-        }
+        if ( $de != '' ) { $de = CassandraUtil::import($de)->bytes; }
+        if ( $ate != '' ) { $ate = CassandraUtil::import($ate)->bytes; }
 
         $idsSugestoes = array_keys(
             $this->_sugestaoPorUsuarioCF->get($usuario->getId(),
@@ -216,11 +192,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
                                               $count)
         );
 
-        $sugestoesArray = $this->_cf->multiget($idsSugestoes);
-
-        $sugestoesObjs = $this->_criarVariosFromCassandra($sugestoesArray, $usuario);
-
-        return $sugestoesObjs;
+        return $this->_recuperarPorIds($idsSugestoes, $usuario);
     }
 
     public function recuperarTodosPorPopularidade($de = 0, $count = 10, array $filtros = null)
@@ -232,34 +204,116 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
            ->order_by('votos', 'desc')
            ->limit($count, $de);
 
-        if (isset($filtros['area']) && $filtros['area'] instanceof WeLearn_Cursos_Area) {
-            $db->where('area_id', $filtros['area']->getId());
+        if (isset($filtros['area_id'])) {
+            $db->where('area_id', $filtros['area_id']);
         }
 
-        if (isset($filtros['segmento']) && $filtros['segmento'] instanceof WeLearn_Cursos_Segmento) {
-            $db->where('segmento_id', $filtros['segmento']->getId());
+        if (isset($filtros['segmento_id'])) {
+            $db->where('segmento_id', $filtros['segmento_id']);
         }
 
         $sugestoesIds = $db->get()->result();
+
+        if ( ! $sugestoesIds ) {
+            return array();
+        }
 
         $sugestoesUUIDs = array();
         foreach ($sugestoesIds as $sugestaoId) {
             $sugestoesUUIDs[] = CassandraUtil::import($sugestaoId->id)->bytes;
         }
 
-        $sugestoesArray = $this->_cf->multiget($sugestoesUUIDs);
-
-        $sugestoesObjs = $this->_criarVariosFromCassandra($sugestoesArray);
-
-        return $sugestoesObjs;
+        return $this->_recuperarPorIds($sugestoesUUIDs);
     }
 
     public function recuperarTodosAceitos($de = '', $ate = '', array $filtros = null)
     {
-        
+        $count = isset($filtros['count']) ? $filtros['count'] : 10;
+
+        if (isset($filtros['area']) && ($filtros['area'] instanceof WeLearn_Cursos_Area)) {
+            return $this->recuperarTodosAceitosPorArea($filtros['area'], $de, $ate, $count);
+        }
+
+        if (isset($filtros['segmento']) && ($filtros['segmento'] instanceof WeLearn_Cursos_Segmento)) {
+            return $this->recuperarTodosAceitosPorSegmento($filtros['segmento'], $de, $ate, $count);
+        }
+
+        if (isset($filtros['usuario']) && ($filtros['usuario'] instanceof WeLearn_Usuarios_Usuario)) {
+            return $this->recuperarTodosAceitosPorUsuario($filtros['usuario'], $de, $ate, $count);
+        }
+
+        return $this->recuperarTodosAceitosRecentes($de, $ate, $count);
     }
 
-    public function votar(WeLearn_Cursos_SugestaoCurso $sugestao, WeLearn_Usuarios_Usuario $votante)
+    public function recuperarTodosAceitosRecentes($de = '', $ate = '', $count = 10)
+    {
+        if ( $de != '' ) { $de = CassandraUtil::import($de)->bytes; }
+        if ( $ate != '' ) { $ate = CassandraUtil::import($ate)->bytes; }
+
+        $idsSugestoes = array_keys(
+            $this->_sugestaoPorStatusCF->get(WeLearn_Cursos_StatusSugestaoCurso::GEROU_CURSO,
+                                             null,
+                                             $de,
+                                             $ate,
+                                             true,
+                                             $count)
+        );
+
+        return $this->_recuperarPorIds($idsSugestoes);
+    }
+
+    public function recuperarTodosAceitosPorArea(WeLearn_Cursos_Area $area, $de = '', $ate = '', $count = 10)
+    {
+        if ( $de != '' ) { $de = CassandraUtil::import($de)->bytes; }
+        if ( $ate != '' ) { $ate = CassandraUtil::import($ate)->bytes; }
+
+        $idsSugestoes = array_keys(
+            $this->_sugestaoAceitaPorAreaCF->get($area->getId(),
+                                                 null,
+                                                 $de,
+                                                 $ate,
+                                                 true,
+                                                 $count)
+        );
+
+        return $this->_recuperarPorIds($idsSugestoes);
+    }
+
+    public function recuperarTodosAceitosPorSegmento(WeLearn_Cursos_Segmento $segmento, $de = '', $ate = '', $count = 10)
+    {
+        if ( $de != '' ) { $de = CassandraUtil::import($de)->bytes; }
+        if ( $ate != '' ) { $ate = CassandraUtil::import($ate)->bytes; }
+
+        $idsSugestoes = array_keys(
+            $this->_sugestaoAceitaPorSegmentoCF->get($segmento->getId(),
+                                                     null,
+                                                     $de,
+                                                     $ate,
+                                                     true,
+                                                     $count)
+        );
+
+        return $this->_recuperarPorIds($idsSugestoes, null, $segmento);
+    }
+
+    public function recuperarTodosAceitosPorUsuario(WeLearn_Usuarios_Usuario $usuario, $de = '', $ate = '', $count)
+    {
+        if ( $de != '' ) { $de = CassandraUtil::import($de)->bytes; }
+        if ( $ate != '' ) { $ate = CassandraUtil::import($ate)->bytes; }
+
+        $idsSugestoes = array_keys(
+            $this->_sugestaoAceitaPorUsuarioCF->get($usuario->getId(),
+                                                    null,
+                                                    $de,
+                                                    $ate,
+                                                    true,
+                                                    $count)
+        );
+
+        return $this->_recuperarPorIds($idsSugestoes, $usuario);
+    }
+
+    public function votar(WeLearn_Cursos_SugestaoCurso &$sugestao, WeLearn_Usuarios_Usuario $votante)
     {
         $sugestaoUUID = CassandraUtil::import($sugestao->getId());
 
@@ -274,10 +328,11 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
             );
             $votos = $votos[0];
 
-            $this->_cf->insert($sugestaoUUID->bytes, array('votos' => $votos));
-
             get_instance()->db->where('id', $sugestaoUUID->string)
                               ->update($this->_mysql_tbl_name, array('votos'=>$votos));
+
+            $sugestao->setVotos($votos);
+            $this->salvar($sugestao);
 
             $this->_sugestaoUsuariosVotantesCF->insert($sugestaoUUID->bytes, array($votante->getId()=>''));
 
@@ -307,13 +362,62 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
         // TODO: Implement recuperarQtdTotal() method.
     }
 
+    public function registrarCriacaoCurso(WeLearn_Cursos_SugestaoCurso &$sugestao, WeLearn_Cursos_Curso $cursoCriado)
+    {
+        $this->_removerIndexesAceitos($sugestao);
+
+        $UUID = CassandraUtil::import($sugestao->getId());
+
+        $this->_sugestaoPorStatusCF->insert(WeLearn_Cursos_StatusSugestaoCurso::GEROU_CURSO, $UUID->bytes);
+        $this->_sugestaoAceitaPorAreaCF->insert($sugestao->getSegmento()->getArea()->getId(), $UUID->bytes);
+        $this->_sugestaoAceitaPorSegmentoCF->insert($sugestao->getSegmento()->getId(), $UUID->bytes);
+        $this->_sugestaoAceitaPorUsuarioCF->insert($sugestao->getCriador()->getId(), $UUID->bytes);
+
+        $sugestao->setCursoCriado($cursoCriado);
+        $this->salvar($sugestao);
+    }
+
+    private function _removerIndexesEmEspera(WeLearn_Cursos_SugestaoCurso $sugestao)
+    {
+        $UUID = CassandraUtil::import($sugestao->getId());
+
+        $this->_sugestaoPorStatusCF->remove(WeLearn_Cursos_StatusSugestaoCurso::EM_ESPERA, $UUID->bytes);
+        $this->_sugestaoPorAreaCF->remove($sugestao->getSegmento()->getArea()->getId(), $UUID->bytes);
+        $this->_sugestaoPorSegmentoCF->remove($sugestao->getSegmento()->getId(), $UUID->bytes);
+        $this->_sugestaoPorUsuarioCF->remove($sugestao->getCriador()->getId(), $UUID->bytes);
+        $this->_contadorCF->remove_counter($this->_nomeContador, $UUID->bytes);
+
+        get_instance()->db->where('id', $UUID->string)
+                          ->delete($this->_mysql_tbl_name);
+    }
+
+    private function _removerIndexesAceitos(WeLearn_Cursos_SugestaoCurso $sugestao)
+    {
+        $UUID = CassandraUtil::import($sugestao->getId());
+
+        $this->_sugestaoPorStatusCF->remove(WeLearn_Cursos_StatusSugestaoCurso::GEROU_CURSO, $UUID->bytes);
+        $this->_sugestaoAceitaPorAreaCF->remove($sugestao->getSegmento()->getArea()->getId(), $UUID->bytes);
+        $this->_sugestaoAceitaPorSegmentoCF->remove($sugestao->getSegmento()->getId(), $UUID->bytes);
+        $this->_sugestaoAceitaPorUsuarioCF->remove($sugestao->getCursoCriado()->getId(), $UUID->bytes);
+        $this->_sugestaoUsuariosVotantesCF->remove($UUID->bytes);
+    }
+
     /**
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
      */
     public function remover($id)
     {
-        // TODO: Implement remover() method.
+        $UUID = CassandraUtil::import($id);
+
+        $sugestaoRemovida = $this->recuperar($UUID);
+
+        $this->_removerIndexesAceitos($sugestaoRemovida);
+
+        $this->_cf->remove($UUID->bytes);
+
+        $sugestaoRemovida->setPersistido(false);
+        return $sugestaoRemovida;
     }
 
     /**
@@ -337,6 +441,12 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
                              ? $segmentoPadrao
                              : $this->_segmentoDao->recuperar($column['segmento']);
 
+        if ( isset($column['cursoCriado']) && ! empty($column['cursoCriado']) ) {
+            $column['cursoCriado'] = WeLearn_DAO_DAOFactory::create('CursoDAO')->recuperar($column['cursoCriado']);
+        } else {
+            unset($column['cursoCriado']);
+        }
+
         $sugestao = new WeLearn_Cursos_SugestaoCurso();
         $sugestao->fromCassandra($column);
         return $sugestao;
@@ -353,5 +463,16 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
         }
 
         return $sugestoes;
+    }
+
+    private function _recuperarPorIds(array $idsSugestoes,
+                                      WeLearn_Usuarios_Usuario $usuarioPadrao = null,
+                                      WeLearn_Cursos_Segmento $segmentoPadrao = null)
+    {
+        $sugestoesArray = $this->_cf->multiget($idsSugestoes);
+
+        $sugestoesObjs = $this->_criarVariosFromCassandra($sugestoesArray, $usuarioPadrao, $segmentoPadrao);
+
+        return $sugestoesObjs;
     }
 }
