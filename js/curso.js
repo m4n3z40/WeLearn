@@ -38,4 +38,17 @@ $(document).ready(function(){
             }
         );
     });
+
+    var formCurso = document.getElementById('form-curso');
+    if (formCurso != null) {
+        $('#btn-form-curso').click(function(e){
+            e.preventDefault();
+
+            var url = WeLearn.url.siteURL('curso/curso/salvar');
+
+            WeLearn.validarForm(formCurso, url, function(res){
+                console.log(res);
+            });
+        });
+    }
 });
