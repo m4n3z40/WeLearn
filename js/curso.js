@@ -41,6 +41,60 @@ $(document).ready(function(){
 
     var formCurso = document.getElementById('form-curso');
     if (formCurso != null) {
+        $('#fil-imagem').live('change', function(e){
+            var url = WeLearn.url.siteURL('curso/curso/salvar_imagem_temporaria/');
+
+            $.ajaxFileUpload({
+                url: url,
+                secureuri: false,
+                fileElementId: $(this).attr('id'),
+                dataType: 'json',
+                timeout: 60 * 1000,
+                success: function (res, status) {
+                    if (res.success) {
+                        WeLearn.notificar({
+                            nivel: 'sucesso',
+                            msg: 'Sua imagem foi carregada com sucesso!',
+                            tempo: 5000
+                        });
+
+                        var $imagem = $('<figure><img src="'+ res.upload_data.imagem_url +'" /><figcaption>Imagem escolhida</figcaption></figure>'),
+                            $img_holder = $('#upload-img-holder'),
+                            hdn_imagem_container = document.getElementById('hdn-imagem-container'),
+                            hdn_imagem_html = '<input type="hidden" name="imagem[id]" value="' + res.upload_data.imagem_id + '" />' +
+                                              '<input type="hidden" name="imagem[ext]" value="' + res.upload_data.imagem_ext + '" />';
+
+                        if ( ! hdn_imagem_container ) {
+                            $('<div id="hdn-imagem-container" />').addClass('hidden').appendTo(formCurso);
+                        } else {
+                            $(hdn_imagem_container).empty();
+                        }
+
+                        $(hdn_imagem_container).append($(hdn_imagem_html));
+
+                        $img_holder.hide('slow', function(){
+                            $(this).empty()
+                                   .append($imagem)
+                                   .show('fast');
+                        });
+                    } else {
+                        WeLearn.notificar({
+                            nivel: 'erro',
+                            msg: res.error_msg,
+                            tempo: 10000
+                        });
+                    }
+                },
+                error: function (res, status) {
+                    WeLearn.notificar({
+                        nivel: 'erro',
+                        msg: 'Ocorreu um erro inesperado! Já estamos verificando, tente novamente mais tarde.',
+                        tempo: 10000
+                    });
+                }
+            });
+        });
+
         $('#btn-form-curso').click(function(e){
             e.preventDefault();
 

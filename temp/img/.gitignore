@@ -1,5 +1,4 @@
-.idea
-nbproject
-.settings
-.project
-.buildpath
+*.jpg
+*.jpeg
+*.png
+*.gif

@@ -1,4 +1,4 @@
-<?php echo form_open($formAction, $extraOpenForm) ?>
+<?php echo form_open_multipart($formAction, $extraOpenForm) ?>
     <fieldset>
         <legend>Dados Principais</legend>
         <dl>
@@ -62,7 +62,10 @@
             <dd><?php echo $imagemAtual ?></dd>
             <?php endif ?>
             <dt><label for="fil-imagem">Escolha</label></dt>
-            <dd><input type="file" name="imagem" id="fil-imagem"/></dd>
+            <dd>
+                <div id="upload-img-holder" style="display: none;"></div>
+                <input type="file" name="imagem" id="fil-imagem"/>
+            </dd>
         </dl>
         <button type="submit" name="acao" value="<?php echo $acaoForm ?>" id="btn-form-curso"><?php echo $textoBotaoSubmit ?></button>
     </fieldset>
