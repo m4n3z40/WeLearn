@@ -103,4 +103,56 @@ $config = array(
             'rules' => 'required'
         )
     ),
+    'curso/salvar' => array(
+        array(
+            'field' => 'nome',
+            'label' => 'Nome do Curso',
+            'rules' => 'required|min_length[5]|max_length[80]|trim|strip_tags'
+        ),
+        array(
+            'field' => 'tema',
+            'label' => 'Tema do Curso',
+            'rules' => 'required|min_length[5]|max_length[256]|trim|strip_tags'
+        ),
+        array(
+            'field' => 'descricao',
+            'label' => 'Descrição',
+            'rules' => 'max_length[2048]|strip_tags'
+        ),
+        array(
+            'field' => 'objetivos',
+            'label' => 'Objetivos',
+            'rules' => 'max_length[4096]'
+        ),
+        array(
+            'field' => 'conteudoProposto',
+            'label' => 'Conteúdo Proposto',
+            'rules' => 'max_length[4096]'
+        ),
+        array(
+            'field' => 'area',
+            'label' => 'Área de Segmento',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'segmento',
+            'label' => 'Segmento do Curso',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'tempoDuracaoMax',
+            'label' => 'Tempo máximo de duração do curso',
+            'rules' => 'required|integer|greater_than[0]',
+        ),
+        array(
+            'field' => 'privacidadeConteudo',
+            'label' => 'Privacidade de Conteúdo',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'privacidadeInscricao',
+            'label' => 'Permissão de Inscrição',
+            'rules' => 'required'
+        )
+    )
 );

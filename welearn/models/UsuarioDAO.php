@@ -133,6 +133,51 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         return new WeLearn_Usuarios_Usuario($dados);
     }
 
+    public function criarGerenciadorPrincipal($dados)
+    {
+        if ($dados instanceof WeLearn_Usuarios_Usuario) {
+
+        }
+
+        return new WeLearn_Usuarios_GerenciadorPrincipal($dados);
+    }
+
+    public function criarGerenciadorAuxiliar($dados)
+    {
+        if ($dados instanceof WeLearn_Usuarios_Usuario) {
+
+        }
+
+        return new WeLearn_Usuarios_GerenciadorAuxiliar($dados);
+    }
+
+    public function criarModerador($dados)
+    {
+        if ($dados instanceof WeLearn_Usuarios_Usuario) {
+
+        }
+
+        return new WeLearn_Usuarios_Moderador($dados);
+    }
+
+    public function criarInstrutor($dados)
+    {
+        if ($dados instanceof WeLearn_Usuarios_Usuario) {
+
+        }
+
+        return new WeLearn_Usuarios_Instrutor($dados);
+    }
+
+    public function criarAluno($dados)
+    {
+        if ($dados instanceof WeLearn_Usuarios_Usuario) {
+
+        }
+
+        return new WeLearn_Usuarios_Aluno($dados);
+    }
+
     public function usuarioCadastrado($usuario)
     {
         try {

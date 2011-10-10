@@ -58,14 +58,15 @@ $(document).ready(function(){
                             tempo: 5000
                         });
 
-                        var $imagem = $('<figure><img src="'+ res.upload_data.imagem_url +'" /><figcaption>Imagem escolhida</figcaption></figure>'),
+                        var $imagem = $('<figure><img src="'+ res.upload_data.imagem_url +'" /><figcaption>Pre-visualização da Imagem escolhida</figcaption></figure>'),
                             $img_holder = $('#upload-img-holder'),
                             hdn_imagem_container = document.getElementById('hdn-imagem-container'),
                             hdn_imagem_html = '<input type="hidden" name="imagem[id]" value="' + res.upload_data.imagem_id + '" />' +
                                               '<input type="hidden" name="imagem[ext]" value="' + res.upload_data.imagem_ext + '" />';
 
-                        if ( ! hdn_imagem_container ) {
+                        if ( hdn_imagem_container == null ) {
                             $('<div id="hdn-imagem-container" />').addClass('hidden').appendTo(formCurso);
+                            hdn_imagem_container = document.getElementById('hdn-imagem-container');
                         } else {
                             $(hdn_imagem_container).empty();
                         }
@@ -98,10 +99,17 @@ $(document).ready(function(){
         $('#btn-form-curso').click(function(e){
             e.preventDefault();
 
-            var url = WeLearn.url.siteURL('curso/curso/salvar');
+            var url = WeLearn.url.siteURL('curso/curso/salvar'),
+                $sltsSegmentos = $(formCurso).find('#slt-area option:selected,#slt-segmento option:selected');
+
+            $sltsSegmentos.each(function(){
+                if( $(this).val() == '0' ) {
+                    $(this).val('');
+                }
+            });
 
             WeLearn.validarForm(formCurso, url, function(res){
-                console.log(res);
+                log(res);
             });
         });
     }

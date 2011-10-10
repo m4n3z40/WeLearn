@@ -64,7 +64,7 @@ $autoload['libraries'] = array('session','database','welearn','autenticacao','te
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('url','file','form','json','exception');
+$autoload['helper'] = array('url','file','form','json','exception','text');
 
 
 /*

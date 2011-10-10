@@ -19,22 +19,22 @@ class WeLearn_Cursos_ConfiguracaoCurso extends WeLearn_DTO_AbstractDTO
     /**
      * @var int
      */
-    private $_privacidadeConteudo;
+    private $_privacidadeConteudo = WeLearn_Cursos_PermissaoCurso::RESTRITO;
 
     /**
      * @var int
      */
-    private $_privacidadeInscricao;
+    private $_privacidadeInscricao = WeLearn_Cursos_PermissaoCurso::RESTRITO;
 
     /**
      * @var int
      */
-    private $_permissaoCriacaoEnquete;
+    private $_permissaoCriacaoEnquete = WeLearn_Cursos_PermissaoCurso::RESTRITO;
 
     /**
      * @var int
      */
-    private $_permissaoCriacaoForum;
+    private $_permissaoCriacaoForum = WeLearn_Cursos_PermissaoCurso::RESTRITO;
 
     /**
      * @param int $permissaoCriacaoEnquete
@@ -131,6 +131,22 @@ class WeLearn_Cursos_ConfiguracaoCurso extends WeLearn_DTO_AbstractDTO
             'permissaoCriacaoEnquete' => $this->getPermissaoCriacaoEnquete(),
             'permissaoCriacaoForum' => $this->getPermissaoCriacaoForum(),
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'cursoId' => $this->getCursoId(),
+            'privacidadeConteudo' => $this->getPrivacidadeConteudo(),
+            'privacidadeInscricao' => $this->getPrivacidadeInscricao(),
+            'permissaoCriacaoEnquete' => $this->getPermissaoCriacaoEnquete(),
+            'permissaoCriacaoForum' => $this->getPermissaoCriacaoForum()
         );
     }
 }

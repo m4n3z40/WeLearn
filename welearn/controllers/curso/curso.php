@@ -41,10 +41,10 @@ class Curso extends WL_Controller {
             'listaSegmentos' => $listaSegmentos,
             'segmentoAtual' => '0',
             'tempoDuracaoMaxAtual' => '40',
-            'privacidadeConteudoAtual' => WeLearn_Cursos_PermissaoCurso::LIVRE,
+            'privacidadeConteudoAtual' => WeLearn_Cursos_PermissaoCurso::RESTRITO,
             'conteudoPublico' => WeLearn_Cursos_PermissaoCurso::LIVRE,
             'conteudoPrivado' => WeLearn_Cursos_PermissaoCurso::RESTRITO,
-            'privacidadeInscricaoAtual' => WeLearn_Cursos_PermissaoCurso::LIVRE,
+            'privacidadeInscricaoAtual' => WeLearn_Cursos_PermissaoCurso::RESTRITO,
             'inscricaoAutomatica' => WeLearn_Cursos_PermissaoCurso::LIVRE,
             'inscricaoRestrita' => WeLearn_Cursos_PermissaoCurso::RESTRITO,
             'imagemAtual' => '',
@@ -59,8 +59,63 @@ class Curso extends WL_Controller {
 
     public function salvar()
     {
-        var_dump($this->input->post());
-        var_dump($_FILES);
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        $this->load->library('form_validation');
+        if ( ! $this->form_validation->run() ) {
+            $json = create_json_feedback(false, validation_errors_json());
+        } else {
+            try {
+                $segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
+                $usuarioDao  = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+                $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+
+                $dadosNovoCurso = $this->input->post();
+
+                $segmentoId = $dadosNovoCurso['segmento'];
+                $dadosNovoCurso['segmento'] = $segmentoDao->recuperar($segmentoId);
+                $dadosNovoCurso['criador'] = $usuarioDao->criarGerenciadorPrincipal(
+                    $this->autenticacao->getUsuarioAutenticado()
+                );
+                $dadosNovoCurso['configuracao'] = $cursoDao->criarConfiguracao($dadosNovoCurso);
+
+                //Gerando e salvando imagem, caso houver.
+                if (isset($dadosNovoCurso['imagem']) && is_array($dadosNovoCurso['imagem'])) {
+                    $dadosImagemTemp = $dadosNovoCurso['imagem'];
+                    $arquivoImagem = $dadosImagemTemp['id'] . $dadosImagemTemp['ext'];
+                    $caminhoImagemTemp = TEMP_UPLOAD_DIR . 'img/' . $arquivoImagem;
+                    $caminhoImagemCurso = USER_IMG_DIR . 'curso/';
+
+                    rename($caminhoImagemTemp, $caminhoImagemCurso . $arquivoImagem);
+
+                    $dadosImagem = array(
+                        'url' => site_url(USER_IMG_URI . 'curso/' . $arquivoImagem),
+                        'nome' => $dadosImagemTemp['id'],
+                        'extensao' => $dadosImagemTemp['ext'],
+                        'diretorio' => $caminhoImagemCurso,
+                        'diretorioCompleto' => $caminhoImagemCurso . $arquivoImagem
+                    );
+
+                    $dadosNovoCurso['imagem'] = $cursoDao->criarImagem($dadosImagem);
+                }
+
+                $novoCurso = $cursoDao->criarNovo($dadosNovoCurso);
+                $cursoDao->salvar($novoCurso);
+
+                $json = create_json_feedback(true);
+            } catch (Exception $e) {
+                log_message('error', 'Ocorreu um erro ao criar um curso: ' . create_exception_description($e));
+
+                $error = create_json_feedback_error_json('Ocorreu um erro desconhecido, já estamos verificando. Tente novamente mais tarde.');
+                $json = create_json_feedback(false, $error);
+            }
+        }
+
+        echo $json;
     }
 
     public function salvar_imagem_temporaria()
@@ -68,7 +123,7 @@ class Curso extends WL_Controller {
         $idImagem = str_replace('-', '', UUID::mint()->string);
 
         $upload_config = array(
-            'upload_path' => realpath(APPPATH . '../temp/img/'),
+            'upload_path' => TEMP_UPLOAD_DIR . 'img/',
             'allowed_types' => 'jpg|jpeg|gif|png',
             'max_size' => '2048',
             'max_width' => '2048',
@@ -96,7 +151,7 @@ class Curso extends WL_Controller {
 
             if ( ! $this->image_lib->resize() ) {
                 $resultado = array(
-                    'success' => true,
+                    'success' => false,
                     'error_msg' => $this->image_lib->display_errors('','')
                 );
             } else {

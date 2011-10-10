@@ -181,4 +181,23 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
         
         return $selfArray;
     }
+
+    public function toCassandra()
+    {
+        $selfArrayCassandra = parent::toCassandra();
+
+        $selfArrayCassandra = array_merge(
+            $selfArrayCassandra,
+            array(
+                'objetivos' => $this->getObjetivos(),
+                'conteudoProposto' => $this->getConteudoProposto(),
+                'tempoDuracaoMax' => $this->getTempoDuracaoMax(),
+                'criador' => $this->getCriador()->getId(),
+                'imagem' => $this->getImagem()->toCassandra(),
+                'configuracao' => $this->getConfiguracao()->toCassandra()
+            )
+        );
+
+        return $selfArrayCassandra;
+    }
 }
