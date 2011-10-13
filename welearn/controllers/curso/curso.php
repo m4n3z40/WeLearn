@@ -6,7 +6,8 @@ class Curso extends WL_Controller {
     {
         parent::__construct();
 
-        $this->template->appendJSImport('curso.js');
+        $this->template->setTemplate('curso')
+                       ->appendJSImport('curso.js');
     }
 
     public function index()
@@ -16,11 +17,37 @@ class Curso extends WL_Controller {
 
     public function exibir($id)
     {
-        echo $id;
+        try {
+            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+            $curso = $cursoDao->recuperar(CassandraUtil::import($id)->bytes);
+
+            $dadosBarraEsquerda = array(
+                'idCurso' => $curso->getId()
+            );
+
+            $dadosBarraDireita = array(
+                'nome' => $curso->getNome(),
+                'imagemUrl' => ($curso->getImagem() instanceof WeLearn_Cursos_ImagemCurso)
+                              ? $curso->getImagem()->getUrl()
+                              : site_url($this->config->item('default_curso_img_uri')),
+                'descricao' => $curso->getDescricao()
+            );
+
+            $dadosViewExibir = array (
+                'curso' => $curso
+            );
+            $this->template->setDefaultPartialVar('curso/barra_lateral_esquerda', $dadosBarraEsquerda)
+                           ->setDefaultPartialVar('curso/barra_lateral_direita', $dadosBarraDireita)
+                           ->render('curso/curso/exibir', $dadosViewExibir);
+        } catch (Exception $e) {
+            die("erro!");
+        }
     }
 
     public function criar()
     {
+        $this->template->setTemplate('perfil');
+
         $idSugestao = $this->input->get('s');
         $listaAreas = null;
         $listaSegmentos = null;

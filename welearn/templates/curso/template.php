@@ -24,8 +24,12 @@
     <header>
         {$partial:perfil/barra_usuario}
     </header>
-    <div id="main" role="main" class="center-container clearfix">
-        {$content}
+    <div id="main" role="main" class="clearfix">
+        {$partial:curso/barra_lateral_esquerda}
+        <section id="inner-content-container">
+            {$content}
+        </section>
+        {$partial:curso/barra_lateral_direita}
     </div>
     <footer>
         <section class="center-container">

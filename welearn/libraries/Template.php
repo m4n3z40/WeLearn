@@ -147,6 +147,8 @@ class WL_Template
     public function setDefaultPartialVar($partial, array $varAndValue)
     {
         $this->_partialsVars[(string)$partial] = $varAndValue;
+
+        return $this;
     }
 
     private function _compileCSS()

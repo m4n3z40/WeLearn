@@ -221,9 +221,30 @@ button, .button {
     border-radius: 5px;
 }
 
-.center-container {
+#main, .center-container {
     width: 965px;
     margin: 0 auto;
+}
+
+#inner-content-container {
+    width: 605px;
+    float:left;
+}
+
+.inner-sidebar-container {
+    padding:  5px;
+    width: 160px;
+    float: left;
+}
+
+.inner-sidebar-container-left {
+    margin-right: 5px;
+    border-right: 1px #000 solid;
+}
+
+.inner-sidebar-container-right {
+    margin-left: 5px;
+    border-left: 1px #000 solid;
 }
 
 #ajax-loading {

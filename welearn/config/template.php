@@ -19,9 +19,15 @@ $config['template_data'] = array(
         '_defaultPartials' => array('perfil/barra_usuario')
     ),
     'curso' => array(
-
+        '_defaultPartials' => array(
+            'perfil/barra_usuario',
+            'curso/barra_lateral_esquerda',
+            'curso/barra_lateral_direita'
+        )
     )
 );
+
+$config['default_curso_img_uri'] = '/img/defaults/curso/header.jpg';
 
 /* End of file template.php */
 /* Location: ./application/config/template.php */
