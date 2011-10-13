@@ -109,7 +109,7 @@ $(document).ready(function(){
             });
 
             WeLearn.validarForm(formCurso, url, function(res){
-                log(res);
+                window.location = WeLearn.url.siteURL('/curso/' + res.idNovoCurso);
             });
         });
     }

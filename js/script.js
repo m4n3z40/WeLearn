@@ -15,6 +15,8 @@ window.WeLearn = {
             return this.baseURL + '/' + uri;
         }
     },
+    helpers: {
+    },
     notificar : function(opcoes) {
         var classeBarra,
             opcoesPadrao,
@@ -27,7 +29,9 @@ window.WeLearn = {
             nivel: 'aviso',
             fechavel: true,
             textoFechar: 'X',
-            tempo: false
+            tempo: false,
+            redirecionarAoFechar: false,
+            redirecionarParaUrl: null
         };
 
         opcoes = $.extend(opcoesPadrao, opcoes);
@@ -48,7 +52,13 @@ window.WeLearn = {
         }
 
         var fechar = function(notificacao) {
-            notificacao.slideUp(function(){$(this).remove()});
+            notificacao.slideUp(function(){
+                $(this).remove();
+
+                if( opcoes.redirecionarAoFechar && opcoes.redirecionarParaUrl != null ) {
+                    window.location = opcoes.redirecionarParaUrl;
+                }
+            });
         };
 
         $divNotificacao = $(document.createElement('div'));
@@ -88,7 +98,7 @@ window.WeLearn = {
                     erro = result.errors[i];
 
                     if (erro.field_name == "noField") {
-                        this.notificar(erro.error_msg);
+                        WeLearn.notificar({msg: erro.error_msg, nivel: 'erro', tempo: 10000});
                         continue;
                     }
 
@@ -117,10 +127,7 @@ window.WeLearn = {
             }
         };
 
-        var $errors = $('.validation-error, .error');
-        if ($errors) {
-            $errors.remove();
-        }
+        $('.validation-error, .error').remove();
 
         $.post(
             url_validacao,

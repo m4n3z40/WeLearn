@@ -1,4 +1,4 @@
-<?php echo form_open_multipart($formAction, $extraOpenForm) ?>
+<?php echo form_open_multipart($formAction, $extraOpenForm, $hiddenFormData) ?>
     <fieldset>
         <legend>Dados Principais</legend>
         <dl>
@@ -12,10 +12,17 @@
             <dd><textarea rows="10" cols="50" name="objetivos" id="txt-objetivos"><?php echo $objetivosAtual ?></textarea></dd>
             <dt><label for="txt-conteudo-proposto">Conteúdo Proposto</label></dt>
             <dd><textarea name="conteudoProposto" id="txt-conteudo-proposto" cols="50" rows="10"><?php echo $conteudoPropostoAtual ?></textarea></dd>
-            <dt><label for="slt-area">Área de Segmento</label></dt>
-            <dd><?php echo form_dropdown('area', $listaAreas, $areaAtual, 'id="slt-area"') ?></dd>
-            <dt><label for="slt-segmento">Segmento do Curso</label></dt>
-            <dd><?php echo form_dropdown('segmento', $listaSegmentos, $segmentoAtual, 'id="slt-segmento"') ?></dd>
+            <?php if ($acaoForm == 'criarFromSugestao'): ?>
+                <dt><span>Área de Segmento</span></dt>
+                <dd><?php echo $sugestao->segmento->area->descricao ?></dd>
+                <dt><span>Segmento do Curso</span></dt>
+                <dd><?php echo $sugestao->segmento->descricao ?></dd>
+            <?php else: ?>
+                <dt><label for="slt-area">Área de Segmento</label></dt>
+                <dd><?php echo form_dropdown('area', $listaAreas, $areaAtual, 'id="slt-area"') ?></dd>
+                <dt><label for="slt-segmento">Segmento do Curso</label></dt>
+                <dd><?php echo form_dropdown('segmento', $listaSegmentos, $segmentoAtual, 'id="slt-segmento"') ?></dd>
+            <?php endif ?>
         </dl>
     </fieldset>
     <fieldset>
@@ -67,6 +74,6 @@
                 <input type="file" name="imagem" id="fil-imagem"/>
             </dd>
         </dl>
-        <button type="submit" name="acao" value="<?php echo $acaoForm ?>" id="btn-form-curso"><?php echo $textoBotaoSubmit ?></button>
+        <button type="submit" id="btn-form-curso"><?php echo $textoBotaoSubmit ?></button>
     </fieldset>
 <?php echo form_close() ?>

@@ -136,7 +136,8 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     public function criarGerenciadorPrincipal($dados)
     {
         if ($dados instanceof WeLearn_Usuarios_Usuario) {
-
+            $dados = $this->_extrairDadosUsuarioParaArray($dados);
+            return new WeLearn_Usuarios_GerenciadorPrincipal($dados);
         }
 
         return new WeLearn_Usuarios_GerenciadorPrincipal($dados);
@@ -145,7 +146,8 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     public function criarGerenciadorAuxiliar($dados)
     {
         if ($dados instanceof WeLearn_Usuarios_Usuario) {
-
+            $dados = $this->_extrairDadosUsuarioParaArray($dados);
+            return new WeLearn_Usuarios_GerenciadorAuxiliar($dados);
         }
 
         return new WeLearn_Usuarios_GerenciadorAuxiliar($dados);
@@ -154,7 +156,8 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     public function criarModerador($dados)
     {
         if ($dados instanceof WeLearn_Usuarios_Usuario) {
-
+            $dados = $this->_extrairDadosUsuarioParaArray($dados);
+            return new WeLearn_Usuarios_Moderador($dados);
         }
 
         return new WeLearn_Usuarios_Moderador($dados);
@@ -163,7 +166,8 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     public function criarInstrutor($dados)
     {
         if ($dados instanceof WeLearn_Usuarios_Usuario) {
-
+            $dados = $this->_extrairDadosUsuarioParaArray($dados);
+            return new WeLearn_Usuarios_Instrutor($dados);
         }
 
         return new WeLearn_Usuarios_Instrutor($dados);
@@ -172,7 +176,8 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     public function criarAluno($dados)
     {
         if ($dados instanceof WeLearn_Usuarios_Usuario) {
-
+            $dados = $this->_extrairDadosUsuarioParaArray($dados);
+            return new WeLearn_Usuarios_Aluno($dados);
         }
 
         return new WeLearn_Usuarios_Aluno($dados);
@@ -231,5 +236,41 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     public function getConfiguracaoDao()
     {
         return $this->_configuracaoDao;
+    }
+
+    private function _extrairDadosUsuarioParaArray(WeLearn_Usuarios_Usuario $usuario)
+    {
+        $usuarioArray =  array(
+            'id' => $usuario->getId(),
+            'nome' => $usuario->getNome(),
+            'sobrenome' => $usuario->getSobrenome(),
+            'email' => $usuario->getEmail(),
+            'nomeUsuario' => $usuario->getNomeUsuario(),
+            'senha' => $usuario->getSenha(),
+            'dataCadastro' => $usuario->getDataCadastro(),
+            'persistido' => $usuario->isPersistido()
+        );
+
+        if ( $usuario->getImagem() ) {
+            $usuarioArray['imagem'] = $usuario->getImagem();
+        }
+
+        if ( $usuario->getDadosPessoais() ) {
+            $usuarioArray['dadosPessoais'] = $usuario->getDadosPessoais();
+        }
+
+        if ( $usuario->getDadosProfissionais() ) {
+            $usuarioArray['dadosProfissionais'] = $usuario->getDadosProfissionais();
+        }
+
+        if ( $usuario->getSegmentoInteresse() ) {
+            $usuarioArray['segmentoInteresse'] = $usuario->getSegmentoInteresse();
+        }
+
+        if ( $usuario->getConfiguracao() ) {
+            $usuarioArray['configuracao'] = $usuario->getConfiguracao();
+        }
+
+        return $usuarioArray;
     }
 }

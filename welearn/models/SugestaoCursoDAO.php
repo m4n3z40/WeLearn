@@ -36,6 +36,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
     private $_usuarioDao;
     private $_segmentoDao;
+    private $_cursoDao;
 
 
     function __construct()
@@ -54,6 +55,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
         $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
         $this->_segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
+        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
     }
 
     /**
@@ -364,16 +366,17 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
     public function registrarCriacaoCurso(WeLearn_Cursos_SugestaoCurso &$sugestao, WeLearn_Cursos_Curso $cursoCriado)
     {
-        $this->_removerIndexesAceitos($sugestao);
+        $this->_removerIndexesEmEspera($sugestao);
 
         $UUID = CassandraUtil::import($sugestao->getId());
 
-        $this->_sugestaoPorStatusCF->insert(WeLearn_Cursos_StatusSugestaoCurso::GEROU_CURSO, $UUID->bytes);
-        $this->_sugestaoAceitaPorAreaCF->insert($sugestao->getSegmento()->getArea()->getId(), $UUID->bytes);
-        $this->_sugestaoAceitaPorSegmentoCF->insert($sugestao->getSegmento()->getId(), $UUID->bytes);
-        $this->_sugestaoAceitaPorUsuarioCF->insert($sugestao->getCriador()->getId(), $UUID->bytes);
+        $this->_sugestaoPorStatusCF->insert(WeLearn_Cursos_StatusSugestaoCurso::GEROU_CURSO, array($UUID->bytes => ''));
+        $this->_sugestaoAceitaPorAreaCF->insert($sugestao->getSegmento()->getArea()->getId(), array($UUID->bytes => ''));
+        $this->_sugestaoAceitaPorSegmentoCF->insert($sugestao->getSegmento()->getId(), array($UUID->bytes => ''));
+        $this->_sugestaoAceitaPorUsuarioCF->insert($sugestao->getCriador()->getId(), array($UUID->bytes => ''));
 
         $sugestao->setCursoCriado($cursoCriado);
+        $sugestao->setStatus(WeLearn_Cursos_StatusSugestaoCurso::GEROU_CURSO);
         $this->salvar($sugestao);
     }
 
@@ -381,10 +384,10 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
     {
         $UUID = CassandraUtil::import($sugestao->getId());
 
-        $this->_sugestaoPorStatusCF->remove(WeLearn_Cursos_StatusSugestaoCurso::EM_ESPERA, $UUID->bytes);
-        $this->_sugestaoPorAreaCF->remove($sugestao->getSegmento()->getArea()->getId(), $UUID->bytes);
-        $this->_sugestaoPorSegmentoCF->remove($sugestao->getSegmento()->getId(), $UUID->bytes);
-        $this->_sugestaoPorUsuarioCF->remove($sugestao->getCriador()->getId(), $UUID->bytes);
+        $this->_sugestaoPorStatusCF->remove(WeLearn_Cursos_StatusSugestaoCurso::EM_ESPERA, array($UUID->bytes));
+        $this->_sugestaoPorAreaCF->remove($sugestao->getSegmento()->getArea()->getId(), array($UUID->bytes));
+        $this->_sugestaoPorSegmentoCF->remove($sugestao->getSegmento()->getId(), array($UUID->bytes));
+        $this->_sugestaoPorUsuarioCF->remove($sugestao->getCriador()->getId(), array($UUID->bytes));
         $this->_contadorCF->remove_counter($this->_nomeContador, $UUID->bytes);
 
         get_instance()->db->where('id', $UUID->string)
@@ -395,10 +398,10 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
     {
         $UUID = CassandraUtil::import($sugestao->getId());
 
-        $this->_sugestaoPorStatusCF->remove(WeLearn_Cursos_StatusSugestaoCurso::GEROU_CURSO, $UUID->bytes);
-        $this->_sugestaoAceitaPorAreaCF->remove($sugestao->getSegmento()->getArea()->getId(), $UUID->bytes);
-        $this->_sugestaoAceitaPorSegmentoCF->remove($sugestao->getSegmento()->getId(), $UUID->bytes);
-        $this->_sugestaoAceitaPorUsuarioCF->remove($sugestao->getCursoCriado()->getId(), $UUID->bytes);
+        $this->_sugestaoPorStatusCF->remove(WeLearn_Cursos_StatusSugestaoCurso::GEROU_CURSO, array($UUID->bytes));
+        $this->_sugestaoAceitaPorAreaCF->remove($sugestao->getSegmento()->getArea()->getId(), array($UUID->bytes));
+        $this->_sugestaoAceitaPorSegmentoCF->remove($sugestao->getSegmento()->getId(), array($UUID->bytes));
+        $this->_sugestaoAceitaPorUsuarioCF->remove($sugestao->getCriador()->getId(), array($UUID->bytes));
         $this->_sugestaoUsuariosVotantesCF->remove($UUID->bytes);
     }
 
@@ -442,7 +445,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
                              : $this->_segmentoDao->recuperar($column['segmento']);
 
         if ( isset($column['cursoCriado']) && ! empty($column['cursoCriado']) ) {
-            $column['cursoCriado'] = WeLearn_DAO_DAOFactory::create('CursoDAO')->recuperar($column['cursoCriado']);
+            $column['cursoCriado'] = $this->_cursoDao->recuperar($column['cursoCriado']);
         } else {
             unset($column['cursoCriado']);
         }

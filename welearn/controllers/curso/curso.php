@@ -21,25 +21,60 @@ class Curso extends WL_Controller {
 
     public function criar()
     {
-        $this->load->helper('area');
-        $listaAreas = lista_areas_para_dados_dropdown();
+        $idSugestao = $this->input->get('s');
+        $listaAreas = null;
+        $listaSegmentos = null;
+        $sugestaoGeradora = null;
 
-        $listaSegmentos = array(
-            '0' => 'Selecione uma área de segmento'
-        );
+        try {
+            $sugestaoDao = WeLearn_DAO_DAOFactory::create('SugestaoCursoDAO');
+            $sugestaoGeradora = $sugestaoDao->recuperar($idSugestao);
+
+            $nomeAtual = $sugestaoGeradora->getNome();
+            $temaAtual = $sugestaoGeradora->getTema();
+            $descricaoAtual = $sugestaoGeradora->getDescricao();
+            $areaAtual = $sugestaoGeradora->getSegmento()->getArea();
+            $segmentoAtual = $sugestaoGeradora->getSegmento();
+            $acaoForm = 'criarFromSugestao';
+            $textoBotaoSubmit = 'Criar curso a partir desta Sugestão';
+            $hiddenFormData = array(
+                'acao' => $acaoForm,
+                'area' => $areaAtual->getId(),
+                'segmento' => $segmentoAtual->getId(),
+                'sugestao' => $sugestaoGeradora->getId()
+            );
+        } catch (Exception $e) {
+            $this->load->helper('area');
+            $listaAreas = lista_areas_para_dados_dropdown();
+            $nomeAtual = '';
+            $temaAtual = '';
+            $descricaoAtual = '';
+            $areaAtual = '0';
+            $listaSegmentos = array(
+                '0' => 'Selecione uma área de segmento'
+            );
+            $segmentoAtual = '0';
+            $acaoForm = 'criarNovo';
+            $textoBotaoSubmit = 'Criar novo curso';
+            $hiddenFormData = array(
+                'acao' => $acaoForm
+            );
+        }
 
         $dadosFormCriar = array(
             'formAction' => 'curso/curso/salvar',
             'extraOpenForm' => 'id="form-curso"',
-            'nomeAtual' => '',
-            'temaAtual' => '',
-            'descricaoAtual' => '',
+            'hiddenFormData' => $hiddenFormData,
+            'sugestao' => $sugestaoGeradora,
+            'nomeAtual' => $nomeAtual,
+            'temaAtual' => $temaAtual,
+            'descricaoAtual' => $descricaoAtual,
             'objetivosAtual' => '',
             'conteudoPropostoAtual' => '',
             'listaAreas' => $listaAreas,
-            'areaAtual' => '0',
+            'areaAtual' => $areaAtual,
             'listaSegmentos' => $listaSegmentos,
-            'segmentoAtual' => '0',
+            'segmentoAtual' => $segmentoAtual,
             'tempoDuracaoMaxAtual' => '40',
             'privacidadeConteudoAtual' => WeLearn_Cursos_PermissaoCurso::RESTRITO,
             'conteudoPublico' => WeLearn_Cursos_PermissaoCurso::LIVRE,
@@ -48,8 +83,8 @@ class Curso extends WL_Controller {
             'inscricaoAutomatica' => WeLearn_Cursos_PermissaoCurso::LIVRE,
             'inscricaoRestrita' => WeLearn_Cursos_PermissaoCurso::RESTRITO,
             'imagemAtual' => '',
-            'acaoForm' => 'criar',
-            'textoBotaoSubmit' => 'Criar Novo Curso!'
+            'acaoForm' => $acaoForm,
+            'textoBotaoSubmit' => $textoBotaoSubmit
         );
 
         $formCriar = $this->template->loadPartial('form', $dadosFormCriar, 'curso/curso');
@@ -88,25 +123,38 @@ class Curso extends WL_Controller {
                     $dadosImagemTemp = $dadosNovoCurso['imagem'];
                     $arquivoImagem = $dadosImagemTemp['id'] . $dadosImagemTemp['ext'];
                     $caminhoImagemTemp = TEMP_UPLOAD_DIR . 'img/' . $arquivoImagem;
-                    $caminhoImagemCurso = USER_IMG_DIR . 'curso/';
 
-                    rename($caminhoImagemTemp, $caminhoImagemCurso . $arquivoImagem);
+                    if ( file_exists($caminhoImagemTemp) ) {
+                        $caminhoImagemCurso = USER_IMG_DIR . 'curso/';
 
-                    $dadosImagem = array(
-                        'url' => site_url(USER_IMG_URI . 'curso/' . $arquivoImagem),
-                        'nome' => $dadosImagemTemp['id'],
-                        'extensao' => $dadosImagemTemp['ext'],
-                        'diretorio' => $caminhoImagemCurso,
-                        'diretorioCompleto' => $caminhoImagemCurso . $arquivoImagem
-                    );
+                        rename($caminhoImagemTemp, $caminhoImagemCurso . $arquivoImagem);
 
-                    $dadosNovoCurso['imagem'] = $cursoDao->criarImagem($dadosImagem);
+                        $dadosImagem = array(
+                            'url' => site_url(USER_IMG_URI . 'curso/' . $arquivoImagem),
+                            'nome' => $dadosImagemTemp['id'],
+                            'extensao' => $dadosImagemTemp['ext'],
+                            'diretorio' => $caminhoImagemCurso,
+                            'diretorioCompleto' => $caminhoImagemCurso . $arquivoImagem
+                        );
+
+                        $dadosNovoCurso['imagem'] = $cursoDao->criarImagem($dadosImagem);
+                    }
                 }
 
                 $novoCurso = $cursoDao->criarNovo($dadosNovoCurso);
                 $cursoDao->salvar($novoCurso);
 
-                $json = create_json_feedback(true);
+                if ($dadosNovoCurso['acao'] == 'criarFromSugestao') {
+                    $sugestaoDao = WeLearn_DAO_DAOFactory::create('SugestaoCursoDAO');
+                    $sugestao = $sugestaoDao->recuperar($dadosNovoCurso['sugestao']);
+                    $sugestao->registrarCriacaoCurso($novoCurso, $sugestaoDao);
+                }
+
+                $extraJson = Zend_Json::encode(array(
+                                                   'idNovoCurso' => $novoCurso->getId()
+                                               ));
+
+                $json = create_json_feedback(true, '', $extraJson);
             } catch (Exception $e) {
                 log_message('error', 'Ocorreu um erro ao criar um curso: ' . create_exception_description($e));
 

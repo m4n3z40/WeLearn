@@ -192,9 +192,7 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
                 'objetivos' => $this->getObjetivos(),
                 'conteudoProposto' => $this->getConteudoProposto(),
                 'tempoDuracaoMax' => $this->getTempoDuracaoMax(),
-                'criador' => $this->getCriador()->getId(),
-                'imagem' => $this->getImagem()->toCassandra(),
-                'configuracao' => $this->getConfiguracao()->toCassandra()
+                'criador' => $this->getCriador()->getId()
             )
         );
 

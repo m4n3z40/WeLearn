@@ -20,8 +20,25 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
     private $_cursosPorSegmentoCF;
     private $_cursosPorCriadorCF;
 
+    /**
+     * @var SegmentoDAO
+     */
     private $_segmentoDAO;
+
+    /**
+     * @var UsuarioDAO
+     */
     private $_usuarioDAO;
+
+    /**
+     * @var ImagemCursoDAO
+     */
+    private $_imagemDAO;
+
+    /**
+     * @var ConfiguracaoCursoDAO
+     */
+    private $_configuracaoDAO;
 
     function __construct()
     {
@@ -34,6 +51,8 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
 
         $this->_segmentoDAO = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
         $this->_usuarioDAO = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+        $this->_imagemDAO = WeLearn_DAO_DAOFactory::create('ImagemCursoDAO');
+        $this->_configuracaoDAO = WeLearn_DAO_DAOFactory::create('ConfiguracaoCursoDAO');
     }
 
     /**
@@ -42,7 +61,13 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperar($id)
     {
-        // TODO: Implementar este metodo.
+        if ( ! ($id instanceof UUID) ) {
+            $id = CassandraUtil::import($id);
+        }
+
+        $column = $this->_cf->get($id->bytes);
+
+        return $this->_criarFromCassandra($column);
     }
 
     /**
@@ -95,10 +120,17 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         $dto->setId($UUID->string);
         $dto->setDataCriacao(time());
         $dto->setStatus(WeLearn_Cursos_StatusCurso::CONTEUDO_BLOQUEADO);
-        $dto->getImagem()->setCursoId($dto->getId());
-        $dto->getConfiguracao()->setCursoId($dto->getId());
-
         $this->_cf->insert($UUID->bytes, $dto->toCassandra());
+
+        if ( ! is_null( $dto->getImagem() ) ) {
+            $dto->getImagem()->setCursoId($dto->getId());
+            $this->_imagemDAO->salvar($dto->getImagem());
+        }
+
+        if ( ! is_null( $dto->getConfiguracao() ) ) {
+            $dto->getConfiguracao()->setCursoId($dto->getId());
+            $this->_configuracaoDAO->salvar($dto->getConfiguracao());
+        }
 
         //indexes
 
@@ -106,14 +138,13 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         $nomeSimplificado = url_title(convert_accented_characters(strtolower($dto->getNome())));
         $primeiraLetra = $nomeSimplificado[0];
 
-        $this->_cursosPorNomeCF->insert($primeiraLetra, array($nomeSimplificado, $UUID->bytes));
+        $this->_cursosPorNomeCF->insert($primeiraLetra, array($nomeSimplificado => $UUID->bytes));
+        $this->_cursosPorAreaCF->insert('__todos__', array($UUID->bytes => ''));
         $this->_cursosPorAreaCF->insert($dto->getSegmento()->getArea()->getId(), array($UUID->bytes => ''));
         $this->_cursosPorSegmentoCF->insert($dto->getSegmento()->getId(), array($UUID->bytes => ''));
         $this->_cursosPorCriadorCF->insert($dto->getCriador()->getId(), array($UUID->bytes => ''));
 
         $dto->setPersistido(true);
-        $dto->getImagem()->setPersistido(true);
-        $dto->getConfiguracao()->setPersistido(true);
     }
 
     /**
@@ -125,6 +156,14 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         $UUID = CassandraUtil::import($dto->getId());
 
         $this->_cf->insert($UUID->bytes, $dto->toCassandra());
+
+        if ( ! is_null( $dto->getImagem() ) ) {
+            $this->_imagemDAO->salvar($dto->getImagem());
+        }
+
+        if ( ! is_null( $dto->getConfiguracao() ) ) {
+            $this->_configuracaoDAO->salvar($dto->getConfiguracao());
+        }
     }
 
     /**
@@ -138,11 +177,52 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
 
     public function criarConfiguracao(array $dados = null)
     {
-        return new WeLearn_Cursos_ConfiguracaoCurso($dados);
+        return $this->_configuracaoDAO->criarNovo($dados);
     }
 
     public function criarImagem(array $dados = null)
     {
-        return new WeLearn_Cursos_ImagemCurso($dados);
+        return $this->_imagemDAO->criarNovo($dados);
+    }
+
+    private function _criarFromCassandra(array $column,
+                                         WeLearn_Cursos_Segmento $segmentoPadrao = null,
+                                         WeLearn_Usuarios_GerenciadorPrincipal $criadorPadrao = null)
+    {
+        $column['segmento'] = ($segmentoPadrao instanceof WeLearn_Cursos_Segmento)
+                             ? $segmentoPadrao
+                             : $this->_segmentoDAO->recuperar($column['segmento']);
+
+        $column['criador'] = ($criadorPadrao instanceof WeLearn_Usuarios_GerenciadorPrincipal)
+                            ? $criadorPadrao
+                            : $this->_usuarioDAO->criarGerenciadorPrincipal(
+                                $this->_usuarioDAO->recuperar($column['criador'])
+                              );
+
+        try{
+            $column['imagem'] = $this->_imagemDAO->recuperar($column['id']);
+        } catch (cassandra_NotFoundException $e) { }
+
+        try {
+            $column['configuracao'] = $this->_configuracaoDAO->recuperar($column['id']);
+        } catch (cassandra_NotFoundException $e) { }
+
+        $curso = new WeLearn_Cursos_Curso();
+        $curso->fromCassandra($column);
+
+        return $curso;
+    }
+
+    private function _criarVariosFromCassandra(array $columns,
+                                               WeLearn_Cursos_Segmento $segmentoPadrao = null,
+                                               WeLearn_Usuarios_GerenciadorPrincipal $criadorPadrao = null)
+    {
+        $listaCursosObjs = array();
+
+        foreach ($columns as $column) {
+            $this->_criarFromCassandra($column, $segmentoPadrao, $criadorPadrao);
+        }
+
+        return $listaCursosObjs;
     }
 }

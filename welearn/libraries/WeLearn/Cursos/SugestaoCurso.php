@@ -77,9 +77,13 @@ class WeLearn_Cursos_SugestaoCurso extends WeLearn_Cursos_CursoBasico
      * @param WeLearn_Cursos_Curso $curso
      * @return void
      */
-    public function registrarCriacaoCurso(WeLearn_Cursos_Curso $curso)
+    public function registrarCriacaoCurso(WeLearn_Cursos_Curso $curso, SugestaoCursoDAO $sugestaoDao = null)
     {
-        WeLearn_DAO_DAOFactory::create($this)->registrarCriacaoCurso($this, $curso);
+        if ( is_null($sugestaoDao) ) {
+            $sugestaoDao = WeLearn_DAO_DAOFactory::create($this);
+        }
+
+        $sugestaoDao->registrarCriacaoCurso($this, $curso);
     }
 
     public function toArray()
