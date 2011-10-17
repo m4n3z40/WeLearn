@@ -21,26 +21,85 @@ class Curso extends WL_Controller {
             $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
             $curso = $cursoDao->recuperar(CassandraUtil::import($id)->bytes);
 
-            $dadosBarraEsquerda = array(
-                'idCurso' => $curso->getId()
-            );
-
-            $dadosBarraDireita = array(
-                'nome' => $curso->getNome(),
-                'imagemUrl' => ($curso->getImagem() instanceof WeLearn_Cursos_ImagemCurso)
-                              ? $curso->getImagem()->getUrl()
-                              : site_url($this->config->item('default_curso_img_uri')),
-                'descricao' => $curso->getDescricao()
-            );
-
             $dadosViewExibir = array (
                 'curso' => $curso
             );
-            $this->template->setDefaultPartialVar('curso/barra_lateral_esquerda', $dadosBarraEsquerda)
-                           ->setDefaultPartialVar('curso/barra_lateral_direita', $dadosBarraDireita)
-                           ->render('curso/curso/exibir', $dadosViewExibir);
+
+            $this->_renderTemplateCurso($curso, 'curso/curso/exibir', $dadosViewExibir);
         } catch (Exception $e) {
-            die("erro!");
+            log_message('error', 'Erro ao exibir o curso: ' . create_exception_description($e));
+            show_404();
+        }
+    }
+
+    public function configurar($id)
+    {
+        try {
+            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+            $curso = $cursoDao->recuperar(CassandraUtil::import($id)->bytes);
+
+            $this->load->helper('area');
+            $listaAreas = lista_areas_para_dados_dropdown();
+
+            $segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
+            $listaSegmentosObjs = $segmentoDao->recuperarTodos(
+                '',
+                '',
+                array( 'areaId' => $curso->getSegmento()->getArea()->getId() )
+            );
+            $this->load->helper('segmento');
+            $listaSegmentos = lista_segmentos_para_dados_dropdown($listaSegmentosObjs);
+
+            $formDadosPrincipais = array(
+                'sugestao' => '',
+                'nomeAtual' => $curso->getNome(),
+                'temaAtual' => $curso->getTema(),
+                'descricaoAtual' => $curso->getDescricao(),
+                'objetivosAtual' => $curso->getObjetivos(),
+                'conteudoPropostoAtual' => $curso->getConteudoProposto(),
+                'acaoForm' => 'salvarConfig',
+                'listaAreas' => $listaAreas,
+                'areaAtual' => $curso->getSegmento()->getArea()->getId(),
+                'listaSegmentos' => $listaSegmentos,
+                'segmentoAtual' => $curso->getSegmento()->getId()
+            );
+
+            $formImagem = array(
+                'imagemAtual' => $curso->getImagem()
+            );
+
+            $formConfiguracoesAvancadas = array(
+                'statusAtual' => $curso->getStatus(),
+                'conteudoBloqueado' => WeLearn_Cursos_StatusCurso::CONTEUDO_BLOQUEADO,
+                'conteudoAberto' => WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO,
+                'tempoDuracaoMaxAtual' => $curso->getTempoDuracaoMax(),
+                'privacidadeConteudoAtual' => $curso->getConfiguracao()->getPrivacidadeConteudo(),
+                'conteudoPublico' => WeLearn_Cursos_PermissaoCurso::LIVRE,
+                'conteudoPrivado' => WeLearn_Cursos_PermissaoCurso::RESTRITO,
+                'privacidadeInscricaoAtual' => $curso->getConfiguracao()->getPrivacidadeInscricao(),
+                'inscricaoAutomatica' => WeLearn_Cursos_PermissaoCurso::LIVRE,
+                'inscricaoRestrita' => WeLearn_Cursos_PermissaoCurso::RESTRITO,
+                'permissaoCriacaoForumAtual' => $curso->getConfiguracao()->getPermissaoCriacaoForum(),
+                'criacaoForumAberta' => WeLearn_Cursos_PermissaoCurso::LIVRE,
+                'criacaoForumRestrita' => WeLearn_Cursos_PermissaoCurso::RESTRITO,
+                'permissaoCriacaoEnqueteAtual' => $curso->getConfiguracao()->getPermissaoCriacaoEnquete(),
+                'criacaoEnqueteAberta' => WeLearn_Cursos_PermissaoCurso::LIVRE,
+                'criacaoEnqueteRestrita' => WeLearn_Cursos_PermissaoCurso::RESTRITO
+            );
+
+            $dadosViewConfigurar = array(
+                'formAction' => 'curso/curso/salvar',
+                'extraOpenForm' => 'id="form-curso"',
+                'hiddenFormData' => array( 'acao' => 'salvarConfig' ),
+                'formDadosPrincipais' => $this->template->loadPartial('form_dados_principais', $formDadosPrincipais, 'curso/curso'),
+                'formImagem' => $this->template->loadPartial('form_imagem', $formImagem, 'curso/curso'),
+                'formConfiguracoesAvancadas' => $this->template->loadPartial('form_configuracoes_avancadas', $formConfiguracoesAvancadas, 'curso/curso'),
+                'textoBotaoSubmit' => 'Salvar alterações!'
+            );
+
+            $this->_renderTemplateCurso($curso, 'curso/curso/configurar', $dadosViewConfigurar);
+        } catch (Exception $e) {
+            echo create_exception_description($e);
         }
     }
 
@@ -88,35 +147,45 @@ class Curso extends WL_Controller {
             );
         }
 
-        $dadosFormCriar = array(
-            'formAction' => 'curso/curso/salvar',
-            'extraOpenForm' => 'id="form-curso"',
-            'hiddenFormData' => $hiddenFormData,
+        $formDadosPrinciais = array(
             'sugestao' => $sugestaoGeradora,
             'nomeAtual' => $nomeAtual,
             'temaAtual' => $temaAtual,
             'descricaoAtual' => $descricaoAtual,
             'objetivosAtual' => '',
             'conteudoPropostoAtual' => '',
+            'acaoForm' => $acaoForm,
             'listaAreas' => $listaAreas,
             'areaAtual' => $areaAtual,
             'listaSegmentos' => $listaSegmentos,
-            'segmentoAtual' => $segmentoAtual,
+            'segmentoAtual' => $segmentoAtual
+        );
+
+        $formConfiguracoesGerais = array(
             'tempoDuracaoMaxAtual' => '40',
             'privacidadeConteudoAtual' => WeLearn_Cursos_PermissaoCurso::RESTRITO,
             'conteudoPublico' => WeLearn_Cursos_PermissaoCurso::LIVRE,
             'conteudoPrivado' => WeLearn_Cursos_PermissaoCurso::RESTRITO,
             'privacidadeInscricaoAtual' => WeLearn_Cursos_PermissaoCurso::RESTRITO,
             'inscricaoAutomatica' => WeLearn_Cursos_PermissaoCurso::LIVRE,
-            'inscricaoRestrita' => WeLearn_Cursos_PermissaoCurso::RESTRITO,
+            'inscricaoRestrita' => WeLearn_Cursos_PermissaoCurso::RESTRITO
+        );
+
+        $formImagem = array(
             'imagemAtual' => '',
-            'acaoForm' => $acaoForm,
+        );
+
+        $dadosCriar = array(
+            'formAction' => 'curso/curso/salvar',
+            'extraOpenForm' => 'id="form-curso"',
+            'hiddenFormData' => $hiddenFormData,
+            'formDadosPrincipais' => $this->template->loadPartial('form_dados_principais', $formDadosPrinciais, 'curso/curso'),
+            'formConfiguracoesGerais' => $this->template->loadPartial('form_configuracoes_gerais', $formConfiguracoesGerais, 'curso/curso'),
+            'formImagem' => $this->template->loadPartial('form_imagem', $formImagem, 'curso/curso'),
             'textoBotaoSubmit' => $textoBotaoSubmit
         );
 
-        $formCriar = $this->template->loadPartial('form', $dadosFormCriar, 'curso/curso');
-
-        $this->template->render('curso/curso/criar', array('formCriar' => $formCriar));
+        $this->template->render('curso/curso/criar', $dadosCriar);
     }
 
     public function salvar()
@@ -244,5 +313,24 @@ class Curso extends WL_Controller {
         $json = Zend_Json::encode($resultado);
 
         echo $json;
+    }
+
+    private function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null, $view = '', array $dados = null)
+    {
+        $dadosBarraEsquerda = array(
+            'idCurso' => $curso->getId()
+        );
+
+        $dadosBarraDireita = array(
+            'nome' => $curso->getNome(),
+            'imagemUrl' => ($curso->getImagem() instanceof WeLearn_Cursos_ImagemCurso)
+                          ? $curso->getImagem()->getUrl()
+                          : site_url($this->config->item('default_curso_img_uri')),
+            'descricao' => $curso->getDescricao()
+        );
+
+        $this->template->setDefaultPartialVar('curso/barra_lateral_esquerda', $dadosBarraEsquerda)
+                       ->setDefaultPartialVar('curso/barra_lateral_direita', $dadosBarraDireita)
+                       ->render($view, $dados);
     }
 }

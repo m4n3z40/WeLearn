@@ -170,4 +170,9 @@ class WeLearn_Cursos_ImagemCurso extends WeLearn_DTO_AbstractDTO
             'diretorioCompleto' => $this->getDiretorioCompleto()
         );
     }
+
+    public function __toString()
+    {
+        return '<figure><img src="' . $this->_url . '" alt="Imagem Atual do Curso" /><figcaption>Imagem Atual</figcaption></figure>';
+    }
 }

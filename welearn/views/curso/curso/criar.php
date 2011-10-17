@@ -9,7 +9,12 @@
         </p>
     </header>
     <div>
-        <?php echo $formCriar ?>
+        <?php echo form_open_multipart($formAction, $extraOpenForm, $hiddenFormData) ?>
+            <?php echo $formDadosPrincipais ?>
+            <?php echo $formConfiguracoesGerais ?>
+            <?php echo $formImagem ?>
+            <button type="submit" id="btn-form-curso"><?php echo $textoBotaoSubmit ?></button>
+        <?php echo form_close() ?>
     </div>
 </div>
  

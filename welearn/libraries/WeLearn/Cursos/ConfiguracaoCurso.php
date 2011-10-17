@@ -89,7 +89,7 @@ class WeLearn_Cursos_ConfiguracaoCurso extends WeLearn_DTO_AbstractDTO
      */
     public function setPrivacidadeInscricao($privacidadeInscricao)
     {
-        $this->_privacidadeInscricao = $privacidadeInscricao;
+        $this->_privacidadeInscricao = (int)$privacidadeInscricao;
     }
 
     /**

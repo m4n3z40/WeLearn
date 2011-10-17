@@ -43,6 +43,7 @@ $route['404_override'] = '';
 
 $route['curso'] = 'curso/curso/index';
 $route['curso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/curso/exibir/$1';
+$route['curso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/configurar'] = 'curso/curso/configurar/$1';
 $route['curso/([a-z_]+)'] = 'curso/curso/$1';
 $route['curso/sugestao'] = 'curso/sugestao/index';
 $route['curso/sugestao/([a-z_]+)'] = 'curso/sugestao/$1';
