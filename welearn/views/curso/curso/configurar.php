@@ -9,17 +9,21 @@
             então sinta-se livre para experimentar a configuração ideal para o curso.
         </p>
     </header>
-    <div>
-        <ul>
-            <li><a href="#fds-dados-principais">Dados Principais</a></li>
-            <li><a href="#fds-imagem">Imagem do Curso</a></li>
-            <li><a href="#fds-config-avancadas">Configurações Avançadas</a></li>
-        </ul>
+    <div id="curso-config-form-container">
+        <header>
+            <ul id="curso-config-form-tab">
+                <li><a href="#fds-dados-principais">Dados Principais</a></li>
+                <li><a href="#fds-imagem">Imagem do Curso</a></li>
+                <li><a href="#fds-config-avancadas">Configurações Avançadas</a></li>
+            </ul>
+        </header>
         <?php echo form_open_multipart($formAction, $extraOpenForm, $hiddenFormData) ?>
-            <?php echo $formDadosPrincipais ?>
-            <?php echo $formImagem ?>
-            <?php echo $formConfiguracoesAvancadas ?>
-            <button type="submit" id="btn-config-curso"><?php echo $textoBotaoSubmit ?></button>
+            <div id="curso-config-form-wraper" style="display: none;">
+                <?php echo $formDadosPrincipais ?>
+                <?php echo $formImagem ?>
+                <?php echo $formConfiguracoesAvancadas ?>
+                <button type="submit" id="btn-config-curso" style="display: none"><?php echo $textoBotaoSubmit ?></button>
+            </div>
         <?php echo form_close() ?>
     </div>
 </section>

@@ -7,8 +7,33 @@
  * To change this template use File | Settings | File Templates.
  */
  
-class CategoriaForumDAO
+class CategoriaForumDAO extends WeLearn_DAO_AbstractDAO
 {
+    protected $_nomeCF = 'cursos_forum_categorias';
+
+    private $_nomeCategoriasPorCurso = 'cursos_forum_categorias_por_curso';
+
+    private $_categoriasPorCursoCF;
+
+    /**
+     * @var UsuarioDAO
+     */
+    private $_usuarioDao;
+
+    /**
+     * @var CursoDAO
+     */
+    private $_cursoDao;
+
+    function __construct()
+    {
+        $phpCassa = WL_Phpcassa::getInstance();
+
+        $this->_categoriasPorCursoCF = $phpCassa->getColumnFamily($this->_nomeCategoriasPorCurso);
+
+        $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+    }
 
     /**
      * @param mixed $id
@@ -57,7 +82,7 @@ class CategoriaForumDAO
      */
     public function criarNovo(array $dados = null)
     {
-        // TODO: Implementar este metodo.
+        return new WeLearn_Cursos_Foruns_Categoria($dados);
     }
 
     /**
@@ -79,33 +104,18 @@ class CategoriaForumDAO
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        // TODO: Implementar este metodo.
-    }
+        $UUID = UUID::mint();
 
+        $dto->setId($UUID->string);
+        $dto->setDataCriacao(time());
 
-    public function salvar(WeLearn_DTO_IDTO &$dto)
-    {
-        return parent::salvar($dto);
-    }
+        $this->_cf->insert($UUID->bytes, $dto->toCassandra());
 
-    public function getNomeCF()
-    {
-        return parent::getNomeCF();
-    }
+        $UUIDCurso = CassandraUtil::import($dto->getCurso()->getId());
 
-    public function getInfoColunas()
-    {
-        return parent::getInfoColunas();
-    }
+        $this->_categoriasPorCursoCF->insert($UUIDCurso->bytes, array($UUID->bytes => ''));
 
-    public function getCf()
-    {
-        return parent::getCf();
-    }
-
-    public function setCf($cf)
-    {
-        parent::setCf($cf);
+        $dto->setPersistido(true);
     }
 
     /**

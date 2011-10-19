@@ -1,4 +1,4 @@
-<div>
+<div id="curso-criar-content">
     <header>
         <hgroup>
             <h1>Criar um Curso</h1>

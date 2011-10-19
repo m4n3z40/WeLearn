@@ -96,7 +96,50 @@ $(document).ready(function(){
             });
         });
 
-        $('#btn-form-curso').click(function(e){
+        var divConfigCursoContainer = document.getElementById('curso-config-form-container');
+        if (divConfigCursoContainer != null) {
+            var $divConfigCursoContainer = $(divConfigCursoContainer),
+                $fdsFormConfigCurso = $divConfigCursoContainer.find('fieldset'),
+                $ulFormConfigCursoTabLinks = $divConfigCursoContainer.find('#curso-config-form-tab').find('a'),
+                $btnConfigCurso = $('#btn-config-curso:hidden'),
+                $formElems = $divConfigCursoContainer.find('input, textarea, select'),
+                $fdsAtivo = null;
+
+            $formElems.change(function(e) {
+                $btnConfigCurso.show();
+            });
+
+            $fdsFormConfigCurso.hide(); $('#curso-config-form-wraper').show();
+
+            $ulFormConfigCursoTabLinks.click(function(e) {
+                e.preventDefault();
+
+                var $fdsAtual = $($(this).attr('href')),
+                    exibirAtual = function($atual) {
+                        log($atual.data('ativo'));
+                        if (typeof $atual.data('ativo') == 'undefined' || $atual.data('ativo') === 0) {
+
+                            if ($fdsAtivo != null) {
+                                $fdsAtivo.data('ativo', 0);
+                            }
+
+                            $fdsAtivo = $atual;
+                            $atual.data('ativo', 1)
+                                  .slideDown();
+                        } else {
+                            $atual.data('ativo', 0);
+                        }
+                    };
+
+                if ($fdsAtivo != null) {
+                    $fdsAtivo.slideUp(function() { exibirAtual($fdsAtual) });
+                } else {
+                    exibirAtual($fdsAtual);
+                }
+            });
+        }
+
+        $('#btn-form-curso, #btn-config-curso').click(function(e){
             e.preventDefault();
 
             var url = WeLearn.url.siteURL('curso/curso/salvar'),
@@ -109,7 +152,11 @@ $(document).ready(function(){
             });
 
             WeLearn.validarForm(formCurso, url, function(res){
-                window.location = WeLearn.url.siteURL('/curso/' + res.idNovoCurso);
+                if (typeof res.idNovoCurso != 'undefined') {
+                    window.location = WeLearn.url.siteURL('/curso/' + res.idNovoCurso);
+                } else {
+                    window.location.reload();
+                }
             });
         });
     }

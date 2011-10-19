@@ -154,5 +154,45 @@ $config = array(
             'label' => 'Permissão de Inscrição',
             'rules' => 'required'
         )
+    ),
+    'categoria/salvar' => array(
+        array(
+            'field' => 'nome',
+            'label' => 'Nome da categoria',
+            'rules' => 'required|min_length[5]|max_length[80]'
+        ),
+        array(
+            'field' => 'descricao',
+            'label' => 'Descricao da categoria',
+            'rules' => 'max_length[512]'
+        )
+    )
+);
+
+
+/************************************
+ *
+ *           CONCATENAÇÕES
+ *
+ ***********************************/
+
+$config['curso/salvar_config'] = array_merge(
+    $config['curso/salvar'],
+    array(
+        array(
+            'field' => 'status',
+            'label' => 'Status do Conteúdo do Curso',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'permissaoCriacaoForum',
+            'label' => 'Permissão de Criação de Fóruns',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'permissaoCriacaoEnquete',
+            'label' => 'Permissão de Criação de Enquetes',
+            'rules' => 'required'
+        )
     )
 );

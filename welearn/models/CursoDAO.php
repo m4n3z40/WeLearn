@@ -155,6 +155,18 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
     {
         $UUID = CassandraUtil::import($dto->getId());
 
+        //Verifica se houve alteração no segmento e reconstroi os indexes.
+        $segmentoAtual = $this->_cf->get($UUID->bytes, array('segmento'));
+
+        if ($segmentoAtual['segmento'] != $dto->getSegmento()->getId()) {
+            $segmentoAtual = $this->_segmentoDAO->recuperar($segmentoAtual['segmento']);
+            $this->_cursosPorAreaCF->remove($segmentoAtual->getArea()->getId(), array($UUID->bytes));
+            $this->_cursosPorSegmentoCF->remove($segmentoAtual->getId(), array($UUID->bytes));
+
+            $this->_cursosPorAreaCF->insert($dto->getSegmento()->getArea()->getId(), array($UUID->bytes => ''));
+            $this->_cursosPorSegmentoCF->insert($dto->getSegmento()->getId(), array($UUID->bytes => ''));
+        }
+
         $this->_cf->insert($UUID->bytes, $dto->toCassandra());
 
         if ( ! is_null( $dto->getImagem() ) ) {

@@ -1,7 +1,7 @@
 <section id="curso-info-content">
     <header>
         <hgroup>
-            <h1>Informações do Curso</h1>
+            <h1><?php echo $curso->nome ?></h1>
             <h3>Saiba mais sobre o curso abaixo.</h3>
         </hgroup>
         <p>Caso queira saber mais detalhes, pergunte aos gerenciadores do curso.</p>
