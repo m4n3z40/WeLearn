@@ -41,7 +41,13 @@ class CategoriaForumDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperar($id)
     {
-        // TODO: implementar este metodo.
+        if ( ! ($id instanceof UUID) ) {
+            $id = CassandraUtil::import($id);
+        }
+
+        $column = $this->_cf->get($id->bytes);
+
+        return $this->_criarFromCassandra($column);
     }
 
 
@@ -51,9 +57,55 @@ class CategoriaForumDAO extends WeLearn_DAO_AbstractDAO
      * @param array|null $filtros
      * @return array
      */
-    public function recuperarTodos($de = null, $ate = null, array $filtros = null)
+    public function recuperarTodos($de = '', $ate = '', array $filtros = null)
     {
-        // TODO: Implementar este metodo.
+        $count = 20;
+
+        if (isset($filtros['count'])) {
+            $count = $filtros['count'];
+        }
+
+        if (isset($filtros['curso']) && $filtros['curso'] instanceof WeLearn_Cursos_Curso) {
+            return $this->recuperarTodosPorCurso($filtros['curso'], $de, $ate, $count);
+        }
+
+        if ($de != '') {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+
+        if ($ate != '') {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
+        $columns = $this->_cf->get_range($de, $ate, $count);
+
+        return $this->_criarVariosFromCassandra($columns);
+    }
+
+    public function recuperarTodosPorCurso(WeLearn_Cursos_Curso $curso, $de = '', $ate = '', $count = 20)
+    {
+        $cursoUUID = CassandraUtil::import($curso->getId());
+
+        if ($de != '') {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+
+        if ($ate != '') {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
+        $arrayKeys = array_keys(
+            $this->_categoriasPorCursoCF->get($cursoUUID->bytes,
+                                              null,
+                                              $de,
+                                              $ate,
+                                              false,
+                                              $count)
+        );
+
+        $columns = $this->_cf->multiget($arrayKeys);
+
+        return $this->_criarVariosFromCassandra($columns, $curso);
     }
 
     /**
@@ -73,7 +125,15 @@ class CategoriaForumDAO extends WeLearn_DAO_AbstractDAO
      */
     public function remover($id)
     {
-        // TODO: Implementar este metodo.
+        if ( ! ( $id instanceof UUID ) ) {
+            $id = CassandraUtil::import($id);
+        }
+
+        $categoriaRemovida = $this->recuperar($id);
+
+        $this->_cf->remove($id->bytes);
+
+        return $categoriaRemovida;
     }
 
     /**
@@ -91,7 +151,9 @@ class CategoriaForumDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _atualizar(WeLearn_DTO_IDTO $dto)
     {
-        // TODO: Implementar este metodo.
+        $UUID = CassandraUtil::import($dto->getId());
+
+        $this->_cf->insert($UUID->bytes, $dto->toCassandra());
     }
 
     /**
@@ -129,5 +191,31 @@ class CategoriaForumDAO extends WeLearn_DAO_AbstractDAO
         // TODO: Implementar este metodo.
     }
     
+    private function _criarFromCassandra(array $column, WeLearn_Cursos_Curso $cursoPadrao = null)
+    {
+        $column['curso'] = ($cursoPadrao instanceof WeLearn_Cursos_Curso)
+                            ? $cursoPadrao
+                            : $this->_cursoDao->recuperar($column['curso']);
 
+        try {
+            $column['criador'] = $this->_usuarioDao->recuperar($column['criador']);
+        } catch (cassandra_NotFoundException $e) {
+            unset($column['criador']);
+        }
+
+        $categoria = new WeLearn_Cursos_Foruns_Categoria();
+        $categoria->fromCassandra($column);
+
+        return $categoria;
+    }
+
+    private function _criarVariosFromCassandra(array $columns, WeLearn_Cursos_Curso $cursoPadrao = null)
+    {
+        $listaCategoriasObjs = array();
+        foreach ($columns as $column) {
+            $listaCategoriasObjs[] = $this->_criarFromCassandra($column, $cursoPadrao);
+        }
+
+        return $listaCategoriasObjs;
+    }
 }

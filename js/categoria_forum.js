@@ -23,4 +23,41 @@ $(document).ready(function(){
             }
         });
     }
+
+    var navPaginacao = document.getElementById('paginacao-categoria-forum');
+    if (navPaginacao != null) {
+        var $aProxPagina = $(navPaginacao).find('a');
+
+        $aProxPagina.click(function(e) {
+            e.preventDefault();
+
+            var $this = $(this),
+                idProximo = $this.data('proximo'),
+                idCurso = $this.data('id-curso'),
+                url = WeLearn.url.siteURL('forum/categoria/proxima_pagina/' + idCurso + '/' + idProximo);
+
+            $.get(
+                url,
+                {},
+                function (res) {
+                    if(res.success) {
+                        $('#categoria-forum-listar-datatable').append(res.htmlListaCategorias);
+
+                        if (res.paginacao.proxima_pagina) {
+                            $this.data('proximo', res.paginacao.inicio_proxima_pagina);
+                        } else {
+                            $this.parent().html('Não há mais categorias a serem exibidas no momento.');
+                        }
+                    } else {
+                        WeLearn.notificar({
+                            msg: res.errors[0].error_msg,
+                            nivel: 'erro',
+                            tempo: 15000
+                        })
+                    }
+                },
+                'json'
+            );
+        });
+    }
 });

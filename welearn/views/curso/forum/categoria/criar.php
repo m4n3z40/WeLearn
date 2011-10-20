@@ -1,4 +1,4 @@
-<div id="forum-criar-content">
+<div id="categoria-forum-criar-content">
     <header>
         <hgroup>
             <h1>Criar uma categoria de fórum</h1>

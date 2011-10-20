@@ -18,13 +18,79 @@ class Categoria extends WL_Controller {
     public function listar($idCurso)
     {
         try {
+            $count = 20;
+
             $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
             $curso = $cursoDao->recuperar($idCurso);
 
-            $this->_renderTemplateCurso($curso);
+            $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
+
+            $listaCategorias = $categoriaDao->recuperarTodosPorCurso($curso, '', '', $count + 1);
+
+            $this->load->helper('paginacao_cassandra');
+            $dados_paginacao = create_paginacao_cassandra($listaCategorias, $count);
+
+            $dadosLista = array(
+                'listaCategorias' => $listaCategorias
+            );
+
+            $dadosViewListar = array(
+                'idCurso' => $curso->getId(),
+                'listaCategorias' => $this->template->loadPartial('lista', $dadosLista, 'curso/forum/categoria'),
+                'haMaisPaginas' => $dados_paginacao['proxima_pagina'],
+                'inicioProxPagina' => $dados_paginacao['inicio_proxima_pagina']
+            );
+
+            $this->_renderTemplateCurso($curso, 'curso/forum/categoria/listar', $dadosViewListar);
         } catch (Exception $e) {
+            log_message('error', 'Ocorreu um erro ao exibir a lista de Categoria de Fórum:'
+                                 . create_exception_description($e));
+
             show_404();
         }
+    }
+
+    public function proxima_pagina($cursoId, $inicio)
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $count = 10;
+
+            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+            $curso = $cursoDao->recuperar($cursoId);
+
+            $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
+            $listaCategorias = $categoriaDao->recuperarTodosPorCurso($curso, $inicio, '', $count + 1);
+
+            $this->load->helper('paginacao_cassandra');
+            $dados_paginacao = create_paginacao_cassandra($listaCategorias, $count);
+
+            $dadosLista = array(
+                'listaCategorias' => $listaCategorias
+            );
+
+            $response = array(
+                'success' => true,
+                'htmlListaCategorias' => $this->template->loadPartial('lista', $dadosLista, 'curso/forum/categoria'),
+                'paginacao' => $dados_paginacao
+            );
+
+            $json = Zend_Json::encode($response);
+        } catch (Exception $e) {
+            log_message('error', 'Ocorreu um erro ao recuperar outra página de categorias de fóruns: '
+                                 . create_exception_description($e));
+
+            $error = create_json_feedback_error_json('Ocorreu um erro inesperado. Já estamos verificando, tente novamente mais tarde.');
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
     }
 
     public function criar($idCurso)
@@ -42,17 +108,22 @@ class Categoria extends WL_Controller {
                 'formAction' => 'forum/categoria/salvar',
                 'extraOpenForm' => 'id="form-criar-categoria-forum"',
                 'hiddenFormData' => array('cursoId' => $curso->getId()),
-                'formCriar' => $this->template->loadPartial('form_criar', $dadosFormCriar, 'curso/forum'),
+                'formCriar' => $this->template->loadPartial('form_criar', $dadosFormCriar, 'curso/forum/categoria'),
                 'textoBotaoSubmit' => 'Criar nova categoria!'
             );
 
-            $this->_renderTemplateCurso($curso, 'curso/forum/criar', $dadosViewCriar);
+            $this->_renderTemplateCurso($curso, 'curso/forum/categoria/criar', $dadosViewCriar);
         } catch (Exception $e) {
             show_404();
         }
     }
 
-    public function alterar($idCurso)
+    public function alterar($id)
+    {
+
+    }
+
+    public function remover($id)
     {
 
     }

@@ -11,7 +11,7 @@
 class WeLearn_Cursos_Foruns_Categoria extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var int
+     * @var string
      */
     private $_id;
 
@@ -105,15 +105,15 @@ class WeLearn_Cursos_Foruns_Categoria extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param int $id
+     * @param string $id
      */
     public function setId($id)
     {
-        $this->_id = (int)$id;
+        $this->_id = (string)$id;
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
