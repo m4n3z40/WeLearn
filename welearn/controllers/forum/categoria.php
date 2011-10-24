@@ -25,7 +25,11 @@ class Categoria extends WL_Controller {
 
             $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
 
-            $listaCategorias = $categoriaDao->recuperarTodosPorCurso($curso, '', '', $count + 1);
+            try {
+                $listaCategorias = $categoriaDao->recuperarTodosPorCurso($curso, '', '', $count + 1);
+            } catch (cassandra_NotFoundException $e) {
+                $listaCategorias = array();
+            }
 
             $this->load->helper('paginacao_cassandra');
             $dados_paginacao = create_paginacao_cassandra($listaCategorias, $count);
@@ -36,6 +40,7 @@ class Categoria extends WL_Controller {
 
             $dadosViewListar = array(
                 'idCurso' => $curso->getId(),
+                'haCategorias' => !empty($listaCategorias),
                 'listaCategorias' => $this->template->loadPartial('lista', $dadosLista, 'curso/forum/categoria'),
                 'haMaisPaginas' => $dados_paginacao['proxima_pagina'],
                 'inicioProxPagina' => $dados_paginacao['inicio_proxima_pagina']
@@ -108,7 +113,7 @@ class Categoria extends WL_Controller {
                 'formAction' => 'forum/categoria/salvar',
                 'extraOpenForm' => 'id="form-criar-categoria-forum"',
                 'hiddenFormData' => array('cursoId' => $curso->getId()),
-                'formCriar' => $this->template->loadPartial('form_criar', $dadosFormCriar, 'curso/forum/categoria'),
+                'formCriar' => $this->template->loadPartial('form', $dadosFormCriar, 'curso/forum/categoria'),
                 'textoBotaoSubmit' => 'Criar nova categoria!'
             );
 
@@ -120,7 +125,29 @@ class Categoria extends WL_Controller {
 
     public function alterar($id)
     {
+        try {
+            $UUID = CassandraUtil::import($id);
 
+            $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
+            $categoria = $categoriaDao->recuperar($UUID);
+
+            $dadosFormAlterar = array(
+                'nomeAtual' => $categoria->getNome(),
+                'descricaoAtual' => $categoria->getDescricao()
+            );
+
+            $dadosViewAlterar = array(
+                'formAction' => 'forum/categoria/salvar',
+                'extraOpenForm' => 'id="form-alterar-categoria-forum"',
+                'hiddenFormData' => array ('categoriaId' => $categoria->getId()),
+                'formAlterar' => $this->template->loadPartial('form', $dadosFormAlterar, 'curso/forum/categoria'),
+                'textoBotaoSubmit' => 'Salvar!'
+            );
+
+            $this->_renderTemplateCurso($categoria->getCurso(), 'curso/forum/categoria/alterar', $dadosViewAlterar);
+        } catch(Exception $e) {
+
+        }
     }
 
     public function remover($id)

@@ -5,10 +5,11 @@
             <h3>Abaixo você verá todas as categorias de fórum dinponíveis</h3>
         </hgroup>
         <p>
-            Quer adicionar outra categoria de fórum? <?php echo anchor('/curso/' . $idCurso . '/forum/categoria/criar', 'É por aqui!') ?>
+            Quer adicionar uma categoria de fórum? <?php echo anchor('/curso/' . $idCurso . '/forum/categoria/criar', 'É por aqui!') ?>
         </p>
     </header>
     <div>
+    <?php if ($haCategorias): ?>
         <table id="categoria-forum-listar-datatable">
             <tr>
                 <th>Nome</th>
@@ -29,6 +30,11 @@
                 <?php endif; ?>
             </nav>
         </footer>
+    <?php else: ?>
+        <h4>
+            Nenhuma categoria de fórum foi criada para este curso até o momento.
+        </h4>
+    <?php endif ?>
     </div>
 </div>
  
