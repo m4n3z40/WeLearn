@@ -37,7 +37,14 @@ function create_json_feedback($success = false, $errors = '', $extra = '')
         if (is_array($extra)) {
             $extra = Zend_Json::encode($extra);
         }
-        $extra = trim($extra, '{}');
+        $extra = ltrim($extra, '{');
+
+        $lastLetter = strlen($extra) - 1;
+
+        if ($extra[$lastLetter] == '}') {
+            $extra = substr($extra, 0, $lastLetter);
+        }
+
         $extra = ', '.$extra;
     }
     

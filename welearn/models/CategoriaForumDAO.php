@@ -131,6 +131,9 @@ class CategoriaForumDAO extends WeLearn_DAO_AbstractDAO
 
         $categoriaRemovida = $this->recuperar($id);
 
+        $cursoUUID = CassandraUtil::import($categoriaRemovida->getCurso()->getId());
+
+        $this->_categoriasPorCursoCF->remove($cursoUUID->bytes, array($id->bytes));
         $this->_cf->remove($id->bytes);
 
         return $categoriaRemovida;

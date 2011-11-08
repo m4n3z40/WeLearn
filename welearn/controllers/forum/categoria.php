@@ -12,7 +12,7 @@ class Categoria extends WL_Controller {
 
     public function index($idCurso)
     {
-
+        $this->listar($idCurso);
     }
 
     public function listar($idCurso)
@@ -112,13 +112,15 @@ class Categoria extends WL_Controller {
             $dadosViewCriar = array(
                 'formAction' => 'forum/categoria/salvar',
                 'extraOpenForm' => 'id="form-criar-categoria-forum"',
-                'hiddenFormData' => array('cursoId' => $curso->getId()),
+                'hiddenFormData' => array('cursoId' => $curso->getId(), 'acao' => 'criar'),
                 'formCriar' => $this->template->loadPartial('form', $dadosFormCriar, 'curso/forum/categoria'),
                 'textoBotaoSubmit' => 'Criar nova categoria!'
             );
 
             $this->_renderTemplateCurso($curso, 'curso/forum/categoria/criar', $dadosViewCriar);
         } catch (Exception $e) {
+            log_message('error', 'Erro ao exibir formulário de criação de categoria de fórum: ' . create_exception_description($e));
+
             show_404();
         }
     }
@@ -137,22 +139,53 @@ class Categoria extends WL_Controller {
             );
 
             $dadosViewAlterar = array(
+                'idCurso' => $categoria->getCurso()->getId(),
                 'formAction' => 'forum/categoria/salvar',
                 'extraOpenForm' => 'id="form-alterar-categoria-forum"',
-                'hiddenFormData' => array ('categoriaId' => $categoria->getId()),
+                'hiddenFormData' => array ('categoriaId' => $categoria->getId(), 'acao' => 'alterar'),
                 'formAlterar' => $this->template->loadPartial('form', $dadosFormAlterar, 'curso/forum/categoria'),
                 'textoBotaoSubmit' => 'Salvar!'
             );
 
             $this->_renderTemplateCurso($categoria->getCurso(), 'curso/forum/categoria/alterar', $dadosViewAlterar);
         } catch(Exception $e) {
-
+            log_message('error', 'Erro ao exibir formulário de alteração de categoria de fórum:' . create_exception_description($e));
+            show_404();
         }
     }
 
     public function remover($id)
     {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
 
+        set_json_header();
+
+        try {
+            $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
+
+            $categoriaRemovida = $categoriaDao->remover($id);
+
+            $dadosNotificacao = array(
+                'notificacao' => array(
+                    'nivel' => 'sucesso',
+                    'msg' => 'A categoria <strong>' . $categoriaRemovida->getNome() . '</strong> foi removida com sucesso!',
+                    'tempo' => 15000
+                )
+            );
+
+            $json = create_json_feedback(true, '', Zend_Json::encode($dadosNotificacao));
+        } catch (Exception $e) {
+            log_message('error', 'Ocorreu um erro ao tentar remover uma categoria de fórum: ' . create_exception_description($e));
+
+            $error = create_json_feedback_error_json('Ocorreu um erro inesperado ao remover esta categoria.'
+                                                    .'Estamos verificando no momento, tente mais tarde.');
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
     }
 
     public function salvar()
@@ -169,26 +202,43 @@ class Categoria extends WL_Controller {
         } else {
             try {
                 $dadosCategoria = $this->input->post();
-
                 $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
-                $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
 
-                $dadosCategoria['curso'] = $cursoDao->recuperar($dadosCategoria['cursoId']);
-                $dadosCategoria['criador'] = $this->autenticacao->getUsuarioAutenticado();
+                if (isset($dadosCategoria['acao']) && $dadosCategoria['acao'] == 'criar') {
+                    $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
 
-                $novaCategoria = $categoriaDao->criarNovo($dadosCategoria);
-                $categoriaDao->salvar($novaCategoria);
+                    $dadosCategoria['curso'] = $cursoDao->recuperar($dadosCategoria['cursoId']);
+                    $dadosCategoria['criador'] = $this->autenticacao->getUsuarioAutenticado();
 
-                $notificacoesFlash = Zend_Json::encode(array(
-                                                           'msg'=> 'A nova categoria de fóruns foi criada com sucesso. <br/>'
-                                                                 . 'Comece a adicionar fóruns à esta categoria!',
-                                                           'nivel' => 'sucesso',
-                                                           'tempo' => '15000'
-                                                       ));
+                    $novaCategoria = $categoriaDao->criarNovo($dadosCategoria);
+                    $categoriaDao->salvar($novaCategoria);
+
+                    $notificacoesFlash = Zend_Json::encode(array(
+                                                               'msg' => 'A nova categoria de fóruns foi criada com sucesso. <br/>'
+                                                                     . 'Comece a adicionar fóruns à esta categoria!',
+                                                               'nivel' => 'sucesso',
+                                                               'tempo' => '15000'
+                                                           ));
+
+                    $json = create_json_feedback(true, '', '"idCurso":"' . $novaCategoria->getCurso()->getid() . '"');
+                } elseif (isset($dadosCategoria['acao']) && $dadosCategoria['acao'] == 'alterar') {
+                    $categoria = $categoriaDao->recuperar($dadosCategoria['categoriaId']);
+                    $categoria->preencherPropriedades($dadosCategoria);
+                    $categoriaDao->salvar($categoria);
+
+                    $notificacoesFlash = Zend_Json::encode(array(
+                                                               'msg' => 'A categoria <strong>' . $categoria->getNome() .
+                                                                       '</strong> foi alterada com sucesso!',
+                                                               'nivel' => 'sucesso',
+                                                               'tempo' => '15000'
+                                                           ));
+
+                    $json = create_json_feedback(true, '', '"idCurso":"' . $categoria->getCurso()->getId() . '"');
+                } else {
+                    throw new WeLearn_Base_Exception('Ação de salvar categoria de fórum inválida!');
+                }
 
                 $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
-
-                $json = create_json_feedback(true, '', '"idCurso":"' . $novaCategoria->getCurso()->getid() . '"');
             } catch (Exception $e) {
                 log_message('error', 'Erro a criar categoria de fórum: ' . create_exception_description($e));
 

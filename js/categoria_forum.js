@@ -14,6 +14,9 @@ $(document).ready(function(){
 
             var formCategoria = document.getElementById('form-criar-categoria-forum'),
                 url = WeLearn.url.siteURL('forum/categoria/salvar');
+
+            formCategoria = (formCategoria != null) ? formCategoria : document.getElementById('form-alterar-categoria-forum');
+
             if (formCategoria != null) {
                 WeLearn.validarForm(formCategoria, url, function(res) {
                    if ( res.success ) {
@@ -23,6 +26,51 @@ $(document).ready(function(){
             }
         });
     }
+
+    $('.a-remover-categoria-forum').live('click', function (e) {
+        e.preventDefault();
+
+        var $this = $(this),
+            $divConfirmacao = $('<div id="dialogo-confirmacao-remover-categoria">' +
+                                '<p>Tem certeza que deseja remover esta categoria?' +
+                                '<br/>Essa ação <strong>NÃO</strong> poderá ser desfeita. ' +
+                                '<br/><strong>TODOS</strong> os fóruns e posts vinculados' +
+                                ' à esta categoria também serão removidos.</p></div>');
+
+        $divConfirmacao.dialog({
+            title: 'Tem certeza?',
+            width: '450px',
+            resizable: false,
+            modal: true,
+            buttons: {
+                'Confirmar': function(){
+                    $.get(
+                        $this.attr('href'),
+                        {},
+                        function(res) {
+                            if (res.success) {
+                                WeLearn.notificar(res.notificacao);
+                                $this.parent().parent().fadeOut('slow', function(){
+                                    $(this).remove();
+                                });
+                            } else {
+                                WeLearn.notificar({
+                                    nivel: 'erro',
+                                    msg: res.errors[0].error_msg,
+                                    tempo: 10000
+                                });
+                            }
+                        }
+                    );
+
+                    $( this ).dialog('close');
+                },
+                'Cancelar': function(){
+                    $( this ).dialog('close');
+                }
+            }
+        });
+    });
 
     var navPaginacao = document.getElementById('paginacao-categoria-forum');
     if (navPaginacao != null) {

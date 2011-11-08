@@ -5,7 +5,7 @@
             <h3>Entre com os novos dados da categoria.</h3>
         </hgroup>
         <p>
-            Não queria estar aqui? <?php echo anchor('', 'Volte para a listagem de categorias') ?>
+            Não queria estar aqui? <?php echo anchor('curso/' . $idCurso . '/forum/categoria/listar', 'Volte para a listagem de categorias') ?>
         </p>
     </header>
     <div>
