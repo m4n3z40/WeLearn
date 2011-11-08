@@ -1,5 +1,9 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+define('TEMP_UPLOAD_DIR', realpath(APPPATH . '../temp/') . '/');
+define('USER_IMG_DIR', realpath(APPPATH . '../img/user_imgs/') . '/');
+define('USER_IMG_URI', '/img/user_imgs/');
+
 /*
 |--------------------------------------------------------------------------
 | File and Directory Modes

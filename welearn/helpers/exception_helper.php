@@ -9,8 +9,8 @@
  
 function create_exception_description(Exception $e)
 {
-    return '(Exception: ' . get_class($e) . '): \n'
-          .'Mensagem: ' . $e->getMessage() . '\n'
-          .'No arquivo "' . $e->getFile() . '", linha ' . $e->getLine() . '.\n'
+    return "(Exception: " . get_class($e) . "): \n"
+          ."Mensagem: " . $e->getMessage() . "\n"
+          .'No arquivo "' . $e->getFile() . '", linha ' . $e->getLine() . ".\n"
           .'Stacktrace: ' . $e->getTraceAsString();
 }

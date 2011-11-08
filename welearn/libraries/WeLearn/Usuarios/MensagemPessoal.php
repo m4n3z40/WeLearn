@@ -12,7 +12,7 @@ class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO
 {
 
     /**
-     * @var int
+     * @var string
      */
     private $_id;
 
@@ -22,7 +22,7 @@ class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO
     private $_mensagem;
 
     /**
-     * @var string
+     * @var int
      */
     private $_dataEnvio;
 
@@ -39,7 +39,7 @@ class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO
     /**
      * @var int
      */
-    private $_status;
+    private $_status = WeLearn_Usuarios_StatusMP::NOVO;
 
     /**
      * @param int $status
@@ -90,15 +90,15 @@ class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param int $id
+     * @param string $id
      */
     public function setId($id)
     {
-        $this->_id = (int)$id;
+        $this->_id = (string)$id;
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
@@ -122,15 +122,15 @@ class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param string $dataEnvio
+     * @param int $dataEnvio
      */
     public function setDataEnvio($dataEnvio)
     {
-        $this->_dataEnvio = (string)$dataEnvio;
+        $this->_dataEnvio = (int)$dataEnvio;
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getDataEnvio()
     {
@@ -169,6 +169,23 @@ class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO
             'destinatario' => $this->getDestinatario()->toArray(),
             'status' => $this->getStatus(),
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'id' => $this->getId(),
+            'mensagem' => $this->getMensagem(),
+            'dataEnvio' => $this->getDataEnvio(),
+            'remetente' => ($this->_remetente instanceof WeLearn_Usuarios_Usuario) ? $this->getRemetente() : '',
+            'destinatario' => ($this->_destinatario instanceof WeLearn_Usuarios_Usuario) ? $this->getDestinatario() : '',
+            'status' => $this->getStatus()
         );
     }
 }

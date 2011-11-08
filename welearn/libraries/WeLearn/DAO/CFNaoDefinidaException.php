@@ -13,7 +13,7 @@ class WeLearn_DAO_CFNaoDefinidaException extends  WeLearn_DAO_DAONaoEncontradaEx
     /**
      * @var string
      */
-    private $message = 'A DAO requisitada não pode ser criada por que sua column family não foi definida.
+    protected $message = 'A DAO requisitada não pode ser criada por que sua column family não foi definida.
                         Defina a column family desta DAO e tente novamente.';
 
     /**

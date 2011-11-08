@@ -7,13 +7,13 @@
  */
 
 $(document).ready(function(){
-    $btnLogout = $('.logoutButton');
+    var $btnLogout = $('.logoutButton');
 
     $btnLogout.click(function(e){
         e.preventDefault();
 
         $.post(
-            'http://welearn.com/usuario/logout',
+            WeLearn.url.siteURL('usuario/logout'),
             function(result) {
                 if (result.success) {
                    location.reload();

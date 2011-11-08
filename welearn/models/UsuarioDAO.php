@@ -42,7 +42,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     {
         $dto->setId($dto->getNomeUsuario()); //Id = Nome de usuário
         $dto->setSenha(md5($dto->getSenha())); //Senha necessita ser encriptada.
-        $dto->setDataCadastro(date('d/m/Y H:m:s'));
+        $dto->setDataCadastro(time());
 
         $this->_cf->insert($dto->getId(), $dto->toCassandra());
 
@@ -133,6 +133,56 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         return new WeLearn_Usuarios_Usuario($dados);
     }
 
+    public function criarGerenciadorPrincipal($dados)
+    {
+        if ($dados instanceof WeLearn_Usuarios_Usuario) {
+            $dados = $this->_extrairDadosUsuarioParaArray($dados);
+            return new WeLearn_Usuarios_GerenciadorPrincipal($dados);
+        }
+
+        return new WeLearn_Usuarios_GerenciadorPrincipal($dados);
+    }
+
+    public function criarGerenciadorAuxiliar($dados)
+    {
+        if ($dados instanceof WeLearn_Usuarios_Usuario) {
+            $dados = $this->_extrairDadosUsuarioParaArray($dados);
+            return new WeLearn_Usuarios_GerenciadorAuxiliar($dados);
+        }
+
+        return new WeLearn_Usuarios_GerenciadorAuxiliar($dados);
+    }
+
+    public function criarModerador($dados)
+    {
+        if ($dados instanceof WeLearn_Usuarios_Usuario) {
+            $dados = $this->_extrairDadosUsuarioParaArray($dados);
+            return new WeLearn_Usuarios_Moderador($dados);
+        }
+
+        return new WeLearn_Usuarios_Moderador($dados);
+    }
+
+    public function criarInstrutor($dados)
+    {
+        if ($dados instanceof WeLearn_Usuarios_Usuario) {
+            $dados = $this->_extrairDadosUsuarioParaArray($dados);
+            return new WeLearn_Usuarios_Instrutor($dados);
+        }
+
+        return new WeLearn_Usuarios_Instrutor($dados);
+    }
+
+    public function criarAluno($dados)
+    {
+        if ($dados instanceof WeLearn_Usuarios_Usuario) {
+            $dados = $this->_extrairDadosUsuarioParaArray($dados);
+            return new WeLearn_Usuarios_Aluno($dados);
+        }
+
+        return new WeLearn_Usuarios_Aluno($dados);
+    }
+
     public function usuarioCadastrado($usuario)
     {
         try {
@@ -166,8 +216,11 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
             } else {
                 $objUsuario = $this->recuperar($usuario);
             }
+
+            //Caso a senha for menor que 24 caracteres não é md5, necessário encriptar.
+            $senha = (strlen($senha) <= 24) ? md5($senha) : $senha;
             
-            if ($objUsuario->getSenha() == md5($senha)) {
+            if ($objUsuario->getSenha() == $senha) {
                 return $objUsuario;
             } else {
                 throw new WeLearn_Usuarios_AutenticacaoSenhaInvalidaException($senha);
@@ -183,5 +236,41 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     public function getConfiguracaoDao()
     {
         return $this->_configuracaoDao;
+    }
+
+    private function _extrairDadosUsuarioParaArray(WeLearn_Usuarios_Usuario $usuario)
+    {
+        $usuarioArray =  array(
+            'id' => $usuario->getId(),
+            'nome' => $usuario->getNome(),
+            'sobrenome' => $usuario->getSobrenome(),
+            'email' => $usuario->getEmail(),
+            'nomeUsuario' => $usuario->getNomeUsuario(),
+            'senha' => $usuario->getSenha(),
+            'dataCadastro' => $usuario->getDataCadastro(),
+            'persistido' => $usuario->isPersistido()
+        );
+
+        if ( $usuario->getImagem() ) {
+            $usuarioArray['imagem'] = $usuario->getImagem();
+        }
+
+        if ( $usuario->getDadosPessoais() ) {
+            $usuarioArray['dadosPessoais'] = $usuario->getDadosPessoais();
+        }
+
+        if ( $usuario->getDadosProfissionais() ) {
+            $usuarioArray['dadosProfissionais'] = $usuario->getDadosProfissionais();
+        }
+
+        if ( $usuario->getSegmentoInteresse() ) {
+            $usuarioArray['segmentoInteresse'] = $usuario->getSegmentoInteresse();
+        }
+
+        if ( $usuario->getConfiguracao() ) {
+            $usuarioArray['configuracao'] = $usuario->getConfiguracao();
+        }
+
+        return $usuarioArray;
     }
 }

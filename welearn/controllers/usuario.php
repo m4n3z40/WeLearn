@@ -1,6 +1,7 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Usuario extends CI_Controller {
+class Usuario extends CI_Controller
+{
 
     /**
      * Construtor carrega configurações da classes base CI_Controller
@@ -13,14 +14,30 @@ class Usuario extends CI_Controller {
 
     public function cadastrar()
     {
-        $partial_cadastro = array(
-            'form_cadastro' => $this->template->loadPartial('form_cadastro', null, 'usuario')
+        
+        if ( $this->autenticacao->isAutenticado() ) {
+            redirect('/home');
+        }
+
+        $this->load->helper('area');
+        $listaAreas = lista_areas_para_dados_dropdown();
+
+        $dadosPartial = array(
+            'listaAreas' => $listaAreas
         );
 
-        $this->template->appendJSImport('login_usuario.js')
-                       ->appendJSImport('cadastro_usuario.js');
+        $partial_cadastro = array(
+            'form_cadastro' => $this->template
+                                    ->loadPartial(
+                                            'form_cadastro', 
+                                            $dadosPartial, 
+                                            'usuario'
+                                    )
+        );
 
-        $this->template->render('usuario/cadastrar', $partial_cadastro);
+        $this->template->setTemplate('default')
+                       ->appendJSImport('cadastro_usuario.js')
+                       ->render('usuario/cadastrar', $partial_cadastro);
     }
 
     public function validar_cadastro()
@@ -31,7 +48,7 @@ class Usuario extends CI_Controller {
         }
 
         //O retorno será em JSON.
-        header('Content-type: applcation/json');
+        set_json_header();
 
         //Faz a validação dos dados do formulário.
         $this->load->library('form_validation');
@@ -83,6 +100,8 @@ class Usuario extends CI_Controller {
 
             $usuarioDao->salvar($novoUsuario);
 
+            $this->autenticacao->autenticar($novoUsuario->getNomeUsuario(), $novoUsuario->getSenha());
+
             $json = create_json_feedback(true);
 
         } catch (Exception $e) {//Caso haja um erro não esperado, o erro é logado e uma mensagem generica é retornada
@@ -97,12 +116,7 @@ class Usuario extends CI_Controller {
         }
 
         //Retorna o resultado!
-        exit($json);
-    }
-
-    public function quickstart()
-    {
-
+        echo $json;
     }
 
     public function login()
@@ -110,20 +124,14 @@ class Usuario extends CI_Controller {
         if ( ! $this->input->is_ajax_request() ) {
            show_404();
         }
-
-        $this->load->library('form_validation');
-        if ($this->form_validation->run() === FALSE) {
-            $json = create_json_feedback(false, validation_errors_json());
-
-            exit($json);
-        }
-
+        
         //O retorno será em JSON.
-        header('Content-type: applcation/json');
+        set_json_header();
 
         $this->load->library('form_validation');
         if ($this->form_validation->run() === FALSE) {
             $json = create_json_feedback(false, validation_errors_json());
+
             exit($json);
         }
 
@@ -131,10 +139,7 @@ class Usuario extends CI_Controller {
             $login = $this->input->post('login');
             $senha = $this->input->post('password');
 
-            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-            $usuario = $usuarioDao->autenticar($login, $senha);
-
-            $this->session->set_userdata('usuario', serialize($usuario));
+            $this->autenticacao->autenticar($login, $senha);
 
             $json = create_json_feedback(true);
         } catch (WeLearn_Usuarios_AutenticacaoLoginInvalidoException $e) {
@@ -163,7 +168,7 @@ class Usuario extends CI_Controller {
         }
 
         //Retorna o resultado!
-        exit($json);
+        echo $json;
     }
 
     public function logout()
@@ -173,19 +178,18 @@ class Usuario extends CI_Controller {
         }
 
         //O retorno será em JSON.
-        header('Content-type: applcation/json');
+        set_json_header();
 
-        $this->session->sess_destroy();
+        $this->autenticacao->limparSessao();
 
         $json = create_json_feedback(true);
 
-        exit($json);
+        echo $json;
     }
 
-	public function index()
-	{
-		$this->template->setTitle('Welcome to CodeIgniter')
-                       ->render('welcome_message');
+    public function index()
+    {
+        $this->template->render();
     }
 }
 

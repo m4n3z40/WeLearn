@@ -267,7 +267,7 @@ $config['sess_time_to_update']	= 300;
 |
 */
 $config['cookie_prefix']	= "welearn";
-$config['cookie_domain']	= "";
+$config['cookie_domain']	= ".welearn.com";
 $config['cookie_path']		= "/";
 $config['cookie_secure']	= FALSE;
 

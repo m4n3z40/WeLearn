@@ -24,17 +24,17 @@ $config = array(
         array(
             'field' => 'nome',
             'label' => 'Nome',
-            'rules' => 'required|min_length[5]|max_length[45]'
+            'rules' => 'required|min_length[5]|max_length[45]|strip_tags'
         ),
         array(
             'field' => 'sobrenome',
             'label' => 'Sobrenome',
-            'rules' => 'max_length[60]'
+            'rules' => 'max_length[60]|strip_tags'
         ),
         array(
             'field' => 'email',
             'label' => 'Email',
-            'rules' => 'required|max_length[80]|valid_email'
+            'rules' => 'required|max_length[80]|valid_email|strip_tags'
         ),
         array(
             'field' => 'nomeUsuario',
@@ -66,14 +66,133 @@ $config = array(
         array(
             'field' => 'descricao',
             'label' => 'Descrição',
-            'rules' => 'required|trim'
+            'rules' => 'required|min_length[3]|max_length[80]|trim|strip_tags'
         )
     ),
     'area/adicionar' => array(
         array(
             'field' => 'descricao',
             'label' => 'Descrição',
-            'rules' => 'required|trim'
+            'rules' => 'required|min_length[3]|max_length[80]|trim|strip_tags'
         )
     ),
+    'sugestao/salvar' => array(
+        array(
+            'field' => 'nome',
+            'label' => 'Nome do Curso',
+            'rules' => 'required|min_length[5]|max_length[80]|trim|strip_tags'
+        ),
+        array(
+            'field' => 'tema',
+            'label' => 'Tema do Curso',
+            'rules' => 'required|min_length[5]|max_length[256]|trim|strip_tags'
+        ),
+        array(
+            'field' => 'descricao',
+            'label' => 'Descrição',
+            'rules' => 'max_length[2048]|strip_tags'
+        ),
+        array(
+            'field' => 'area',
+            'label' => 'Área de Segmento',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'segmento',
+            'label' => 'Segmento do Curso',
+            'rules' => 'required'
+        )
+    ),
+    'curso/salvar' => array(
+        array(
+            'field' => 'nome',
+            'label' => 'Nome do Curso',
+            'rules' => 'required|min_length[5]|max_length[80]|trim|strip_tags'
+        ),
+        array(
+            'field' => 'tema',
+            'label' => 'Tema do Curso',
+            'rules' => 'required|min_length[5]|max_length[256]|trim|strip_tags'
+        ),
+        array(
+            'field' => 'descricao',
+            'label' => 'Descrição',
+            'rules' => 'max_length[2048]|strip_tags'
+        ),
+        array(
+            'field' => 'objetivos',
+            'label' => 'Objetivos',
+            'rules' => 'max_length[4096]'
+        ),
+        array(
+            'field' => 'conteudoProposto',
+            'label' => 'Conteúdo Proposto',
+            'rules' => 'max_length[4096]'
+        ),
+        array(
+            'field' => 'area',
+            'label' => 'Área de Segmento',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'segmento',
+            'label' => 'Segmento do Curso',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'tempoDuracaoMax',
+            'label' => 'Tempo máximo de duração do curso',
+            'rules' => 'required|integer|greater_than[0]',
+        ),
+        array(
+            'field' => 'privacidadeConteudo',
+            'label' => 'Privacidade de Conteúdo',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'privacidadeInscricao',
+            'label' => 'Permissão de Inscrição',
+            'rules' => 'required'
+        )
+    ),
+    'categoria/salvar' => array(
+        array(
+            'field' => 'nome',
+            'label' => 'Nome da categoria',
+            'rules' => 'required|min_length[5]|max_length[80]'
+        ),
+        array(
+            'field' => 'descricao',
+            'label' => 'Descricao da categoria',
+            'rules' => 'max_length[512]'
+        )
+    )
+);
+
+
+/************************************
+ *
+ *           CONCATENAÇÕES
+ *
+ ***********************************/
+
+$config['curso/salvar_config'] = array_merge(
+    $config['curso/salvar'],
+    array(
+        array(
+            'field' => 'status',
+            'label' => 'Status do Conteúdo do Curso',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'permissaoCriacaoForum',
+            'label' => 'Permissão de Criação de Fóruns',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'permissaoCriacaoEnquete',
+            'label' => 'Permissão de Criação de Enquetes',
+            'rules' => 'required'
+        )
+    )
 );

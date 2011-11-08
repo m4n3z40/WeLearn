@@ -7,7 +7,6 @@
  */
 $(document).ready(function(){
     var $btnLogin = $('button[name=submitLogin]');
-
     $btnLogin.click(function(e){
         e.preventDefault();
 
@@ -15,9 +14,9 @@ $(document).ready(function(){
 
         WeLearn.validarForm(
             form,
-            'http://welearn.com/usuario/login',
+            WeLearn.url.siteURL('usuario/login'),
             function(result) {
-                window.location = 'http://welearn.com/home';
+                window.location = WeLearn.url.siteURL('home');
             }
         );
     });

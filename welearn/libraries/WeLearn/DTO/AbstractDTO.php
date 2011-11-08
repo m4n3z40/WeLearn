@@ -119,5 +119,6 @@ abstract class WeLearn_DTO_AbstractDTO implements WeLearn_DTO_IDTO
     public function fromCassandra(array $dados)
     {
         $this->preencherPropriedades($dados);
+        $this->setPersistido(true);
     }
 }

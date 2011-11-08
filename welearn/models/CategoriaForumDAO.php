@@ -7,8 +7,33 @@
  * To change this template use File | Settings | File Templates.
  */
  
-class CategoriaForumDAO
+class CategoriaForumDAO extends WeLearn_DAO_AbstractDAO
 {
+    protected $_nomeCF = 'cursos_forum_categorias';
+
+    private $_nomeCategoriasPorCurso = 'cursos_forum_categorias_por_curso';
+
+    private $_categoriasPorCursoCF;
+
+    /**
+     * @var UsuarioDAO
+     */
+    private $_usuarioDao;
+
+    /**
+     * @var CursoDAO
+     */
+    private $_cursoDao;
+
+    function __construct()
+    {
+        $phpCassa = WL_Phpcassa::getInstance();
+
+        $this->_categoriasPorCursoCF = $phpCassa->getColumnFamily($this->_nomeCategoriasPorCurso);
+
+        $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+    }
 
     /**
      * @param mixed $id
@@ -16,7 +41,13 @@ class CategoriaForumDAO
      */
     public function recuperar($id)
     {
-        // TODO: implementar este metodo.
+        if ( ! ($id instanceof UUID) ) {
+            $id = CassandraUtil::import($id);
+        }
+
+        $column = $this->_cf->get($id->bytes);
+
+        return $this->_criarFromCassandra($column);
     }
 
 
@@ -26,9 +57,55 @@ class CategoriaForumDAO
      * @param array|null $filtros
      * @return array
      */
-    public function recuperarTodos($de = null, $ate = null, array $filtros = null)
+    public function recuperarTodos($de = '', $ate = '', array $filtros = null)
     {
-        // TODO: Implementar este metodo.
+        $count = 20;
+
+        if (isset($filtros['count'])) {
+            $count = $filtros['count'];
+        }
+
+        if (isset($filtros['curso']) && $filtros['curso'] instanceof WeLearn_Cursos_Curso) {
+            return $this->recuperarTodosPorCurso($filtros['curso'], $de, $ate, $count);
+        }
+
+        if ($de != '') {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+
+        if ($ate != '') {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
+        $columns = $this->_cf->get_range($de, $ate, $count);
+
+        return $this->_criarVariosFromCassandra($columns);
+    }
+
+    public function recuperarTodosPorCurso(WeLearn_Cursos_Curso $curso, $de = '', $ate = '', $count = 20)
+    {
+        $cursoUUID = CassandraUtil::import($curso->getId());
+
+        if ($de != '') {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+
+        if ($ate != '') {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
+        $arrayKeys = array_keys(
+            $this->_categoriasPorCursoCF->get($cursoUUID->bytes,
+                                              null,
+                                              $de,
+                                              $ate,
+                                              false,
+                                              $count)
+        );
+
+        $columns = $this->_cf->multiget($arrayKeys);
+
+        return $this->_criarVariosFromCassandra($columns, $curso);
     }
 
     /**
@@ -48,7 +125,18 @@ class CategoriaForumDAO
      */
     public function remover($id)
     {
-        // TODO: Implementar este metodo.
+        if ( ! ( $id instanceof UUID ) ) {
+            $id = CassandraUtil::import($id);
+        }
+
+        $categoriaRemovida = $this->recuperar($id);
+
+        $cursoUUID = CassandraUtil::import($categoriaRemovida->getCurso()->getId());
+
+        $this->_categoriasPorCursoCF->remove($cursoUUID->bytes, array($id->bytes));
+        $this->_cf->remove($id->bytes);
+
+        return $categoriaRemovida;
     }
 
     /**
@@ -57,7 +145,7 @@ class CategoriaForumDAO
      */
     public function criarNovo(array $dados = null)
     {
-        // TODO: Implementar este metodo.
+        return new WeLearn_Cursos_Foruns_Categoria($dados);
     }
 
     /**
@@ -66,7 +154,9 @@ class CategoriaForumDAO
      */
     protected function _atualizar(WeLearn_DTO_IDTO $dto)
     {
-        // TODO: Implementar este metodo.
+        $UUID = CassandraUtil::import($dto->getId());
+
+        $this->_cf->insert($UUID->bytes, $dto->toCassandra());
     }
 
     /**
@@ -79,33 +169,18 @@ class CategoriaForumDAO
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        // TODO: Implementar este metodo.
-    }
+        $UUID = UUID::mint();
 
+        $dto->setId($UUID->string);
+        $dto->setDataCriacao(time());
 
-    public function salvar(WeLearn_DTO_IDTO &$dto)
-    {
-        return parent::salvar($dto);
-    }
+        $this->_cf->insert($UUID->bytes, $dto->toCassandra());
 
-    public function getNomeCF()
-    {
-        return parent::getNomeCF();
-    }
+        $UUIDCurso = CassandraUtil::import($dto->getCurso()->getId());
 
-    public function getInfoColunas()
-    {
-        return parent::getInfoColunas();
-    }
+        $this->_categoriasPorCursoCF->insert($UUIDCurso->bytes, array($UUID->bytes => ''));
 
-    public function getCf()
-    {
-        return parent::getCf();
-    }
-
-    public function setCf($cf)
-    {
-        parent::setCf($cf);
+        $dto->setPersistido(true);
     }
 
     /**
@@ -119,5 +194,31 @@ class CategoriaForumDAO
         // TODO: Implementar este metodo.
     }
     
+    private function _criarFromCassandra(array $column, WeLearn_Cursos_Curso $cursoPadrao = null)
+    {
+        $column['curso'] = ($cursoPadrao instanceof WeLearn_Cursos_Curso)
+                            ? $cursoPadrao
+                            : $this->_cursoDao->recuperar($column['curso']);
 
+        try {
+            $column['criador'] = $this->_usuarioDao->recuperar($column['criador']);
+        } catch (cassandra_NotFoundException $e) {
+            unset($column['criador']);
+        }
+
+        $categoria = new WeLearn_Cursos_Foruns_Categoria();
+        $categoria->fromCassandra($column);
+
+        return $categoria;
+    }
+
+    private function _criarVariosFromCassandra(array $columns, WeLearn_Cursos_Curso $cursoPadrao = null)
+    {
+        $listaCategoriasObjs = array();
+        foreach ($columns as $column) {
+            $listaCategoriasObjs[] = $this->_criarFromCassandra($column, $cursoPadrao);
+        }
+
+        return $listaCategoriasObjs;
+    }
 }

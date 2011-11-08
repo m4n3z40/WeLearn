@@ -27,7 +27,7 @@
  * default, except for the service interfaces. The generated code will populate
  * values into $GLOBALS['THRIFT_AUTOLOAD'] which can be used by the autoload
  * method below. If you have your own autoload system already in place, rename your
- * __autoload function to something else and then do:
+ * __autoload_thrift function to something else and then do:
  * $GLOBALS['AUTOLOAD_HOOKS'][] = 'my_autoload_func';
  *
  * Generate this code using the --gen php:autoload Thrift generator flag.
@@ -36,8 +36,8 @@
 $GLOBALS['THRIFT_AUTOLOAD'] = array();
 $GLOBALS['AUTOLOAD_HOOKS'] = array();
 
-if (!function_exists('__thrift_autoload')) {
-  function __thrift_autoload($class) {
+if (!function_exists('__autoload_thrift')) {
+  function __autoload_thrift($class) {
     global $THRIFT_AUTOLOAD;
     $classl = strtolower($class);
     if (isset($THRIFT_AUTOLOAD[$classl])) {
@@ -48,6 +48,6 @@ if (!function_exists('__thrift_autoload')) {
       }
     }
   }
-}
 
-spl_autoload_register('__thrift_autoload');
+  spl_autoload_register('__autoload_thrift');
+}

@@ -1,4 +1,4 @@
-<?php echo form_open('usuario/validar_cadastro') ?>
+<?php echo form_open() ?>
     <fieldset>
         <legend>Novo por aqui? Cadastre-se!</legend>
         <dl>
@@ -14,10 +14,10 @@
                 <dd><input type="password" name="senha" id="txt-senha" maxlength="24" placeholder="Sua senha" /></dd>
             <dt><label for="txt-senha-confirm">Coonfirme a senha</label></dt>
                 <dd><input type="password" name="senhaConfirm" id="txt-senha-confirm" maxlength="24" placeholder="Confirme a senha" /></dd>
-            <dt><label for="txt-area">Área de interesse</label></dt>
-                <dd><input type="text" name="area" id="txt-area" placeholder="Em qual área você se interessa?" /></dd>
-            <dt><label for="txt-segmento">Segmento de interesse</label></dt>
-                <dd><input type="text" name="segmento" id="txt-segmento" placeholder="Qual segmento desta área te atrai mais?" /></dd>
+            <dt><label for="slt-area">Área de interesse</label></dt>
+                <dd><?php echo form_dropdown('area', $listaAreas, '0', 'id="slt-area"') ?></dd>
+            <dt style="display: none;"><label for="slt-segmento">Segmento de interesse</label></dt>
+                <dd style="display: none;"><?php echo form_dropdown('segmento', array(), '0', 'id="slt-segmento"') ?></dd>
         </dl>
         <button type="submit" name="cadastrar" value="1">Cadastrar!</button>
     </fieldset>

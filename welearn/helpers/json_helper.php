@@ -7,7 +7,16 @@
  * To change this template use File | Settings | File Templates.
  */
  
-function create_json_feedback($success = false, $errors = '')
+function set_json_header()
+{
+	header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); 
+	header("Last-Modified: " . gmdate( "D, d M Y H:i:s" ) . "GMT"); 
+	header("Cache-Control: no-cache, must-revalidate"); 
+	header("Pragma: no-cache");
+	header("Content-type: application/json; charset=utf-8");
+}
+
+function create_json_feedback($success = false, $errors = '', $extra = '')
 {
     if (!empty($errors) && is_array($errors)) {
         if(!isset($errors['field_name']) || !isset($errors['error_msg'])) {
@@ -23,11 +32,26 @@ function create_json_feedback($success = false, $errors = '')
     }
 
     $errors = '[' . trim($errors, '[]') . ']';
+
+    if ($extra != '') {
+        if (is_array($extra)) {
+            $extra = Zend_Json::encode($extra);
+        }
+        $extra = ltrim($extra, '{');
+
+        $lastLetter = strlen($extra) - 1;
+
+        if ($extra[$lastLetter] == '}') {
+            $extra = substr($extra, 0, $lastLetter);
+        }
+
+        $extra = ', '.$extra;
+    }
     
     if ($success) {
-        return '{"success":true, "errors":' . $errors . '}';
+        return '{"success":true, "errors":' . $errors . $extra . '}';
     } else {
-        return '{"success":false, "errors":' . $errors . '}';
+        return '{"success":false, "errors":' . $errors . $extra . '}';
     }
 }
 

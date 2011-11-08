@@ -22,7 +22,7 @@ class WeLearn_Usuarios_AmizadeUsuario extends WeLearn_DTO_AbstractDTO
     private $_amigo;
 
     /**
-     * @var string
+     * @var int
      */
     private $_comecouEm;
 
@@ -32,14 +32,19 @@ class WeLearn_Usuarios_AmizadeUsuario extends WeLearn_DTO_AbstractDTO
     private $_status;
 
     /**
+     * @var AmizadeUsuarioDAO
+     */
+    private $_amizadeDao;
+
+    /**
      * @param null|WeLearn_Usuarios_Usuario $usuario
      * @param null|WeLearn_Usuarios_Usuario $amigo
-     * @param string $comecouEm
+     * @param int $comecouEm
      * @param int $status
      */
     public function __construct(WeLearn_Usuarios_Usuario $usuario = null,
         WeLearn_Usuarios_Usuario $amigo = null,
-        $comecouEm = '',
+        $comecouEm = 0,
         $status = WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA)
     {
         $dados = array(
@@ -50,6 +55,8 @@ class WeLearn_Usuarios_AmizadeUsuario extends WeLearn_DTO_AbstractDTO
         );
 
         parent::__construct($dados);
+
+        $this->_amizadeDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
     }
 
     /**
@@ -69,15 +76,15 @@ class WeLearn_Usuarios_AmizadeUsuario extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param string $comecouEm
+     * @param int $comecouEm
      */
     public function setComecouEm($comecouEm)
     {
-        $this->_comecouEm = (string)$comecouEm;
+        $this->_comecouEm = (int)$comecouEm;
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getComecouEm()
     {
@@ -163,5 +170,28 @@ class WeLearn_Usuarios_AmizadeUsuario extends WeLearn_DTO_AbstractDTO
             'status' => $this->getStatus(),
             'persistido' => $this->isPersistido()
         );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'id' => $this->_amizadeDao->gerarIdAmizade($this->getUsuario(), $this->getAmigo()),
+            'timeUUID' => UUID::mint(1, null, null, $this->getComecouEm() * 1000000)->string,
+            'comecouEm' => $this->getComecouEm(),
+            'status' => $this->getStatus()
+        );
+    }
+
+    /**
+     * @return \AmizadeUsuarioDAO
+     */
+    public function getAmizadeDao()
+    {
+        return $this->_amizadeDao;
     }
 }
