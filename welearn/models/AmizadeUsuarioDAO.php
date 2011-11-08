@@ -194,7 +194,7 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
     public function remover($id)
     {
         $column = $this->_cf->get($id);
-        $timeUUID = $column['timeUUID'];
+        $timeUUID = CassandraUtil::import($column['timeUUID'])->bytes;
         $amizadeRemovida = $this->_criarFromCassandra($column);
 
         $this->_cf->remove($id);
@@ -246,7 +246,7 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
 
         $statusArray = $this->_cf->get($idAmizade, array('status','timeUUID'));
         $statusAntigo = $statusArray['status'];
-        $timeUUID = $statusArray['timeUUID'];
+        $timeUUID = CassandraUtil::import($statusArray['timeUUID'])->bytes;
 
         $this->_cf->insert($idAmizade, $dto->toCassandra());
 

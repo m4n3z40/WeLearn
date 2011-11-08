@@ -14,11 +14,14 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
     //indexes
     private $_nomeMPPorRemetenteCF = 'usuarios_mensagem_pessoal_por_remetente';
     private $_nomeMPPorDestinatarioCF = 'usuarios_mensagem_pessoal_por_destinatario';
-    private $_nomeMPPorStatusCF = 'usuarios_mensagem_pessoal_por_status'; // Super
 
     private $_MPPorRemetenteCF;
     private $_MPPorDestinatarioCF;
-    private $_MPPorStatusCF;
+
+    /**
+     * @var UsuarioDAO
+     */
+    private $_usuarioDao;
 
     function __construct()
     {
@@ -28,7 +31,8 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
 
         $this->_MPPorRemetenteCF = $phpCassa->getColumnFamily($this->_nomeMPPorRemetenteCF);
         $this->_MPPorDestinatarioCF = $phpCassa->getColumnFamily($this->_nomeMPPorDestinatarioCF);
-        $this->_MPPorStatusCF = $phpCassa->getColumnFamily($this->_nomeMPPorStatusCF);
+
+        $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
     }
 
     /**
@@ -37,7 +41,15 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        // TODO: Implement _adicionar() method.
+        $UUID = UUID::mint();
+
+        $dto->setId($UUID->string);
+        $dto->setDataEnvio(time());
+
+        $this->_cf->insert($UUID->bytes, $dto->toCassandra());
+
+        $this->_MPPorRemetenteCF->insert($dto->getRemetente()->getId(), array($UUID->bytes => ''));
+        $this->_MPPorDestinatarioCF->insert($dto->getDestinatario()->getId(), array($UUID->bytes => ''));
     }
 
     /**
@@ -46,7 +58,9 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
      */
     protected function _atualizar(WeLearn_DTO_IDTO $dto)
     {
-        // TODO: Implement _atualizar() method.
+        $UUID = CassandraUtil::import($dto->getId());
+
+        $this->_cf->insert($UUID->bytes, $dto->toCassandra());
     }
 
     /**
@@ -55,9 +69,55 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
      * @param array|null $filtros
      * @return array
      */
-    public function recuperarTodos($de = null, $ate = null, array $filtros = null)
+    public function recuperarTodos($de = '', $ate = '', array $filtros = null)
     {
-        // TODO: Implement recuperarTodos() method.
+        if (isset($filtros['count'])) {
+            $count = $filtros['count'];
+        } else {
+            $count = 10;
+        }
+
+        if (isset($filtros['remetente']) && $filtros['remetente'] instanceof WeLearn_Usuarios_Usuario) {
+            return $this->recuperarTodosPorRemetente($filtros['remerente'], $de, $ate, $count);
+        }
+
+        if (isset($filtros['destinatario']) && $filtros['destinatario'] instanceof WeLearn_Usuarios_Usuario) {
+            return $this->recuperarTodosPorDestinatario($filtros['destinatario'], $de, $ate, $count);
+        }
+
+        return array();
+    }
+
+    public function recuperarTodosPorRemetente(WeLearn_Usuarios_Usuario $remetente, $de = '', $ate = '', $count = 10)
+    {
+        if ( $de != '' ) {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+        if ( $ate != '' ) {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
+        $idsMensagens = $this->_MPPorRemetenteCF->get($remetente->getId(), null, $de, $ate, true, $count);
+
+        $columns = $this->_cf->multiget($idsMensagens);
+
+        return $this->_criarVariosFromCassandra($columns, $remetente);
+    }
+
+    public function recuperarTodosPorDestinatario(WeLearn_Usuarios_Usuario $destinatario, $de = '', $ate = '', $count = 10)
+    {
+        if ( $de != '' ) {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+        if ( $ate != '' ) {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
+        $idsMensagens = $this->_MPPorDestinatarioCF->get($destinatario->getId(), null, $de, $ate, true, $count);
+
+        $columns = $this->_cf->multiget($idsMensagens);
+
+        return $this->_criarVariosFromCassandra($columns, null, $destinatario);
     }
 
     /**
@@ -66,7 +126,13 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
      */
     public function recuperar($id)
     {
-        // TODO: Implement recuperar() method.
+        if ( ! ($id instanceof UUID) ) {
+            $id = CassandraUtil::import($id);
+        }
+
+        $column = $this->_cf->get($id->bytes);
+
+        return $this->_criarFromCassandra($column);
     }
 
     /**
@@ -76,7 +142,17 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
      */
     public function recuperarQtdTotal($de = null, $ate = null)
     {
-        // TODO: Implement recuperarQtdTotal() method.
+        return 0;
+    }
+
+    public function recuperarQtdPorRemetente(WeLearn_Usuarios_Usuario $remetente)
+    {
+        return $this->_MPPorRemetenteCF->get_count($remetente->getId());
+    }
+
+    public function recuperarQtdPorDestinatario(WeLearn_Usuarios_Usuario $destinatario)
+    {
+        return $this->_MPPorDestinatarioCF->get_count($destinatario->getId());
     }
 
     /**
@@ -85,7 +161,18 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
      */
     public function remover($id)
     {
-        // TODO: Implement remover() method.
+        if ( ! ($id instanceof UUID) ) {
+            $id = CassandraUtil::import($id);
+        }
+
+        $mensagem = $this->recuperar($id);
+
+        $this->_cf->remove($id->bytes);
+
+        $this->_MPPorRemetenteCF->remove($mensagem->getRemetente()->getId(), array($id->bytes));
+        $this->_MPPorDestinatarioCF->remove($mensagem->getDestinatario()->getId(), array($id->bytes));
+
+        return $mensagem;
     }
 
     /**
@@ -94,6 +181,41 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
      */
     public function criarNovo(array $dados = null)
     {
-        // TODO: Implement criarNovo() method.
+        return new WeLearn_Usuarios_MensagemPessoal($dados);
+    }
+
+    private function _criarFromCassandra(array $column,
+                                         WeLearn_Usuarios_Usuario $remetentePadrao = null,
+                                         WeLearn_Usuarios_Usuario $destinatarioPadrao = null)
+    {
+        if ($remetentePadrao instanceof WeLearn_Usuarios_Usuario) {
+            $column['remetente'] = $remetentePadrao;
+        } else {
+            $column['remetente'] = $this->_usuarioDao->recuperar($column['remetente']);
+        }
+
+        if ($destinatarioPadrao instanceof WeLearn_Usuarios_Usuario) {
+            $column['destinatario'] = $destinatarioPadrao;
+        } else {
+            $column['destinatario'] = $this->_usuarioDao->recuperar($column['destinatario']);
+        }
+
+        $mensagem = $this->criarNovo();
+        $mensagem->fromCassandra($column);
+
+        return $mensagem;
+    }
+
+    private function _criarVariosFromCassandra(array $columns,
+                                               WeLearn_Usuarios_Usuario $remetentePadrao = null,
+                                               WeLearn_Usuarios_Usuario $destinatarioPadrao = null)
+    {
+        $arrayMensagens = array();
+
+        foreach ( $columns as $column ) {
+            $arrayMensagens[] = $this->_criarFromCassandra($column, $remetentePadrao, $destinatarioPadrao);
+        }
+
+        return $arrayMensagens;
     }
 }
