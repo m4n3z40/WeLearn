@@ -9,7 +9,18 @@
  
 class AlternativaEnqueteDAO extends WeLearn_DAO_AbstractDAO{
 
+    protected $_nomeCF = 'cursos_enquete_alternativa';
 
+    private $_nomeAlternativaPorEnqueteCF = 'cursos_enquete_alternativa_por_enquete';
+
+    private $_alternativaPorEnqueteCF;
+
+    function __construct()
+    {
+        $phpCassa = WL_Phpcassa::getInstance();
+
+        $this->_alternativaPorEnqueteCF = $phpCassa->getColumnFamily($this->_nomeAlternativaPorEnqueteCF);
+    }
 
     /**
      * @param mixed $de
@@ -112,5 +123,4 @@ class AlternativaEnqueteDAO extends WeLearn_DAO_AbstractDAO{
          * implementar metodo
          */
     }
-
 }

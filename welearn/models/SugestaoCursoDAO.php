@@ -420,6 +420,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
         $this->_cf->remove($UUID->bytes);
 
         $sugestaoRemovida->setPersistido(false);
+
         return $sugestaoRemovida;
     }
 

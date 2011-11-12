@@ -76,47 +76,6 @@ class DepoimentoDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
-     * @param WeLearn_DTO_IDTO $dto
-     * @return bool
-     */
-    public function salvar(WeLearn_DTO_IDTO &$dto)
-    {
-        return parent::salvar($dto);
-    }
-
-    /**
-     * @param \ColumnFamily $cf
-     */
-    public function setCf($cf)
-    {
-        parent::setCf($cf);
-    }
-
-     /**
-     * @return \ColumnFamily
-     */
-    public function getCf()
-    {
-        return parent::getCf();
-    }
-
-     /**
-     * @return array
-     */
-    public function getInfoColunas()
-    {
-        return parent::getInfoColunas();
-    }
-
-     /**
-     * @return string
-     */
-    public function getNomeCF()
-    {
-        return parent::getNomeCF();
-    }
-
-    /**
      * @param inteiro $maxPag
      * @param inteiro $inicioPag
      * @param array $filtros
@@ -146,7 +105,4 @@ class DepoimentoDAO extends WeLearn_DAO_AbstractDAO
     {
       // TODO: Implementar este metodo.
     }
-
-    
-
 }

@@ -85,6 +85,8 @@ class ConfiguracaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
         $this->_cf->remove($id->bytes);
 
+        $configuracaoRemovida->setPersistido(false);
+
         return $configuracaoRemovida;
     }
 

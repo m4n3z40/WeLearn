@@ -221,6 +221,8 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
             );
         }
 
+        $amizadeRemovida->setPersistido(false);
+
         return $amizadeRemovida;
     }
 

@@ -228,11 +228,24 @@ and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
-create column family contadores_timeuuid
+create column family cursos_forum
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_forum_por_categoria
 with comparator = 'TimeUUIDType'
 and column_type = 'Standard'
-and default_validation_class = 'CounterColumnType'
-and key_validation_class = 'UTF8Type';
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_forum_por_status_e_categoria
+with comparator = 'IntegerType'
+and subcomparator = 'TimeUUIDType'
+and column_type = 'Super'
+and default_validation_class = 'BytesType'
+and key_validation_class = 'TimeUUIDType';
 
 create column family cursos_forum_categorias
 with comparator = 'UTF8Type'
@@ -245,3 +258,72 @@ with comparator = 'TimeUUIDType'
 and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_forum_posts
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_forum_posts_por_forum
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_enquete
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_enquete_por_curso
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_enquete_por_status
+with comparator = 'IntegerType'
+and subcomparator = 'TimeUUIDType'
+and column_type = 'Super'
+and default_validation_class = 'BytesType'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_enquete_por_situacao
+with comparator = 'IntegerType'
+and subcomparator = 'TimeUUIDType'
+and column_type = 'Super'
+and default_validation_class = 'BytesType'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_enquete_alternativa
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_enquete_alternativa_por_enquete
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_enquete_votos
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_enquete_votos_por_enquete
+with comparator = 'TimeUUIDType'
+with subcomparator = 'TimeUUIDType'
+and column_type = 'Super'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family contadores_timeuuid
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'CounterColumnType'
+and key_validation_class = 'UTF8Type';

@@ -54,21 +54,17 @@ class AreaDAO extends WeLearn_DAO_AbstractDAO
             $encontrados = $this->_cf->get_range('', '', $count);
         }
 
-        if ( ! empty($encontrados) ) {
-            $listaAreas = array();
+        $listaAreas = array();
 
-            foreach ($encontrados as $key => $columns) {
-                $area = new WeLearn_Cursos_Area();
-                $area->fromCassandra($columns);
-                $area->setPersistido(true);
+        foreach ($encontrados as $key => $columns) {
+            $area = new WeLearn_Cursos_Area();
+            $area->fromCassandra($columns);
+            $area->setPersistido(true);
 
-                $listaAreas[] = $area;
-            }
-
-            return $listaAreas;
+            $listaAreas[] = $area;
         }
 
-        return false;
+        return $listaAreas;
     }
 
     /**
@@ -81,7 +77,6 @@ class AreaDAO extends WeLearn_DAO_AbstractDAO
 
         $area = new WeLearn_Cursos_Area();
         $area->fromCassandra($dados_area);
-        $area->setPersistido(true);
 
         return $area;
     }
@@ -93,7 +88,15 @@ class AreaDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperarQtdTotal($de = null, $ate = null)
     {
-        // TODO: Implement recuperarQtdTotal() method.
+        $columns = $this->_cf->get_range();
+
+        $qtd = 0;
+
+        foreach ($columns as $column) {
+            $qtd++;
+        }
+
+        return $qtd;
     }
 
     /**
@@ -102,7 +105,13 @@ class AreaDAO extends WeLearn_DAO_AbstractDAO
      */
     public function remover($id)
     {
-        // TODO: Implement remover() method.
+        $categoria = $this->recuperar($id);
+
+        $this->_cf->remove($id);
+
+        $categoria->setPersistido(false);
+
+        return $categoria;
     }
 
     /**
@@ -111,7 +120,10 @@ class AreaDAO extends WeLearn_DAO_AbstractDAO
      */
     public function criarNovo(array $dados = null)
     {
-        // TODO: Implement criarNovo() method.
+        $area = new WeLearn_Cursos_Area();
+        $area->preencherPropriedades($dados);
+
+        return $area;
     }
 
     private function _createAreaId($str)
