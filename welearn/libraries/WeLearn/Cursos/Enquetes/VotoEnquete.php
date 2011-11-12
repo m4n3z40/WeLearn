@@ -11,6 +11,11 @@
 class WeLearn_Cursos_Enquetes_VotoEnquete extends WeLearn_DTO_AbstractDTO
 {
     /**
+     * @var string
+     */
+    private $_id;
+
+    /**
      * @var int
      */
     private $_dataVoto;
@@ -100,6 +105,22 @@ class WeLearn_Cursos_Enquetes_VotoEnquete extends WeLearn_DTO_AbstractDTO
     }
 
     /**
+     * @param string $id
+     */
+    public function setId($id)
+    {
+        $this->_id = $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    /**
      * @param \WeLearn_Usuarios_Usuario $votante
      */
     public function setVotante(WeLearn_Usuarios_Usuario $votante)
@@ -124,6 +145,7 @@ class WeLearn_Cursos_Enquetes_VotoEnquete extends WeLearn_DTO_AbstractDTO
     public function toArray()
     {
         return array(
+            'id' => $this->getId(),
             'dataVoto' => $this->getDataVoto(),
             'enquete' => $this->getEnquete()->toArray(),
             'votante' => $this->getVotante()->toArray(),
@@ -140,6 +162,7 @@ class WeLearn_Cursos_Enquetes_VotoEnquete extends WeLearn_DTO_AbstractDTO
     public function toCassandra()
     {
         return array(
+            'id' => $this->getId(),
             'dataVoto' => $this->getDataVoto(),
             'enquete' => ($this->_enquete instanceof WeLearn_Cursos_Enquetes_Enquete) ? $this->getEnquete()->getId() : '',
             'votante' => ($this->_votante instanceof WeLearn_Usuarios_Usuario) ? $this->getVotante()->getId() : '',
