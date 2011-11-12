@@ -28,11 +28,40 @@ class AlternativaEnqueteDAO extends WeLearn_DAO_AbstractDAO{
      * @param array|null $filtros
      * @return array
      */
-    public function recuperarTodos($de = null, $ate = null, array $filtros = null)
+    public function recuperarTodos($de = '', $ate = '', array $filtros = null)
     {
-        /*
-         * implementar metodo
-         * */
+        if ( isset($filtros['count']) ) {
+            $count = $filtros['count'];
+        } else {
+            $count = 10;
+        }
+
+        if ( isset($filtros['enquete']) && $filtros['enquete'] instanceof WeLearn_Cursos_Enquetes_Enquete ) {
+            return $this->recuperarTodosPorEnquete($filtros['enquete'], $de, $ate, $count);
+        }
+
+        return array();
+    }
+
+    public function recuperarTodosPorEnquete(WeLearn_Cursos_Enquetes_Enquete $enquete, $de = '', $ate = '', $count = 10)
+    {
+        if ($de != '') {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+
+        if ($ate != '') {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
+        $enqueteUUID = CassandraUtil::import($enquete->getId());
+
+        $idsAlternativas = array_keys(
+            $this->_alternativaPorEnqueteCF->get($enqueteUUID->bytes, null, $de, $ate, false, $count)
+        );
+
+        $columns = $this->_cf->multiget($idsAlternativas);
+
+        return $this->_criarVariosFromCassandra($columns);
     }
 
     /**
@@ -41,9 +70,13 @@ class AlternativaEnqueteDAO extends WeLearn_DAO_AbstractDAO{
      */
     public function recuperar($id)
     {
-        /*
-         * implementar metodo
-         */
+        if ( ! ($id instanceof UUID) ) {
+            $id = CassandraUtil::import($id);
+        }
+
+        $column = $this->_cf->get($id->bytes);
+
+        return $this->_criarFromCassandra($column);
     }
 
     /**
@@ -53,20 +86,18 @@ class AlternativaEnqueteDAO extends WeLearn_DAO_AbstractDAO{
      */
     public function recuperarQtdTotal($de = null, $ate = null)
     {
-        /*
-         * implementar metodo
-         */
+        if ($de instanceof WeLearn_Cursos_Enquetes_Enquete) {
+            return $this->recuperarQtdTotal($de);
+        }
+
+        return 0;
     }
 
-    /**
-     * @param WeLearn_DTO_IDTO $dto
-     * @return boolean
-     */
-    public function salvar()
+    public function recuperarQtdTotalPorEnquete(WeLearn_Cursos_Enquetes_Enquete $enquete)
     {
-        /*
-         * implementar metodo
-         */
+        $enqueteUUID = CassandraUtil::import($enquete->getId());
+
+        return $this->_alternativaPorEnqueteCF->get_count($enqueteUUID->bytes);
     }
 
      /**
@@ -75,9 +106,21 @@ class AlternativaEnqueteDAO extends WeLearn_DAO_AbstractDAO{
      */
     public function remover($id)
     {
-        /*
-         * implementar metodo
-         */
+        if ( ! ($id instanceof UUID) ) {
+            $id = CassandraUtil::import($id);
+        }
+
+        $alternativa = $this->recuperar($id);
+
+        $enqueteUUID = CassandraUtil::import($alternativa->getEnqueteId());
+
+        $this->_cf->remove($id->bytes);
+
+        $this->_alternativaPorEnqueteCF->remove($enqueteUUID->bytes, array($id->bytes));
+
+        $alternativa->setPersistido(false);
+
+        return $alternativa;
     }
 
      /**
@@ -86,9 +129,10 @@ class AlternativaEnqueteDAO extends WeLearn_DAO_AbstractDAO{
      */
     public function criarNovo(array $dados = null)
     {
-       /*
-         * implementar metodo
-         */
+        $alternativa = new WeLearn_Cursos_Enquetes_AlternativaEnquete();
+        $alternativa->preencherPropriedades($dados);
+
+        return $alternativa;
     }
 
     /**
@@ -97,9 +141,16 @@ class AlternativaEnqueteDAO extends WeLearn_DAO_AbstractDAO{
      */
     public function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-       /*
-         * implementar metodo
-         */
+        $UUID = UUID::mint();
+        $enqueteUUID = CassandraUtil::import($dto->getEnqueteId());
+
+        $dto->setId($UUID->string);
+
+        $this->_cf->insert($UUID->bytes, $dto->toCassandra());
+
+        $this->_alternativaPorEnqueteCF->insert($enqueteUUID->bytes, array($UUID->bytes => ''));
+
+        $dto->setPersistido(true);
     }
 
      /**
@@ -108,9 +159,9 @@ class AlternativaEnqueteDAO extends WeLearn_DAO_AbstractDAO{
      */
     public function _atualizar(WeLearn_DTO_IDTO $dto)
     {
-        /*
-         * implementar metodo
-         */
+        $UUID = CassandraUtil::import($dto->getId());
+
+        $this->_cf->insert($UUID->bytes, $dto->toCassandra());
     }
 
     /**
@@ -122,5 +173,25 @@ class AlternativaEnqueteDAO extends WeLearn_DAO_AbstractDAO{
         /*
          * implementar metodo
          */
+    }
+
+    private function _criarFromCassandra(array $column)
+    {
+        $alternativa = $this->criarNovo();
+
+        $alternativa->fromCassandra($column);
+
+        return $alternativa;
+    }
+
+    private function _criarVariosFromCassandra(array $columns)
+    {
+        $listaAlternativas = array();
+
+        foreach ($columns as $column) {
+            $listaAlternativas[] = $this->_criarFromCassandra($column);
+        }
+
+        return $listaAlternativas;
     }
 }
