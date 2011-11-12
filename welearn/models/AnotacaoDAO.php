@@ -74,30 +74,4 @@ class AnotacaoDAO extends WeLearn_DAO_AbstractDAO
     {
         // TODO: Implementar este metodo
     }
-
-    public function salvar(WeLearn_DTO_IDTO &$dto)
-    {
-        return parent::salvar($dto);
-    }
-
-    public function getNomeCF()
-    {
-        return parent::getNomeCF();
-    }
-
-    public function getInfoColunas()
-    {
-        return parent::getInfoColunas();
-    }
-
-    public function getCf()
-    {
-        return parent::getCf();
-    }
-
-    public function setCf($cf)
-    {
-        parent::setCf($cf);
-    }
-
 }

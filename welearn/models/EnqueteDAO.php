@@ -8,6 +8,30 @@
  */
  
 class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
+    protected $_nomeCF = 'cursos_enquete';
+
+    private $_nomeEnquetePorCursoCF = 'cursos_enquete_por_curso';
+    private $_nomeEnquetePorStatusSuperCF = 'cursos_enquete_por_status';
+    private $_nomeEnquetePorSituacaoSuperCF = 'cursos_enquete_por_situacao';
+
+    private $_enquetePorCursoCF;
+    private $_enquetePorStatusSuperCF;
+    private $_enquetePorSituacaoSuperCF;
+
+    private $_cursoDao;
+    private $_usuarioDao;
+
+    function __construct()
+    {
+        $phpCassa = WL_Phpcassa::getInstance();
+
+        $this->_enquetePorCursoCF = $phpCassa->getColumnFamily($this->_nomeEnquetePorCursoCF);
+        $this->_enquetePorStatusSuperCF = $phpCassa->getColumnFamily($this->_nomeEnquetePorStatusSuperCF);
+        $this->_enquetePorSituacaoSuperCF = $phpCassa->getColumnFamily($this->_nomeEnquetePorSituacaoSuperCF);
+
+        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+        $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+    }
 
     /**
      * @param mixed $id
@@ -76,47 +100,6 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
     }
 
     /**
-     * @param WeLearn_DTO_IDTO $dto
-     * @return bool
-     */
-    public function salvar(WeLearn_DTO_IDTO &$dto)
-    {
-        return parent::salvar($dto);
-    }
-
-    /**
-     * @param \ColumnFamily $cf
-     */
-    public function setCf($cf)
-    {
-        parent::setCf($cf);
-    }
-
-     /**
-     * @return \ColumnFamily
-     */
-    public function getCf()
-    {
-        return parent::getCf();
-    }
-
-     /**
-     * @return array
-     */
-    public function getInfoColunas()
-    {
-        return parent::getInfoColunas();
-    }
-
-     /**
-     * @return string
-     */
-    public function getNomeCF()
-    {
-        return parent::getNomeCF();
-    }
-
-    /**
      * @param array $dadosAlterantiva
      * @return void
      */
@@ -151,5 +134,4 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
     {
         // TODO: Implementar este metodo.
     }
-
 }

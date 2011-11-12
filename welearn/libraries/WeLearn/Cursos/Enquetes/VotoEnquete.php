@@ -11,7 +11,7 @@
 class WeLearn_Cursos_Enquetes_VotoEnquete extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var string
+     * @var int
      */
     private $_dataVoto;
 
@@ -36,7 +36,7 @@ class WeLearn_Cursos_Enquetes_VotoEnquete extends WeLearn_DTO_AbstractDTO
      * @param null|WeLearn_Usuarios_Usuario $votante
      * @param null|WeLearn_Cursos_Enquetes_AlternativaEnquete $alternativa
      */
-    public function __construct($dataVoto = '',
+    public function __construct($dataVoto = 0,
                                 WeLearn_Cursos_Enquetes_Enquete $enquete = null,
                                 WeLearn_Usuarios_Usuario $votante = null,
                                 WeLearn_Cursos_Enquetes_AlternativaEnquete $alternativa = null)
@@ -68,15 +68,15 @@ class WeLearn_Cursos_Enquetes_VotoEnquete extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param string $dataVoto
+     * @param int $dataVoto
      */
     public function setDataVoto($dataVoto)
     {
-        $this->_dataVoto = (string)$dataVoto;
+        $this->_dataVoto = (int)$dataVoto;
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getDataVoto()
     {
@@ -129,6 +129,21 @@ class WeLearn_Cursos_Enquetes_VotoEnquete extends WeLearn_DTO_AbstractDTO
             'votante' => $this->getVotante()->toArray(),
             'alternativa' => $this->getAlternativa()->toArray(),
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'dataVoto' => $this->getDataVoto(),
+            'enquete' => ($this->_enquete instanceof WeLearn_Cursos_Enquetes_Enquete) ? $this->getEnquete()->getId() : '',
+            'votante' => ($this->_votante instanceof WeLearn_Usuarios_Usuario) ? $this->getVotante()->getId() : '',
+            'alternativa' => ($this->_alternativa instanceof WeLearn_Cursos_Enquetes_AlternativaEnquete) ? $this->getAlternativa()->getId() : ''
         );
     }
 }

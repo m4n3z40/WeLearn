@@ -121,6 +121,8 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
 
         $this->_cf->remove($id);
 
+        $usuarioRemovido->setPersistido(false);
+
         return $usuarioRemovido;
     }
 

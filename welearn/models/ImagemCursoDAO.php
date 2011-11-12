@@ -85,6 +85,8 @@ class ImagemCursoDAO extends WeLearn_DAO_AbstractDAO
 
         $this->_cf->remove($id->bytes);
 
+        $imagemRemovida->setPersistido(false);
+
         return $imagemRemovida;
     }
 

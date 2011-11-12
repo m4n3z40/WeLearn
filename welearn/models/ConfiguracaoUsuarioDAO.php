@@ -76,6 +76,8 @@ class ConfiguracaoUsuarioDAO extends WeLearn_DAO_AbstractDAO
 
         $this->_cf->remove($id);
 
+        $configuracaoRemovida->setPersistido(false);
+
         return $configuracaoRemovida;
     }
 
@@ -85,6 +87,6 @@ class ConfiguracaoUsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     public function criarNovo(array $dados = null)
     {
-        return new WeLearn_Usuarios_ConfiguracaoUsuario();
+        return new WeLearn_Usuarios_ConfiguracaoUsuario($dados);
     }
 }

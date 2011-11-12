@@ -11,7 +11,7 @@
 class WeLearn_Cursos_Enquetes_AlternativaEnquete extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var int
+     * @var string
      */
     private $_id;
 
@@ -28,14 +28,14 @@ class WeLearn_Cursos_Enquetes_AlternativaEnquete extends WeLearn_DTO_AbstractDTO
     /**
      * @var int
      */
-    private $_totalVotos;
+    private $_totalVotos = 0;
 
     /**
      * @param int $id
      * @param string $txtAlternativa
      * @param string_ $enqueteId
      */
-    public function __construct($id = 0, $txtAlternativa = '', $enqueteId = null)
+    public function __construct($id = '', $txtAlternativa = '', $enqueteId = '')
     {
         $dados = array(
             'id' => $id,
@@ -51,7 +51,7 @@ class WeLearn_Cursos_Enquetes_AlternativaEnquete extends WeLearn_DTO_AbstractDTO
      */
     public function setEnqueteId($enqueteId)
     {
-        $this->_enqueteId = $enqueteId;
+        $this->_enqueteId = (string)$enqueteId;
     }
 
     /**
@@ -63,19 +63,28 @@ class WeLearn_Cursos_Enquetes_AlternativaEnquete extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param int $id
+     * @param string $id
      */
     public function setId($id)
     {
-        $this->_id = (int)$id;
+        $this->_id = (string)$id;
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
         return $this->_id;
+    }
+
+    /**
+     * @param int $votos
+     * @return void
+     */
+    public function setTotalVotos($votos)
+    {
+        $this->_totalVotos = (int)$votos;
     }
 
     /**
@@ -124,6 +133,21 @@ class WeLearn_Cursos_Enquetes_AlternativaEnquete extends WeLearn_DTO_AbstractDTO
             'enqueteId' => $this->getEnqueteId(),
             'totalVotos' => $this->getTotalVotos(),
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'id' => $this->getId(),
+            'txtAlternativa' => $this->getTxtAlternativa(),
+            'enqueteId' => $this->getEnqueteId(),
+            'totalVotos' => $this->getTotalVotos()
         );
     }
 }

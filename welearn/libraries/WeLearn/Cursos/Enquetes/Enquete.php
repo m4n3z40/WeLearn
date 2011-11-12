@@ -11,7 +11,7 @@
 class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var int
+     * @var string
      */
     private $_id;
 
@@ -26,12 +26,12 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
     private $_qtdAlternativas;
 
     /**
-     * @var string
+     * @var int
      */
     private $_dataCriacao;
 
     /**
-     * @var string
+     * @var int
      */
     private $_dataExpiracao;
 
@@ -48,12 +48,12 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
     /**
      * @var int
      */
-    private $_status;
+    private $_status = WeLearn_Cursos_Enquetes_StatusEnquete::ATIVA;
 
     /**
      * @var int
      */
-    private $_situacao;
+    private $_situacao = WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA;
 
     /**
      * @var array
@@ -63,7 +63,7 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
     /**
      * @var int
      */
-    private $_totalVotos;
+    private $_totalVotos = 0;
 
     /**
      * @param array $alternativas
@@ -114,15 +114,15 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param string $dataCriacao
+     * @param int $dataCriacao
      */
     public function setDataCriacao($dataCriacao)
     {
-        $this->_dataCriacao = (string)$dataCriacao;
+        $this->_dataCriacao = (int)$dataCriacao;
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getDataCriacao()
     {
@@ -130,15 +130,15 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param string $dataExpiracao
+     * @param int $dataExpiracao
      */
     public function setDataExpiracao($dataExpiracao)
     {
-        $this->_dataExpiracao = (string)$dataExpiracao;
+        $this->_dataExpiracao = (int)$dataExpiracao;
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getDataExpiracao()
     {
@@ -146,15 +146,15 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param int $id
+     * @param string $id
      */
     public function setId($id)
     {
-        $this->_id = (int)$id;
+        $this->_id = (string)$id;
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
@@ -226,6 +226,15 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
     }
 
     /**
+     * @param int $votos
+     * @return int
+     */
+    public function setTotalVotos($votos)
+    {
+        $this->_totalVotos = (int)$votos;
+    }
+
+    /**
      * @return int
      */
     public function getTotalVotos()
@@ -240,17 +249,25 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
 
     public function adicionarAlternativa(WeLearn_Cursos_Enquetes_AlternativaEnquete $alternativa)
     {
-        //@TODO: Implementar este método!!
+        array_push($this->_alternativas, $alternativa);
     }
 
     public function alterarSituacao()
     {
-        //@TODO: Implementar este método!!
+        if ( $this->_situacao === WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA ) {
+            $this->setSituacao(WeLearn_Cursos_Enquetes_SituacaoEnquete::FECHADA);
+        } else {
+            $this->setSituacao(WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA);
+        }
     }
 
     public function alterarStatus()
     {
-        //@TODO: Implementar este método!!
+        if ( $this->_status === WeLearn_Cursos_Enquetes_StatusEnquete::ATIVA ) {
+            $this->setStatus(WeLearn_Cursos_Enquetes_StatusEnquete::INATIVA);
+        } else {
+            $this->setStatus(WeLearn_Cursos_Enquetes_StatusEnquete::ATIVA);
+        }
     }
 
     public function recuperarQtdTotalVotos()
@@ -296,6 +313,27 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
             'alternativas' => $alternativas,
             'totalVotos' => $this->getTotalVotos(),
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'id' => $this->getId(),
+            'questao' => $this->getQuestao(),
+            'qtdAlternativas' => $this->getQtdAlternativas(),
+            'dataCriacao' => $this->getDataCriacao(),
+            'dataExpiracao' => $this->getDataExpiracao(),
+            'curso' => ($this->_curso instanceof WeLearn_Cursos_Curso) ? $this->getCurso()->getId() : '',
+            'criador' => ($this->_curso instanceof WeLearn_Usuarios_Usuario) ? $this->getCriador()->getId() : '',
+            'status' => $this->getStatus(),
+            'situacao' => $this->getSituacao(),
+            'totalVotos' => $this->getTotalVotos()
         );
     }
 }

@@ -75,26 +75,6 @@ class AvaliacaoDAO extends WeLearn_DAO_AbstractDAO
             // TODO: Implementar este metodo
         }
 
-        public function salvar(WeLearn_DTO_IDTO &$dto)
-        {
-            return parent::salvar($dto);
-        }
-
-        public function getNomeCF()
-        {
-            return parent::getNomeCF();
-        }
-
-        public function getCf()
-        {
-            return parent::getCf();
-        }
-
-        public function setCf($cf)
-        {
-            parent::setCf($cf);
-        }
-
         /**
          * @param WeLearn_Cursos_Avaliacoes_Avaliacao $Avaliacao
          * @return Array

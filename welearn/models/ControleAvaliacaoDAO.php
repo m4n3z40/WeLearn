@@ -80,26 +80,4 @@ class ControleAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
     {
         return parent::salvar($dto);
     }
-
-    public function getNomeCF()
-    {
-        return parent::getNomeCF();
-    }
-
-    public function getInfoColunas()
-    {
-        return parent::getInfoColunas();
-    }
-
-    public function getCf()
-    {
-        return parent::getCf();
-    }
-
-    public function setCf($cf)
-    {
-        parent::setCf($cf);
-    }
-
-
 }

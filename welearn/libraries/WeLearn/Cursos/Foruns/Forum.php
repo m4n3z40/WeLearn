@@ -11,7 +11,7 @@
 class WeLearn_Cursos_Foruns_Forum extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var int
+     * @var string
      */
     private $_id;
 
@@ -26,7 +26,7 @@ class WeLearn_Cursos_Foruns_Forum extends WeLearn_DTO_AbstractDTO
     private $_descricao;
 
     /**
-     * @var string
+     * @var int
      */
     private $_dataCriacao;
 
@@ -43,7 +43,7 @@ class WeLearn_Cursos_Foruns_Forum extends WeLearn_DTO_AbstractDTO
     /**
      * @var int
      */
-    private $_status;
+    private $_status = WeLearn_Cursos_Foruns_StatusForum::ATIVO;
 
     /**
      * @param \WeLearn_Cursos_Foruns_Categoria $categoria
@@ -78,15 +78,15 @@ class WeLearn_Cursos_Foruns_Forum extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param string $dataCriacao
+     * @param int $dataCriacao
      */
     public function setDataCriacao($dataCriacao)
     {
-        $this->_dataCriacao = (string)$dataCriacao;
+        $this->_dataCriacao = (int)$dataCriacao;
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getDataCriacao()
     {
@@ -110,11 +110,11 @@ class WeLearn_Cursos_Foruns_Forum extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param int $id
+     * @param string $id
      */
     public function setId($id)
     {
-        $this->_id = (int)$id;
+        $this->_id = (string)$id;
     }
 
     /**
@@ -182,6 +182,24 @@ class WeLearn_Cursos_Foruns_Forum extends WeLearn_DTO_AbstractDTO
             'criador' => $this->getCriador()->toArray(),
             'status' => $this->getStatus(),
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'id' => $this->getId(),
+            'titulo' => $this->getTitulo(),
+            'descricao' => $this->getDescricao(),
+            'dataCriacao' => $this->getDataCriacao(),
+            'categoria' => ($this->_categoria instanceof WeLearn_Cursos_Foruns_Categoria) ? $this->getCategoria()->getId() : '',
+            'criador' => ($this->_criador instanceof WeLearn_Usuarios_Usuario) ? $this->getCriador()->getId() : '',
+            'status' => $this->getStatus()
         );
     }
 }

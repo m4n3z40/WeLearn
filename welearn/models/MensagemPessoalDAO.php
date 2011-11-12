@@ -172,6 +172,8 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
         $this->_MPPorRemetenteCF->remove($mensagem->getRemetente()->getId(), array($id->bytes));
         $this->_MPPorDestinatarioCF->remove($mensagem->getDestinatario()->getId(), array($id->bytes));
 
+        $mensagem->setPersistido(false);
+
         return $mensagem;
     }
 

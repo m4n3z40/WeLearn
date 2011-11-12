@@ -115,7 +115,18 @@ class CategoriaForumDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperarQtdTotal($de = null, $ate = null)
     {
-        // TODO: Implementar este metodo.
+        if ($de instanceof WeLearn_Cursos_Curso) {
+            return $this->recuperarQtdTotalPorCurso($de);
+        }
+
+        return 0;
+    }
+
+    public function recuperarQtdTotalPorCurso(WeLearn_Cursos_Curso $curso)
+    {
+        $cursoUUID = CassandraUtil::import($curso->getId());
+
+        return $this->_categoriasPorCursoCF->get_count($cursoUUID->bytes);
     }
 
    
@@ -135,6 +146,8 @@ class CategoriaForumDAO extends WeLearn_DAO_AbstractDAO
 
         $this->_categoriasPorCursoCF->remove($cursoUUID->bytes, array($id->bytes));
         $this->_cf->remove($id->bytes);
+
+        $categoriaRemovida->setPersistido(false);
 
         return $categoriaRemovida;
     }
@@ -187,11 +200,13 @@ class CategoriaForumDAO extends WeLearn_DAO_AbstractDAO
      * @param int $maxPag
      * @param int $iniPag
      * @param array $filtros
-     * @return void
+     * @return array
      */
-    public function recuperarForuns(int $maxPag, int $iniPag, Array $filtros )
+    public function recuperarForuns($de = '', $ate = '', array $filtros = null)
     {
-        // TODO: Implementar este metodo.
+        $forumDao = WeLearn_DAO_DAOFactory::create('ForumDAO');
+
+        return $forumDao->recuperarTodos($de, $ate, $filtros);
     }
     
     private function _criarFromCassandra(array $column, WeLearn_Cursos_Curso $cursoPadrao = null)
