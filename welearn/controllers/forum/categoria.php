@@ -250,7 +250,7 @@ class Categoria extends WL_Controller {
         echo $json;
     }
 
-    public function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null, $view = '', array $dados = null)
+    private function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null, $view = '', array $dados = null)
     {
         $dadosBarraEsquerda = array(
             'idCurso' => $curso->getId()
@@ -261,7 +261,8 @@ class Categoria extends WL_Controller {
             'imagemUrl' => ($curso->getImagem() instanceof WeLearn_Cursos_ImagemCurso)
                           ? $curso->getImagem()->getUrl()
                           : site_url($this->config->item('default_curso_img_uri')),
-            'descricao' => $curso->getDescricao()
+            'descricao' => $curso->getDescricao(),
+            'menuContexto' => $this->template->loadPartial('menu', array('idCurso' => $curso->getId()), 'curso/forum')
         );
 
         $this->template->setDefaultPartialVar('curso/barra_lateral_esquerda', $dadosBarraEsquerda)

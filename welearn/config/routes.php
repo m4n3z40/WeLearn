@@ -44,16 +44,18 @@ $route['404_override'] = '';
 $route['curso'] = 'curso/curso/index';
 $route['curso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/curso/exibir/$1';
 $route['curso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/configurar'] = 'curso/curso/configurar/$1';
+$route['curso/([a-z_]+)'] = 'curso/curso/$1';
+$route['curso/sugestao'] = 'curso/sugestao/index';
+$route['curso/sugestao/([a-z_]+)'] = 'curso/sugestao/$1';
 $route['curso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/forum'] = 'forum/forum/index/$1';
 $route['curso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/forum/categoria'] = 'forum/categoria/index/$1';
 $route['curso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/forum/categoria/([a-z_]+)'] = 'forum/categoria/$2/$1';
 $route['curso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/forum/post'] = 'forum/post/index/$1';
 $route['curso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/forum/post/([a-z_]+)'] = 'forum/post/$2/$1';
 $route['curso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})/forum/([a-z_]+)'] = 'forum/forum/$2/$1';
-$route['curso/([a-z_]+)'] = 'curso/curso/$1';
-$route['curso/sugestao'] = 'curso/sugestao/index';
-$route['curso/sugestao/([a-z_]+)'] = 'curso/sugestao/$1';
-
+$route['curso/forum/listar/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/forum/listar/$1';
+$route['curso/forum/criar/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/forum/criar/$1';
+$route['curso/forum/([a-z_]+)'] = 'forum/forum/$1';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

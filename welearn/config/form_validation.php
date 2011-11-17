@@ -166,6 +166,18 @@ $config = array(
             'label' => 'Descricao da categoria',
             'rules' => 'max_length[512]'
         )
+    ),
+    'forum/salvar' => array(
+        array(
+            'field' => 'titulo',
+            'label' => 'Título',
+            'rules' => 'required|min_length[5]|max_length[80]'
+        ),
+        array(
+            'field' => 'descricao',
+            'label' => 'Descrição',
+            'rules' => 'max_length[512]'
+        )
     )
 );
 

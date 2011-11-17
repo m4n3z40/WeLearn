@@ -99,7 +99,7 @@ class CategoriaForumDAO extends WeLearn_DAO_AbstractDAO
                                               null,
                                               $de,
                                               $ate,
-                                              false,
+                                              true,
                                               $count)
         );
 
