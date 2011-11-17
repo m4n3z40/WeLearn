@@ -162,7 +162,11 @@ class WeLearn_Cursos_Foruns_Forum extends WeLearn_DTO_AbstractDTO
      */
     public function alterarStatus()
     {
-        //@TODO: Implementar este método!!
+        if ( $this->_status === WeLearn_Cursos_Foruns_StatusForum::ATIVO ) {
+            $this->setStatus(WeLearn_Cursos_Foruns_StatusForum::INATIVO);
+        } else {
+            $this->setStatus(WeLearn_Cursos_Foruns_StatusForum::ATIVO);
+        }
     }
 
     /**

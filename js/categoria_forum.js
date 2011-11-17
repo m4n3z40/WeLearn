@@ -94,7 +94,7 @@ $(document).ready(function(){
                         if (res.paginacao.proxima_pagina) {
                             $this.data('proximo', res.paginacao.inicio_proxima_pagina);
                         } else {
-                            $this.parent().html('Não há mais categorias a serem exibidas no momento.');
+                            $this.parent().html('<h4>Não há mais categorias a serem exibidas no momento.</h4>');
                         }
                     } else {
                         WeLearn.notificar({

@@ -24,7 +24,7 @@
         <footer>
             <nav id="paginacao-categoria-forum">
                 <?php if ($haMaisPaginas): ?>
-                    <a href="#" data-proximo="<?php echo $inicioProxPagina ?>" data-id-curso="<?php echo $idCurso ?>" class="button">Categorias mais rescentes</a>
+                    <a href="#" data-proximo="<?php echo $inicioProxPagina ?>" data-id-curso="<?php echo $idCurso ?>" class="button">Categorias mais antigas</a>
                 <?php else: ?>
                     <h4>Não há mais categorias a serem exibidas no momento.</h4>
                 <?php endif; ?>
