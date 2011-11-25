@@ -8,27 +8,27 @@
     </header>
     <div id="curso-info-content-tema">
         <h4>Tema</h4>
-        <div><?php echo $curso->tema ?></div>
+        <div><?php echo nl2br($curso->tema) ?></div>
     </div>
     <hr class="curso-info-content-separator" />
     <?php if ( $curso->descricao ): ?>
     <div>
         <h4>Descricao</h4>
-        <div><?php echo $curso->descricao ?></div>
+        <div><?php echo nl2br($curso->descricao) ?></div>
     </div>
     <hr class="curso-info-content-separator" />
     <?php endif ?>
     <?php if ( $curso->objetivos ): ?>
     <div>
         <h4>Objetivos</h4>
-        <div><?php echo $curso->objetivos ?></div>
+        <div><?php echo nl2br($curso->objetivos) ?></div>
     </div>
     <hr class="curso-info-content-separator" />
     <?php endif ?>
     <?php if ( $curso->conteudoProposto ): ?>
     <div>
         <h4>Conteúdo Proposto</h4>
-        <div><?php echo $curso->conteudoProposto ?></div>
+        <div><?php echo nl2br($curso->conteudoProposto) ?></div>
     </div>
     <hr class="curso-info-content-separator" />
     <?php endif ?>
