@@ -71,18 +71,23 @@ abstract class WeLearn_DAO_AbstractDAOFactory implements WeLearn_DAO_IDAOFactory
             throw new WeLearn_DAO_DAOInvalidaException($classeDAO);
         }
 
-        $DAOObject = new $classeDAO($opcoes);
 
-        if ($DaoPadrao) {
-            //Se o nome da Column Family da DAO não foi definido, não continua
-            if (is_null($DAOObject->getNomeCF())) {
-                throw new WeLearn_DAO_CFNaoDefinidaException($classeDAO);
+        if ( ! $classeDAO::isSingletonInstanciado() ) {
+            $DAOObject = $classeDAO::getInstanciaSingleton($classeDAO);
+
+            if ($DaoPadrao) {
+                //Se o nome da Column Family da DAO não foi definido, não continua
+                if (is_null($DAOObject->getNomeCF())) {
+                    throw new WeLearn_DAO_CFNaoDefinidaException($classeDAO);
+                }
+
+                //Rotina para criar o objeto que representa a Column Family (pode ser modificado)
+                $CF = WL_Phpcassa::getInstance()->getColumnFamily($DAOObject->getNomeCF(), $opcoes);
+
+                $DAOObject->setCF($CF);
             }
-
-            //Rotina para criar o objeto que representa a Column Family (pode ser modificado)
-            $CF = WL_Phpcassa::getInstance()->getColumnFamily($DAOObject->getNomeCF(), $opcoes);
-
-            $DAOObject->setCF($CF);
+        } else {
+            $DAOObject = $classeDAO::getInstanciaSingleton($classeDAO);
         }
 
         return $DAOObject;
