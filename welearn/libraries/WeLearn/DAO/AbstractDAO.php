@@ -21,6 +21,11 @@ abstract class WeLearn_DAO_AbstractDAO implements WeLearn_DAO_IDAO
     protected $_nomeCF;
 
     /**
+     * @var WeLearn_DAO_AbstractDAO
+     */
+    protected static $_singleton = null;
+
+    /**
      * @abstract
      * @param WeLearn_DTO_IDTO $dto
      * @return void
@@ -69,5 +74,33 @@ abstract class WeLearn_DAO_AbstractDAO implements WeLearn_DAO_IDAO
     public function getNomeCF()
     {
         return $this->_nomeCF;
+    }
+
+    /**
+     * @static
+     * @var string $nomeClasse
+     *
+     * @return null|WeLearn_DAO_AbstractDAO
+     */
+    public static function getInstanciaSingleton($nomeClasse = '')
+    {
+        if ( self::$_singleton == null ) {
+            if ($nomeClasse == '') {
+                $nomeClasse = __CLASS__;
+            }
+
+            self::$_singleton = new $nomeClasse;
+        }
+
+        return self::$_singleton;
+    }
+
+    /**
+     * @static
+     * @return bool
+     */
+    public static function isSingletonInstanciado()
+    {
+        return self::$_singleton != null;
     }
 }
