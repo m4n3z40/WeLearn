@@ -185,6 +185,9 @@ class WeLearn_Cursos_Foruns_Categoria extends WeLearn_DTO_AbstractDTO
         return $this->_qtdForuns;
     }
 
+    /**
+     * @return int
+     */
     public function recuperarQtdForuns()
     {
         $this->_qtdForuns = WeLearn_DAO_DAOFactory::create('ForumDAO')->recuperarQtdTotalPorCategoria($this);

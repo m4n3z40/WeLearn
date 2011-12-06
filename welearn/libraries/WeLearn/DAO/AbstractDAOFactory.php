@@ -34,12 +34,7 @@ abstract class WeLearn_DAO_AbstractDAOFactory implements WeLearn_DAO_IDAOFactory
 
         if (is_string($nomeDao) && $nomeDao !== '') {
 
-            $classeDAO = ucfirst($nomeDao);
-
-            //Se a classe não terminar com 'DAO', inválido, mas aqui é adicionado automaticamente
-            if ('DAO' !== substr($classeDAO, -3)) {
-                $classeDAO = $classeDAO . 'DAO';
-            }
+            $classeDAO = $nomeDao;
 
         } elseif (is_object($nomeDao) && is_subclass_of($nomeDao, 'WeLearn_DTO_IDTO')) {
 
@@ -72,22 +67,22 @@ abstract class WeLearn_DAO_AbstractDAOFactory implements WeLearn_DAO_IDAOFactory
         }
 
 
-        if ( ! $classeDAO::isSingletonInstanciado() ) {
-            $DAOObject = $classeDAO::getInstanciaSingleton($classeDAO);
+        if ( $DaoPadrao && !$classeDAO::isSingletonInstanciado() ) {
+            $DAOObject = $classeDAO::getInstanciaSingleton();
 
-            if ($DaoPadrao) {
-                //Se o nome da Column Family da DAO não foi definido, não continua
-                if (is_null($DAOObject->getNomeCF())) {
-                    throw new WeLearn_DAO_CFNaoDefinidaException($classeDAO);
-                }
-
-                //Rotina para criar o objeto que representa a Column Family (pode ser modificado)
-                $CF = WL_Phpcassa::getInstance()->getColumnFamily($DAOObject->getNomeCF(), $opcoes);
-
-                $DAOObject->setCF($CF);
+            //Se o nome da Column Family da DAO não foi definido, não continua
+            if ( is_null( $DAOObject->getNomeCF() ) ) {
+                throw new WeLearn_DAO_CFNaoDefinidaException($classeDAO);
             }
+
+            //Rotina para criar o objeto que representa a Column Family (pode ser modificado)
+            $CF = WL_Phpcassa::getInstance()->getColumnFamily($DAOObject->getNomeCF(), $opcoes);
+
+            $DAOObject->setCF($CF);
+        } elseif ($DaoPadrao) {
+            $DAOObject = $classeDAO::getInstanciaSingleton();
         } else {
-            $DAOObject = $classeDAO::getInstanciaSingleton($classeDAO);
+            $DAOObject = new $classeDAO;
         }
 
         return $DAOObject;

@@ -7,6 +7,137 @@
  */
 
 $(document).ready(function(e){
+    var navPaginacaoForum = document.getElementById('paginacao-forum-lista');
+    if (navPaginacaoForum != null) {
+        var $aProxPagina = $(navPaginacaoForum).find('a');
+
+        $aProxPagina.click(function(e){
+            e.preventDefault();
+
+            var $this = $(this),
+                idProximo = $this.data('proximo'),
+                idCategoria = $this.data('id-categoria'),
+                url = WeLearn.url.siteURL('forum/forum/proxima_pagina/' + idCategoria + '/' + idProximo);
+
+            $.get(
+                url,
+                (WeLearn.url.queryString != '') ? WeLearn.url.queryString : null,
+                function (res) {
+                    if(res.success) {
+                        $('#forum-lista-forums').append(res.htmlListaForuns);
+
+                        if (res.paginacao.proxima_pagina) {
+                            $this.data('proximo', res.paginacao.inicio_proxima_pagina);
+                        } else {
+                            $this.parent().html('<h4>Não há mais fóruns a serem exibidos.</h4>')
+                        }
+                    } else {
+                        WeLearn.notificar({
+                            msg: res.errors[0].error_msg,
+                            nivel: 'erro',
+                            tempo: 15000
+                        });
+                    }
+                },
+                'json'
+            )
+        });
+    }
+
+    var tblListaForuns = document.getElementById('forum-lista-forums');
+    if(tblListaForuns != null) {
+        var $aAlterarStatusForum = $('.a-alterarstatus-forum'),
+            $aRemoverForum = $('.a-remover-forum');
+
+        $aAlterarStatusForum.live('click', function(e) {
+            e.preventDefault();
+
+            var $this = $(this),
+                $divConfirmacao = $('<div id="dialogo-confirmacao-alterarstatus-forum">' +
+                                    '<p>Tem certeza que deseja alterar o status deste fórum?<br/>' +
+                                    '<strong>Somente</strong> fóruns <strong>ATIVOS</strong> podem ser visualizados' +
+                                    ' pelos alunos.</p></div>');
+
+            $divConfirmacao.dialog({
+                title: 'Tem certeza?',
+                width: '450px',
+                resizable: false,
+                modal: true,
+                buttons: {
+                    'Confirmar' : function() {
+                        $.get(
+                            $this.attr('href'),
+                            {},
+                            function(res) {
+                                if (res.success) {
+                                    WeLearn.notificar(res.notificacao);
+                                    $this.parent().parent().parent().parent().fadeOut('slow', function(){
+                                        $( this ).remove();
+                                    });
+                                } else {
+                                    WeLearn.notificar({
+                                        nivel: 'erro',
+                                        msg: res.errors[0].error_msg,
+                                        tempo: 10000
+                                    });
+                                }
+                            }
+                        );
+
+                        $( this ).dialog('close');
+                    },
+                    'Cancelar' : function() {
+                        $( this ).dialog('close');
+                    }
+                }
+            });
+        });
+
+        $aRemoverForum.live('click', function(e) {
+            e.preventDefault();
+
+            var $this = $(this),
+                $divConfirmacao = $('<div id="dialogo-confirmacao-remover-forum">' +
+                                    '<p>Tem certeza que deseja remover este fórum?<br/>' +
+                                    'Esta ação <strong>NÃO</strong> poderá ser desfeita!<br/>' +
+                                    '<strong>TODOS</strong> os posts deste fórum serão perdidos!</p></div>');
+
+            $divConfirmacao.dialog({
+                title: 'Tem certeza?',
+                width: '450px',
+                resizable: false,
+                modal: true,
+                buttons: {
+                    'Confirmar' : function() {
+                        $.get(
+                            $this.attr('href'),
+                            {},
+                            function(res) {
+                                if (res.success) {
+                                    WeLearn.notificar(res.notificacao);
+                                    $this.parent().parent().parent().parent().fadeOut('slow', function(){
+                                        $( this ).remove();
+                                    });
+                                } else {
+                                    WeLearn.notificar({
+                                        nivel: 'erro',
+                                        msg: res.errors[0].error_msg,
+                                        tempo: 10000
+                                    });
+                                }
+                            }
+                        );
+
+                        $( this ).dialog('close');
+                    },
+                    'Cancelar' : function() {
+                        $( this ).dialog('close');
+                    }
+                }
+            });
+        });
+    }
+
     var navPaginacaoCategorias = document.getElementById('paginacao-forum-categorias');
     if (navPaginacaoCategorias != null) {
         var $aProxPagina = $(navPaginacaoCategorias).find('a');
@@ -57,7 +188,7 @@ $(document).ready(function(e){
             if(formForum != null) {
                 WeLearn.validarForm(formForum, url, function(res) {
                     if ( res.success ) {
-                        alert('Sucesso!');
+                        window.location = WeLearn.url.siteURL('curso/forum/exibir/' + res.idForum);
                     }
                 });
             }

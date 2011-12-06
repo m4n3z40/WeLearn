@@ -240,11 +240,16 @@ and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
-create column family cursos_forum_por_status_e_categoria
-with comparator = 'IntegerType'
-and subcomparator = 'TimeUUIDType'
-and column_type = 'Super'
-and default_validation_class = 'BytesType'
+create column family cursos_forum_ativos
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_forum_inativos
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
 create column family cursos_forum_categorias

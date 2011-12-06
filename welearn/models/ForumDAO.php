@@ -12,10 +12,12 @@ class ForumDAO extends WeLearn_DAO_AbstractDAO {
     protected $_nomeCF = 'cursos_forum';
 
     private $_nomeForumPorCategoriaCF = 'cursos_forum_por_categoria';
-    private $_nomeForumPorCategoriaEStatusSuperCF = 'cursos_forum_por_status_e_categoria';
+    private $_nomeForumAtivos = 'cursos_forum_ativos';
+    private $_nomeForumInativos = 'cursos_forum_inativos';
 
     private $_forumPorCategoriaCF;
-    private $_forumPorCategoriaEStatusSuperCF;
+    private $_forumAtivosCF;
+    private $_forumInativosCF;
 
     private $_categoriaDao;
     private $_usuarioDao;
@@ -25,7 +27,8 @@ class ForumDAO extends WeLearn_DAO_AbstractDAO {
         $phpCassa = WL_Phpcassa::getInstance();
 
         $this->_forumPorCategoriaCF = $phpCassa->getColumnFamily($this->_nomeForumPorCategoriaCF);
-        $this->_forumPorCategoriaEStatusSuperCF = $phpCassa->getColumnFamily($this->_nomeForumPorCategoriaEStatusSuperCF);
+        $this->_forumAtivosCF = $phpCassa->getColumnFamily($this->_nomeForumAtivos);
+        $this->_forumInativosCF = $phpCassa->getColumnFamily($this->_nomeForumInativos);
 
         $this->_categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
         $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
@@ -46,14 +49,12 @@ class ForumDAO extends WeLearn_DAO_AbstractDAO {
         $this->_cf->insert($UUID->bytes, $dto->toCassandra());
 
         $this->_forumPorCategoriaCF->insert($categoriaUUID->bytes, array($UUID->bytes => ''));
-        $this->_forumPorCategoriaEStatusSuperCF->insert(
-            $categoriaUUID->bytes,
-            array(
-                 $dto->getStatus() => array(
-                     $UUID->bytes => ''
-                 )
-            )
-        );
+
+        if ($dto->getStatus() == WeLearn_Cursos_Foruns_StatusForum::ATIVO) {
+            $this->_forumAtivosCF->insert($categoriaUUID->bytes, array($UUID->bytes => ''));
+        } else {
+            $this->_forumInativosCF->insert($categoriaUUID->bytes, array($UUID->bytes => ''));
+        }
 
         $dto->setPersistido(true);
     }
@@ -72,17 +73,14 @@ class ForumDAO extends WeLearn_DAO_AbstractDAO {
 
         $this->_cf->insert($UUID->bytes, $dto->toCassandra());
 
-        if ( $statusAntigo != $dto->getStatus() ) {
-            $this->_forumPorCategoriaEStatusSuperCF->remove($categoriaUUID->bytes, array($UUID->bytes), $statusAntigo);
-
-            $this->_forumPorCategoriaEStatusSuperCF->insert(
-                $categoriaUUID->bytes,
-                array(
-                     $dto->getStatus() => array(
-                         $UUID->bytes => ''
-                     )
-                )
-            );
+        if ($statusAntigo != $dto->getStatus()) {
+            if ($statusAntigo == WeLearn_Cursos_Foruns_StatusForum::ATIVO) {
+                $this->_forumAtivosCF->remove($categoriaUUID->bytes, array($UUID->bytes));
+                $this->_forumInativosCF->insert($categoriaUUID->bytes, array($UUID->bytes => ''));
+            } else {
+                $this->_forumInativosCF->remove($categoriaUUID->bytes, array($UUID->bytes));
+                $this->_forumAtivosCF->insert($categoriaUUID->bytes, array($UUID->bytes => ''));
+            }
         }
     }
 
@@ -115,14 +113,14 @@ class ForumDAO extends WeLearn_DAO_AbstractDAO {
         WeLearn_Cursos_Foruns_Categoria $categoria,
         $de = '',
         $ate = '',
-        $count = 20)
+        $count = 10)
     {
-        if ( ! ($de instanceof UUID) ) {
-            $de = CassandraUtil::import($de);
+        if ( $de != '' && !($de instanceof UUID) ) {
+            $de = CassandraUtil::import($de)->bytes;
         }
 
-        if ( ! ($ate instanceof UUID) ) {
-            $ate = CassandraUtil::import($ate);
+        if ( $ate != '' && !($ate instanceof UUID) ) {
+            $ate = CassandraUtil::import($ate)->bytes;
         }
 
         $categoriaUUID = CassandraUtil::import($categoria->getId());
@@ -146,27 +144,27 @@ class ForumDAO extends WeLearn_DAO_AbstractDAO {
         $status = WeLearn_Cursos_Foruns_StatusForum::ATIVO,
         $de = '',
         $ate = '',
-        $count = 20)
+        $count = 10)
     {
-        if ( ! ($de instanceof UUID) ) {
-            $de = CassandraUtil::import($de);
+        if ( $de != '' && !($de instanceof UUID) ) {
+            $de = CassandraUtil::import($de)->bytes;
         }
 
-        if ( ! ($ate instanceof UUID) ) {
-            $ate = CassandraUtil::import($ate);
+        if ( $ate != '' && !($ate instanceof UUID) ) {
+            $ate = CassandraUtil::import($ate)->bytes;
         }
 
         $categoriaUUID = CassandraUtil::import($categoria->getId());
 
-        $idsForuns = array_keys(
-                $this->_forumPorCategoriaEStatusSuperCF->get($categoriaUUID->bytes,
-                                                                  null,
-                                                                  $de,
-                                                                  $ate,
-                                                                  true,
-                                                                  $count,
-                                                                  $status)
-        );
+        if ($status == WeLearn_Cursos_Foruns_StatusForum::ATIVO) {
+            $idsForuns = array_keys(
+                $this->_forumAtivosCF->get($categoriaUUID->bytes, null, $de, $ate, true, $count)
+            );
+        } else {
+            $idsForuns = array_keys(
+                $this->_forumInativosCF->get($categoriaUUID->bytes, null, $de, $ate, true, $count)
+            );
+        }
 
         $columns = $this->_cf->multiget($idsForuns);
 
@@ -209,6 +207,18 @@ class ForumDAO extends WeLearn_DAO_AbstractDAO {
         return $this->_forumPorCategoriaCF->get_count($UUID->bytes);
     }
 
+    public function recuperarQtdTotalPorCategoriaEStatus(WeLearn_Cursos_Foruns_Categoria $categoria,
+                                                         $status = WeLearn_Cursos_Foruns_StatusForum::ATIVO)
+    {
+        $UUID = CassandraUtil::import($categoria->getId());
+
+        if ($status == WeLearn_Cursos_Foruns_StatusForum::ATIVO) {
+            return $this->_forumAtivosCF->get_count($UUID->bytes);
+        } else {
+            return $this->_forumInativosCF->get_count($UUID->bytes);
+        }
+    }
+
     /**
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
@@ -225,7 +235,12 @@ class ForumDAO extends WeLearn_DAO_AbstractDAO {
 
         $this->_cf->remove($id->bytes);
         $this->_forumPorCategoriaCF->remove($categoriaUUID->bytes, array($id->bytes));
-        $this->_forumPorCategoriaEStatusSuperCF->remove($categoriaUUID->bytes, array($id->bytes), $forumRemovido->getStatus());
+
+        if ($forumRemovido->getStatus() == WeLearn_Cursos_Foruns_StatusForum::ATIVO) {
+            $this->_forumAtivosCF->remove($categoriaUUID->bytes, array($id->bytes));
+        } else {
+            $this->_forumInativosCF->remove($categoriaUUID->bytes, array($id->bytes));
+        }
 
         $forumRemovido->setPersistido(false);
 
@@ -246,7 +261,7 @@ class ForumDAO extends WeLearn_DAO_AbstractDAO {
         if ( $categoriaPadrao instanceof WeLearn_Cursos_Foruns_Categoria ) {
             $column['categoria'] = $categoriaPadrao;
         } else {
-            $column['categoria'] = $this->_categoriaDao->recuperar($column['criador']);
+            $column['categoria'] = $this->_categoriaDao->recuperar($column['categoria']);
         }
 
         $column['criador'] = $this->_usuarioDao->recuperar($column['criador']);

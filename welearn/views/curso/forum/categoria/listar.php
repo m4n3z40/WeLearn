@@ -5,7 +5,7 @@
             <h3>Abaixo você verá todas as categorias de fórum dinponíveis</h3>
         </hgroup>
         <p>
-            Quer adicionar uma categoria de fórum? <?php echo anchor('/curso/' . $idCurso . '/forum/categoria/criar', 'É por aqui!') ?>
+            Quer adicionar uma categoria de fórum? <?php echo anchor('/curso/forum/categoria/criar/' . $idCurso, 'É por aqui!') ?>
         </p>
     </header>
     <div>

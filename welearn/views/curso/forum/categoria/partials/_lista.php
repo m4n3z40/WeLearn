@@ -8,7 +8,7 @@
     <?php else: ?>
         <td>O usuário criador deste curso não está mais no WeLearn :(</td>
     <?php endif; ?>
-    <td><?php echo anchor('/forum/categoria/alterar/' . $categoria->id, 'Alterar', 'class="a-alterar-categoria-forum"') ?></td>
-    <td><?php echo anchor('/forum/categoria/remover/' . $categoria->id, 'Remover', 'class="a-remover-categoria-forum"') ?></td>
+    <td><?php echo anchor('/curso/forum/categoria/alterar/' . $categoria->id, 'Alterar', 'class="a-alterar-categoria-forum"') ?></td>
+    <td><?php echo anchor('/curso/forum/categoria/remover/' . $categoria->id, 'Remover', 'class="a-remover-categoria-forum"') ?></td>
 </tr>
 <?php endforeach ?>

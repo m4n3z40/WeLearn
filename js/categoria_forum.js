@@ -20,7 +20,7 @@ $(document).ready(function(){
             if (formCategoria != null) {
                 WeLearn.validarForm(formCategoria, url, function(res) {
                    if ( res.success ) {
-                       window.location = WeLearn.url.siteURL('curso/' + res.idCurso + '/forum/categoria/listar');
+                       window.location = WeLearn.url.siteURL('curso/forum/categoria/listar/' + res.idCurso);
                    }
                 });
             }
@@ -31,7 +31,7 @@ $(document).ready(function(){
         e.preventDefault();
 
         var $this = $(this),
-            $divConfirmacao = $('<div id="dialogo-confirmacao-remover-categoria">' +
+            $divConfirmacao = $('<div id="dialogo-confirmacao-remover-categoria-forum">' +
                                 '<p>Tem certeza que deseja remover esta categoria?' +
                                 '<br/>Essa ação <strong>NÃO</strong> poderá ser desfeita. ' +
                                 '<br/><strong>TODOS</strong> os fóruns e posts vinculados' +

@@ -7,7 +7,7 @@
         <div>
             <h4>
                 Não achou o curso que procura?
-                <?php echo anchor('curso/sugestao/criar', 'Sugira um Curso.') ?>
+                <?php echo anchor('/curso/sugestao/criar', 'Sugira um Curso.') ?>
             </h4>
             <p>
                 Divulgue a sugestão e aguarde, logo logo sua sugestão se tornará um curso!<br/>
