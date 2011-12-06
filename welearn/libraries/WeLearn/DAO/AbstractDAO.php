@@ -23,7 +23,7 @@ abstract class WeLearn_DAO_AbstractDAO implements WeLearn_DAO_IDAO
     /**
      * @var WeLearn_DAO_AbstractDAO
      */
-    protected static $_singleton = null;
+    protected static $_singletons = array();
 
     /**
      * @abstract
@@ -78,21 +78,18 @@ abstract class WeLearn_DAO_AbstractDAO implements WeLearn_DAO_IDAO
 
     /**
      * @static
-     * @var string $nomeClasse
      *
      * @return null|WeLearn_DAO_AbstractDAO
      */
-    public static function getInstanciaSingleton($nomeClasse = '')
+    public static function getInstanciaSingleton()
     {
-        if ( self::$_singleton == null ) {
-            if ($nomeClasse == '') {
-                $nomeClasse = __CLASS__;
-            }
+        $nomeClasse = get_called_class();
 
-            self::$_singleton = new $nomeClasse;
+        if ( ! isset(self::$_singletons[$nomeClasse]) ) {
+            self::$_singletons[$nomeClasse] = new $nomeClasse;
         }
 
-        return self::$_singleton;
+        return self::$_singletons[$nomeClasse];
     }
 
     /**
@@ -101,6 +98,6 @@ abstract class WeLearn_DAO_AbstractDAO implements WeLearn_DAO_IDAO
      */
     public static function isSingletonInstanciado()
     {
-        return self::$_singleton != null;
+        return isset( self::$_singletons[ get_called_class() ] );
     }
 }

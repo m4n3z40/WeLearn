@@ -46,6 +46,11 @@ class WeLearn_Cursos_Foruns_Forum extends WeLearn_DTO_AbstractDTO
     private $_status = WeLearn_Cursos_Foruns_StatusForum::ATIVO;
 
     /**
+     * @var int
+     */
+    private $_qtdPosts;
+
+    /**
      * @param \WeLearn_Cursos_Foruns_Categoria $categoria
      */
     public function setCategoria(WeLearn_Cursos_Foruns_Categoria $categoria)
@@ -205,5 +210,23 @@ class WeLearn_Cursos_Foruns_Forum extends WeLearn_DTO_AbstractDTO
             'criador' => ($this->_criador instanceof WeLearn_Usuarios_Usuario) ? $this->getCriador()->getId() : '',
             'status' => $this->getStatus()
         );
+    }
+
+    /**
+     * @return int
+     */
+    public function getQtdPosts()
+    {
+        return $this->_qtdPosts;
+    }
+
+    /**
+     * @return int
+     */
+    public function recuperarQtdPosts()
+    {
+        $this->_qtdPosts = WeLearn_DAO_DAOFactory::create('PostForumDAO')->recuperarQtdTotalPorForum($this);
+
+        return $this->_qtdPosts;
     }
 }
