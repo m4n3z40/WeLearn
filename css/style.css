@@ -400,6 +400,13 @@ button, .button {
     margin-top: 1px;
 }
 
+
+
+
+#forum-lista-posts article {
+    overflow: hidden;
+}
+
 /* =============================================================================
    Non-semantic helper classes
    Please define your styles before this section.

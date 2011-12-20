@@ -5,7 +5,7 @@
             <h3>Entre com os novos dados do fórum.</h3>
         </hgroup>
         <p>
-            Não queria estar aqui? <?php echo anchor('curso/forum/exibir/' . $idForum, 'Clique aqui e vá para exibição do fórum.') ?>
+            Não queria estar aqui? <?php echo anchor('curso/forum/post/listar/' . $idForum, 'Clique aqui e vá para exibição do fórum.') ?>
         </p>
     </header>
     <div>

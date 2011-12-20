@@ -15,17 +15,6 @@ class Forum extends WL_Controller {
         $this->listar_categorias($idCurso);
     }
 
-    public function exibir($idForum) {
-        try {
-            $forumDao = WeLearn_DAO_DAOFactory::create('ForumDAO');
-            $forum = $forumDao->recuperar($idForum);
-
-            $this->_renderTemplateCurso($forum->getCategoria()->getCurso());
-        } catch (Exception $e) {
-            echo create_exception_description($e);
-        }
-    }
-
     public function listar($idCategoria)
     {
         try {
@@ -335,6 +324,7 @@ class Forum extends WL_Controller {
             $statusStr = $forum->getStatus() == WeLearn_Cursos_Foruns_StatusForum::ATIVO ? 'ativado' : 'desativado';
 
             $notificacao = Zend_Json::encode(array(
+                                                 'statusAtual' => $statusStr,
                                                  'notificacao' => array(
                                                      'nivel' => 'sucesso',
                                                      'msg' => 'O fórum <strong>' . $forum->getTitulo() . '</strong> foi ' . $statusStr . ' com sucesso!',
@@ -368,6 +358,7 @@ class Forum extends WL_Controller {
             $forumRemovido = $forumDao->remover($idForum);
 
             $notificacao = Zend_Json::encode(array(
+                                                 'idCategoria' => $forumRemovido->getCategoria()->getId(),
                                                  'notificacao' => array(
                                                      'nivel' => 'sucesso',
                                                      'msg' => 'O fórum <strong>' . $forumRemovido->getTitulo() . '</strong> foi removido com sucesso!',

@@ -2,7 +2,7 @@
     <tr>
         <td>
             <div>
-                <h4><?php echo anchor('curso/forum/exibir/'. $forum->id, $forum->titulo) ?></h4>
+                <h4><?php echo anchor('curso/forum/post/listar/'. $forum->id, $forum->titulo) ?></h4>
                 <p><?php echo $forum->descricao ?></p>
                 <footer>
                     Criador: <span><?php echo anchor('usuario/' . $forum->criador->id, $forum->criador->nome) ?></span><br/>
