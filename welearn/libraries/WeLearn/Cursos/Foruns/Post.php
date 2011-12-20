@@ -189,7 +189,7 @@ class WeLearn_Cursos_Foruns_Post extends WeLearn_DTO_AbstractDTO
             'titulo' => $this->getTitulo(),
             'conteudo' => $this->getConteudo(),
             'dataCriacao' => $this->getDataCriacao(),
-            'dataAlteracao' => $this->getDataAlteracao(),
+            'dataAlteracao' => ( ! $this->_dataAlteracao ) ? '' : $this->getDataAlteracao(),
             'forum' => ($this->_forum instanceof WeLearn_Cursos_Foruns_Forum) ? $this->getForum()->getId() : '',
             'criador' => ($this->_criador instanceof WeLearn_Usuarios_Usuario) ? $this->getCriador()->getId() : ''
         );

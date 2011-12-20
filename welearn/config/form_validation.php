@@ -178,6 +178,18 @@ $config = array(
             'label' => 'Descrição',
             'rules' => 'max_length[512]'
         )
+    ),
+    'post/salvar' => array(
+        array(
+            'field' => 'titulo',
+            'label' => 'Título',
+            'rules' => ''
+        ),
+        array(
+            'field' => 'conteudo',
+            'label' => 'Conteúdo',
+            'rules' => 'required'
+        )
     )
 );
 

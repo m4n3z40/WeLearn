@@ -85,8 +85,16 @@ class PostForumDAO extends WeLearn_DAO_AbstractDAO {
     {
         $forumUUID = CassandraUtil::import($forum->getId());
 
+        if ($de != '') {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+
+        if ($ate != '') {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
         $idsPosts = array_keys(
-                $this->_postsPorForumCF->get($forumUUID->bytes, null, $de, $ate, false, $count)
+            $this->_postsPorForumCF->get($forumUUID->bytes, null, $de, $ate, true, $count)
         );
 
         $columns = $this->_cf->multiget($idsPosts);
@@ -159,7 +167,7 @@ class PostForumDAO extends WeLearn_DAO_AbstractDAO {
      */
     public function criarNovo(array $dados = null)
     {
-        return new WeLearn_Cursos_Foruns_Forum($dados);
+        return new WeLearn_Cursos_Foruns_Post($dados);
     }
 
     public function _criarFromCassandra(array $column, WeLearn_Cursos_Foruns_Forum $forumPadrao = null)
