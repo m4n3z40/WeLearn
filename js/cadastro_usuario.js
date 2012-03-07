@@ -33,13 +33,13 @@ $(document).ready(function(){
             function(res){
                 if (res.success) {
                     var html = WeLearn.segmento.gerarOpcoesHTML(res.segmentos);
-                    
+
                     $sltSegmento.html(html);
                     $lblSegmento.show('fast');
                     $ddSegmento.show('fast');
-                } else {                    
+                } else {
                     var errors = res.errors;
-                    
+
                     for (var i = 0; i < errors.length; i++) {
                         $('select[name='+errors[i].field_name+']').after(
                             '<p class="error">'+errors[i].error_msg+'</p>'

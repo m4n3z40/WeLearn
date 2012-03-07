@@ -41,7 +41,7 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
     private $_curso;
 
     /**
-     * @var WeLearn_Usuarios_Moderador
+     * @var WeLearn_Usuarios_Usuario
      */
     private $_criador;
 
@@ -58,7 +58,7 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
     /**
      * @var array
      */
-    private $_alternativas;
+    private $_alternativas = array();
 
     /**
      * @var int
@@ -84,13 +84,13 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
     /**
      * @param \WeLearn_Usuarios_Moderador $criador
      */
-    public function setCriador(WeLearn_Usuarios_Moderador $criador)
+    public function setCriador(WeLearn_Usuarios_Usuario $criador)
     {
         $this->_criador = $criador;
     }
 
     /**
-     * @return \WeLearn_Usuarios_Moderador
+     * @return \WeLearn_Usuarios_Usuario
      */
     public function getCriador()
     {
@@ -330,7 +330,7 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
             'dataCriacao' => $this->getDataCriacao(),
             'dataExpiracao' => $this->getDataExpiracao(),
             'curso' => ($this->_curso instanceof WeLearn_Cursos_Curso) ? $this->getCurso()->getId() : '',
-            'criador' => ($this->_curso instanceof WeLearn_Usuarios_Usuario) ? $this->getCriador()->getId() : '',
+            'criador' => ($this->_criador instanceof WeLearn_Usuarios_Usuario) ? $this->getCriador()->getId() : '',
             'status' => $this->getStatus(),
             'situacao' => $this->getSituacao(),
             'totalVotos' => $this->getTotalVotos()

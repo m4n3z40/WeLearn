@@ -108,13 +108,21 @@ window.WeLearn = {
 
                     var $campos = $(elems);
 
-                    $campos.after(
-                        '<p class="validation-error">' + erro.error_msg + '</p>'
-                    );
+                    if( $campos.length > 0 ) {
+                        $campos.after(
+                            '<p class="validation-error">' + erro.error_msg + '</p>'
+                        );
 
-                    $campos.change(function(evt){
-                        $(this).next('p.validation-error').remove();
-                    });
+                        $campos.change(function(evt){
+                            $(this).next('p.validation-error').remove();
+                        });
+                    } else {
+                        WeLearn.notificar({
+                            msg: erro.error_msg,
+                            nivel: 'erro',
+                            tempo: 10000
+                        });
+                    }
                 }
 
                 if (onValidationFail) {
@@ -197,6 +205,24 @@ window.WeLearn = {
         this.initUrl();
         this.initAjax();
         this.initNotificacoes();
+
+        $.datepicker.setDefaults({
+            closeText:"Pronto",
+            prevText:"Ant.",
+            nextText:"Próx.",
+            currentText:"Hoje",
+            monthNames:["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"],
+            monthNamesShort:["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"],
+            dayNames:["Domingo","Segunda","terça","Quarta","Quinta","Sexta","Sábado"],
+            dayNamesShort:["Dom","Seg","Ter","Qua","Qui","Sex","Sab"],
+            dayNamesMin:["Do","Se","Te","Qu","Qu","Se","Sa"],
+            weekHeader:"Sem",
+            dateFormat:"dd/mm/yy",
+            firstDay:0,
+            isRTL:false,
+            showMonthAfterYear:false,
+            yearSuffix:""
+        });
     }
 };
 

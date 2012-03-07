@@ -19,9 +19,7 @@ $(document).ready(function(){
 
             if (formCategoria != null) {
                 WeLearn.validarForm(formCategoria, url, function(res) {
-                   if ( res.success ) {
-                       window.location = WeLearn.url.siteURL('curso/forum/categoria/listar/' + res.idCurso);
-                   }
+                   window.location = WeLearn.url.siteURL('curso/forum/categoria/listar/' + res.idCurso);
                 });
             }
         });

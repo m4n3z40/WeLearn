@@ -38,44 +38,40 @@ $(document).ready(function(e){
                 formPost,
                 url,
                 function(res) {
-                    if (res.success) {
+                    var hdnAcao = $( document.getElementsByName('acao') ).first().val(),
+                        $divListaPosts;
 
-                        var hdnAcao = $( document.getElementsByName('acao') ).first().val(),
-                            $divListaPosts;
+                    if ( hdnAcao == 'criar' ) {
 
-                        if ( hdnAcao == 'criar' ) {
+                        var divListaPosts = document.getElementById('forum-lista-posts');
 
-                            var divListaPosts = document.getElementById('forum-lista-posts');
+                        if ( divListaPosts == null ) {
+                            $divListaPosts = $('<div id="forum-lista-posts"></div>');
 
-                            if ( divListaPosts == null ) {
-                                $divListaPosts = $('<div id="forum-lista-posts"></div>');
+                            var $divListaPostsVazio = $('#forum-lista-posts-vazio');
 
-                                var $divListaPostsVazio = $('#forum-lista-posts-vazio');
+                            $divListaPostsVazio.before( $divListaPosts );
 
-                                $divListaPostsVazio.before( $divListaPosts );
-
-                                $divListaPostsVazio.remove();
-                            } else {
-                                $divListaPosts = $('#forum-lista-posts');
-                            }
-
-                            var $artNovoPost = $(res.htmlNovoPost);
-
-                            $artNovoPost.hide();
-
-                            $divListaPosts.append($artNovoPost);
-
-                            $(formCriarContainer).slideUp('fast');
-
-                            setTimeout(function(){
-                                formPost.reset();
-                                $artNovoPost.fadeIn(600);
-                            }, 600);
-
-                        } else if ( hdnAcao == 'alterar' ) {
-                            window.location = WeLearn.url.siteURL('/curso/forum/post/listar/' + res.idForum)
+                            $divListaPostsVazio.remove();
+                        } else {
+                            $divListaPosts = $('#forum-lista-posts');
                         }
 
+                        var $artNovoPost = $(res.htmlNovoPost);
+
+                        $artNovoPost.hide();
+
+                        $divListaPosts.append($artNovoPost);
+
+                        $(formCriarContainer).slideUp();
+
+                        setTimeout(function(){
+                            formPost.reset();
+                            $artNovoPost.fadeIn(600);
+                        }, 600);
+
+                    } else if ( hdnAcao == 'alterar' ) {
+                        window.location = WeLearn.url.siteURL('/curso/forum/post/listar/' + res.idForum)
                     }
                 }
             )
