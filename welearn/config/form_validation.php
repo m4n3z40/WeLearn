@@ -183,12 +183,29 @@ $config = array(
         array(
             'field' => 'titulo',
             'label' => 'Título',
-            'rules' => ''
+            'rules' => 'min_length[5]|max_length[80]'
         ),
         array(
             'field' => 'conteudo',
             'label' => 'Conteúdo',
-            'rules' => 'required'
+            'rules' => 'required|max_length[2048]'
+        )
+    ),
+    'enquete/salvar' => array(
+        array(
+            'field' => 'questao',
+            'label' => 'Questão',
+            'rules' => 'required|max_length[1024]'
+        ),
+        array (
+            'field' => 'dataExpiracao',
+            'label' => 'Data de Expiração',
+            'rules' => 'required|exact_length[10]'
+        ),
+        array (
+            'field' => 'alternativas',
+            'label' => 'Alternativas',
+            'rules' => 'required|callback__validarQtdAlternativas'
         )
     )
 );

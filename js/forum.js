@@ -196,9 +196,7 @@ $(document).ready(function(e){
 
             if(formForum != null) {
                 WeLearn.validarForm(formForum, url, function(res) {
-                    if ( res.success ) {
-                        window.location = WeLearn.url.siteURL('curso/forum/post/listar/' + res.idForum);
-                    }
+                    window.location = WeLearn.url.siteURL('curso/forum/post/listar/' + res.idForum);
                 });
             }
         });

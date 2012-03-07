@@ -3,7 +3,7 @@
         <legend>Conteúdo do Post</legend>
         <dl>
             <dt><label for="txt-titulo">Título</label></dt>
-            <dd><input type="text" name="titulo" id="txt-titulo" value="<?php echo $tituloAtual ?>"></dd>
+            <dd><input type="text" name="titulo" id="txt-titulo" value="<?php echo $tituloAtual ?>" maxlength="80"></dd>
             <dt><label for="txt-conteudo">Conteúdo</label></dt>
             <dd><textarea name="conteudo" id="txt-conteudo" cols="60" rows="15"><?php echo $conteudoAtual ?></textarea></dd>
         </dl>

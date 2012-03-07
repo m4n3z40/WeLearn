@@ -53,10 +53,10 @@ $route['curso/forum/categoria/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-
 $route['curso/forum/post/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/post/index/$1';
 $route['curso/forum/post/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/post/$1/$2';
 $route['curso/forum/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/forum/$1/$2';
-$route['curso/forum/listar/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/forum/listar/$1';
-$route['curso/forum/criar/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/forum/criar/$1';
-$route['curso/forum/exibir/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/forum/exibir/$1';
 $route['curso/forum/([a-z_]+)'] = 'forum/forum/$1';
+$route['curso/enquete/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'enquete/enquete/index/$1';
+$route['curso/enquete/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'enquete/enquete/$1/$2';
+$route['curso/enquete/([a-z_]+)'] = 'enquete/enquete/$1';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

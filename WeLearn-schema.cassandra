@@ -288,18 +288,28 @@ and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
-create column family cursos_enquete_por_status
-with comparator = 'IntegerType'
-and subcomparator = 'TimeUUIDType'
-and column_type = 'Super'
-and default_validation_class = 'BytesType'
+create column family cursos_enquete_por_status_ativo
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
-create column family cursos_enquete_por_situacao
-with comparator = 'IntegerType'
-and subcomparator = 'TimeUUIDType'
-and column_type = 'Super'
-and default_validation_class = 'BytesType'
+create column family cursos_enquete_por_status_inativo
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_enquete_por_situacao_aberto
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_enquete_por_situacao_fechado
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
 create column family cursos_enquete_alternativa

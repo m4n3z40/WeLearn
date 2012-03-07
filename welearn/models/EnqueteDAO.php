@@ -11,26 +11,36 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
     protected $_nomeCF = 'cursos_enquete';
 
     private $_nomeEnquetePorCursoCF = 'cursos_enquete_por_curso';
-    private $_nomeEnquetePorStatusSuperCF = 'cursos_enquete_por_status';
-    private $_nomeEnquetePorSituacaoSuperCF = 'cursos_enquete_por_situacao';
+    private $_nomeEnquetePorStatusAtivoCF = 'cursos_enquete_por_status_ativo';
+    private $_nomeEnquetePorStatusInativoCF = 'cursos_enquete_por_status_inativo';
+    private $_nomeEnquetePorSituacaoAbertoCF = 'cursos_enquete_por_situacao_aberto';
+    private $_nomeEnquetePorSituacaoFechadoCF = 'cursos_enquete_por_situacao_fechado';
 
     private $_enquetePorCursoCF;
-    private $_enquetePorStatusSuperCF;
-    private $_enquetePorSituacaoSuperCF;
+    private $_enquetePorStatusAtivoCF;
+    private $_enquetePorStatusInativoCF;
+    private $_enquetePorSituacaoAbertoCF;
+    private $_enquetePorSituacaoFechadoCF;
 
     private $_cursoDao;
     private $_usuarioDao;
+    private $_alternativaEnqueteDao;
+    //private $_votoEnqueteDao;
 
     function __construct()
     {
         $phpCassa = WL_Phpcassa::getInstance();
 
         $this->_enquetePorCursoCF = $phpCassa->getColumnFamily($this->_nomeEnquetePorCursoCF);
-        $this->_enquetePorStatusSuperCF = $phpCassa->getColumnFamily($this->_nomeEnquetePorStatusSuperCF);
-        $this->_enquetePorSituacaoSuperCF = $phpCassa->getColumnFamily($this->_nomeEnquetePorSituacaoSuperCF);
+        $this->_enquetePorStatusAtivoCF = $phpCassa->getColumnFamily($this->_nomeEnquetePorStatusAtivoCF);
+        $this->_enquetePorStatusInativoCF = $phpCassa->getColumnFamily($this->_nomeEnquetePorStatusInativoCF);
+        $this->_enquetePorSituacaoAbertoCF = $phpCassa->getColumnFamily($this->_nomeEnquetePorSituacaoAbertoCF);
+        $this->_enquetePorSituacaoFechadoCF = $phpCassa->getColumnFamily($this->_nomeEnquetePorSituacaoFechadoCF);
 
         $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
         $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+        $this->_alternativaEnqueteDao = WeLearn_DAO_DAOFactory::create('AlternativaEnqueteDAO');
+        //$this->_votoEnqueteDao = WeLearn_DAO_DAOFactory::create('VotoEnqueteDAO');
     }
 
     /**
@@ -110,9 +120,13 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
 
         $cursoUUID = CassandraUtil::import($curso->getId());
 
-        $idsEnquetes = array_keys(
-            $this->_enquetePorStatusSuperCF->get($cursoUUID->bytes, null, $de, $ate, true, $count, $status)
-        );
+        if ($status == WeLearn_Cursos_Enquetes_StatusEnquete::ATIVA) {
+            $idsEnquetes = $this->_enquetePorStatusAtivoCF->get($cursoUUID->bytes, null, $de, $ate, true, $count);
+        } else {
+            $idsEnquetes = $this->_enquetePorStatusInativoCF->get($cursoUUID->bytes, null, $de, $ate, true, $count);
+        }
+
+        $idsEnquetes = array_keys($idsEnquetes);
 
         $columns = $this->_cf->multiget($idsEnquetes);
 
@@ -131,9 +145,13 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
 
         $cursoUUID = CassandraUtil::import($curso->getId());
 
-        $idsEnquetes = array_keys(
-            $this->_enquetePorSituacaoSuperCF->get($cursoUUID->bytes, null, $de, $ate, true, $count, $situacao)
-        );
+        if ($situacao == WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA) {
+            $idsEnquetes = $this->_enquetePorSituacaoAbertoCF->get($cursoUUID->bytes, null, $de, $ate, $count);
+        } else {
+            $idsEnquetes = $this->_enquetePorSituacaoFechadoCF->get($cursoUUID->bytes, null, $de, $ate, $count);
+        }
+
+        $idsEnquetes = array_keys($idsEnquetes);
 
         $columns = $this->_cf->multiget($idsEnquetes);
 
@@ -169,14 +187,22 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
     {
         $cursoUUID = CassandraUtil::import($curso->getId());
 
-        return $this->_enquetePorStatusSuperCF->get_count($cursoUUID->bytes, null, '', '', $status);
+        if ($status == WeLearn_Cursos_Enquetes_StatusEnquete::ATIVA) {
+            return $this->_enquetePorStatusAtivoCF->get_count($cursoUUID->bytes);
+        } else {
+            return $this->_enquetePorStatusInativoCF->get_count($cursoUUID->bytes);
+        }
     }
 
     public function recuperarQtdTotalPorSituacao(WeLearn_Cursos_Curso $curso, $situacao)
     {
         $cursoUUID = CassandraUtil::import($curso->getId());
 
-        return $this->_enquetePorSituacaoSuperCF->get_count($cursoUUID->bytes, null, '', '', $situacao);
+        if ($situacao == WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA) {
+            return $this->_enquetePorSituacaoAbertoCF->get_count($cursoUUID->bytes);
+        } else {
+            return $this->_enquetePorSituacaoFechadoCF->get_count($cursoUUID->bytes);
+        }
     }
 
     /**
@@ -196,8 +222,18 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
         $this->_cf->remove($id->bytes);
 
         $this->_enquetePorCursoCF->remove($cursoUUID->bytes, array($id->bytes));
-        $this->_enquetePorStatusSuperCF->remove($cursoUUID->bytes, array($id->bytes), $enquete->getStatus());
-        $this->_enquetePorSituacaoSuperCF->remove($cursoUUID->bytes, array($id->bytes), $enquete->getStuacao());
+
+        if ($enquete->getStatus() == WeLearn_Cursos_Enquetes_StatusEnquete::ATIVA) {
+            $this->_enquetePorStatusAtivoCF->remove($cursoUUID->bytes, array($id->bytes));
+        } else {
+            $this->_enquetePorStatusInativoCF->remove($cursoUUID->bytes, array($id->bytes));
+        }
+
+        if ($enquete->getSituacao() == WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA) {
+            $this->_enquetePorSituacaoAbertoCF->remove($cursoUUID->bytes, array($id->bytes));
+        } else {
+            $this->_enquetePorSituacaoFechadoCF->remove($cursoUUID->bytes, array($id->bytes));
+        }
 
         $enquete->setPersistido(false);
 
@@ -228,8 +264,18 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
         $this->_cf->insert($UUID->bytes, $dto->toCassandra());
 
         $this->_enquetePorCursoCF->insert($cursoUUID->bytes, array($UUID->bytes => ''));
-        $this->_enquetePorStatusSuperCF->insert($cursoUUID->bytes, array($dto->getStatus() => array($UUID->bytes => '')));
-        $this->_enquetePorSituacaoSuperCF->insert($cursoUUID->bytes, array($dto->getSituacao() => array($UUID->bytes => '')));
+
+        if ( $dto->getStatus() == WeLearn_Cursos_Enquetes_StatusEnquete::ATIVA ) {
+            $this->_enquetePorStatusAtivoCF->insert($cursoUUID->bytes, array($UUID->bytes => ''));
+        } else {
+            $this->_enquetePorStatusInativoCF->insert($cursoUUID->bytes, array($UUID->bytes => ''));
+        }
+
+        if ( $dto->getSituacao() == WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA ) {
+            $this->_enquetePorSituacaoAbertoCF->insert($cursoUUID->bytes, array($UUID->bytes => ''));
+        } else {
+            $this->_enquetePorSituacaoFechadoCF->insert($cursoUUID->bytes, array($UUID->bytes => ''));
+        }
 
         $dto->setPersistido(true);
     }
@@ -250,25 +296,36 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
         $this->_cf->insert($UUID->bytes, $dto->toCassandra());
 
         if ($statusAntigo != $dto->getStatus()) {
-            $this->_enquetePorStatusSuperCF->remove($cursoUUID->bytes, array($UUID->bytes), $statusAntigo);
-
-            $this->_enquetePorStatusSuperCF->insert($cursoUUID->bytes, array($dto->getStatus() => array($UUID->bytes => '')));
+            if ( $dto->getStatus() == WeLearn_Cursos_Enquetes_StatusEnquete::ATIVA ) {
+                $this->_enquetePorStatusInativoCF->remove($cursoUUID->bytes, array($UUID->bytes));
+                $this->_enquetePorStatusAtivoCF->insert($cursoUUID->bytes, array($UUID->bytes => ''));
+            } else {
+                $this->_enquetePorStatusAtivoCF->remove($cursoUUID->bytes, array($UUID->bytes));
+                $this->_enquetePorStatusInativoCF->insert($cursoUUID->bytes, array($UUID->bytes => ''));
+            }
         }
 
         if ($situacaoAntiga != $dto->getSituacao()) {
-            $this->_enquetePorSituacaoSuperCF->remove($cursoUUID->bytes, array($UUID->bytes), $situacaoAntiga);
-
-            $this->_enquetePorSituacaoSuperCF->insert($cursoUUID->bytes, array($dto->getSituacao() => array($UUID->bytes => '')));
+            if ( $dto->getSituacao() == WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA ) {
+                $this->_enquetePorSituacaoFechadoCF->remove($cursoUUID->bytes, array($UUID->bytes));
+                $this->_enquetePorSituacaoAbertoCF->insert($cursoUUID->bytes, array($UUID->bytes => ''));
+            } else {
+                $this->_enquetePorSituacaoAbertoCF->remove($cursoUUID->bytes, array($UUID->bytes));
+                $this->_enquetePorSituacaoFechadoCF->insert($cursoUUID->bytes, array($UUID->bytes => ''));
+            }
         }
     }
 
     /**
      * @param array $dadosAlterantiva
-     * @return void
+     * @return WeLearn_Cursos_Enquetes_AlternativaEnquete
      */
-    public function criarAlternativas(array $dadosAlterantiva)
+    public function criarAlternativa(array $dadosAlterantiva)
     {
-         // TODO: Implementar este metodo.
+        $novaAlternativa = new WeLearn_Cursos_Enquetes_AlternativaEnquete();
+        $novaAlternativa->preencherPropriedades($dadosAlterantiva);
+
+        return $novaAlternativa;
     }
 
     /**
@@ -296,6 +353,13 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
     public function zerarVotos(WeLearn_Cursos_Enquetes_Enquete $enquete)
     {
         // TODO: Implementar este metodo.
+    }
+
+    public function salvarAlternativas (array $alternativas)
+    {
+        foreach ( $alternativas as $alternativa ) {
+            $this->_alternativaEnqueteDao->salvar( $alternativa );
+        }
     }
 
     private function _criarFromCassandra(array $column, WeLearn_Cursos_Curso $cursoPadrao = null)
