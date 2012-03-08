@@ -1,4 +1,4 @@
-$(document).ready(function(){
+(function () {
     var gerarHTMLAlternativa = function(n) {
             return "<li>" +
                    "<input type='text' name='alternativas[]' id='txt-alternativa-enquete-" + n +
@@ -71,10 +71,7 @@ $(document).ready(function(){
         var url = WeLearn.url.siteURL('enquete/enquete/salvar');
 
         WeLearn.validarForm(formEnquete, url, function(res) {
-            log(res);
-        },
-        function(res) {
-            log(res);
+            window.location = WeLearn.url.siteURL('curso/enquete/exibir/' + res.idEnquete);
         });
     });
-});
+})();

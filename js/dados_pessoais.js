@@ -5,7 +5,7 @@
  * Time: 15:50
  * To change this template use File | Settings | File Templates.
  */
-$(document).ready(function(){
+(function(){
     var $sltPais = $('#slt-pais'),
         $btnAddIM = $('#btn-add-im'),
         $btnRemoveIM = $('#btn-remove-im'),
@@ -107,4 +107,4 @@ $(document).ready(function(){
             $tblListaRStr.last().remove();
         }
     });
-});
+})();

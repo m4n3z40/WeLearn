@@ -4,8 +4,7 @@
  * Date: 06/09/11
  * Time: 14:18
  */
-
-$(document).ready(function(){
+(function(){
     var $sltArea = $('#slt-area');
 
     $sltArea.change(function(e){
@@ -41,4 +40,4 @@ $(document).ready(function(){
             }
         );
     });
-});
+})();

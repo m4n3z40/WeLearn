@@ -32,7 +32,7 @@
         </footer>
     <?php else: ?>
         <h4>
-            Nenhuma categoria de fórum foi criada para este curso até o momento.
+            Nenhuma categoria de fórum foi criada para este curso até o momento. <?php echo anchor('/curso/forum/categoria/criar/' . $idCurso, 'Seja o primeiro') ?>
         </h4>
     <?php endif ?>
     </div>

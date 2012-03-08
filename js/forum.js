@@ -5,8 +5,7 @@
  * Time: 13:40
  * To change this template use File | Settings | File Templates.
  */
-
-$(document).ready(function(e){
+(function(){
     var navPaginacaoForum = document.getElementById('paginacao-forum-lista');
     if (navPaginacaoForum != null) {
         var $aProxPaginaForum = $(navPaginacaoForum).find('a');
@@ -201,4 +200,4 @@ $(document).ready(function(e){
             }
         });
     }
-});
+})();

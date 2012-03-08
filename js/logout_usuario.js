@@ -6,7 +6,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-$(document).ready(function(){
+(function(){
     var $btnLogout = $('.logoutButton');
 
     $btnLogout.click(function(e){
@@ -22,4 +22,4 @@ $(document).ready(function(){
             'json'
         );
     });
-});
+})();

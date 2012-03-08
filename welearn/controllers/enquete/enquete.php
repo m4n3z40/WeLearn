@@ -12,10 +12,46 @@ class Enquete extends WL_Controller {
 
     public function index ($idCurso)
     {
-
+        $this->listar($idCurso);
     }
 
     public function listar ($idCurso)
+    {
+        try {
+            $count = 20;
+
+            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+            $curso = $cursoDao->recuperar($idCurso);
+
+            $enqueteDao = WeLearn_DAO_DAOFactory::create('EnqueteDAO');
+
+            try {
+                $listaEnquetes = $enqueteDao->recuperarTodosPorSituacao($curso, WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA, '', '', $count + 1);
+            } catch (cassandra_NotFoundException $e) {
+                $listaEnquetes = array();
+            }
+
+            $this->load->helper('paginacao_cassandra');
+            $dadosPaginacao = create_paginacao_cassandra($listaEnquetes, $count);
+
+            $dadosPartialLista = array( 'listaEnquetes' => $listaEnquetes );
+            $partialLista = $this->template->loadPartial('lista', $dadosPartialLista, 'curso/enquete/enquete');
+
+            $dadosView = array(
+                'idCurso' => $curso->getId(),
+                'haEnquetes' => !empty($listaEnquetes),
+                'listaEnquetes' => $partialLista,
+                'haMaisPaginas' => $dadosPaginacao['proxima_pagina'],
+                'inicioProxPagina' => $dadosPaginacao['inicio_proxima_pagina'],
+            );
+
+            $this->_renderTemplateCurso($curso, 'curso/enquete/enquete/listar', $dadosView);
+        } catch (Exception $e) {
+            echo create_exception_description($e);
+        }
+    }
+
+    public function exibir ($idEnquete)
     {
 
     }
@@ -34,7 +70,10 @@ class Enquete extends WL_Controller {
 
             $this->_renderTemplateCurso($curso, 'curso/enquete/enquete/criar', $dadosViewCriar);
         } catch (Exception $e) {
-            echo create_exception_description($e);
+            log_message('error', 'Erro ao tentar exibir formulário de criação de enquetes:'
+                . create_exception_description($e));
+
+            show_404();
         }
     }
 

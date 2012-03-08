@@ -5,8 +5,7 @@
  * Time: 02:15
  * To change this template use File | Settings | File Templates.
  */
-
-$(document).ready(function(){
+(function(){
     var btnFormCategoriaForum = document.getElementById('btn-form-categoria-forum');
     if (btnFormCategoriaForum != null) {
         $(btnFormCategoriaForum).click(function(e){
@@ -106,4 +105,4 @@ $(document).ready(function(){
             );
         });
     }
-});
+})();

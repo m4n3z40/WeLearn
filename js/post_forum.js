@@ -6,7 +6,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-$(document).ready(function(e){
+(function(){
     var formCriarContainer = document.getElementById('form-criar-post-container');
     if (formCriarContainer != null) {
         $('.a-forum-post-criar').click(function(e){
@@ -167,4 +167,4 @@ $(document).ready(function(e){
             'json'
         )
     });
-});
+})();
