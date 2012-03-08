@@ -5,7 +5,7 @@
  * Time: 15:39
  * To change this template use File | Settings | File Templates.
  */
-$(document).ready(function(){
+(function(){
     var $btnLogin = $('button[name=submitLogin]');
     $btnLogin.click(function(e){
         e.preventDefault();
@@ -20,4 +20,4 @@ $(document).ready(function(){
             }
         );
     });
-});
+})();

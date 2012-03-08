@@ -5,7 +5,7 @@
  * Time: 14:38
  */
 
-$(document).ready(function(){
+(function(){
     var $barraProgresso = $('#progressbar'),
         $etapasContainer = $('#quickstart-form-container');
 
@@ -137,4 +137,4 @@ $(document).ready(function(){
     }
 
     init();
-});
+})();

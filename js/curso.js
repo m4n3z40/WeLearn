@@ -4,8 +4,7 @@
  * Date: 08/09/11
  * Time: 13:13
  */
-
-$(document).ready(function(){
+(function(){
     $('#slt-area').change(function(e){
         var vazio = '<option value="0">Selecione uma área de segmento</option>';
 
@@ -160,4 +159,4 @@ $(document).ready(function(){
             });
         });
     }
-});
+})();

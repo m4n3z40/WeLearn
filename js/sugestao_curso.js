@@ -6,7 +6,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-$(document).ready(function(){
+(function(){
     var btnSugerir = document.getElementById('btn-sugerir');
     if(btnSugerir != null) {
         var $btnSugerir = $('#btn-sugerir');
@@ -168,4 +168,4 @@ $(document).ready(function(){
             $.get(url, {}, processar);
         });
     }
-});
+})();

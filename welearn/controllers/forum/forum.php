@@ -36,7 +36,7 @@ class Forum extends WL_Controller {
                         );
                     break;
                     case 'inativos':
-                        $listaForuns = $listaForuns = $forumDao->recuperarTodosPorCategoriaEStatus(
+                        $listaForuns = $forumDao->recuperarTodosPorCategoriaEStatus(
                             $categoria,
                             WeLearn_Cursos_Foruns_StatusForum::INATIVO,
                             '',

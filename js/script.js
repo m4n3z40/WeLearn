@@ -226,6 +226,4 @@ window.WeLearn = {
     }
 };
 
-$(document).ready(function(){
-   WeLearn.init();
-});
+WeLearn.init();

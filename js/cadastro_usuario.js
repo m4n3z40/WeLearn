@@ -5,7 +5,7 @@
  * Time: 14:18
  * To change this template use File | Settings | File Templates.
  */
-$(document).ready(function(){
+(function(){
     var $btnCadastrar = $('button[name=cadastrar]'),
         $sltArea = $('#slt-area');
 
@@ -71,4 +71,4 @@ $(document).ready(function(){
             }
         );
     });
-});
+})();

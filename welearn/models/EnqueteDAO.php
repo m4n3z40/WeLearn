@@ -146,9 +146,9 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
         $cursoUUID = CassandraUtil::import($curso->getId());
 
         if ($situacao == WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA) {
-            $idsEnquetes = $this->_enquetePorSituacaoAbertoCF->get($cursoUUID->bytes, null, $de, $ate, $count);
+            $idsEnquetes = $this->_enquetePorSituacaoAbertoCF->get($cursoUUID->bytes, null, $de, $ate, true, $count);
         } else {
-            $idsEnquetes = $this->_enquetePorSituacaoFechadoCF->get($cursoUUID->bytes, null, $de, $ate, $count);
+            $idsEnquetes = $this->_enquetePorSituacaoFechadoCF->get($cursoUUID->bytes, null, $de, $ate, true, $count);
         }
 
         $idsEnquetes = array_keys($idsEnquetes);
