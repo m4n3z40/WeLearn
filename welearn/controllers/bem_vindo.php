@@ -12,30 +12,9 @@ class Bem_vindo extends CI_Controller {
         
         if ( $this->autenticacao->isAutenticado() ) {
             redirect('/home');
+        } else {
+            redirect('/usuario/cadastrar');
         }
-        $this->template->setTemplate('default')
-                       ->appendJSImport('cadastro_usuario.js');
-    }
-
-    public function index()
-    {
-        $this->load->helper('area');
-        $listaAreas = lista_areas_para_dados_dropdown();
-        
-        $dadosPartial = array(
-            'listaAreas' => $listaAreas
-        );
-        
-        $partial_cadastro = array(
-            'form_cadastro' => $this->template
-                                    ->loadPartial(
-                                            'form_cadastro',
-                                            $dadosPartial,
-                                            'usuario'
-                                    )
-        );
-        
-        $this->template->render('usuario/cadastrar', $partial_cadastro);
     }
 }
 

@@ -9,11 +9,14 @@ class Home extends WL_Controller {
     function __construct()
     {
         parent::__construct();
+
+        $this->template->setTemplate('home')
+                       ->appendJSImport('home.js');
     }
 
     public function index()
     {
-        
+        $this->template->render('usuario/home/index');
     }
 }
 

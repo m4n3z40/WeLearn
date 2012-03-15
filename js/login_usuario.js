@@ -14,7 +14,7 @@
 
         WeLearn.validarForm(
             form,
-            WeLearn.url.siteURL('usuario/login'),
+            WeLearn.url.siteURL('usuario/usuario/login'),
             function(result) {
                 window.location = WeLearn.url.siteURL('home');
             }

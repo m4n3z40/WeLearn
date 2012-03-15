@@ -13,7 +13,7 @@
         e.preventDefault();
 
         $.post(
-            WeLearn.url.siteURL('usuario/logout'),
+            WeLearn.url.siteURL('usuario/usuario/logout'),
             function(result) {
                 if (result.success) {
                    location.reload();

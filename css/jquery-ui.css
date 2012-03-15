@@ -316,6 +316,11 @@
  * http://docs.jquery.com/UI/Selectable#theming
  */
 .ui-selectable-helper { position: absolute; z-index: 100; border:1px dotted black; }
+ul.ui-selectable { padding-left: 0; }
+li.ui-selectee { list-style: none; cursor: pointer; border-radius: 5px; border: 1px solid #d4ccb0; background: #fafaf4 url(images/ui-bg_highlight-hard_100_fafaf4_1x100.png) 50% 50% repeat-x; }
+li.ui-selecting { border: 1px solid #327e04; background: #459e00 url(images/ui-bg_highlight-hard_15_459e00_1x100.png) 50% 50% repeat-x; }
+li.ui-selected { border: 1px solid #327e04; background: #67b021 url(images/ui-bg_highlight-soft_25_67b021_1x100.png) 50% 50% repeat-x; }
+li.ui-unselecting {}
 /*
  * jQuery UI Accordion 1.8.16
  *

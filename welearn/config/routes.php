@@ -58,5 +58,8 @@ $route['curso/enquete/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{
 $route['curso/enquete/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'enquete/enquete/$1/$2';
 $route['curso/enquete/([a-z_]+)'] = 'enquete/enquete/$1';
 
+$route['usuario/perfil'] = 'usuario/perfil/index';
+$route['usuario/perfil/([a-z_]+)'] = 'usuario/perfil/$1';
+$route['usuario/([a-z_]+)'] = 'usuario/usuario/$1';
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */
