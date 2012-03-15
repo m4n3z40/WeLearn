@@ -65,7 +65,7 @@
 
         WeLearn.validarForm(
             form,
-            WeLearn.url.siteURL('usuario/validar_cadastro'),
+            WeLearn.url.siteURL('usuario/usuario/validar_cadastro'),
             function(result) {
                 window.location = WeLearn.url.siteURL('quickstart');
             }

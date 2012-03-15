@@ -7,6 +7,15 @@
             <br>
             Fique à vontade para navegar pelos filtros.
         </p>
+        <nav id="nav-filtros-lista-enquetes">
+            <ul>
+                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=todas', 'Todas as enquetes') ?></li>
+                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=ativas', 'Somente enquetes ativas') ?></li>
+                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=inativas', 'Somente enquetes inativas') ?></li>
+                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=abertas', 'Somente enquetes abertas') ?></li>
+                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=fechadas', 'Somente enquetes fechadas') ?></li>
+            </ul>
+        </nav>
     </header>
     <div>
     <?php if ($haEnquetes): ?>

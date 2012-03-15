@@ -10,7 +10,7 @@ function datetime_ptbr_to_en($datetime, $unix = false)
         list($date, $time) = $datetimeArray;
     } elseif ( $parts == 1 ) {
         $date = $datetimeArray[0];
-        $time = false;
+        $time = '23:59:59';
     } else {
         return $datetime;
     }
@@ -21,11 +21,7 @@ function datetime_ptbr_to_en($datetime, $unix = false)
 
     $date = implode( '/', array($m, $d, $y) );
 
-    if ($date && $time) {
-        $datetime = $date . ' ' . $time;
-    } elseif ($date && !$time) {
-        $datetime = $date;
-    }
+    $datetime = $date . ' ' . $time;
 
     if ($unix) {
         return strtotime( $datetime );

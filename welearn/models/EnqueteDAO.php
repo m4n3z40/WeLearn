@@ -332,9 +332,10 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
      * @param WeLearn_Cursos_Enquetes_Enquete $enquete
      * @return void
      */
-    public function recuperarAlternativas(WeLearn_Cursos_Enquetes_Enquete $enquete)
+    public function recuperarAlternativas(WeLearn_Cursos_Enquetes_Enquete &$enquete)
     {
-         // TODO: Implementar este metodo.
+        $alternativas = $this->_alternativaEnqueteDao->recuperarTodosPorEnquete($enquete);
+        $enquete->setAlternativas($alternativas);
     }
 
     /**

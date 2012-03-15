@@ -244,7 +244,7 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
 
     public function recuperarAlternativas()
     {
-        //@TODO: Implementar este método!!
+        WeLearn_DAO_DAOFactory::create('EnqueteDAO')->recuperarAlternativas($this);
     }
 
     public function adicionarAlternativa(WeLearn_Cursos_Enquetes_AlternativaEnquete $alternativa)

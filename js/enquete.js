@@ -74,4 +74,52 @@
             window.location = WeLearn.url.siteURL('curso/enquete/exibir/' + res.idEnquete);
         });
     });
+
+    var $listaEnqueteDataTable = $('#enquete-listar-datatable');
+
+    $('#paginacao-enquete').children('a').click(function(e){
+        e.preventDefault();
+
+        var $this = $(this),
+            proximo = $this.data('proximo'),
+            idCurso = $this.data('id-curso'),
+            url = WeLearn.url.siteURL('enquete/enquete/proxima_pagina/' + idCurso + '/' + proximo);
+
+        $.get(
+            url,
+            (WeLearn.url.queryString != '') ? WeLearn.url.queryString : null,
+            function(res) {
+                if (res.success) {
+                    $listaEnqueteDataTable.append(res.htmlListaEnquetes);
+
+                    if (res.paginacao.proxima_pagina) {
+                        $this.data('proximo', res.paginacao.inicio_proxima_pagina);
+                    } else {
+                        $this.parent().html('<h4>Não há mais enquetes a serem exibidas.</h4>')
+                    }
+                } else {
+                    WeLearn.notificar({
+                        msg: res.errors[0].error_msg,
+                        nivel: 'erro',
+                        tempo: 15000
+                    });
+                }
+            },
+            'json'
+        )
+    });
+
+    var $ulListaAlternativas = $('#ul-enquete-alternativas');
+    $ulListaAlternativas.find('input[type=radio]').hide();
+    $ulListaAlternativas.selectable({
+        tolerance: 'fit',
+        start: function(e, ui) {
+            var $selected = $(this).children('li.ui-selected');
+            $selected.find('input[type=radio]').removeAttr('checked');
+            $selected.removeClass('ui-selected');
+        },
+        stop: function(e, ui) {
+            $(this).children('li.ui-selected').first().find('input[type=radio]').attr('checked', true);
+        }
+    });
 })();

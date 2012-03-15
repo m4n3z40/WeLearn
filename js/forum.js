@@ -6,9 +6,10 @@
  * To change this template use File | Settings | File Templates.
  */
 (function(){
-    var navPaginacaoForum = document.getElementById('paginacao-forum-lista');
+    var navPaginacaoForum = document.getElementById('paginacao-forum-lista'),
+        $listaForuns = $('#forum-lista-forums');
     if (navPaginacaoForum != null) {
-        var $aProxPaginaForum = $(navPaginacaoForum).find('a');
+        var $aProxPaginaForum = $(navPaginacaoForum).children('a');
 
         $aProxPaginaForum.click(function(e){
             e.preventDefault();
@@ -23,7 +24,7 @@
                 (WeLearn.url.queryString != '') ? WeLearn.url.queryString : null,
                 function (res) {
                     if(res.success) {
-                        $('#forum-lista-forums').append(res.htmlListaForuns);
+                        $listaForuns.append(res.htmlListaForuns);
 
                         if (res.paginacao.proxima_pagina) {
                             $this.data('proximo', res.paginacao.inicio_proxima_pagina);
