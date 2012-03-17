@@ -1,7 +1,7 @@
 <div id="forum-listar-content">
     <header>
         <hgroup>
-            <h1>Lista de Fóruns da Categoria <span><?php echo $categoria->nome; ?></span></h1>
+            <h1>Lista de Fóruns da Categoria <span><?php echo $categoria->nome; echo $tituloLista ?></span></h1>
             <h3>Entre no fórum desejado para visualizar a discussão em andamento.</h3>
         </hgroup>
         <p>
@@ -12,9 +12,12 @@
         </p>
         <nav id="nav-filtros-lista-forums">
             <ul>
-                <li><?php echo anchor('/curso/forum/listar/' . $categoria->id . '?f=todos', 'Todos os fóruns') ?></li>
-                <li><?php echo anchor('/curso/forum/listar/' . $categoria->id . '?f=ativos', 'Somente fóruns ativos') ?></a></li>
-                <li><?php echo anchor('/curso/forum/listar/'. $categoria->id . '?f=inativos', 'Somente fóruns inativos') ?></a></li>
+                <li><?php echo anchor('/curso/forum/listar/' . $categoria->id . '?f=todos', 'Todos os fóruns') ?> -
+                    <span>(<?php echo $qtdTodos ?>)</span></li>
+                <li><?php echo anchor('/curso/forum/listar/' . $categoria->id . '?f=ativos', 'Somente fóruns ativos') ?> -
+                    <span>(<?php echo $qtdAtivos ?>)</span></a></li>
+                <li><?php echo anchor('/curso/forum/listar/'. $categoria->id . '?f=inativos', 'Somente fóruns inativos') ?> -
+                    <span>(<?php echo $qtdInativos ?>)</span></a></li>
             </ul>
         </nav>
     </header>

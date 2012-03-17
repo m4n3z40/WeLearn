@@ -13,6 +13,21 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     protected $_nomeCF = 'usuarios_usuario';
 
     /**
+     * @var ImagemUsuarioDAO
+     */
+    protected $_imagemDao;
+
+    /**
+     * @var DadosPessoaisUsuarioDAO
+     */
+    protected $_dadosPessoaisDao;
+
+    /**
+     * @var DadosProfissionaisUsuarioDAO
+     */
+    protected $_dadosProfissionaisDao;
+
+    /**
      * @var ConfiguracaoUsuarioDAO
      */
     protected $_configuracaoDao;
@@ -22,6 +37,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     protected $_segmentoDao;
 
+
     /**
      * @var ColumnFamily
      */
@@ -30,6 +46,9 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     public function __construct()
     {
         $this->_emailUsuarioCF = WL_Phpcassa::getInstance()->getColumnFamily('usuarios_email_usuario');
+        $this->_imagemDao = WeLearn_DAO_DAOFactory::create('ImagemUsuarioDAO');
+        $this->_dadosPessoaisDao = WeLearn_DAO_DAOFactory::create('DadosPessoaisUsuarioDAO');
+        $this->_dadosProfissionaisDao = WeLearn_DAO_DAOFactory::create('DadosProfissionaisUsuarioDAO');
         $this->_configuracaoDao = WeLearn_DAO_DAOFactory::create('ConfiguracaoUsuarioDAO');
         $this->_segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
     }
@@ -54,7 +73,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
 
         //Salva a configuração padrão do usuário recem cadastrado.
         if ($dto->getConfiguracao()) {
-            $this->_configuracaoDao->salvar($dto->getConfiguracao());
+            $this->salvarConfiguracao( $dto->getConfiguracao() );
         }
 
         $dto->setPersistido(true);
@@ -71,6 +90,38 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         }
 
         $this->_cf->insert($dto->getId(), $dto->toCassandra());
+    }
+
+    /**
+     * @param WeLearn_Usuarios_ImagemUsuario $imagem
+     */
+    public function salvarImagem(WeLearn_Usuarios_ImagemUsuario &$imagem)
+    {
+        $this->_imagemDao->salvar($imagem);
+    }
+
+    /**
+     * @param WeLearn_Usuarios_DadosPessoaisUsuario $dadosPessoais
+     */
+    public function salvarDadosPessoais(WeLearn_Usuarios_DadosPessoaisUsuario &$dadosPessoais)
+    {
+        $this->_dadosPessoaisDao->salvar($dadosPessoais);
+    }
+
+    /**
+     * @param WeLearn_Usuarios_DadosProfissionaisUsuario $dadosProfissionais
+     */
+    public function salvarDadosProfissionais(WeLearn_Usuarios_DadosProfissionaisUsuario &$dadosProfissionais)
+    {
+        $this->_dadosProfissionaisDao->salvar($dadosProfissionais);
+    }
+
+    /**
+     * @param WeLearn_Usuarios_ConfiguracaoUsuario $configuracao
+     */
+    public function salvarConfiguracao(WeLearn_Usuarios_ConfiguracaoUsuario &$configuracao)
+    {
+        $this->_configuracaoDao->salvar($configuracao);
     }
 
     /**
@@ -92,13 +143,46 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     {
         $dados_usuario = $this->_cf->get($id);
         $dados_usuario['segmentoInteresse'] = $this->_segmentoDao->recuperar($dados_usuario['segmentoInteresse']);
-        $dados_usuario['configuracao'] = $this->_configuracaoDao->recuperar($dados_usuario['id']);
 
-        $usuario = new WeLearn_Usuarios_Usuario();
+        $usuario = $this->criarNovo();
         $usuario->fromCassandra($dados_usuario);
+
+        $this->recuperarConfiguracao($usuario);
 
         $usuario->setPersistido(true);
         return $usuario;
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     */
+    public function recuperarImagem(WeLearn_Usuarios_Usuario &$usuario)
+    {
+        $usuario->setImagem( $this->_imagemDao->recuperar( $usuario->getId() ) );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     */
+    public function recuperarDadosPessoais(WeLearn_Usuarios_Usuario &$usuario)
+    {
+        $usuario->setDadosPessoais( $this->_dadosPessoaisDao->recuperar( $usuario->getId() ) );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     */
+    public function recuperarDadosProfissionais(WeLearn_Usuarios_Usuario &$usuario)
+    {
+        $usuario->setDadosProfissionais( $this->_dadosProfissionaisDao->recuperar( $usuario->getId() ) );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     */
+    public function recuperarConfiguracao(WeLearn_Usuarios_Usuario &$usuario)
+    {
+        $usuario->setConfiguracao( $this->_configuracaoDao->recuperar( $usuario->getId() ) );
     }
 
     /**
@@ -120,6 +204,10 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         $usuarioRemovido = $this->recuperar($id);
 
         $this->_cf->remove($id);
+        $usuarioRemovido->setImagem( $this->_imagemDao->remover( $id ) );
+        $usuarioRemovido->setDadosPessoais( $this->_dadosPessoaisDao->remover( $id ) );
+        $usuarioRemovido->setDadosProfissionais( $this->_dadosProfissionaisDao->remover( $id ) );
+        $usuarioRemovido->setConfiguracao( $this->_configuracaoDao->remover( $id ) );
 
         $usuarioRemovido->setPersistido(false);
 
@@ -135,6 +223,10 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         return new WeLearn_Usuarios_Usuario($dados);
     }
 
+    /**
+     * @param $dados
+     * @return WeLearn_Usuarios_GerenciadorPrincipal
+     */
     public function criarGerenciadorPrincipal($dados)
     {
         if ($dados instanceof WeLearn_Usuarios_Usuario) {
@@ -145,6 +237,10 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         return new WeLearn_Usuarios_GerenciadorPrincipal($dados);
     }
 
+    /**
+     * @param $dados
+     * @return WeLearn_Usuarios_GerenciadorAuxiliar
+     */
     public function criarGerenciadorAuxiliar($dados)
     {
         if ($dados instanceof WeLearn_Usuarios_Usuario) {
@@ -155,6 +251,10 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         return new WeLearn_Usuarios_GerenciadorAuxiliar($dados);
     }
 
+    /**
+     * @param $dados
+     * @return WeLearn_Usuarios_Moderador
+     */
     public function criarModerador($dados)
     {
         if ($dados instanceof WeLearn_Usuarios_Usuario) {
@@ -165,6 +265,10 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         return new WeLearn_Usuarios_Moderador($dados);
     }
 
+    /**
+     * @param $dados
+     * @return WeLearn_Usuarios_Instrutor
+     */
     public function criarInstrutor($dados)
     {
         if ($dados instanceof WeLearn_Usuarios_Usuario) {
@@ -175,6 +279,10 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         return new WeLearn_Usuarios_Instrutor($dados);
     }
 
+    /**
+     * @param $dados
+     * @return WeLearn_Usuarios_Aluno
+     */
     public function criarAluno($dados)
     {
         if ($dados instanceof WeLearn_Usuarios_Usuario) {
@@ -185,6 +293,10 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         return new WeLearn_Usuarios_Aluno($dados);
     }
 
+    /**
+     * @param string $usuario
+     * @return bool
+     */
     public function usuarioCadastrado($usuario)
     {
         try {
@@ -195,6 +307,10 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         }
     }
 
+    /**
+     * @param string $email
+     * @return bool
+     */
     public function emailCadastrado($email)
     {
         try {
@@ -205,6 +321,12 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         }
     }
 
+    /**
+     * @param string $usuario
+     * @param string $senha
+     * @return WeLearn_DTO_IDTO
+     * @throws WeLearn_Usuarios_AutenticacaoLoginInvalidoException|WeLearn_Usuarios_AutenticacaoSenhaInvalidaException
+     */
     public function autenticar($usuario, $senha)
     {
         $usuario = (string)$usuario;
@@ -240,6 +362,42 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         return $this->_configuracaoDao;
     }
 
+    /**
+     * @return \DadosPessoaisUsuarioDAO
+     */
+    public function getDadosPessoaisDao()
+    {
+        return $this->_dadosPessoaisDao;
+    }
+
+    /**
+     * @return \DadosProfissionaisUsuarioDAO
+     */
+    public function getDadosProfissionaisDao()
+    {
+        return $this->_dadosProfissionaisDao;
+    }
+
+    /**
+     * @return \ImagemUsuarioDAO
+     */
+    public function getImagemDao()
+    {
+        return $this->_imagemDao;
+    }
+
+    /**
+     * @return \SegmentoDAO
+     */
+    public function getSegmentoDao()
+    {
+        return $this->_segmentoDao;
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     * @return array
+     */
     private function _extrairDadosUsuarioParaArray(WeLearn_Usuarios_Usuario $usuario)
     {
         $usuarioArray =  array(

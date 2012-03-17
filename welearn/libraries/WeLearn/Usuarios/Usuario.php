@@ -359,4 +359,52 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO implements Serial
 
         $this->__construct($arrayUsuario);
     }
+
+    /**
+     *
+     */
+    public function salvarImagem()
+    {
+        if ( ! $this->getImagem()->getUsuarioId() ) {
+            $this->getImagem()->setUsuarioId( $this->getId() );
+        }
+
+        WeLearn_DAO_DAOFactory::create('UsuarioDAO')->salvarImagem( $this->getImagem() );
+    }
+
+    /**
+     *
+     */
+    public function salvarDadosPessoais()
+    {
+        if ( ! $this->getDadosPessoais()->getUsuarioId() ) {
+            $this->getDadosPessoais()->setUsuarioId( $this->getId() );
+        }
+
+        WeLearn_DAO_DAOFactory::create('UsuarioDAO')->salvarDadosPessoais( $this->getDadosPessoais() );
+    }
+
+    /**
+     *
+     */
+    public function salvarDadosProfissionais()
+    {
+        if ( ! $this->getDadosProfissionais()->getUsuarioId() ) {
+            $this->getDadosProfissionais()->setUsuarioId( $this->getId() );
+        }
+
+        WeLearn_DAO_DAOFactory::create('UsuarioDAO')->salvarDadosProfissionais( $this->getDadosProfissionais() );
+    }
+
+    /**
+     *
+     */
+    public function salvarConfiguracao()
+    {
+        if ( ! $this->getConfiguracao()->getUsuarioId() ) {
+            $this->getConfiguracao()->setUsuarioId( $this->getId() );
+        }
+
+        WeLearn_DAO_DAOFactory::create('UsuarioDAO')->salvarConfiguracao( $this->getConfiguracao() );
+    }
 }

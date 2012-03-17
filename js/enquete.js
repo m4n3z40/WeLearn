@@ -63,7 +63,8 @@
         showAnim: 'fadeIn'
     });
 
-    var formEnquete = document.getElementById('form-criar-enquete');
+    var formEnquete = document.getElementById('form-criar-enquete') ||
+                      document.getElementById('form-alterar-enquete');
 
     $('#btn-form-enquete').click(function(e){
         e.preventDefault();
@@ -107,6 +108,165 @@
             },
             'json'
         )
+    });
+
+    var visualizandoListaEnquetes = (document.getElementById('enquete-listar-content') != null),
+        $divConfirmacaoRemover = $('<div id="dialogo-confirmacao-remover-enquete">' +
+                                    '<p>Tem certeza que deseja remover esta enquete?<br/>' +
+                                    'Esta ação <strong>NÃO</strong> poderá ser desfeita!<br/>' +
+                                    '<strong>TODAS</strong> as participações de usuários nesta enquete serão perdidas!</p></div>');
+
+    $('a.a-enquete-remover').live('click', function(e){
+        e.preventDefault();
+
+        var $this = $(this);
+
+        $divConfirmacaoRemover.dialog({
+            title: 'Tem certeza?',
+            width: '450px',
+            resizable: false,
+            modal: true,
+            buttons: {
+                'Confirmar' : function() {
+                    $.get(
+                        $this.attr('href'),
+                        {},
+                        function(res) {
+                            if (res.success) {
+                                if (visualizandoListaEnquetes) {
+                                    $this.parent().parent().parent().parent().parent().fadeOut('slow', function(){
+                                        $( this ).remove();
+                                    });
+                                } else {
+                                    res.notificacao.redirecionarAoFechar = true;
+                                    res.notificacao.redirecionarParaUrl = WeLearn.url.siteURL('/curso/enquete/' + res.idCurso);
+                                    res.notificacao.tempo = 1000;
+                                }
+
+                                WeLearn.notificar(res.notificacao);
+                            } else {
+                                WeLearn.notificar({
+                                    nivel: 'erro',
+                                    msg: res.errors[0].error_msg,
+                                    tempo: 10000
+                                });
+                            }
+                        }
+                    );
+
+                    $( this ).dialog('close');
+                },
+                'Cancelar' : function() {
+                    $( this ).dialog('close');
+                }
+            }
+        });
+    });
+
+    var $divConfirmacaoAlterarStatus = $('<div id="dialogo-confirmacao-alterarstatus-enquete">' +
+                                         '<p>Tem certeza que deseja alterar o status desta enquete?<br/>' +
+                                         'Enquetes <strong>Inativas</strong> não serão visíveis aos alunos.</p></div>');
+
+    $('a.a-enquete-alterarstatus').live('click', function(e){
+        e.preventDefault();
+
+        var $this = $(this);
+
+        $divConfirmacaoAlterarStatus.dialog({
+            title: 'Tem certeza?',
+            width: '450px',
+            resizable: false,
+            modal: true,
+            buttons: {
+                'Confirmar' : function() {
+                    $.get(
+                        $this.attr('href'),
+                        {},
+                        function(res) {
+                            if (res.success) {
+                                WeLearn.notificar(res.notificacao);
+
+                                if (visualizandoListaEnquetes) {
+                                    $this.parent().parent().parent().parent().parent().fadeOut('slow', function(){
+                                        $( this ).remove();
+                                    });
+                                } else {
+                                    if (res.statusAtual == 'ativada') {
+                                        $this.text('Desativar');
+                                    } else {
+                                        $this.text('Ativar');
+                                    }
+                                }
+                            } else {
+                                WeLearn.notificar({
+                                    nivel: 'erro',
+                                    msg: res.errors[0].error_msg,
+                                    tempo: 10000
+                                });
+                            }
+                        }
+                    );
+
+                    $( this ).dialog('close');
+                },
+                'Cancelar' : function() {
+                    $( this ).dialog('close');
+                }
+            }
+        });
+    });
+
+    var $divConfirmacaoAlterarSituacao = $('<div id="dialogo-confirmacao-alterarsituacao-enquete">' +
+                                           '<p>Tem certeza que deseja alterar a situação desta enquete?<br/>' +
+                                           'Ao <strong>Fechar</strong> uma enquete, esta não poderá mais receber participações.</p></div>');
+
+    $('a.a-enquete-alterarsituacao').live('click', function(e){
+        e.preventDefault();
+
+        var $this = $(this);
+
+        $divConfirmacaoAlterarSituacao.dialog({
+            title: 'Tem certeza?',
+            width: '450px',
+            resizable: false,
+            modal: true,
+            buttons: {
+                'Confirmar' : function() {
+                    $.get(
+                        $this.attr('href'),
+                        {},
+                        function(res) {
+                            if (res.success) {
+                                WeLearn.notificar(res.notificacao);
+
+                                if (visualizandoListaEnquetes) {
+                                    $this.parent().parent().parent().parent().parent().fadeOut('slow', function(){
+                                        $( this ).remove();
+                                    });
+                                } else {
+                                    if (res.situacaoAtual == 'reaberta') {
+                                        $this.text('Fechar');
+                                    } else {
+                                        $this.text('Reabrir');
+                                    }
+                                }
+                            } else {
+                                WeLearn.notificar({
+                                    nivel: 'erro',
+                                    msg: res.errors[0].error_msg,
+                                    tempo: 10000
+                                });
+                            }
+                        }
+                    );
+
+                    $( this ).dialog('close');
+                },
+                'Cancelar' : function() {
+                    $( this ).dialog('close');
+                }
+            }
+        });
     });
 
     var $ulListaAlternativas = $('#ul-enquete-alternativas');

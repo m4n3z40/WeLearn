@@ -25,6 +25,8 @@ class Enquete extends WL_Controller {
 
             $filtro = $this->input->get('f');
 
+            $enqueteDao = WeLearn_DAO_DAOFactory::create('EnqueteDAO');
+
             try {
                 $listaEnquetes = $this->_recuperarEnquetes($curso, $filtro);
             } catch (cassandra_NotFoundException $e) {
@@ -38,7 +40,13 @@ class Enquete extends WL_Controller {
             $partialLista = $this->template->loadPartial('lista', $dadosPartialLista, 'curso/enquete/enquete');
 
             $dadosView = array(
+                'tituloLista' => $this->_tituloLista($filtro),
                 'idCurso' => $curso->getId(),
+                'qtdTodas' => $enqueteDao->recuperarQtdTotalPorCurso($curso),
+                'qtdAtivas' => $enqueteDao->recuperarQtdTotalPorStatus($curso, WeLearn_Cursos_Enquetes_StatusEnquete::ATIVA),
+                'qtdInativas' => $enqueteDao->recuperarQtdTotalPorStatus($curso, WeLearn_Cursos_Enquetes_StatusEnquete::INATIVA),
+                'qtdAbertas' => $enqueteDao->recuperarQtdTotalPorSituacao($curso, WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA),
+                'qtdFechadas' => $enqueteDao->recuperarQtdTotalPorSituacao($curso, WeLearn_Cursos_Enquetes_SituacaoEnquete::FECHADA),
                 'haEnquetes' => !empty($listaEnquetes),
                 'listaEnquetes' => $partialLista,
                 'haMaisPaginas' => $dadosPaginacao['proxima_pagina'],
@@ -172,7 +180,9 @@ class Enquete extends WL_Controller {
 
             $this->_renderTemplateCurso($enquete->getCurso(), 'curso/enquete/enquete/alterar', $dadosView);
         } catch (Exception $e) {
-            echo create_exception_description($e);
+            log_message('error', 'Erro ao tentar exibir formulário de alteração: ' . create_exception_description($e));
+
+            show_404();
         }
     }
 
@@ -199,21 +209,36 @@ class Enquete extends WL_Controller {
 
         } else {
             try {
+                $this->load->helper('notificacao_js');
 
                 switch ( $this->input->post('acao') ) {
                     case 'criar':
                         $json = $this->_criarEnquete( $this->input->post() );
+                        $notificacoesFlash = create_notificacao_json(
+                            'sucesso',
+                            'A nova enquete foi criada com sucesso, na verdade você já está nela!<br/>Caso pense em alguma alteração faça-a o mais rápido possível!',
+                            10000
+                        );
                         break;
                     case 'alterar';
+                        $json = $this->_alterarEnquete( $this->input->post() );
+                        $notificacoesFlash = create_notificacao_json(
+                            'sucesso',
+                            'As alterações na enquete foram salvas com sucesso!',
+                            10000
+                        );
                         break;
                     default:
                         throw new WeLearn_Base_Exception('Opção de salvamento inválida!');
                 }
 
+                $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
             } catch ( Exception $e ) {
+                log_message('error', 'Erro ao tentar salvar enquete: ' . create_exception_description($e));
 
-                echo create_exception_description($e);
+                $error = create_json_feedback_error_json('Ocorreu um erro inesperado, já estamos tentando resolver. Tente novamente mais tarde!');
 
+                $json = create_json_feedback(false, $error);
             }
         }
 
@@ -222,7 +247,120 @@ class Enquete extends WL_Controller {
 
     public function remover ($idEnquete)
     {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
 
+        set_json_header();
+
+        try {
+            $enqueteDao = WeLearn_DAO_DAOFactory::create('EnqueteDAO');
+
+            $enqueteRemovida = $enqueteDao->remover($idEnquete);
+
+            $this->load->helper('notificacao_js');
+
+            $notificacao = Zend_Json::encode(array(
+                'idCurso' => $enqueteRemovida->getCurso()->getId(),
+                'notificacao' => create_notificacao_array(
+                    'sucesso',
+                    'A enquete <strong>' . $enqueteRemovida->getQuestao() . '</strong> foi removida com sucesso!',
+                    10000
+                )
+            ));
+
+            $json = create_json_feedback(true, '', $notificacao);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar remover enquete de curso: ' . create_exception_description($e));
+
+            $error = create_json_feedback_error_json('Ocorreu um erro inesperado, já estamos tentando resolver. Tente novamente mais tarde!');
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    public function alterar_status ($idEnquete)
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $enqueteDao = WeLearn_DAO_DAOFactory::create('EnqueteDAO');
+
+            $enquete = $enqueteDao->recuperar($idEnquete);
+            $enquete->alterarStatus();
+
+            $enqueteDao->salvar($enquete);
+
+            $strStatus = ($enquete->getStatus() == WeLearn_Cursos_Enquetes_StatusEnquete::ATIVA) ? 'ativada' : 'desativada';
+
+            $this->load->helper('notificacao_js');
+
+            $notificacao = Zend_Json::encode(array(
+                'statusAtual' => $strStatus,
+                'notificacao' => create_notificacao_array(
+                    'sucesso',
+                    'A enquete <strong>' . $enquete->getQuestao() . '</strong> foi ' . $strStatus . ' com sucesso!',
+                    10000
+                )
+            ));
+
+            $json = create_json_feedback(true, '', $notificacao);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar alterar status da enquete de curso: ' . create_exception_description($e));
+
+            $error = create_json_feedback_error_json('Ocorreu um erro inesperado, já estamos tentando resolver. Tente novamente mais tarde!');
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    public function alterar_situacao ($idEnquete)
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $enqueteDao = WeLearn_DAO_DAOFactory::create('EnqueteDAO');
+
+            $enquete = $enqueteDao->recuperar($idEnquete);
+            $enquete->alterarSituacao();
+
+            $enqueteDao->salvar($enquete);
+
+            $strSituacao = ($enquete->getSituacao() == WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA) ? 'reaberta' : 'fechada';
+
+            $this->load->helper('notificacao_js');
+
+            $notificacao = Zend_Json::encode(array(
+                'situacaoAtual' => $strSituacao,
+                'notificacao' => create_notificacao_array(
+                    'sucesso',
+                    'A enquete <strong>' . $enquete->getQuestao() . '</strong> foi ' . $strSituacao . ' com sucesso!',
+                    10000
+                )
+            ));
+
+            $json = create_json_feedback(true, '', $notificacao);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar alterar situação da enquete de curso: ' . create_exception_description($e));
+
+            $error = create_json_feedback_error_json('Ocorreu um erro inesperado, já estamos tentando resolver. Tente novamente mais tarde!');
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
     }
 
     private function _criarEnquete ($post)
@@ -256,6 +394,40 @@ class Enquete extends WL_Controller {
         $enqueteDao->salvarAlternativas( $novaEnquete->getAlternativas() );
 
         return create_json_feedback(true, '', Zend_Json::encode( array('idEnquete' => $novaEnquete->getId()) ));
+    }
+
+    private function _alterarEnquete ($post)
+    {
+        $enqueteDao = WeLearn_DAO_DAOFactory::create('EnqueteDAO');
+        $enquete = $enqueteDao->recuperar( $post['enqueteId'] );
+
+        $this->load->helper('date');
+        $dataExpiração = datetime_ptbr_to_en($post['dataExpiracao'], true);
+
+        $enquete->setQuestao( $post['questao'] );
+        $enquete->setDataExpiracao( $dataExpiração );
+        $enquete->setQtdAlternativas( count( $post['alternativas'] ) );
+
+        $enqueteDao->salvar( $enquete );
+
+        $enqueteDao->recuperarAlternativas( $enquete );
+
+        $enqueteDao->removerAlternativas( $enquete->getAlternativas() );
+
+        $enquete->zerarAlternativas();
+
+        foreach ($post['alternativas'] as $alternativa ) {
+            $novaAlternativa = $enqueteDao->criarAlternativa(array(
+                'txtAlternativa' => $alternativa,
+                'enqueteId' => $enquete->getId()
+            ));
+
+            $enquete->adicionarAlternativa( $novaAlternativa );
+        }
+
+        $enqueteDao->salvarAlternativas( $enquete->getAlternativas() );
+
+        return create_json_feedback(true, '', Zend_Json::encode( array('idEnquete' => $enquete->getId()) ));
     }
 
     private function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null, $view = '', array $dados = null)
@@ -318,6 +490,18 @@ class Enquete extends WL_Controller {
                     '',
                     $count + 1
                 );
+        }
+    }
+
+    public function _tituloLista($filtro)
+    {
+        switch ($filtro) {
+            case 'todas': return '- Todas as Enquetes' ;
+            case 'ativas': return ' - Enquetes Ativas' ;
+            case 'inativas': return ' - Enquetes Inativas' ;
+            case 'fechadas': return ' - Enquetes Fechadas' ;
+            case 'abertas': return ' - Enquetes Abertas';
+            default: return '' ;
         }
     }
 

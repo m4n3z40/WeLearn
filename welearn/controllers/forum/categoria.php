@@ -167,11 +167,13 @@ class Categoria extends WL_Controller {
 
             $categoriaRemovida = $categoriaDao->remover($id);
 
+            $this->load->helper('notificacao_js');
+
             $dadosNotificacao = array(
-                'notificacao' => array(
-                    'nivel' => 'sucesso',
-                    'msg' => 'A categoria <strong>' . $categoriaRemovida->getNome() . '</strong> foi removida com sucesso!',
-                    'tempo' => 15000
+                'notificacao' => create_notificacao_array(
+                    'sucesso',
+                    'A categoria <strong>' . $categoriaRemovida->getNome() . '</strong> foi removida com sucesso!',
+                    10000
                 )
             );
 
@@ -204,6 +206,8 @@ class Categoria extends WL_Controller {
                 $dadosCategoria = $this->input->post();
                 $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
 
+                $this->load->helper('notificacao_js');
+
                 if (isset($dadosCategoria['acao']) && $dadosCategoria['acao'] == 'criar') {
                     $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
 
@@ -213,12 +217,11 @@ class Categoria extends WL_Controller {
                     $novaCategoria = $categoriaDao->criarNovo($dadosCategoria);
                     $categoriaDao->salvar($novaCategoria);
 
-                    $notificacoesFlash = Zend_Json::encode(array(
-                                                               'msg' => 'A nova categoria de fóruns foi criada com sucesso. <br/>'
-                                                                     . 'Comece a adicionar fóruns à esta categoria!',
-                                                               'nivel' => 'sucesso',
-                                                               'tempo' => '15000'
-                                                           ));
+                    $notificacoesFlash = create_notificacao_json(
+                        'sucesso',
+                        'A nova categoria de fóruns foi criada com sucesso. <br/> Comece a adicionar fóruns à esta categoria!',
+                        10000
+                   );
 
                     $json = create_json_feedback(true, '', '"idCurso":"' . $novaCategoria->getCurso()->getid() . '"');
                 } elseif (isset($dadosCategoria['acao']) && $dadosCategoria['acao'] == 'alterar') {
@@ -226,12 +229,11 @@ class Categoria extends WL_Controller {
                     $categoria->preencherPropriedades($dadosCategoria);
                     $categoriaDao->salvar($categoria);
 
-                    $notificacoesFlash = Zend_Json::encode(array(
-                                                               'msg' => 'A categoria <strong>' . $categoria->getNome() .
-                                                                       '</strong> foi alterada com sucesso!',
-                                                               'nivel' => 'sucesso',
-                                                               'tempo' => '15000'
-                                                           ));
+                    $notificacoesFlash = create_notificacao_json(
+                        'sucesso',
+                        'A categoria <strong>' . $categoria->getNome() . '</strong> foi alterada com sucesso!',
+                        10000
+                    );
 
                     $json = create_json_feedback(true, '', '"idCurso":"' . $categoria->getCurso()->getId() . '"');
                 } else {

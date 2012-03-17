@@ -89,11 +89,11 @@ class Usuario extends CI_Controller
             }
 
             //Se chegamos até aqui, tudo certo, é hora de cadastrar o usuário novo.
-            $segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
+            $segmentoDao = $usuarioDao->getSegmentoDao();
             $segmento = $segmentoDao->recuperar($this->input->post('segmento'));
             $novoUsuario->setSegmentoInteresse($segmento);
 
-            $configuracaoDao = WeLearn_DAO_DAOFactory::create('ConfiguracaoUsuarioDAO');
+            $configuracaoDao = $usuarioDao->getConfiguracaoDao();
             $configuracao = $configuracaoDao->criarNovo();
             $configuracao->setUsuarioId($novoUsuario->getNomeUsuario());
             $novoUsuario->setConfiguracao($configuracao);

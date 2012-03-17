@@ -88,8 +88,8 @@ class WeLearn_Usuarios_ImagemUsuario extends WeLearn_DTO_AbstractDTO
     public function toCassandra()
     {
         return array(
-            'url' => (string) $this->getUrl(),
-            'usuarioId' => (string) $this->getUsuarioId()
+            'url' => $this->getUrl(),
+            'usuarioId' => $this->getUsuarioId()
         );
     }
 }

@@ -280,6 +280,11 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
         //@TODO: Implementar este método!!
     }
 
+    public function zerarAlternativas()
+    {
+        $this->_alternativas = array();
+    }
+
     public function recuperarQtdParcialVotos()
     {
         //@TODO: Implementar este método!!

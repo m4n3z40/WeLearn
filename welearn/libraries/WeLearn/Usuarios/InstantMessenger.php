@@ -14,61 +14,96 @@
 class WeLearn_Usuarios_InstantMessenger extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var int
+     * @var string
      */
     private $_id;
 
     /**
      * @var string
      */
-    private $_descricao;
+    private $_descricaoIM;
 
     /**
-     * @param int $id
-     * @param string $descricao
+     * @var string
      */
-    public function __construct($id = 0, $descricao = '')
-    {
-        $dados = array(
-            'id' => $id,
-            'descricao' => $descricao
-        );
+    private $_descricaoUsuarioIM;
 
+    /**
+     * @var string
+     */
+    private $_usuarioId;
+
+    /**
+     * @param array $dados
+     */
+    public function __construct(array $dados = null)
+    {
         parent::__construct($dados);
     }
 
     /**
-     * @param string $descricao
+     * @param string $id
      * @return void
      */
-    public function setDescricao($descricao)
+    public function setId($id)
     {
-        $this->_descricao = (string)$descricao;
+        $this->_id = (string)$id;
     }
 
     /**
      * @return string
      */
-    public function getDescricao()
-    {
-        return $this->_descricao;
-    }
-
-    /**
-     * @param int $id
-     * @return void
-     */
-    public function setId($id)
-    {
-        $this->_id = (int)$id;
-    }
-
-    /**
-     * @return int
-     */
     public function getId()
     {
         return $this->_id;
+    }
+
+    /**
+     * @param string $descricaoIM
+     */
+    public function setDescricaoIM($descricaoIM)
+    {
+        $this->_descricaoIM = (string)$descricaoIM;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescricaoIM()
+    {
+        return $this->_descricaoIM;
+    }
+
+    /**
+     * @param string $descricaoUsuarioIM
+     */
+    public function setDescricaoUsuarioIM($descricaoUsuarioIM)
+    {
+        $this->_descricaoUsuarioIM = (string)$descricaoUsuarioIM;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescricaoUsuarioIM()
+    {
+        return $this->_descricaoUsuarioIM;
+    }
+
+    /**
+     * @param string $usuarioId
+     */
+    public function setUsuarioId($usuarioId)
+    {
+        $this->_usuarioId = (string)$usuarioId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsuarioId()
+    {
+        return $this->_usuarioId;
     }
 
     /**
@@ -81,7 +116,9 @@ class WeLearn_Usuarios_InstantMessenger extends WeLearn_DTO_AbstractDTO
     {
         return array(
             'id' => $this->getId(),
-            'descricao' => $this->getDescricao(),
+            'descricaoIM' => $this->getDescricaoIM(),
+            'descricaoUsuarioIM' => $this->getDescricaoUsuarioIM(),
+            'usuarioId' => $this->getUsuarioId(),
             'persistido' => $this->isPersistido()
         );
     }
@@ -94,8 +131,10 @@ class WeLearn_Usuarios_InstantMessenger extends WeLearn_DTO_AbstractDTO
     public function toCassandra()
     {
         return array(
-            'id' => (string) $this->getId(),
-            'descricao' => (string) $this->getDescricao()
+            'id' => $this->getId(),
+            'descricaoIM' => $this->getDescricaoIM(),
+            'descricaoUsuarioIM' => $this->getDescricaoUsuarioIM(),
+            'usuarioId' => $this->getUsuarioId()
         );
     }
 }

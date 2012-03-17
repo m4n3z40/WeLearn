@@ -205,6 +205,8 @@ class Curso extends WL_Controller {
 
         $this->load->library('form_validation');
 
+        $this->load->helper('notificacao_js');
+
         if ($acao == 'criarNovo' || $acao == 'criarFromSugestao') {
             $json = $this->_salvarNovoCurso();
         } elseif ($acao == 'salvarConfig') {
@@ -322,12 +324,12 @@ class Curso extends WL_Controller {
                     $sugestao->registrarCriacaoCurso($novoCurso, $sugestaoDao);
                 }
 
-                $notificacoesFlash = Zend_Json::encode(array(
-                                                           'msg'=> 'O novo curso foi criado com sucesso e você é o Gerenciador Principal!'.
-                                                                   '<br /> Comece a Alterar as configurações, editar o conteúdo e convidar alunos em potencial.',
-                                                           'nivel' => 'sucesso',
-                                                           'tempo' => '15000'
-                                                       ));
+                $notificacoesFlash = create_notificacao_json(
+                    'sucesso',
+                    'O novo curso foi criado com sucesso e você é o Gerenciador Principal!'.
+                    '<br /> Comece a Alterar as configurações, editar o conteúdo e convidar alunos em potencial.',
+                    10000
+                );
 
                 $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
 
@@ -383,12 +385,12 @@ class Curso extends WL_Controller {
                 $curso->preencherPropriedades($dadosConfig);
                 $cursoDao->salvar($curso);
 
-                $notificacoesFlash = Zend_Json::encode(array(
-                                                           'msg'=> 'As alterações nas configurações do curso'.
-                                                                   ' foram salvas com sucesso!',
-                                                           'nivel' => 'sucesso',
-                                                           'tempo' => '15000'
-                                                       ));
+                $notificacoesFlash = create_notificacao_json(
+                    'sucesso',
+                    'As alterações nas configurações do curso foram salvas com sucesso!',
+                    10000
+                );
+
                 $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
 
                 $json = create_json_feedback(true);

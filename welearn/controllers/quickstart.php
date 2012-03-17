@@ -115,7 +115,40 @@ class Quickstart extends WL_Controller {
 
     private function _salvar_etapa1($dados_post)
     {
-        echo '{"success":true}';
+        $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
+
+        $dadosPessoaisDao = WeLearn_DAO_DAOFactory::create('DadosPessoaisUsuarioDAO');
+        $dadosPessoais = $dadosPessoaisDao->criarNovo($dados_post);
+
+        for ($i = 0; $i < count($dados_post['rsId']); $i++) {
+            if ( $dados_post['rsId'][$i] ) {
+                $dadosRS = array(
+                    'usuarioId' => $usuarioAtual->getId(),
+                    'descricaoRS' => $dados_post['rsId'][$i],
+                    'urlUsuarioRS' => $dados_post['rsUsuario'][$i]
+                );
+
+                $dadosPessoais->adicionarRS( $dadosPessoaisDao->criarNovoRS($dadosRS) );
+            }
+        }
+
+        for ($i = 0; $i < count($dados_post['imId']); $i++) {
+            if ( $dados_post['imId'][$i] ) {
+                $dadosIM = array(
+                    'usuarioId' => $usuarioAtual->getId(),
+                    'descricaoIM' => $dados_post['imId'][$i],
+                    'descricaoUsuarioIM' => $dados_post['imUsuario'][$i]
+                );
+
+                $dadosPessoais->adicionarIM( $dadosPessoaisDao->criarNovoIM($dadosIM) );
+            }
+        }
+
+        $usuarioAtual->setDadosPessoais( $dadosPessoais );
+
+        $usuarioAtual->salvarDadosPessoais();
+
+        var_dump($usuarioAtual);
     }
 
     private function _etapa2()

@@ -44,18 +44,18 @@
         });
     }
 
-    var visualizandoListaForuns = (document.getElementById('forum-lista-forums') != null);
+    var visualizandoListaForuns = (document.getElementById('forum-lista-forums') != null),
+        $divConfirmacaoAlterarStatus = $('<div id="dialogo-confirmacao-alterarstatus-forum">' +
+                                        '<p>Tem certeza que deseja alterar o status deste fórum?<br/>' +
+                                        '<strong>Somente</strong> fóruns <strong>ATIVOS</strong> podem ser visualizados' +
+                                        ' pelos alunos.</p></div>');
 
     $('.a-alterarstatus-forum').live('click', function(e) {
         e.preventDefault();
 
-        var $this = $(this),
-            $divConfirmacao = $('<div id="dialogo-confirmacao-alterarstatus-forum">' +
-                                '<p>Tem certeza que deseja alterar o status deste fórum?<br/>' +
-                                '<strong>Somente</strong> fóruns <strong>ATIVOS</strong> podem ser visualizados' +
-                                ' pelos alunos.</p></div>');
+        var $this = $(this);
 
-        $divConfirmacao.dialog({
+        $divConfirmacaoAlterarStatus.dialog({
             title: 'Tem certeza?',
             width: '450px',
             resizable: false,
@@ -99,16 +99,17 @@
         });
     });
 
-    $('.a-remover-forum').live('click', function(e) {
-        e.preventDefault();
-
-        var $this = $(this),
-            $divConfirmacao = $('<div id="dialogo-confirmacao-remover-forum">' +
+    var $divConfirmacaoRemover = $('<div id="dialogo-confirmacao-remover-forum">' +
                                 '<p>Tem certeza que deseja remover este fórum?<br/>' +
                                 'Esta ação <strong>NÃO</strong> poderá ser desfeita!<br/>' +
                                 '<strong>TODOS</strong> os posts deste fórum serão perdidos!</p></div>');
 
-        $divConfirmacao.dialog({
+    $('.a-remover-forum').live('click', function(e) {
+        e.preventDefault();
+
+        var $this = $(this);
+
+        $divConfirmacaoRemover.dialog({
             title: 'Tem certeza?',
             width: '450px',
             resizable: false,
@@ -120,14 +121,17 @@
                         {},
                         function(res) {
                             if (res.success) {
-                                WeLearn.notificar(res.notificacao);
                                 if (visualizandoListaForuns) {
                                     $this.parent().parent().parent().parent().fadeOut('slow', function(){
                                         $( this ).remove();
                                     });
                                 } else {
-                                    window.location = WeLearn.url.siteURL('/curso/forum/listar/' + res.idCategoria)
+                                    res.notificacao.redirecionarAoFechar = true;
+                                    res.notificacao.redirecionarParaUrl = WeLearn.url.siteURL('/curso/forum/listar/' + res.idCategoria);
+                                    res.notificacao.tempo = 1000;
                                 }
+
+                                WeLearn.notificar(res.notificacao);
                             } else {
                                 WeLearn.notificar({
                                     nivel: 'erro',
