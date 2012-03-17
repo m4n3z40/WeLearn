@@ -359,7 +359,7 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
             'descricaoTrabalho' => $this->getDescricaoTrabalho(),
             'habilidadesProfissionais' => $this->getHabilidadesProfissionais(),
             'interessesProfissionais' => $this->getInteressesProfissionais(),
-            'segmentoTrabalho' => empty($this->_segmentoTrabalho) ? '' : $this->getSegmentoTrabalho()->toArray(),
+            'segmentoTrabalho' => !($this->_segmentoTrabalho instanceof WeLearn_Cursos_Segmento) ? '' : $this->getSegmentoTrabalho()->toArray(),
             'persistido' => $this->isPersistido()
         );
     }
@@ -372,21 +372,21 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
     public function toCassandra()
     {
         return array(
-            'usuarioId' => (string)$this->getUsuarioId(),
-            'escolaridade' => (string) $this->getEscolaridade(),
-            'escola' => (string) $this->getEscola(),
-            'faculdade' => (string) $this->getFaculdade(),
-            'curso' => (string) $this->getCurso(),
-            'diploma' => (string) $this->getDiploma(),
-            'ano' => (string) $this->getAno(),
-            'profissao' => (string) $this->getProfissao(),
-            'empresa' => (string) $this->getEmpresa(),
-            'siteEmpresa' => (string) $this->getSiteEmpresa(),
-            'cargo' => (string) $this->getCargo(),
-            'descricaoTrabalho' => (string) $this->getDescricaoTrabalho(),
-            'habilidadesProfissionais' => (string) $this->getHabilidadesProfissionais(),
-            'interessesProfissionais' => (string) $this->getInteressesProfissionais(),
-            'segmentoTrabalho' => empty($this->_segmentoTrabalho) ? '' : $this->getSegmentoTrabalho()->getId()
+            'usuarioId' => $this->getUsuarioId(),
+            'escolaridade' => $this->getEscolaridade(),
+            'escola' => $this->getEscola(),
+            'faculdade' => $this->getFaculdade(),
+            'curso' => $this->getCurso(),
+            'diploma' => $this->getDiploma(),
+            'ano' => $this->getAno(),
+            'profissao' => $this->getProfissao(),
+            'empresa' => $this->getEmpresa(),
+            'siteEmpresa' => $this->getSiteEmpresa(),
+            'cargo' => $this->getCargo(),
+            'descricaoTrabalho' => $this->getDescricaoTrabalho(),
+            'habilidadesProfissionais' => $this->getHabilidadesProfissionais(),
+            'interessesProfissionais' => $this->getInteressesProfissionais(),
+            'segmentoTrabalho' => !($this->_segmentoTrabalho instanceof WeLearn_Cursos_Segmento) ? '' : $this->getSegmentoTrabalho()->getId()
         );
     }
 }

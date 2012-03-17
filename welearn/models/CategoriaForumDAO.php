@@ -147,6 +147,8 @@ class CategoriaForumDAO extends WeLearn_DAO_AbstractDAO
         $this->_categoriasPorCursoCF->remove($cursoUUID->bytes, array($id->bytes));
         $this->_cf->remove($id->bytes);
 
+        WeLearn_DAO_DAOFactory::create('ForumDAO')->removerTodosPorCategoria( $categoriaRemovida->getId() );
+
         $categoriaRemovida->setPersistido(false);
 
         return $categoriaRemovida;

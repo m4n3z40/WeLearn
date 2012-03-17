@@ -395,12 +395,13 @@ class Sugestao extends WL_Controller {
 
                 $sugestaoCursoDao->salvar($novaSugestao);
 
-                $notificacoesFlash = Zend_Json::encode(array(
-                                                           'msg'=> 'A sugestão de curso foi enviada'.
-                                                                   ' com sucesso! Obrigado pela participação!',
-                                                           'nivel' => 'sucesso',
-                                                           'tempo' => '15000'
-                                                       ));
+                $this->load->helper('notificacao_js');
+
+                $notificacoesFlash = create_notificacao_json(
+                    'sucesso',
+                    'A sugestão de curso foi enviada com sucesso! Obrigado pela participação!',
+                    10000
+                );
                 $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
 
                 $json = create_json_feedback(true);

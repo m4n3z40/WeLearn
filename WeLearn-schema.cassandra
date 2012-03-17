@@ -19,8 +19,7 @@ and key_validation_class = 'UTF8Type';
 
 create column family usuarios_dados_pessoais
 with comparator = 'UTF8Type'
-and column_type = 'Super'
-and subcomparator = 'UTF8Type'
+and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'UTF8Type';
 
@@ -46,10 +45,22 @@ create column family usuarios_im
 with comparator = 'UTF8Type'
 and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family usuarios_im_por_usuario
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
 and key_validation_class = 'UTF8Type';
 
 create column family usuarios_rs
 with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family usuarios_rs_por_usuario
+with comparator = 'TimeUUIDType'
 and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'UTF8Type';

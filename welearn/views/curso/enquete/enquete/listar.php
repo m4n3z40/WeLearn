@@ -1,6 +1,6 @@
 <div id="enquete-listar-content">
     <header>
-        <h1>Lista de Enquetes do Curso</h1>
+        <h1>Lista de Enquetes do Curso <?php echo $tituloLista ?></h1>
         <h3>Abaixo são listada todas as enquetes contidas neste curso</h3>
         <p>
             Quer adicionar uma nova enquete ao curso? <?php echo anchor('/curso/enquete/criar/' . $idCurso, 'Clique aqui!') ?>
@@ -9,11 +9,16 @@
         </p>
         <nav id="nav-filtros-lista-enquetes">
             <ul>
-                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=todas', 'Todas as enquetes') ?></li>
-                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=ativas', 'Somente enquetes ativas') ?></li>
-                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=inativas', 'Somente enquetes inativas') ?></li>
-                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=abertas', 'Somente enquetes abertas') ?></li>
-                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=fechadas', 'Somente enquetes fechadas') ?></li>
+                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=todas', 'Todas as enquetes') ?> -
+                    <span>(<?php echo $qtdTodas ?>)</span></li>
+                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=ativas', 'Somente enquetes ativas') ?> -
+                    <span>(<?php echo $qtdAtivas ?>)</span></li>
+                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=inativas', 'Somente enquetes inativas') ?> -
+                    <span>(<?php echo $qtdInativas ?>)</span></li>
+                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=abertas', 'Somente enquetes abertas') ?> -
+                    <span>(<?php echo $qtdAbertas ?>)</span></li>
+                <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=fechadas', 'Somente enquetes fechadas') ?> -
+                    <span>(<?php echo $qtdFechadas ?>)</span></li>
             </ul>
         </nav>
     </header>

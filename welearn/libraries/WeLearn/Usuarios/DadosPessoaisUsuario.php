@@ -69,12 +69,12 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO
     private $_homePage = '';
 
     /**
-     * @var array
+     * @var array WeLearn_Usuarios_InstantMessenger
      */
     private $_listaDeIM = array();
 
     /**
-     * @var array
+     * @var array WeLearn_Usuarios_RedeSocial
      */
     private $_listaDeRS = array();
 
@@ -191,6 +191,14 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO
     }
 
     /**
+     * @param WeLearn_Usuarios_InstantMessenger $IM
+     */
+    public function adicionarIM(WeLearn_Usuarios_InstantMessenger $IM)
+    {
+        $this->_listaDeIM[] = $IM;
+    }
+
+    /**
      * @param array $listaDeRS
      */
     public function setListaDeRS(array $listaDeRS)
@@ -204,6 +212,14 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO
     public function getListaDeRS()
     {
         return $this->_listaDeRS;
+    }
+
+    /**
+     * @param WeLearn_Usuarios_RedeSocial $RS
+     */
+    public function adicionarRS(WeLearn_Usuarios_RedeSocial $RS)
+    {
+        $this->_listaDeRS[] = $RS;
     }
 
     /**
@@ -322,29 +338,17 @@ class WeLearn_Usuarios_DadosPessoaisUsuario extends WeLearn_DTO_AbstractDTO
      */
     public function toCassandra()
     {
-        $listaDeIM = array();
-        foreach ($this->getListaDeIM() as $IM) {
-            $listaDeIM[$IM->getID()] = $IM->toCassandra();
-        }
-
-        $listaDeRS = array();
-        foreach ($this->getListaDeRS() as $RS) {
-            $listaDeRS[$RS->getId()] = $RS->toCassandra();
-        }
-
         return array(
-            'usuarioId' => (string) $this->getUsuarioId(),
-            'sexo' => (string) $this->getSexo(),
-            'pais' => (string) $this->getPais(),
-            'cidade' => (string) $this->getCidade(),
-            'endereco' => (string) $this->getEndereco(),
-            'dataNascimento' => (string) $this->getDataNascimento(),
-            'tel' => (string) $this->getTel(),
-            'telAlternativo' => (string) $this->getTelAlternativo(),
-            'descricaoPessoal' => (string) $this->getDescricaoPessoal(),
-            'homePage' => (string) $this->getHomePage(),
-            'listaDeIM' => empty($listaDeIM) ? '' : $listaDeIM,
-            'listaDeRS' => empty($listaDeRS) ? '' : $listaDeRS
+            'usuarioId' => $this->getUsuarioId(),
+            'sexo' => $this->getSexo(),
+            'pais' => $this->getPais(),
+            'cidade' => $this->getCidade(),
+            'endereco' => $this->getEndereco(),
+            'dataNascimento' => $this->getDataNascimento(),
+            'tel' => $this->getTel(),
+            'telAlternativo' => $this->getTelAlternativo(),
+            'descricaoPessoal' => $this->getDescricaoPessoal(),
+            'homePage' => $this->getHomePage()
         );
     }
 }

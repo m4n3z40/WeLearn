@@ -162,6 +162,29 @@ class PostForumDAO extends WeLearn_DAO_AbstractDAO {
     }
 
     /**
+     * @param string $forumId
+     * @return void
+     */
+    public function removerTodosPorForum($forumId)
+    {
+        $forumUUID = CassandraUtil::import($forumId);
+
+        try {
+            $idsPosts = array_keys(
+                $this->_postsPorForumCF->get($forumUUID->bytes, null, '', '', true, 1000000)
+            );
+
+            foreach ($idsPosts as $id) {
+                $this->_cf->remove($id);
+            }
+
+            $this->_postsPorForumCF->remove($forumUUID->bytes);
+        } catch (cassandra_NotFoundException $e) {
+            return;
+        }
+    }
+
+    /**
      * @param array|null $dados
      * @return WeLearn_DTO_IDTO
      */

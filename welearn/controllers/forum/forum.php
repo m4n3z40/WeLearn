@@ -25,39 +25,10 @@ class Forum extends WL_Controller {
 
             $forumDao = WeLearn_DAO_DAOFactory::create('ForumDAO');
 
-            try {
-                switch ($this->input->get('f')) {
-                    case 'todos':
-                        $listaForuns = $forumDao->recuperarTodosPorCategoria(
-                            $categoria,
-                            '',
-                            '',
-                            $count + 1
-                        );
-                    break;
-                    case 'inativos':
-                        $listaForuns = $forumDao->recuperarTodosPorCategoriaEStatus(
-                            $categoria,
-                            WeLearn_Cursos_Foruns_StatusForum::INATIVO,
-                            '',
-                            '',
-                            $count + 1
-                        );
-                    break;
-                    case 'ativos':
-                    default:
-                        $listaForuns = $forumDao->recuperarTodosPorCategoriaEStatus(
-                            $categoria,
-                            WeLearn_Cursos_Foruns_StatusForum::ATIVO,
-                            '',
-                            '',
-                            $count + 1
-                        );
-                }
+            $filtro = $this->input->get('f');
 
-                foreach($listaForuns as $forum) {
-                    $forum->recuperarQtdPosts();
-                }
+            try {
+                $listaForuns = $this->_recuperarForuns($categoria, $filtro);
             } catch (cassandra_NotFoundException $e) {
                 $listaForuns = array();
             }
@@ -69,7 +40,11 @@ class Forum extends WL_Controller {
             $partialLista = $this->template->loadPartial('lista', $dadosPartialLista, 'curso/forum/forum');
 
             $dadosView = array(
+                'tituloLista' => $this->_tituloLista($filtro),
                 'categoria' => $categoria,
+                'qtdTodos' => $forumDao->recuperarQtdTotalPorCategoria($categoria),
+                'qtdAtivos' => $forumDao->recuperarQtdTotalPorCategoriaEStatus($categoria, WeLearn_Cursos_Foruns_StatusForum::ATIVO),
+                'qtdInativos' => $forumDao->recuperarQtdTotalPorCategoriaEStatus($categoria, WeLearn_Cursos_Foruns_StatusForum::INATIVO),
                 'partialLista' => $partialLista,
                 'haForuns' => !empty($listaForuns),
                 'haMaisPaginas' => $dadosPaginacao['proxima_pagina'],
@@ -98,40 +73,7 @@ class Forum extends WL_Controller {
             $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
             $categoria = $categoriaDao->recuperar($idCategoria);
 
-            $forumDao = WeLearn_DAO_DAOFactory::create('ForumDAO');
-
-            switch ($this->input->get('f')) {
-                case 'todos':
-                    $listaForuns = $forumDao->recuperarTodosPorCategoria(
-                        $categoria,
-                        $inicio,
-                        '',
-                        $count + 1
-                    );
-                break;
-                case 'inativos':
-                    $listaForuns = $listaForuns = $forumDao->recuperarTodosPorCategoriaEStatus(
-                        $categoria,
-                        WeLearn_Cursos_Foruns_StatusForum::INATIVO,
-                        $inicio,
-                        '',
-                        $count + 1
-                    );
-                break;
-                case 'ativos':
-                default:
-                    $listaForuns = $forumDao->recuperarTodosPorCategoriaEStatus(
-                        $categoria,
-                        WeLearn_Cursos_Foruns_StatusForum::ATIVO,
-                        $inicio,
-                        '',
-                        $count + 1
-                    );
-            }
-
-            foreach($listaForuns as $forum) {
-                $forum->recuperarQtdPosts();
-            }
+            $listaForuns = $this->_recuperarForuns($categoria, $this->input->get('f'), $inicio);
 
             $this->load->helper('Paginacao_cassandra');
             $paginacao = create_paginacao_cassandra($listaForuns, $count);
@@ -323,14 +265,16 @@ class Forum extends WL_Controller {
 
             $statusStr = $forum->getStatus() == WeLearn_Cursos_Foruns_StatusForum::ATIVO ? 'ativado' : 'desativado';
 
+            $this->load->helper('notificacao_js');
+
             $notificacao = Zend_Json::encode(array(
-                                                 'statusAtual' => $statusStr,
-                                                 'notificacao' => array(
-                                                     'nivel' => 'sucesso',
-                                                     'msg' => 'O fórum <strong>' . $forum->getTitulo() . '</strong> foi ' . $statusStr . ' com sucesso!',
-                                                     'tempo' => 10000
-                                                 )
-                                             ));
+                 'statusAtual' => $statusStr,
+                 'notificacao' => create_notificacao_array(
+                     'sucesso',
+                     'O fórum <strong>' . $forum->getTitulo() . '</strong> foi ' . $statusStr . ' com sucesso!',
+                     10000
+                 )
+             ));
 
             $json = create_json_feedback(true, '', $notificacao);
         } catch (Exception $e) {
@@ -357,20 +301,22 @@ class Forum extends WL_Controller {
 
             $forumRemovido = $forumDao->remover($idForum);
 
+            $this->load->helper('notificacao_js');
+
             $notificacao = Zend_Json::encode(array(
-                                                 'idCategoria' => $forumRemovido->getCategoria()->getId(),
-                                                 'notificacao' => array(
-                                                     'nivel' => 'sucesso',
-                                                     'msg' => 'O fórum <strong>' . $forumRemovido->getTitulo() . '</strong> foi removido com sucesso!',
-                                                     'tempo' => 10000
-                                                 )
-                                             ));
+                 'idCategoria' => $forumRemovido->getCategoria()->getId(),
+                 'notificacao' => create_notificacao_array(
+                     'sucesso',
+                     'O fórum <strong>' . $forumRemovido->getTitulo() . '</strong> foi removido com sucesso!',
+                     10000
+                 )
+             ));
 
             $json = create_json_feedback(true, '', $notificacao);
         } catch (Exception $e) {
             log_message('error', 'Erro ao tentar remover um fórum: ' . create_exception_description($e));
 
-            $error = create_exception_description('Ocorreu um erro inesperado! Já estamos verificando, tente novamente mais tarde.');
+            $error = create_json_feedback_error_json('Ocorreu um erro inesperado! Já estamos verificando, tente novamente mais tarde.');
 
             $json = create_json_feedback(false, $error);
         }
@@ -391,20 +337,22 @@ class Forum extends WL_Controller {
             $json = create_json_feedback(false, validation_errors_json());
         } else {
             try {
+                $this->load->helper('notificacao_js');
+
                 if ($this->input->post('acao') == 'criar') {
                     $json = $this->_salvarNovoForum( $this->input->post() );
-                    $notificacoesFlash = Zend_Json::encode(array(
-                                                               'msg' => 'O novo fórum foi criado com sucesso, na verdade você já está nele!<br/> Aguarde enquanto essa discussão se desenvolve.',
-                                                               'nivel' => 'sucesso',
-                                                               'tempo' => '10000'
-                                                           ));
+                    $notificacoesFlash = create_notificacao_json(
+                        'sucesso',
+                        'O novo fórum foi criado com sucesso, na verdade você já está nele!<br/> Aguarde enquanto essa discussão se desenvolve.',
+                        10000
+                    );
                 } elseif ($this->input->post('acao') == 'alterar') {
                     $json = $this->_salvarAlteracoesForum( $this->input->post() );
-                    $notificacoesFlash = Zend_Json::encode(array(
-                                                               'msg' => 'Fórum alterado com sucesso!',
-                                                               'nivel' => 'sucesso',
-                                                               'tempo' => '10000'
-                                                           ));
+                    $notificacoesFlash = create_notificacao_json(
+                        'sucesso',
+                        'Fórum alterado com sucesso!',
+                        10000
+                    );
                 } else {
                     throw new WeLearn_Base_Exception('Ação de salvar fórum inválida!');
                 }
@@ -419,6 +367,46 @@ class Forum extends WL_Controller {
         }
 
         echo $json;
+    }
+
+    private function _recuperarForuns(WeLearn_Cursos_Foruns_Categoria $categoria, $filtro, $inicio = '', $count = 10)
+    {
+        $forumDao = WeLearn_DAO_DAOFactory::create('ForumDAO');
+
+        switch ($filtro) {
+            case 'todos':
+                $listaForuns = $forumDao->recuperarTodosPorCategoria(
+                    $categoria,
+                    $inicio,
+                    '',
+                    $count + 1
+                );
+            break;
+            case 'inativos':
+                $listaForuns = $forumDao->recuperarTodosPorCategoriaEStatus(
+                    $categoria,
+                    WeLearn_Cursos_Foruns_StatusForum::INATIVO,
+                    $inicio,
+                    '',
+                    $count + 1
+                );
+            break;
+            case 'ativos':
+            default:
+                $listaForuns = $forumDao->recuperarTodosPorCategoriaEStatus(
+                    $categoria,
+                    WeLearn_Cursos_Foruns_StatusForum::ATIVO,
+                    $inicio,
+                    '',
+                    $count + 1
+                );
+        }
+
+        foreach($listaForuns as $forum) {
+            $forum->recuperarQtdPosts();
+        }
+
+        return $listaForuns;
     }
 
     private function _salvarNovoForum(array $dadosPost)
@@ -467,5 +455,15 @@ class Forum extends WL_Controller {
         $this->template->setDefaultPartialVar('curso/barra_lateral_esquerda', $dadosBarraEsquerda)
                        ->setDefaultPartialVar('curso/barra_lateral_direita', $dadosBarraDireita)
                        ->render($view, $dados);
+    }
+
+    private function _tituloLista($filtro)
+    {
+        switch ($filtro) {
+            case 'todos': return '- Todos os Fóruns';
+            case 'ativos': return ' - Fóruns Ativos';
+            case 'inativos': return ' - Fóruns Inativos';
+            default: return '';
+        }
     }
 }

@@ -13,7 +13,9 @@
             <li>Criada por: <?php echo anchor('usuario/' . $enquete->criador->id, $enquete->criador->nome) ?></li>
             <li>Criada em: <?php echo date('d/m/Y H:i:s', $enquete->dataCriacao) ?></li>
             <li>Fecha as votações em: <?php echo ($enquete->situacao == WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA) ?
-                                                 date('d/m/Y H:i:s', $enquete->dataExpiracao) : 'Enquete fechada' ?></li>
+                                                 date('d/m/Y H:i:s', $enquete->dataExpiracao) :
+                                                 WeLearn_Cursos_Enquetes_SituacaoEnquete::getDescricao($enquete->situacao) ?></li>
+            <li>Status: <?php echo WeLearn_Cursos_Enquetes_StatusEnquete::getDescricao($enquete->status) ?></li>
             <li>Total de participações: <?php echo $enquete->totalVotos ?></li>
         </ul>
     </td>
@@ -22,13 +24,13 @@
             <ul>
                 <li><?php echo anchor('curso/enquete/alterar/' . $enquete->id, 'Alterar') ?></li>
                 <li><?php echo anchor('curso/enquete/remover/' . $enquete->id, 'Remover',
-                    array('id' => 'a-enquete-remover')) ?></li>
+                    array('class' => 'a-enquete-remover')) ?></li>
                 <li><?php echo anchor('curso/enquete/alterar_status/' . $enquete->id,
                     ($enquete->status == WeLearn_Cursos_Enquetes_StatusEnquete::ATIVA) ? 'Desativar' : 'Ativar',
-                    array('id' => 'a-enquete-alterarstatus')) ?></li>
+                    array('class' => 'a-enquete-alterarstatus')) ?></li>
                 <li><?php echo anchor('curso/enquete/alterar_situacao/' . $enquete->id,
                     ($enquete->situacao == WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA) ? 'Fechar' : 'Reabrir',
-                    array('id' => 'a-enquete-alterarsituacao')) ?></li>
+                    array('class' => 'a-enquete-alterarsituacao')) ?></li>
             </ul>
         </nav>
     </td>

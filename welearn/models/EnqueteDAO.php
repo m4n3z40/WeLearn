@@ -7,7 +7,8 @@
  * To change this template use File | Settings | File Templates.
  */
  
-class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
+class EnqueteDAO extends WeLearn_DAO_AbstractDAO
+{
     protected $_nomeCF = 'cursos_enquete';
 
     private $_nomeEnquetePorCursoCF = 'cursos_enquete_por_curso';
@@ -235,6 +236,10 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
             $this->_enquetePorSituacaoFechadoCF->remove($cursoUUID->bytes, array($id->bytes));
         }
 
+        $this->recuperarAlternativas($enquete);
+
+        $this->removerAlternativas($enquete->getAlternativas());
+
         $enquete->setPersistido(false);
 
         return $enquete;
@@ -330,19 +335,21 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
 
     /**
      * @param WeLearn_Cursos_Enquetes_Enquete $enquete
-     * @return void
+     * @return array WeLearn_Cursos_Enquetes_AlternativaEnquete[]
      */
     public function recuperarAlternativas(WeLearn_Cursos_Enquetes_Enquete &$enquete)
     {
         $alternativas = $this->_alternativaEnqueteDao->recuperarTodosPorEnquete($enquete);
         $enquete->setAlternativas($alternativas);
+
+        return $alternativas;
     }
 
     /**
      * @param WeLearn_Cursos_Enquetes_Enquete $enquete
      * @return int
      */
-    public function recuperarQtdTotalVotos(WeLearn_Cursos_Enquetes_Enquete $enquete)
+    public function recuperarQtdTotalVotos(WeLearn_Cursos_Enquetes_Enquete &$enquete)
     {
          // TODO: Implementar este metodo.
     }
@@ -351,9 +358,20 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO {
      * @param WeLearn_Cursos_Enquetes_Enquete $enquete
      * @return void
      */
-    public function zerarVotos(WeLearn_Cursos_Enquetes_Enquete $enquete)
+    public function zerarVotos(WeLearn_Cursos_Enquetes_Enquete &$enquete)
     {
         // TODO: Implementar este metodo.
+    }
+
+    /**
+     * @param WeLearn_Cursos_Enquetes_Enquete $enquete
+     * @return void
+     */
+    public function removerAlternativas (array $alternativas)
+    {
+        foreach ( $alternativas as $alterntativa ) {
+            $this->_alternativaEnqueteDao->remover( $alterntativa->getId() );
+        }
     }
 
     public function salvarAlternativas (array $alternativas)

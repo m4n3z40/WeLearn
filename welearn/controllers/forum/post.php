@@ -194,11 +194,13 @@ class Post extends WL_Controller {
 
             $postDao->remover($idPost);
 
+            $this->load->helper('notificacao_js');
+
             $extraJson = Zend_Json::encode(array(
-                'notificacao' => array(
-                    'nivel' => 'sucesso',
-                    'msg' => 'O seu post foi removido com sucesso!',
-                    'tempo' => 10000
+                'notificacao' => create_notificacao_array(
+                    'sucesso',
+                    'O seu post foi removido com sucesso!',
+                    10000
                 )
             ));
 

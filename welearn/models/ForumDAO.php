@@ -242,9 +242,38 @@ class ForumDAO extends WeLearn_DAO_AbstractDAO {
             $this->_forumInativosCF->remove($categoriaUUID->bytes, array($id->bytes));
         }
 
+        WeLearn_DAO_DAOFactory::create('PostForumDAO')->removerTodosPorForum( $forumRemovido->getId() );
+
         $forumRemovido->setPersistido(false);
 
         return $forumRemovido;
+    }
+
+    /**
+     * @param string $categoriaId
+     * @return void
+     */
+    public function removerTodosPorCategoria($categoriaId)
+    {
+        $categoriaUUID = CassandraUtil::import($categoriaId);
+
+        try {
+            $idsForuns = array_keys(
+                    $this->_forumPorCategoriaCF->get($categoriaUUID->bytes, null, '', '', true, 1000000)
+            );
+
+            $postDao = WeLearn_DAO_DAOFactory::create('PostForumDAO');
+            foreach ($idsForuns as $id) {
+                $this->_cf->remove($id);
+                $postDao->removerTodosPorForum($id);
+            }
+
+            $this->_forumPorCategoriaCF->remove($categoriaUUID->bytes);
+            $this->_forumAtivosCF->remove($categoriaUUID->bytes);
+            $this->_forumInativosCF->remove($categoriaUUID->bytes);
+        } catch (cassandra_NotFoundException $e) {
+            return;
+        }
     }
 
     /**
