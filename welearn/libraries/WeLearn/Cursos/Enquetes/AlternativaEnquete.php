@@ -31,6 +31,11 @@ class WeLearn_Cursos_Enquetes_AlternativaEnquete extends WeLearn_DTO_AbstractDTO
     private $_totalVotos = 0;
 
     /**
+     * @var float
+     */
+    private $_proporcaoParcial = 0;
+
+    /**
      * @param int $id
      * @param string $txtAlternativa
      * @param string_ $enqueteId
@@ -112,11 +117,27 @@ class WeLearn_Cursos_Enquetes_AlternativaEnquete extends WeLearn_DTO_AbstractDTO
     }
 
     /**
+     * @param float $proporcaoParcial
+     */
+    public function setProporcaoParcial($proporcaoParcial)
+    {
+        $this->_proporcaoParcial = round((float)$proporcaoParcial, 2);
+    }
+
+    /**
+     * @return float
+     */
+    public function getProporcaoParcial()
+    {
+        return $this->_proporcaoParcial;
+    }
+
+    /**
      * @return void
      */
     public function recuperarQtdTotalVotos()
     {
-        //@TODO: Implementar este método!!
+        WeLearn_DAO_DAOFactory::create('EnqueteDAO')->recuperarQtdTotalVotosPorAlternativa($this);
     }
 
     /**
@@ -132,6 +153,7 @@ class WeLearn_Cursos_Enquetes_AlternativaEnquete extends WeLearn_DTO_AbstractDTO
             'txtAlternativa' => $this->getTxtAlternativa(),
             'enqueteId' => $this->getEnqueteId(),
             'totalVotos' => $this->getTotalVotos(),
+            'proporcaoParcial' => $this->getProporcaoParcial(),
             'persistido' => $this->isPersistido()
         );
     }

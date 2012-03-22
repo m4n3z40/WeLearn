@@ -15,11 +15,18 @@ class AlternativaEnqueteDAO extends WeLearn_DAO_AbstractDAO{
 
     private $_alternativaPorEnqueteCF;
 
+    /**
+     * @var VotoEnqueteDAO
+     */
+    private $_votoDao;
+
     function __construct()
     {
         $phpCassa = WL_Phpcassa::getInstance();
 
         $this->_alternativaPorEnqueteCF = $phpCassa->getColumnFamily($this->_nomeAlternativaPorEnqueteCF);
+
+        $this->_votoDao = WeLearn_DAO_DAOFactory::create('VotoEnqueteDAO');
     }
 
     /**
@@ -168,11 +175,13 @@ class AlternativaEnqueteDAO extends WeLearn_DAO_AbstractDAO{
      * @param WeLearn_Cursos_Enquetes_AlternativaEnquete $AlternativaEnquete
      * @return int
      */
-    public function recuperarQtdVotos(WeLearn_Cursos_Enquetes_AlternativaEnquete $AlternativaEnquete)
+    public function recuperarQtdVotos(WeLearn_Cursos_Enquetes_AlternativaEnquete &$AlternativaEnquete)
     {
-        /*
-         * implementar metodo
-         */
+        $AlternativaEnquete->setTotalVotos(
+            $this->_votoDao->recuperarQtdTotalPorAlternativa($AlternativaEnquete)
+        );
+
+        return $AlternativaEnquete->getTotalVotos();
     }
 
     private function _criarFromCassandra(array $column)

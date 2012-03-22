@@ -1,10 +1,15 @@
-<div id="enquete-exibir-content">
+<div id="enquete-exibirresultados-content">
     <header>
         <hgroup>
-            <h1>Exibição de Enquete</h1>
-            <h3>Escolha a alternativa desejada e depois confirme sua participação</h3>
+            <h1>Exibição de Resultados <?php echo $textoSituacao ?> da Enquete</h1>
+            <h3>Abaixo o gráfico demonstrativo das proporções equivalentes
+                ao número de votos que cada alternativa recebeu</h3>
         </hgroup>
-        <p>Não é aqui que queria estar? <?php echo anchor('/curso/enquete/' . $enquete->curso->id, 'Volte para lista de enquetes.') ?></p>
+        <p>
+            Já viu o que queria?
+            <?php echo anchor('/curso/enquete/' . $enquete->curso->id,
+            'Clique aqui para voltar à lista de enquetes.') ?>
+        </p>
         <ul>
             <li>Criada por: <?php echo anchor('usuario/' . $enquete->criador->id, $enquete->criador->nome) ?></li>
             <li>Criada em: <?php echo date('d/m/Y H:i:s', $enquete->dataCriacao) ?></li>
@@ -12,8 +17,9 @@
                                                  date('d/m/Y H:i:s', $enquete->dataExpiracao) :
                                                  WeLearn_Cursos_Enquetes_SituacaoEnquete::getDescricao($enquete->situacao) ?></li>
             <li>Status: <?php echo WeLearn_Cursos_Enquetes_StatusEnquete::getDescricao($enquete->status) ?></li>
-            <li>Total de participações: <?php echo $enquete->totalVotos ?></li>
-            <li><?php echo anchor('/curso/enquete/exibir_resultados/' . $enquete->id, 'Visualizar resultados!') ?></li>
+            <?php if ($linkParaVotar): ?>
+            <li><?php echo anchor('/curso/enquete/exibir/' . $enquete->id, 'Participar desta enquete!') ?></li>
+            <?php endif; ?>
         </ul>
     </header>
     <div>
@@ -30,20 +36,26 @@
                     array('class' => 'a-enquete-alterarsituacao')) ?></li>
             </ul>
         </nav>
-        <?php echo form_open($formAction, $extraOpenForm, $formHidden); ?>
-            <h2><?php echo $enquete->questao ?></h2>
-            <ul id="ul-enquete-alternativas">
+        <div class="barchart">
+            <header>
+                <h2><?php echo $enquete->questao ?></h2>
+                <p>
+                    Total de votos: <em><?php echo $enquete->totalVotos ?></em>
+                </p>
+            </header>
+            <ul>
             <?php foreach ($enquete->alternativas as $alternativa): ?>
                 <li>
-                    <input type="radio"
-                           name="alternativaEscolhida"
-                           id="<?php echo $alternativa->id ?>"
-                           value="<?php echo $alternativa->id ?>">
-                    <label for="<?php echo $alternativa->id ?>"><?php echo $alternativa->txtAlternativa ?></label>
+                    <p><?php echo $alternativa->txtAlternativa ?></p>
+                    <div class="barchart-bar" style="width: <?php echo $alternativa->proporcaoParcial ?>%;">
+                        <p>
+                            <?php echo $alternativa->proporcaoParcial ?>%
+                            <span>(<?php echo $alternativa->totalVotos ?> votos)</span>
+                        </p>
+                    </div>
                 </li>
             <?php endforeach; ?>
             </ul>
-            <button type="submit" id="btn-votar-enquete">Confirmar!</button>
-        <?php echo form_close() ?>
+        </div>
     </div>
 </div>
