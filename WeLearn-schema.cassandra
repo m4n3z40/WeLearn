@@ -335,16 +335,15 @@ and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
-create column family cursos_enquete_votos
+create column family cursos_enquete_votos_por_enquete
 with comparator = 'UTF8Type'
 and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
-create column family cursos_enquete_votos_por_enquete
-with comparator = 'TimeUUIDType'
-with subcomparator = 'TimeUUIDType'
-and column_type = 'Super'
+create column family cursos_enquete_votos_por_alternativa
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 

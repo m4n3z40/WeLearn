@@ -109,7 +109,15 @@ class Enquete extends WL_Controller {
         try {
             $enqueteDao = WeLearn_DAO_DAOFactory::create('EnqueteDAO');
             $enquete = $enqueteDao->recuperar($idEnquete);
-            $enquete->recuperarAlternativas();
+            $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
+
+            $enqueteFechada = $enquete->getSituacao() == WeLearn_Cursos_Enquetes_SituacaoEnquete::FECHADA;
+            if ( $enqueteFechada || $enqueteDao->usuarioJaVotou($usuarioAtual, $enquete) ) {
+                $this->session->keep_flashdata('notificacoesFlash');
+                redirect('/curso/enquete/exibir_resultados/' . $enquete->getId());
+            }
+
+            $enqueteDao->recuperarAlternativas($enquete);
 
             $dadosView = array(
                 'enquete' => $enquete,
@@ -121,6 +129,36 @@ class Enquete extends WL_Controller {
             $this->_renderTemplateCurso($enquete->getCurso(), 'curso/enquete/enquete/exibir', $dadosView);
         } catch (Exception $e) {
             log_message('error', 'Ocorreu um erro ao exibir a enquete para votação: ' . create_exception_description($e));
+
+            show_404();
+        }
+    }
+
+    public function exibir_resultados ($idEnquete)
+    {
+        try {
+            $enqueteDao = WeLearn_DAO_DAOFactory::create('EnqueteDAO');
+            $enquete = $enqueteDao->recuperar($idEnquete);
+
+            $enqueteDao->recuperarAlternativas($enquete);
+            $enqueteDao->recuperarQtdParcialVotos($enquete);
+
+            $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
+
+            $dadosView = array(
+                'textoSituacao' => ($enquete->getSituacao() ==
+                    WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA) ?
+                    'Parciais' : 'Finais',
+                'enquete' => $enquete,
+                'linkParaVotar' => ! (
+                    $enquete->getSituacao() == WeLearn_Cursos_Enquetes_SituacaoEnquete::FECHADA ||
+                    $enqueteDao->usuarioJaVotou( $usuarioAtual, $enquete )
+                )
+            );
+
+            $this->_renderTemplateCurso($enquete->getCurso(), 'curso/enquete/enquete/exibir_resultados', $dadosView);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar exibir resultados de enquete: ' . create_exception_description($e));
 
             show_404();
         }
@@ -161,7 +199,7 @@ class Enquete extends WL_Controller {
         try {
             $enqueteDao = WeLearn_DAO_DAOFactory::create('EnqueteDAO');
             $enquete = $enqueteDao->recuperar($idEnquete);
-            $enquete->recuperarAlternativas();
+            $enqueteDao->recuperarAlternativas($enquete);
 
             $dadosPartialForm = array(
                 'formAction' => 'enquete/enquete/salvar',
@@ -188,7 +226,58 @@ class Enquete extends WL_Controller {
 
     public function votar ()
     {
-        print_r($_POST);
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        $this->load->library('form_validation');
+
+        if ( ! $this->form_validation->run() ) {
+
+            $json = create_json_feedback(false, validation_errors_json());
+
+        } else {
+            try {
+                $this->load->helper('notificacao_js');
+
+                $enqueteDao = WeLearn_DAO_DAOFactory::create('EnqueteDAO');
+                $alternativaDao = $enqueteDao->getAlternativaEnqueteDAO();
+
+                $enquete = $enqueteDao->recuperar( $this->input->post('enqueteId') );
+                $usuarioVotante = $this->autenticacao->getUsuarioAutenticado();
+                $alternativaVotada = $alternativaDao->recuperar( $this->input->post('alternativaEscolhida') );
+
+                $voto = new WeLearn_Cursos_Enquetes_VotoEnquete(0, $enquete, $usuarioVotante, $alternativaVotada);
+
+                $enqueteDao->votar($voto);
+
+                $dadosResponse = Zend_Json::encode(array(
+                    'idEnquete' => $enquete->getId()
+                ));
+
+                $json = create_json_feedback(true, '', $dadosResponse);
+
+                $textoSituacao = ($enquete->getSituacao() == WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA) ? 'parcial' : 'final';
+
+                $notificacoesFlash = create_notificacao_json(
+                    'sucesso',
+                    'Seu voto foi registrado com sucesso! <br> Veja abaixo o resultado <strong>' . $textoSituacao . '</strong> da enquete.',
+                    10000
+                );
+
+                $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+            } catch (Exception $e) {
+                log_message('error', 'Erro ao registrar voto em enquete: ' . create_exception_description($e));
+
+                $error = create_json_feedback_error_json('Ocorreu um erro inesperado, já estamos tentando resolver. Tente novamente mais tarde!');
+
+                $json = create_json_feedback(false, $error);
+            }
+        }
+
+        echo $json;
     }
 
     public function salvar ()
@@ -342,16 +431,22 @@ class Enquete extends WL_Controller {
 
             $this->load->helper('notificacao_js');
 
+            $notificacao_array = create_notificacao_array(
+                'sucesso',
+                'A enquete <strong>' . $enquete->getQuestao() . '</strong> foi ' . $strSituacao . ' com sucesso!',
+                10000
+            );
+
             $notificacao = Zend_Json::encode(array(
-                'situacaoAtual' => $strSituacao,
-                'notificacao' => create_notificacao_array(
-                    'sucesso',
-                    'A enquete <strong>' . $enquete->getQuestao() . '</strong> foi ' . $strSituacao . ' com sucesso!',
-                    10000
-                )
+                'notificacao' => $notificacao_array
             ));
 
             $json = create_json_feedback(true, '', $notificacao);
+
+            if ( $this->input->get('exibindoEnquete') ) {
+                $this->session->set_flashdata('notificacoesFlash',
+                    Zend_Json::encode($notificacao_array));
+            }
         } catch (Exception $e) {
             log_message('error', 'Erro ao tentar alterar situação da enquete de curso: ' . create_exception_description($e));
 
@@ -409,6 +504,8 @@ class Enquete extends WL_Controller {
         $enquete->setQtdAlternativas( count( $post['alternativas'] ) );
 
         $enqueteDao->salvar( $enquete );
+
+        $enqueteDao->zerarVotos( $enquete );
 
         $enqueteDao->recuperarAlternativas( $enquete );
 
@@ -493,7 +590,7 @@ class Enquete extends WL_Controller {
         }
     }
 
-    public function _tituloLista($filtro)
+    private function _tituloLista($filtro)
     {
         switch ($filtro) {
             case 'todas': return '- Todas as Enquetes' ;

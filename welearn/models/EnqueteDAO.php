@@ -17,16 +17,50 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO
     private $_nomeEnquetePorSituacaoAbertoCF = 'cursos_enquete_por_situacao_aberto';
     private $_nomeEnquetePorSituacaoFechadoCF = 'cursos_enquete_por_situacao_fechado';
 
+    /**
+     * @var ColumnFamily|null
+     */
     private $_enquetePorCursoCF;
+
+    /**
+     * @var ColumnFamily|null
+     */
     private $_enquetePorStatusAtivoCF;
+
+    /**
+     * @var ColumnFamily|null
+     */
     private $_enquetePorStatusInativoCF;
+
+    /**
+     * @var ColumnFamily|null
+     */
     private $_enquetePorSituacaoAbertoCF;
+
+    /**
+     * @var ColumnFamily|null
+     */
     private $_enquetePorSituacaoFechadoCF;
 
+    /**
+     * @var CursoDAO
+     */
     private $_cursoDao;
+
+    /**
+     * @var UsuarioDAO
+     */
     private $_usuarioDao;
+
+    /**
+     * @var AlternativaEnqueteDAO
+     */
     private $_alternativaEnqueteDao;
-    //private $_votoEnqueteDao;
+
+    /**
+     * @var VotoEnqueteDAO
+     */
+    private $_votoEnqueteDao;
 
     function __construct()
     {
@@ -41,7 +75,7 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO
         $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
         $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
         $this->_alternativaEnqueteDao = WeLearn_DAO_DAOFactory::create('AlternativaEnqueteDAO');
-        //$this->_votoEnqueteDao = WeLearn_DAO_DAOFactory::create('VotoEnqueteDAO');
+        $this->_votoEnqueteDao = WeLearn_DAO_DAOFactory::create('VotoEnqueteDAO');
     }
 
     /**
@@ -88,6 +122,13 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO
         return array();
     }
 
+    /**
+     * @param WeLearn_Cursos_Curso $curso
+     * @param string $de
+     * @param string $ate
+     * @param int $count
+     * @return array
+     */
     public function recuperarTodosPorCurso(WeLearn_Cursos_Curso $curso, $de = '', $ate ='', $count = 10)
     {
         if ($de != '') {
@@ -109,6 +150,14 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO
         return $this->_criarVariosFromCassandra($columns);
     }
 
+    /**
+     * @param WeLearn_Cursos_Curso $curso
+     * @param $status
+     * @param string $de
+     * @param string $ate
+     * @param int $count
+     * @return array
+     */
     public function recuperarTodosPorStatus(WeLearn_Cursos_Curso $curso, $status, $de = '', $ate = '', $count = 10)
     {
         if ($de != '') {
@@ -134,6 +183,14 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO
         return $this->_criarVariosFromCassandra($columns, $curso);
     }
 
+    /**
+     * @param WeLearn_Cursos_Curso $curso
+     * @param $situacao
+     * @param string $de
+     * @param string $ate
+     * @param int $count
+     * @return array
+     */
     public function recuperarTodosPorSituacao(WeLearn_Cursos_Curso $curso, $situacao, $de = '', $ate = '', $count = 10)
     {
         if ($de != '') {
@@ -177,6 +234,10 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO
         return 0;
     }
 
+    /**
+     * @param WeLearn_Cursos_Curso $curso
+     * @return int
+     */
     public function recuperarQtdTotalPorCurso(WeLearn_Cursos_Curso $curso)
     {
         $cursoUUID = CassandraUtil::import($curso->getId());
@@ -184,6 +245,11 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO
         return $this->_enquetePorCursoCF->get_count($cursoUUID->bytes);
     }
 
+    /**
+     * @param WeLearn_Cursos_Curso $curso
+     * @param $status
+     * @return int
+     */
     public function recuperarQtdTotalPorStatus(WeLearn_Cursos_Curso $curso, $status)
     {
         $cursoUUID = CassandraUtil::import($curso->getId());
@@ -195,6 +261,11 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO
         }
     }
 
+    /**
+     * @param WeLearn_Cursos_Curso $curso
+     * @param $situacao
+     * @return int
+     */
     public function recuperarQtdTotalPorSituacao(WeLearn_Cursos_Curso $curso, $situacao)
     {
         $cursoUUID = CassandraUtil::import($curso->getId());
@@ -235,6 +306,8 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO
         } else {
             $this->_enquetePorSituacaoFechadoCF->remove($cursoUUID->bytes, array($id->bytes));
         }
+
+        $this->zerarVotos($enquete);
 
         $this->recuperarAlternativas($enquete);
 
@@ -345,13 +418,47 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO
         return $alternativas;
     }
 
+    public function votar(WeLearn_Cursos_Enquetes_VotoEnquete &$voto)
+    {
+        $this->_votoEnqueteDao->salvar($voto);
+    }
+
     /**
      * @param WeLearn_Cursos_Enquetes_Enquete $enquete
      * @return int
      */
     public function recuperarQtdTotalVotos(WeLearn_Cursos_Enquetes_Enquete &$enquete)
     {
-         // TODO: Implementar este metodo.
+         $enquete->setTotalVotos(
+             $this->_votoEnqueteDao->recuperarQtdTotalPorEnquete($enquete)
+         );
+
+        return $enquete->getTotalVotos();
+    }
+
+    /**
+     * @param WeLearn_Cursos_Enquetes_Enquete $enquete
+     */
+    public function recuperarQtdParcialVotos(WeLearn_Cursos_Enquetes_Enquete &$enquete)
+    {
+        foreach ($enquete->getAlternativas() as $alternativa) {
+            $parcial = $this->recuperarQtdTotalVotosPorAlternativa($alternativa);
+
+            if ( $enquete->getTotalVotos() > 0 ) {
+                $alternativa->setProporcaoParcial(
+                    ($parcial / $enquete->getTotalVotos()) * 100
+                );
+            }
+        }
+    }
+
+    /**
+     * @param WeLearn_Cursos_Enquetes_AlternativaEnquete $alternativa
+     * @return int
+     */
+    public function recuperarQtdTotalVotosPorAlternativa(WeLearn_Cursos_Enquetes_AlternativaEnquete &$alternativa)
+    {
+        return $this->_alternativaEnqueteDao->recuperarQtdVotos($alternativa);
     }
 
     /**
@@ -360,11 +467,28 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO
      */
     public function zerarVotos(WeLearn_Cursos_Enquetes_Enquete &$enquete)
     {
-        // TODO: Implementar este metodo.
+        $this->_votoEnqueteDao->removeTodosrPorEnquete($enquete);
+
+        $enquete->setTotalVotos(0);
+
+        foreach ($enquete->getAlternativas() as $alternativa)
+        {
+            $alternativa->setTotalVotos(0);
+        }
     }
 
     /**
+     * @param WeLearn_Usuarios_Usuario $usuario
      * @param WeLearn_Cursos_Enquetes_Enquete $enquete
+     * @return bool
+     */
+    public function usuarioJaVotou(WeLearn_Usuarios_Usuario $usuario, WeLearn_Cursos_Enquetes_Enquete $enquete)
+    {
+        return $this->_votoEnqueteDao->usuarioJaVotouEnquete($usuario, $enquete);
+    }
+
+    /**
+     * @param array $alternativas
      * @return void
      */
     public function removerAlternativas (array $alternativas)
@@ -374,6 +498,9 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO
         }
     }
 
+    /**
+     * @param array $alternativas
+     */
     public function salvarAlternativas (array $alternativas)
     {
         foreach ( $alternativas as $alternativa ) {
@@ -395,6 +522,8 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO
 
         $enquete->fromCassandra($column);
 
+        $this->recuperarQtdTotalVotos($enquete);
+
         return $enquete;
     }
 
@@ -407,5 +536,30 @@ class EnqueteDAO extends WeLearn_DAO_AbstractDAO
         }
 
         return $listaEnquetes;
+    }
+
+    /**
+     * @return mixed|UsuarioDAO
+     */
+    public function getUsuarioDao()
+    {
+        return $this->_usuarioDao;
+    }
+
+    /**
+     * @return CursoDAO|mixed
+     */
+    public function getCursoDao()
+    {
+        return $this->_cursoDao;
+    }
+
+
+    /**
+     * @return AlternativaEnqueteDAO|mixed
+     */
+    public function getAlternativaEnqueteDao()
+    {
+        return $this->_alternativaEnqueteDao;
     }
 }
