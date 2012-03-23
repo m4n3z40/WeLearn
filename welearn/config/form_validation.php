@@ -207,7 +207,14 @@ $config = array(
             'label' => 'Alternativas',
             'rules' => 'required|callback__validarQtdAlternativas'
         )
-    )
+    ),
+    'enquete/votar' => array(
+        array(
+            'field' => 'alternativaEscolhida',
+            'label' => 'Alternativa',
+            'rules' => 'required'
+        )
+    ),
 );
 
 

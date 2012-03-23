@@ -64,16 +64,46 @@
     });
 
     var formEnquete = document.getElementById('form-criar-enquete') ||
-                      document.getElementById('form-alterar-enquete');
+                      document.getElementById('form-alterar-enquete'),
+        alterandoEnquete = ( $(formEnquete).attr('id') == 'form-alterar-enquete' );
+
+    if ( alterandoEnquete ) {
+        var $divConfirmacaoAlterar = $('<div id="dialogo-confirmacao-remover-enquete">' +
+                                       '<p>Tem certeza que deseja alterar os dados desta enquete?<br/>' +
+                                       'Ao fazer isso <strong>TODAS</strong> as participações de ' +
+                                       'usuários contidas nesta enquete serão ' +
+                                       '<strong>PERDIDAS PARA SEMPRE!</strong></p></div>');
+    }
 
     $('#btn-form-enquete').click(function(e){
         e.preventDefault();
 
         var url = WeLearn.url.siteURL('enquete/enquete/salvar');
 
-        WeLearn.validarForm(formEnquete, url, function(res) {
-            window.location = WeLearn.url.siteURL('curso/enquete/exibir/' + res.idEnquete);
-        });
+        if ( alterandoEnquete ) {
+            $divConfirmacaoAlterar.dialog({
+                title: 'Tem certeza?',
+                width: '450px',
+                resizable: false,
+                modal: true,
+                buttons: {
+                    'Confirmar' : function() {
+                        WeLearn.validarForm(formEnquete, url, function(res) {
+                            window.location = WeLearn.url.siteURL('curso/enquete/exibir/' + res.idEnquete);
+                        });
+
+                        $( this ).dialog('close');
+                    },
+                    'Cancelar' : function() {
+                        $( this ).dialog('close');
+                    }
+                }
+            });
+        } else {
+            WeLearn.validarForm(formEnquete, url, function(res) {
+                window.location = WeLearn.url.siteURL('curso/enquete/exibir/' + res.idEnquete);
+            });
+        }
     });
 
     var $listaEnqueteDataTable = $('#enquete-listar-datatable');
@@ -112,9 +142,10 @@
 
     var visualizandoListaEnquetes = (document.getElementById('enquete-listar-content') != null),
         $divConfirmacaoRemover = $('<div id="dialogo-confirmacao-remover-enquete">' +
-                                    '<p>Tem certeza que deseja remover esta enquete?<br/>' +
-                                    'Esta ação <strong>NÃO</strong> poderá ser desfeita!<br/>' +
-                                    '<strong>TODAS</strong> as participações de usuários nesta enquete serão perdidas!</p></div>');
+                                   '<p>Tem certeza que deseja remover esta enquete?<br/>' +
+                                   'Esta ação <strong>NÃO</strong> poderá ser desfeita!<br/>' +
+                                   '<strong>TODAS</strong> as participações de usuários nesta ' +
+                                   'enquete serão <strong>PERDIDAS!</strong></p></div>');
 
     $('a.a-enquete-remover').live('click', function(e){
         e.preventDefault();
@@ -234,21 +265,17 @@
                 'Confirmar' : function() {
                     $.get(
                         $this.attr('href'),
-                        {},
+                        visualizandoListaEnquetes ? {} : {'exibindoEnquete': 1},
                         function(res) {
                             if (res.success) {
-                                WeLearn.notificar(res.notificacao);
-
                                 if (visualizandoListaEnquetes) {
+                                    WeLearn.notificar(res.notificacao);
+
                                     $this.parent().parent().parent().parent().parent().fadeOut('slow', function(){
                                         $( this ).remove();
                                     });
                                 } else {
-                                    if (res.situacaoAtual == 'reaberta') {
-                                        $this.text('Fechar');
-                                    } else {
-                                        $this.text('Reabrir');
-                                    }
+                                    window.location.reload();
                                 }
                             } else {
                                 WeLearn.notificar({
@@ -281,5 +308,26 @@
         stop: function(e, ui) {
             $(this).children('li.ui-selected').first().find('input[type=radio]').attr('checked', true);
         }
+    });
+
+    var $formVotar = $(document.getElementById('form-enquete-votar'));
+    $('#btn-votar-enquete').click(function(e){
+        e.preventDefault();
+
+        $.post(
+            $formVotar.attr('action'),
+            $formVotar.serialize(),
+            function (res) {
+                if (res.success) {
+                    window.location.reload();
+                } else {
+                    WeLearn.notificar({
+                        'nivel': 'erro',
+                        'msg': res.errors[0].error_msg,
+                        'tempo': 5000
+                    });
+                }
+            }
+        );
     });
 })();

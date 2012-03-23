@@ -400,7 +400,46 @@ button, .button {
     margin-top: 1px;
 }
 
+.barchart {}
 
+    .barchart header > p {
+        margin: 0;
+    }
+
+    .barchart ul {
+        list-style: none;
+        padding-left: 0px;
+    }
+    
+        .barchart ul li > p {
+            margin-bottom: 0;
+            padding-left: 15px;
+        }
+
+    .barchart-bar {
+        background-color: #006600;
+        background-image: -webkit-linear-gradient(left , #459e00 3%, #99ff66 80%);
+        background-image: -moz-linear-gradient(left , #459e00 3%, #99ff66 80%);
+        background-image: -o-linear-gradient(left , #459e00 3%, #99ff66 80%);
+        background-image: -ms-linear-gradient(left , #459e00 3%, #99ff66 80%);
+        background-image: linear-gradient(left , #459e00 3%, #99ff66 80%);
+        height: 30px;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        border: 1px #363636 solid;
+    }
+    
+    .barchart-bar > p {
+        padding: 10px 5px;
+        text-align: right;
+        color: #363636;
+        font-size: 9pt;
+        margin: 0;
+        font-weight: bold;
+        overflow: visible;
+        white-space: nowrap;
+    }
 
 
 #forum-lista-posts article {

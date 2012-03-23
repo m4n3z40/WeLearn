@@ -272,12 +272,12 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
 
     public function recuperarQtdTotalVotos()
     {
-        //@TODO: Implementar este método!!
+        WeLearn_DAO_DAOFactory::create('EnqueteDAO')->recuperarQtdTotalVotos($this);
     }
 
     public function zerarVotos()
     {
-        //@TODO: Implementar este método!!
+        WeLearn_DAO_DAOFactory::create('EnqueteDAO')->zerarVotos($this);
     }
 
     public function zerarAlternativas()
@@ -287,7 +287,9 @@ class WeLearn_Cursos_Enquetes_Enquete extends WeLearn_DTO_AbstractDTO
 
     public function recuperarQtdParcialVotos()
     {
-        //@TODO: Implementar este método!!
+        $enqueteDao = WeLearn_DAO_DAOFactory::create('EnqueteDAO');
+
+        $enqueteDao->recuperarQtdParcialVotos( $this );
     }
 
     /**
