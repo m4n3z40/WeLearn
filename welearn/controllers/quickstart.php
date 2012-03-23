@@ -147,8 +147,8 @@ class Quickstart extends WL_Controller {
         $usuarioAtual->setDadosPessoais( $dadosPessoais );
 
         $usuarioAtual->salvarDadosPessoais();
-
-        var_dump($usuarioAtual);
+        //var_dump($usuarioAtual);
+        echo '{"success":true}';
     }
 
     private function _etapa2()
@@ -184,6 +184,14 @@ class Quickstart extends WL_Controller {
 
     private function _salvar_etapa2($dados_post)
     {
+        $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
+
+        $dadosProfissionaisDao = WeLearn_DAO_DAOFactory::create('DadosProfissionaisUsuarioDAO');
+        $dadosProfissionais = $dadosProfissionaisDao->criarNovo($dados_post);
+        $usuarioAtual->setDadosProfissionais( $dadosProfissionais );
+
+        $usuarioAtual->salvarDadosProfissionais();
+        //var_dump($dados_post);
         echo '{"success":true}';
     }
 
@@ -199,6 +207,14 @@ class Quickstart extends WL_Controller {
 
     private function _salvar_etapa3($dados_post)
     {
+        $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
+
+        $imagemUsuarioDao = WeLearn_DAO_DAOFactory::create('ImagemUsuarioDAO');
+        $imagemUsuario = $imagemUsuarioDao->criarNovo($dados_post);
+        $usuarioAtual->setImagem( $imagemUsuario );
+
+        $usuarioAtual->salvarImagem();
+        //var_dump($dados_post);
         echo '{"success":true}';
     }
 
