@@ -305,16 +305,16 @@ class Enquete extends WL_Controller {
                         $json = $this->_criarEnquete( $this->input->post() );
                         $notificacoesFlash = create_notificacao_json(
                             'sucesso',
-                            'A nova enquete foi criada com sucesso, na verdade você já está nela!<br/>Caso pense em alguma alteração faça-a o mais rápido possível!',
-                            10000
+                            'A nova enquete foi criada com sucesso, na verdade você
+                             já está nela!<br/>Caso pense em alguma alteração faça-a
+                             o mais rápido possível!'
                         );
                         break;
                     case 'alterar';
                         $json = $this->_alterarEnquete( $this->input->post() );
                         $notificacoesFlash = create_notificacao_json(
                             'sucesso',
-                            'As alterações na enquete foram salvas com sucesso!',
-                            10000
+                            'As alterações na enquete foram salvas com sucesso!'
                         );
                         break;
                     default:

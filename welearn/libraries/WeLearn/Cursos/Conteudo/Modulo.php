@@ -12,7 +12,7 @@ class WeLearn_Cursos_Conteudo_Modulo extends WeLearn_DTO_AbstractDTO
 {
 
     /**
-     * @var int
+     * @var string
      */
     private $_id;
 
@@ -58,15 +58,15 @@ class WeLearn_Cursos_Conteudo_Modulo extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param int $id
+     * @param string $id
      */
     public function setId($id)
     {
-        $this->_id = (int)$id;
+        $this->_id = (string)$id;
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
@@ -94,7 +94,7 @@ class WeLearn_Cursos_Conteudo_Modulo extends WeLearn_DTO_AbstractDTO
      */
     public function setNroOrdem($nroOrdem)
     {
-        $this->_nroOrdem = (string)$nroOrdem;
+        $this->_nroOrdem = (int)$nroOrdem;
     }
 
     /**
@@ -124,7 +124,7 @@ class WeLearn_Cursos_Conteudo_Modulo extends WeLearn_DTO_AbstractDTO
     /**
      * @param \WeLearn_Cursos_Curso $curso
      */
-    public function setCurso($curso)
+    public function setCurso(WeLearn_Cursos_Curso $curso)
     {
         $this->_curso = $curso;
     }
@@ -153,6 +153,23 @@ class WeLearn_Cursos_Conteudo_Modulo extends WeLearn_DTO_AbstractDTO
             'nroOrdem' => $this->getNroOrdem(),
             'curso' => $this->getCurso()->toArray(),
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'descricao' => $this->getDescricao(),
+            'objetivos' => $this->getObjetivos(),
+            'nroOrdem' => $this->getNroOrdem(),
+            'curso' => ($this->_curso instanceof WeLearn_Cursos_Curso) ? $this->getCurso()->getId() : ''
         );
     }
 }

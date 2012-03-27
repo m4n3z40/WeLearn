@@ -215,6 +215,23 @@ $config = array(
             'rules' => 'required'
         )
     ),
+    'modulo/salvar' => array(
+        array(
+            'field' => 'nome',
+            'label' => 'Nome',
+            'rules' => 'required|min_length[5]|max_length[125]'
+        ),
+        array(
+            'field' => 'descricao',
+            'label' => 'Descrição',
+            'rules' => 'required|max_length[512]'
+        ),
+        array(
+            'field' => 'objetivos',
+            'label' => 'Objetivos',
+            'rules' => 'required|max_length[1024]'
+        )
+    ),
 );
 
 

@@ -57,7 +57,10 @@ $route['curso/forum/([a-z_]+)'] = 'forum/forum/$1';
 $route['curso/enquete/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'enquete/enquete/index/$1';
 $route['curso/enquete/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'enquete/enquete/$1/$2';
 $route['curso/enquete/([a-z_]+)'] = 'enquete/enquete/$1';
-
+$route['curso/conteudo/modulo/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/modulo/index/$1';
+$route['curso/conteudo/modulo/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] ='conteudo/modulo/$1/$2';
+$route['curso/conteudo/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/conteudo/index/$1';
+$route['curso/conteudo/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/conteudo/$1/$2';
 $route['usuario/perfil'] = 'usuario/perfil/index';
 $route['usuario/perfil/([a-z_]+)'] = 'usuario/perfil/$1';
 $route['usuario/([a-z_]+)'] = 'usuario/usuario/$1';
