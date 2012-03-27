@@ -16,7 +16,10 @@ class Home extends WL_Controller {
 
     public function index()
     {
-        $this->template->render('usuario/home/index');
+        $usuario=$this->autenticacao->getUsuarioAutenticado();
+        $partial_perfil = array('dados_usuario' => $this->autenticacao->getUsuarioAutenticado());
+        $this->template->render('usuario/home/index',$partial_perfil);
+
     }
 }
 

@@ -18,6 +18,7 @@ class teste extends CI_Controller
 
     public function index()
     {
+        /*
         $areadao= WeLearn_DAO_DAOFactory::create('AreaDAO');
         $areaobj= $areadao->criarNovo();
         $areaobj->setId('1');
@@ -29,5 +30,14 @@ class teste extends CI_Controller
         $segmentoObj->setDescricao('descricao');
         $segmentoObj->setArea($areaobj);
         $segmentodao->salvar($segmentoObj);
+        */
+
+
+
+
+
+
+
+
     }
 }

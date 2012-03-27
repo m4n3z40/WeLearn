@@ -108,6 +108,9 @@
         }
     }
 
+
+
+
     function init() {
         var etapaAtual = 0;
         exibirProximaEtapa(etapaAtual);

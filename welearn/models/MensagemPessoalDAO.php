@@ -6,17 +6,26 @@
  * Time: 20:57
  * To change this template use File | Settings | File Templates.
  */
- 
+
+
+// como o allan explicou, existirá uma lista com o nome de todos os amigos que já trocaram mensagem com o usuario
+// ao clicar em uma amigo será exibido a lista de conversas do usuario com este amigo, baseado na chave usuario1::usuario2
+//usuarios_mensagem irá guardar o id da mensagem e a mensagem em si
+//usuarios_mensagem_por_amigos irá guardar (key: usuario1::usuario2){array(id_mensagem:"")}
+//usuario_mensagem_amigos ira guardar (key: destinatario)array(
+
+
+
 class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
 
     protected $_nomeCF = 'usuarios_mensagem_pessoal';
 
     //indexes
-    private $_nomeMPPorRemetenteCF = 'usuarios_mensagem_pessoal_por_remetente';
-    private $_nomeMPPorDestinatarioCF = 'usuarios_mensagem_pessoal_por_destinatario';
+    private $_nomeMPPorAmigosCF = 'usuarios_mensagem_por_amigos';//mantem os ids da mensagens trocadas entre dois usuarios agrupadas
+    private $_nomeMPAmigosCF = 'usuarios_mensagem_amigos';//mantem a lista de amigos que já trocaram mensagens com o usuario pelo menos uma vez(id da column  vai ser o id do amigo)
 
-    private $_MPPorRemetenteCF;
-    private $_MPPorDestinatarioCF;
+    private $_MPPorAmigosCF;
+    private $_MPAmigosCF;
 
     /**
      * @var UsuarioDAO
@@ -25,13 +34,11 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
 
     function __construct()
     {
-        parent::__construct();
 
         $phpCassa = WL_Phpcassa::getInstance();
 
-        $this->_MPPorRemetenteCF = $phpCassa->getColumnFamily($this->_nomeMPPorRemetenteCF);
-        $this->_MPPorDestinatarioCF = $phpCassa->getColumnFamily($this->_nomeMPPorDestinatarioCF);
-
+        $this->_MPPorAmigosCF = $phpCassa->getColumnFamily($this->_nomeMPPorAmigosCF);
+        $this->_MPAmigosCF = $phpCassa->getColumnFamily($this->_nomeMPAmigosCF);
         $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
     }
 
@@ -45,11 +52,17 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
 
         $dto->setId($UUID->string);
         $dto->setDataEnvio(time());
-
         $this->_cf->insert($UUID->bytes, $dto->toCassandra());
 
-        $this->_MPPorRemetenteCF->insert($dto->getRemetente()->getId(), array($UUID->bytes => ''));
-        $this->_MPPorDestinatarioCF->insert($dto->getDestinatario()->getId(), array($UUID->bytes => ''));
+        $remetente=$dto->getRemetente();
+        $destinatario=$dto->getDestinatario();
+        $arraySort = array($remetente->getId(), $destinatario->getId());
+        sort($arraySort);
+        $chave= implode('::', $arraySort);
+
+        $this->_MPPorAmigosCF->insert($chave, array($UUID->bytes => ''));
+        $this->_MPAmigosCF->insert($destinatario->getId(), array($remetente->getId() => ''));
+        $this->_MPAmigosCF->insert($remetente->getId(), array($destinatario->getId() => ''));
     }
 
     /**
@@ -71,54 +84,9 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
      */
     public function recuperarTodos($de = '', $ate = '', array $filtros = null)
     {
-        if (isset($filtros['count'])) {
-            $count = $filtros['count'];
-        } else {
-            $count = 10;
-        }
-
-        if (isset($filtros['remetente']) && $filtros['remetente'] instanceof WeLearn_Usuarios_Usuario) {
-            return $this->recuperarTodosPorRemetente($filtros['remerente'], $de, $ate, $count);
-        }
-
-        if (isset($filtros['destinatario']) && $filtros['destinatario'] instanceof WeLearn_Usuarios_Usuario) {
-            return $this->recuperarTodosPorDestinatario($filtros['destinatario'], $de, $ate, $count);
-        }
-
         return array();
     }
 
-    public function recuperarTodosPorRemetente(WeLearn_Usuarios_Usuario $remetente, $de = '', $ate = '', $count = 10)
-    {
-        if ( $de != '' ) {
-            $de = CassandraUtil::import($de)->bytes;
-        }
-        if ( $ate != '' ) {
-            $ate = CassandraUtil::import($ate)->bytes;
-        }
-
-        $idsMensagens = $this->_MPPorRemetenteCF->get($remetente->getId(), null, $de, $ate, true, $count);
-
-        $columns = $this->_cf->multiget($idsMensagens);
-
-        return $this->_criarVariosFromCassandra($columns, $remetente);
-    }
-
-    public function recuperarTodosPorDestinatario(WeLearn_Usuarios_Usuario $destinatario, $de = '', $ate = '', $count = 10)
-    {
-        if ( $de != '' ) {
-            $de = CassandraUtil::import($de)->bytes;
-        }
-        if ( $ate != '' ) {
-            $ate = CassandraUtil::import($ate)->bytes;
-        }
-
-        $idsMensagens = $this->_MPPorDestinatarioCF->get($destinatario->getId(), null, $de, $ate, true, $count);
-
-        $columns = $this->_cf->multiget($idsMensagens);
-
-        return $this->_criarVariosFromCassandra($columns, null, $destinatario);
-    }
 
     /**
      * @param mixed $id
@@ -145,15 +113,7 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
         return 0;
     }
 
-    public function recuperarQtdPorRemetente(WeLearn_Usuarios_Usuario $remetente)
-    {
-        return $this->_MPPorRemetenteCF->get_count($remetente->getId());
-    }
 
-    public function recuperarQtdPorDestinatario(WeLearn_Usuarios_Usuario $destinatario)
-    {
-        return $this->_MPPorDestinatarioCF->get_count($destinatario->getId());
-    }
 
     /**
      * @param mixed $id
