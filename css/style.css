@@ -216,9 +216,11 @@ aside {
 
 button, .button {
     background: #fff;
-    padding: 5px;
+    color: #000;
+    padding: 10px;
     border: #000 solid 1px;
     border-radius: 5px;
+    display: inline-block;
 }
 
 #main, .center-container {
@@ -446,14 +448,47 @@ button, .button {
     }
 
 
+
 #forum-lista-posts article {
     overflow: hidden;
+}
+
+
+
+.div-modulo-gerenciar-posicoes {
+    text-align: center;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+
+.btn-modulo-salvar-posicoes {
+    display: none;
+}
+
+#ul-modulo-listar-lista  {
+    width: 605px;
+}
+
+#ul-modulo-listar-lista > li {
+    width: inherit;
+}
+
+#ul-modulo-listar-lista > li > h3 {
+    line-height: 2em;
+}
+
+#ul-modulo-listar-lista > li.sortable-placeholder {
+    height: 3.5em;
 }
 
 /* =============================================================================
    Non-semantic helper classes
    Please define your styles before this section.
    ========================================================================== */
+
+.disabled {
+    color: #99a;
+}
 
 /* For image replacement */
 .ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }

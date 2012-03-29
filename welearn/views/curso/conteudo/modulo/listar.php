@@ -10,18 +10,21 @@
     </header>
     <div>
     <?php if ($haModulos): ?>
-        <ul id="ul-modulo-listar-lista">
+        <p>
+            Sinta-se livre para mudar a ordem dos módulos da maneira que preferir.
+            Para isso, basta clicar e arrastar o módulo que quiser para posição da
+            sua preferência e então clicar no botão "Salvar ordem dos módulos" que
+            aparecerá logo acima e abaixo da lista.
+        </p>
+        <div class="div-modulo-gerenciar-posicoes">
+            <button class="btn-modulo-salvar-posicoes">Salvar ordem dos módulos</button>
+        </div>
+        <ul id="ul-modulo-listar-lista" data-id-curso="<?php echo $idCurso ?>">
             <?php echo $listaModulos ?>
         </ul>
-        <footer>
-            <nav id="paginacao-modulo">
-                <?php if ($haMaisPaginas): ?>
-                    <a href="#" data-proximo="<?php echo $inicioProxPagina ?>" data-id-curso="<?php echo $idCurso ?>" class="button">Mais Módulos...</a>
-                <?php else: ?>
-                    <h4>Não há mais módulos a serem exibidos no momento.</h4>
-                <?php endif; ?>
-            </nav>
-        </footer>
+        <div class="div-modulo-gerenciar-posicoes">
+            <button class="btn-modulo-salvar-posicoes">Salvar ordem dos módulos</button>
+        </div>
     <?php else: ?>
         <h4>
             Nenhum módulo de curso foi criado até o momento. <?php echo anchor('/curso/conteudo/modulo/criar/' . $idCurso, 'Seja o primeiro!') ?>

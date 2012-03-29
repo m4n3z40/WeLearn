@@ -20,7 +20,7 @@
         </ul>
     </td>
     <td>
-        <nav id="enquete-listar-adminpanel" class="enquete-adminpanel">
+        <nav class="enquete-adminpanel">
             <ul>
                 <li><?php echo anchor('curso/enquete/alterar/' . $enquete->id, 'Alterar') ?></li>
                 <li><?php echo anchor('curso/enquete/remover/' . $enquete->id, 'Remover',

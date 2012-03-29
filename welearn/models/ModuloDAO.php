@@ -58,6 +58,30 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param WeLearn_Cursos_Conteudo_Modulo $modulo
+     * @param null|UUID $cursoUUID
+     */
+    public function atualizarPosicao(WeLearn_Cursos_Conteudo_Modulo $modulo,
+                                     UUID $cursoUUID = null)
+    {
+        $UUID = CassandraUtil::import( $modulo->getId() );
+
+        if ( !( $cursoUUID instanceof UUID ) ) {
+            $cursoUUID = CassandraUtil::import( $modulo->getCurso()->getId() );
+        }
+
+        $this->_cf->insert(
+            $UUID->bytes,
+            array( 'nroOrdem' => $modulo->getNroOrdem() )
+        );
+
+        $this->_moduloPorCursoCF->insert(
+            $cursoUUID->bytes,
+            array( $UUID->bytes => $modulo->getNroOrdem() )
+        );
+    }
+
+    /**
      * @param mixed $de
      * @param mixed $ate
      * @param array|null $filtros
@@ -158,7 +182,7 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
     {
         $UUID = CassandraUtil::import( $id );
 
-        $moduloRemovido = $this->recuperar( $UUID );
+        $moduloRemovido = $this->recuperar( $id );
 
         $cursoUUID = CassandraUtil::import( $moduloRemovido->getCurso()->getId() );
 

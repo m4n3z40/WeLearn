@@ -126,13 +126,14 @@
                     if (res.paginacao.proxima_pagina) {
                         $this.data('proximo', res.paginacao.inicio_proxima_pagina);
                     } else {
-                        $this.parent().html('<h4>Não há mais enquetes a serem exibidas.</h4>')
+                        $this.parent().html('<h4>Não há mais enquetes a ' +
+                                            'serem exibidas.</h4>');
                     }
                 } else {
                     WeLearn.notificar({
                         msg: res.errors[0].error_msg,
                         nivel: 'erro',
-                        tempo: 15000
+                        tempo: 10000
                     });
                 }
             },
