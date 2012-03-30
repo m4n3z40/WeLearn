@@ -5,15 +5,16 @@
             <h3>Abaixo você verá todos módulos contidos neste curso.</h3>
         </hgroup>
         <p>
-            Quer criar um novo módulo de curso? <?php echo anchor('/curso/conteudo/modulo/criar/' . $idCurso, 'É por aqui!') ?>
+            Quer criar um novo módulo de curso?
+            <?php echo anchor('/curso/conteudo/modulo/criar/' . $idCurso, 'É por aqui!') ?>
         </p>
     </header>
     <div>
     <?php if ($haModulos): ?>
         <p>
             Sinta-se livre para mudar a ordem dos módulos da maneira que preferir.
-            Para isso, basta clicar e arrastar o módulo que quiser para posição da
-            sua preferência e então clicar no botão "Salvar ordem dos módulos" que
+            Para isso, basta clicar e arrastar o módulo que quiser para posição de
+            sua preferência e então clicar no botão "Salvar ordem dos módulos", que
             aparecerá logo acima e abaixo da lista.
         </p>
         <div class="div-modulo-gerenciar-posicoes">
@@ -27,7 +28,11 @@
         </div>
     <?php else: ?>
         <h4>
-            Nenhum módulo de curso foi criado até o momento. <?php echo anchor('/curso/conteudo/modulo/criar/' . $idCurso, 'Seja o primeiro!') ?>
+            Nenhum módulo de curso foi criado até o momento.
+            <?php echo anchor(
+                '/curso/conteudo/modulo/criar/' . $idCurso,
+                'Crie o primeiro!'
+            ) ?>
         </h4>
     <?php endif ?>
     </div>

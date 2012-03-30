@@ -34,8 +34,8 @@
                     } else {
                         WeLearn.notificar({
                             msg: res.errors[0].error_msg,
-                            nivel: 'erro',
-                            tempo: 15000
+                            nivel: 'error',
+                            tempo: 10000
                         });
                     }
                 },
@@ -82,7 +82,7 @@
                                 }
                             } else {
                                 WeLearn.notificar({
-                                    nivel: 'erro',
+                                    nivel: 'error',
                                     msg: res.errors[0].error_msg,
                                     tempo: 10000
                                 });
@@ -134,7 +134,7 @@
                                 WeLearn.notificar(res.notificacao);
                             } else {
                                 WeLearn.notificar({
-                                    nivel: 'erro',
+                                    nivel: 'error',
                                     msg: res.errors[0].error_msg,
                                     tempo: 10000
                                 });
@@ -178,8 +178,8 @@
                     } else {
                         WeLearn.notificar({
                             msg: res.errors[0].error_msg,
-                            nivel: 'erro',
-                            tempo: 15000
+                            nivel: 'error',
+                            tempo: 10000
                         })
                     }
                 },

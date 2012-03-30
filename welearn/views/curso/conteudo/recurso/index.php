@@ -2,7 +2,7 @@
     <header>
         <hgroup>
             <h1>Recursos Extras do Curso</h1>
-            <h3>Aqui é onde você encontra ou gerencia os recursos
+            <h3>Aqui é onde você encontra/gerencia os recursos
                 extras contidos neste curso.</h3>
         </hgroup>
         <div>
@@ -33,7 +33,7 @@
                                   array('class'=>'button')) ?>
             </li>
             <li>
-                <?php echo anchor('/curso/conteudo/recurso/restrito',
+                <?php echo anchor('/curso/conteudo/recurso/restrito/' . $idCurso,
                                   'Recursos Restritos',
                                   array('class'=>'button')) ?>
                 <div id="div-recurso-select-modulos"
@@ -50,7 +50,7 @@
                     <?php echo form_dropdown('aulas',
                                              $listaAulas,
                                              '',
-                                             'id="slt-recursos-aulas"') ?>
+                                             'id="slt-recurso-aulas"') ?>
                 </div>
             </li>
         </ul>

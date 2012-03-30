@@ -118,7 +118,7 @@
 
                             } else {
                                 WeLearn.notificar({
-                                    nivel: 'erro',
+                                    nivel: 'error',
                                     msg: res.errors[0].error_msg,
                                     tempo: 10000
                                 });
@@ -158,7 +158,7 @@
 
                 } else {
                     WeLearn.notificar({
-                        nivel: 'erro',
+                        nivel: 'error',
                         msg: res.errors[0].error_msg,
                         tempo: 10000
                     });

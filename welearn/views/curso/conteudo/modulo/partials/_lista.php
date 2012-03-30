@@ -41,7 +41,7 @@
                         ) ?>
                     </li>
                     <li>
-                        <?php echo anchor('/curso/conteudo/recurso/'
+                        <?php echo anchor('/curso/conteudo/recurso/restrito/'
                                               . $modulo->curso->id
                                               . '?m=' . $modulo->id,
                                           'Gerenciar Recursos',

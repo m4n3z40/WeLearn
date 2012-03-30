@@ -52,7 +52,7 @@
                 success: function (res, status) {
                     if (res.success) {
                         WeLearn.notificar({
-                            nivel: 'sucesso',
+                            nivel: 'success',
                             msg: 'Sua imagem foi carregada com sucesso!',
                             tempo: 5000
                         });
@@ -79,7 +79,7 @@
                         });
                     } else {
                         WeLearn.notificar({
-                            nivel: 'erro',
+                            nivel: 'error',
                             msg: res.error_msg,
                             tempo: 10000
                         });
@@ -87,7 +87,7 @@
                 },
                 error: function (res, status) {
                     WeLearn.notificar({
-                        nivel: 'erro',
+                        nivel: 'error',
                         msg: 'Ocorreu um erro inesperado! Já estamos verificando, tente novamente mais tarde.',
                         tempo: 10000
                     });

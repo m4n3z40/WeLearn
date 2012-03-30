@@ -9,8 +9,6 @@
  */
 class Modulo extends WL_Controller
 {
-    const MAX_MODULOS = 50;
-
     public function __construct()
     {
         parent::__construct();
@@ -27,18 +25,13 @@ class Modulo extends WL_Controller
     public function listar ($idCurso)
     {
         try {
-            $count = Modulo::MAX_MODULOS;
-
             $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
             $curso = $cursoDao->recuperar($idCurso);
 
             $moduloDAO = WeLearn_DAO_DAOFactory::create('ModuloDAO');
 
             try {
-                $listaModulos = $moduloDAO->recuperarTodosPorCurso($curso,
-                                                                   '',
-                                                                   '',
-                                                                   $count);
+                $listaModulos = $moduloDAO->recuperarTodosPorCurso($curso);
             } catch (cassandra_NotFoundException $e) {
                 $listaModulos = array();
             }
@@ -154,10 +147,9 @@ class Modulo extends WL_Controller
             $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
             $curso = $cursoDao->recuperar($idCurso);
 
-            $maxModulos = Modulo::MAX_MODULOS;
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             $ultrapassouLimite = ( $moduloDao->recuperarQtdTotalPorCurso($curso)
-                                   >= $maxModulos );
+                                   >= ModuloDAO::MAX_MODULOS );
 
             if ($ultrapassouLimite) {
                 $form = '';
@@ -178,7 +170,7 @@ class Modulo extends WL_Controller
             $dadosView = array(
                 'idCurso' => $curso->getId(),
                 'ultrapassouLimite' => $ultrapassouLimite,
-                'maxModulos' => $maxModulos,
+                'maxModulos' => ModuloDAO::MAX_MODULOS,
                 'form' => $form
             );
 
@@ -248,8 +240,7 @@ class Modulo extends WL_Controller
                         $notificacoesFlash = create_notificacao_json(
                             'sucesso',
                             'O módulo foi criado com sucesso!
-                             Verifique os dados inseridos na lista abaixo
-                             na lista abaixo.'
+                             Verifique os dados inseridos na lista de módulos abaixo.'
                         );
                         break;
                     case 'alterar':
@@ -261,7 +252,7 @@ class Modulo extends WL_Controller
                         );
                         break;
                     default:
-                        throw new WeLearn_Base_Exception('Ação inválida ao salvar módulo');
+                        throw new WeLearn_Base_Exception('Ação inválida ao salvar módulo.');
                 }
 
                 $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);

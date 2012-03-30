@@ -8,6 +8,8 @@
  */
 class ModuloDAO extends WeLearn_DAO_AbstractDAO
 {
+    const MAX_MODULOS = 50;
+
     protected $_nomeCF = 'cursos_modulo';
 
     private $_nomeModuloPorCursoCF = 'cursos_modulo_por_curso';
@@ -92,7 +94,7 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
         if ( isset($filtros['count']) ) {
             $count = (int) $filtros['count'];
         } else {
-            $count = 20;
+            $count = ModuloDAO::MAX_MODULOS;
         }
 
         if ( isset($filtros['curso'] ) &&
@@ -113,7 +115,7 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
     public function recuperarTodosPorCurso(WeLearn_Cursos_Curso $curso,
                                            $de = '',
                                            $ate = '',
-                                           $count = 20)
+                                           $count = ModuloDAO::MAX_MODULOS)
     {
         if ($de != '') {
             $de = CassandraUtil::import($de)->bytes;
@@ -206,7 +208,7 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
     public function __construct()
     {
         $this->_moduloPorCursoCF = WL_Phpcassa::getInstance()
-            ->getColumnFamily($this->_nomeModuloPorCursoCF);
+             ->getColumnFamily($this->_nomeModuloPorCursoCF);
 
         $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
     }
@@ -214,9 +216,9 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
     private function _criarFromCassandra(array $column,
                                          WeLearn_Cursos_Curso $cursoPadrao = null)
     {
-        $column['curso'] = ($cursoPadrao instanceof WeLearn_Cursos_Curso) ?
-                            $cursoPadrao :
-                            $this->_cursoDao->recuperar( $column['curso'] );
+        $column['curso'] = ($cursoPadrao instanceof WeLearn_Cursos_Curso)
+                           ? $cursoPadrao
+                           : $this->_cursoDao->recuperar( $column['curso'] );
 
         $modulo = $this->criarNovo();
         $modulo->fromCassandra($column);

@@ -272,64 +272,6 @@ button, .button {
         margin-top: 5px;
     }
 
-#container-notificacoes {
-    width: 100%;
-    position: fixed;
-    top: 0;
-    z-index: 1000;
-}
-
-    #container-notificacoes .wrapper-notificacao {
-        position: relative;
-    }
-
-    #container-notificacoes .barra-notificacao-erro,
-    #container-notificacoes .barra-notificacao-sucesso,
-    #container-notificacoes .barra-notificacao-aviso {
-        padding: 10px;
-    }
-
-    .barra-notificacao-erro .msg-notificacao,
-    .barra-notificacao-sucesso .msg-notificacao,
-    .barra-notificacao-aviso .msg-notificacao {
-        text-align: center;
-        margin: 0 auto;
-    }
-
-    #container-notificacoes .barra-notificacao-erro {
-        background: #f3a3a3;
-        border: 1px #9f1c25 solid;
-        color: #9f1c25;
-    }
-
-    #container-notificacoes .barra-notificacao-sucesso {
-        background: #99ff99;
-        border: 1px #327e04 solid;
-        color: #006600;
-    }
-
-    #container-notificacoes .barra-notificacao-aviso {
-        background: #fcf0ba;
-        border: 1px #e8e1b5 solid;
-        color: #363636;
-    }
-
-    .barra-notificacao-fechar-habilitado {
-        position: absolute;
-        right: 0;
-        top: 0;
-        padding: 10px;
-    }
-
-        .barra-notificacao-fechar-habilitado a {
-            text-decoration: none;
-        }
-
-    .barra-notificacao-fechar-desabilitado {
-        display: none;
-        visibility: hidden;
-    }
-
 #about {
     width: 650px;
     margin-right: 10px;
@@ -389,21 +331,19 @@ button, .button {
     float: right;
 }
 
-.validation-error {
-    font-style: italic;
-}
-
 /**************************************
 ************ Template Curso *********
 **************************************/
 
 .validation-error, .error {
-    background: #f3a3a3;
-    border: 1px #9f1c25 solid;
-    color: #9f1c25;
+    background: red;
+    border: 1px #8b0000 solid;
+    color: #fff;
     padding: 5px;
     border-radius: 5px;
     margin-top: 1px;
+    font-weight: bold;
+    opacity: 0.9;
 }
 
 .barchart {}
