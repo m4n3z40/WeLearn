@@ -18,74 +18,32 @@ window.WeLearn = {
     helpers: {
     },
     notificar : function(opcoes) {
-        var classeBarra,
-            opcoesPadrao,
-            divContainerNotificacoes,
-            $divContainerNotificacoes,
-            $divNotificacao;
-
-        opcoesPadrao = {
-            msg: 'Isto é uma barra de notificação, uma mensagem deveria aparecer aqui.',
-            nivel: 'aviso',
-            fechavel: true,
-            textoFechar: 'X',
-            tempo: false,
-            redirecionarAoFechar: false,
-            redirecionarParaUrl: null
-        };
+        var opcoesPadrao = {
+                msg: 'Isto é uma barra de notificação, uma mensagem deveria aparecer aqui.',
+                nivel: 'alert',
+                fechavel: true,
+                tempo: false,
+                redirecionarAoFechar: false,
+                redirecionarParaUrl: null
+            },
+            opcoesNoty;
 
         opcoes = $.extend(opcoesPadrao, opcoes);
 
-        divContainerNotificacoes = document.getElementById('container-notificacoes');
-        if (divContainerNotificacoes == null) {
-            divContainerNotificacoes = document.createElement('div');
-            divContainerNotificacoes.setAttribute('id', 'container-notificacoes');
-            $('body').prepend(divContainerNotificacoes);
-        }
-        $divContainerNotificacoes = $(divContainerNotificacoes);
-
-        switch ( opcoes.nivel ) {
-            case 'erro': classeBarra = 'barra-notificacao-erro'; break;
-            case 'sucesso': classeBarra = 'barra-notificacao-sucesso'; break;
-            case 'aviso': classeBarra = 'barra-notificacao-aviso'; break;
-            default: classeBarra = 'barra-notificacao-aviso';
+        opcoesNoty = {
+            text: opcoes.msg,
+            type: opcoes.nivel,
+            closeOnSelfClick: opcoes.fechavel,
+            timeout: opcoes.tempo
         }
 
-        var fechar = function(notificacao) {
-            notificacao.slideUp(function(){
-                $(this).remove();
-
-                if( opcoes.redirecionarAoFechar && opcoes.redirecionarParaUrl != null ) {
-                    window.location = opcoes.redirecionarParaUrl;
-                }
-            });
-        };
-
-        $divNotificacao = $(document.createElement('div'));
-
-        var $botaoFechar = $('<span />');
-        if ( opcoes.fechavel ) {
-            $botaoFechar.addClass('barra-notificacao-fechar-habilitado')
-                        .html('<a href="#">' + opcoes.textoFechar + '</a>')
-                        .find('a')
-                            .bind('click', function(e){ e.preventDefault(); fechar($divNotificacao); });
-        } else {
-            $botaoFechar.addClass('barra-notificacao-fechar-desabilitado');
+        if ( opcoes.redirecionarAoFechar ) {
+            opcoesNoty.onClose = function(){
+                window.location = opcoes.redirecionarParaUrl;
+            };
         }
 
-        $divNotificacao.css({display: 'none'})
-                       .addClass('wrapper-notificacao')
-                       .addClass(classeBarra)
-                       .html('<div class="msg-notificacao">' + opcoes.msg + '</div>')
-                       .append($botaoFechar)
-                       .appendTo($divContainerNotificacoes)
-                       .slideDown();
-
-        if( opcoes.tempo ) {
-            setTimeout(function(){
-                fechar($divNotificacao);
-            }, opcoes.tempo)
-        }
+        $.noty(opcoesNoty);
     },
     validarForm : function(form, url_validacao, onValidationPass, onValidationFail) {
         var $form = $(form);
@@ -98,7 +56,7 @@ window.WeLearn = {
                     erro = result.errors[i];
 
                     if (erro.field_name == "noField") {
-                        WeLearn.notificar({msg: erro.error_msg, nivel: 'erro', tempo: 10000});
+                        WeLearn.notificar({msg: erro.error_msg, nivel: 'error', tempo: 10000});
                         continue;
                     }
 
@@ -119,7 +77,7 @@ window.WeLearn = {
                     } else {
                         WeLearn.notificar({
                             msg: erro.error_msg,
-                            nivel: 'erro',
+                            nivel: 'error',
                             tempo: 10000
                         });
                     }

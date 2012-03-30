@@ -224,7 +224,7 @@ $config = array(
         array(
             'field' => 'descricao',
             'label' => 'Descrição',
-            'rules' => 'required|max_length[512]'
+            'rules' => 'required|max_length[1024]'
         ),
         array(
             'field' => 'objetivos',
@@ -232,6 +232,18 @@ $config = array(
             'rules' => 'required|max_length[1024]'
         )
     ),
+    'aula/salvar' => array(
+        array(
+            'field' => 'nome',
+            'label' => 'Nome',
+            'rules' => 'required|min_length[5]|max_length[125]'
+        ),
+        array(
+            'field' => 'descricao',
+            'label' => 'Descrição',
+            'rules' => 'required|max_length[1024]'
+        )
+    )
 );
 
 

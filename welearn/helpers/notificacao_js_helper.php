@@ -1,9 +1,16 @@
 <?php
 
 function create_notificacao_array ($nivel = 'sucesso', $msg = '', $tempo = 10000,
-                                   $fechavel = true, $textoFechar = '', $redirecionarAoFechar = false,
+                                   $fechavel = true, $redirecionarAoFechar = false,
                                    $redirecionarParaUrl = '')
 {
+    switch ($nivel) {
+        case 'sucesso': $nivel = 'success'; break;
+        case 'erro': $nivel = 'error'; break;
+        case 'aviso':
+        default: $nivel = 'alert';
+    }
+
     $notificacao = array(
         'nivel' => $nivel,
         'msg' => $msg,
@@ -12,10 +19,6 @@ function create_notificacao_array ($nivel = 'sucesso', $msg = '', $tempo = 10000
 
     if ( ! $fechavel ) {
         $notificacao['fechavel'] = false;
-    }
-
-    if ( $textoFechar ) {
-        $notificacao['textoFechar'] = $textoFechar;
     }
 
     if ( $redirecionarAoFechar ) {
@@ -27,12 +30,12 @@ function create_notificacao_array ($nivel = 'sucesso', $msg = '', $tempo = 10000
 }
 
 function create_notificacao_json ($nivel = 'sucesso', $msg = '', $tempo = 10000,
-                                   $fechavel = true, $textoFechar = '', $redirecionarAoFechar = false,
+                                   $fechavel = true, $redirecionarAoFechar = false,
                                    $redirecionarParaUrl = '')
 {
     return Zend_Json::encode(
         create_notificacao_array(
-            $nivel, $msg, $tempo, $fechavel, $textoFechar, $redirecionarAoFechar, $redirecionarParaUrl
+            $nivel, $msg, $tempo, $fechavel, $redirecionarAoFechar, $redirecionarParaUrl
         )
     );
 }

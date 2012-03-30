@@ -15,6 +15,8 @@
 
 	<link rel="stylesheet" href="{$base_url}css/style.css">
     <link rel="stylesheet" href="{$base_url}css/jquery-ui.css">
+    <link rel="stylesheet" href="{$base_url}css/jquery.noty.css">
+    <link rel="stylesheet" href="{$base_url}css/noty_theme_default.css">
     {$template.cssLinks}
 
 	<script src="{$base_url}js/libs/modernizr-2.0.6.min.js"></script>
@@ -38,11 +40,13 @@
     </footer>
 </div> <!--! end of #container -->
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="{$base_url}js/libs/jquery-1.6.2.min.js"><\/script>')</script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="{$base_url}js/libs/jquery-1.7.2.min.js"><\/script>')</script>
 
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
 <script>window.jQuery.ui || document.write('<script src="{$base_url}js/libs/jquery-ui-1.8.16.min.js"><\/script>')</script>
+
+<script src="{$base_url}js/libs/jquery.noty.js"></script>
 
 <script>
     var flashData = {$template.jsNotificacoes};

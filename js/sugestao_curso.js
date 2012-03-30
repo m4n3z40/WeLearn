@@ -34,7 +34,7 @@
 
                     WeLearn.notificar({
                         msg: msg,
-                        nivel: 'erro',
+                        nivel: 'error',
                         tempo: 10000
                     });
                 }
@@ -129,7 +129,7 @@
 
                         WeLearn.notificar({
                             msg: msg,
-                            nivel: 'erro',
+                            nivel: 'error',
                             tempo: 10000
                         });
                     }
@@ -152,7 +152,7 @@
                             msg: 'Seu voto foi registrado com sucesso! Aguarde, quando esta sugestão gerar um curso, <br/>' +
                                  'Você será avisado!',
                             tempo: 10000,
-                            nivel: 'sucesso'
+                            nivel: 'success'
                         });
 
                         $spnQtdVotos.text(res.qtdVotos);
@@ -160,7 +160,7 @@
                         WeLearn.notificar({
                             msg: res.errors[0].error_msg,
                             tempo: 10000,
-                            nivel: 'erro'
+                            nivel: 'error'
                         });
                     }
                 };

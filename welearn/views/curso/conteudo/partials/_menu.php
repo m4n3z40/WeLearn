@@ -1,3 +1,4 @@
+<h3>Ações em Conteúdo</h3>
 <ul>
     <li><?php echo anchor('/curso/conteudo/modulo/' . $idCurso, 'Gerenciar Módulos') ?></li>
     <li><?php echo anchor('/curso/conteudo/aula/' . $idCurso, 'Gerenciar Aulas') ?></li>

@@ -9,13 +9,41 @@
  
 class AulaDAO extends WeLearn_DAO_AbstractDAO
 {
+    const MAX_AULAS = 50;
+
+    protected $_nomeCF = 'cursos_aula';
+
+    private $_nomeAulaPorModuloCF = 'cursos_aula_por_modulo';
+
+    /**
+     * @var ColumnFamily
+     */
+    private $_aulaPorModuloCF;
+
+    /**
+     * @var ModuloDAO
+     */
+    private $_moduloDao;
+
+    public function __construct()
+    {
+        $this->_aulaPorModuloCF = WL_Phpcassa::getInstance()
+                                      ->getColumnFamily($this->_nomeAulaPorModuloCF);
+
+        $this->_moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
+    }
+
     /**
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
      */
     public function recuperar($id)
     {
-        // TODO: Implementar este metodo
+        $UUID = CassandraUtil::import( $id );
+
+        $column = $this->_cf->get( $UUID->bytes );
+
+        return $this->_criarFromCassandra( $column );
     }
 
     /**
@@ -26,7 +54,53 @@ class AulaDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperarTodos($de = null, $ate = null, array $filtros = null)
     {
-         // TODO: Implementar este metodo
+        if ( isset($filtros['count']) ) {
+            $count = (int) $filtros['count'];
+        } else {
+            $count = AulaDAO::MAX_AULAS;
+        }
+
+        if ( isset($filtros['modulo'] ) &&
+             ($filtros['modulo'] instanceof WeLearn_Cursos_Curso) ) {
+            return $this->recuperarTodosPorModulo($filtros['modulo'],
+                                                  $de,
+                                                  $ate,
+                                                  $count);
+        }
+
+        return array();
+    }
+
+    /**
+     * @param WeLearn_Cursos_Conteudo_Modulo $modulo
+     * @param string $de
+     * @param string $ate
+     * @param int $count
+     */
+    public function recuperarTodosPorModulo(WeLearn_Cursos_Conteudo_Modulo $modulo,
+                                            $de = '',
+                                            $ate = '',
+                                            $count = AulaDAO::MAX_AULAS)
+    {
+        if ($de != '') {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+
+        if ($ate != '') {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
+        $moduloUUID = CassandraUtil::import( $modulo->getId() );
+
+        $aulasIds = $this->_aulaPorModuloCF->get(
+            $moduloUUID->bytes, null, $de, $ate, false, $count
+        );
+        asort($aulasIds, SORT_NUMERIC);
+        $aulasIds = array_keys($aulasIds);
+
+        $columns = $this->_cf->multiget($aulasIds);
+
+        return $this->_criarVariosFromCassandra($columns);
     }
 
     /**
@@ -36,7 +110,22 @@ class AulaDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperarQtdTotal($de = null, $ate = null)
     {
-         // TODO: Implementar este metodo
+         if ($de instanceof WeLearn_Cursos_Conteudo_Modulo) {
+             return $this->recuperarQtdTotalPorModulo($de);
+         }
+
+        return 0;
+    }
+
+    /**
+     * @param WeLearn_Cursos_Conteudo_Modulo $modulo
+     * @return int
+     */
+    public function recuperarQtdTotalPorModulo(WeLearn_Cursos_Conteudo_Modulo $modulo)
+    {
+        $moduloUUID = CassandraUtil::import( $modulo->getId() );
+
+        return $this->_aulaPorModuloCF->get_count($moduloUUID->bytes);
     }
 
     /**
@@ -45,7 +134,18 @@ class AulaDAO extends WeLearn_DAO_AbstractDAO
      */
     public function remover($id)
     {
-        // TODO: Implementar este metodo
+        $UUID = CassandraUtil::import($id);
+
+        $aulaRemovida = $this->recuperar( $id );
+
+        $moduloUUID = CassandraUtil::import( $aulaRemovida->getModulo()->getId() );
+
+        $this->_cf->remove($UUID->bytes);
+        $this->_aulaPorModuloCF->remove($moduloUUID->bytes, array($UUID->bytes));
+
+        $aulaRemovida->setPersistido(false);
+
+        return $aulaRemovida;
     }
 
      /**
@@ -54,7 +154,7 @@ class AulaDAO extends WeLearn_DAO_AbstractDAO
      */
     public function criarNovo(array $dados = null)
     {
-        // TODO: Implementar este metodo
+        return new WeLearn_Cursos_Conteudo_Aula($dados);
     }
 
     /**
@@ -63,7 +163,9 @@ class AulaDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _atualizar(WeLearn_DTO_IDTO $dto)
     {
-        // TODO: Implementar este metodo
+        $UUID = CassandraUtil::import( $dto->getId() );
+
+        $this->_cf->insert($UUID->bytes, $dto->toCassandra());
     }
 
     /**
@@ -72,26 +174,79 @@ class AulaDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        // TODO: Implementar este metodo
+        $UUID = UUID::mint();
+        $moduloUUID = CassandraUtil::import( $dto->getModulo()->getId() );
+
+        $dto->setId( $UUID->string );
+        $dto->setNroOrdem(
+            $this->recuperarQtdTotalPorModulo( $dto->getModulo() ) + 1
+        );
+
+        $this->_cf->insert($UUID->bytes, $dto->toCassandra());
+        $this->_aulaPorModuloCF->insert(
+            $moduloUUID->bytes,
+            array( $UUID->bytes => $dto->getNroOrdem())
+        );
+
+        $dto->setPersistido(true);
     }
 
     /**
      * @param WeLearn_Cursos_Conteudo_Aula $Aula
      * @return int
      */
-    public function recuperarQtdPaginas(WeLearn_Cursos_Conteudo_Aula $Aula)
+    public function recuperarQtdPaginas(WeLearn_Cursos_Conteudo_Aula $aula)
     {
         // TODO: Implementar este metodo
     }
 
     /**
      * @param WeLearn_Cursos_Conteudo_Aula $Aula
-     * @param int $posicao
+     * @param UUID $moduloUUID
      * @return void
      */
-    public function alterarPosicao(WeLearn_Cursos_Conteudo_Aula $Aula, int $posicao)
+    public function atualizarPosicao(WeLearn_Cursos_Conteudo_Aula $aula,
+                                     UUID $moduloUUID)
     {
-       // TODO: Implementar este metodo
+       $UUID = CassandraUtil::import( $aula->getId() );
+
+        if ( !( $moduloUUID instanceof UUID ) ) {
+            $moduloUUID = CassandraUtil::import( $aula->getModulo()->getId() );
+        }
+
+        $this->_cf->insert(
+            $UUID->bytes,
+            array( 'nroOrdem' => $aula->getNroOrdem() )
+        );
+
+        $this->_aulaPorModuloCF->insert(
+            $moduloUUID->bytes,
+            array( $UUID->bytes => $aula->getNroOrdem() )
+        );
     }
 
+    private function _criarFromCassandra(array $column,
+                                         WeLearn_Cursos_Conteudo_Modulo $moduloPadrao = null)
+    {
+        $column['modulo'] = ($moduloPadrao instanceof WeLearn_Cursos_Conteudo_Modulo)
+                            ? $moduloPadrao
+                            : $this->_moduloDao->recuperar( $column['modulo'] );
+
+        $aula = $this->criarNovo();
+        $aula->fromCassandra($column);
+
+        return $aula;
+    }
+
+    private function _criarVariosFromCassandra(array $columns,
+                                               WeLearn_Cursos_Conteudo_Modulo $moduloPadra = null)
+    {
+        $listaAulas = array();
+
+        foreach ($columns as $column) {
+            $listaAulas[] = $this->_criarFromCassandra($column, $moduloPadra);
+        }
+
+        return $listaAulas;
+    }
 }

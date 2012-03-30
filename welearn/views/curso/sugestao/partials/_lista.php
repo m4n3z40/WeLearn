@@ -47,7 +47,9 @@
         <div>
             <h4>Um curso foi gerado a partir desta sugestão</h4>
             <ul>
-                <li><?php echo anchor('/curso/' . $sugestao->cursoCriado->id, 'Clique aqui para acessá-lo') ?></li>
+                <li><?php echo anchor('/curso/' . $sugestao->cursoCriado->id,
+                                      'Clique aqui para acessá-lo',
+                                      array('class' => 'button')) ?></li>
             </ul>
         </div>
         <?php endif; ?>
