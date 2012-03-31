@@ -8,7 +8,7 @@
  */
 class ModuloDAO extends WeLearn_DAO_AbstractDAO
 {
-    const MAX_MODULOS = 50;
+    const MAX_MODULOS = 12;
 
     protected $_nomeCF = 'cursos_modulo';
 

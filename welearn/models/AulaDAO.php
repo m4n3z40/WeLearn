@@ -9,7 +9,7 @@
  
 class AulaDAO extends WeLearn_DAO_AbstractDAO
 {
-    const MAX_AULAS = 50;
+    const MAX_AULAS = 30;
 
     protected $_nomeCF = 'cursos_aula';
 

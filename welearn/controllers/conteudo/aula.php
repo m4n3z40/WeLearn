@@ -27,7 +27,13 @@ class Aula extends WL_Controller
             $curso = $cursoDao->recuperar($idCurso);
 
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
-            $listaModulos = $moduloDao->recuperarTodosPorCurso($curso);
+
+            try{
+                $listaModulos = $moduloDao->recuperarTodosPorCurso($curso);
+            } catch (cassandra_NotFoundException $e) {
+                $listaModulos = array();
+            }
+
 
             $this->load->helper('modulo');
 
@@ -61,10 +67,45 @@ class Aula extends WL_Controller
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             $modulo = $moduloDao->recuperar($idModulo);
 
+            try{
+                $listaModulos = $moduloDao->recuperarTodosPorCurso( $modulo->getCurso() );
+            } catch (cassandra_NotFoundException $e) {
+                $listaModulos = array();
+            }
+
+            $this->load->helper('modulo');
+
+            $dadosPartialSelect = array(
+                'listaModulos' => lista_modulos_para_dados_dropdown($listaModulos),
+                'moduloSelecionado' => '0',
+                'extra' => 'id="slt-aula-modulos"'
+            );
+
+            $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
+
+            try {
+                $listaAulas = $aulaDao->recuperarTodosPorModulo($modulo);
+            } catch ( cassandra_NotFoundException $e ) {
+                $listaAulas = array();
+            }
+
+            $dadosPartial = array(
+                'listaAulas' => $listaAulas
+            );
+
             $dadosView = array(
                 'modulo' => $modulo,
-                'haAulas' => false,
-                'listaAulas' => ''
+                'selectModulo' => $this->template->loadPartial(
+                    'select_modulos',
+                    $dadosPartialSelect,
+                    'curso/conteudo'
+                ),
+                'haAulas' => ! empty( $listaAulas ),
+                'listaAulas' => $this->template->loadPartial(
+                    'lista',
+                    $dadosPartial,
+                    'curso/conteudo/aula'
+                )
             );
 
             $this->_renderTemplateCurso(
@@ -128,11 +169,135 @@ class Aula extends WL_Controller
 
     public function alterar($idAula)
     {
+        try {
+            $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
+            $aula = $aulaDao->recuperar($idAula);
 
+            $dadosPartial = array(
+                'formAction' => 'conteudo/aula/salvar',
+                'extraOpenForm' => 'id="aula-alterar-form"',
+                'formHidden' => array(
+                    'aulaId' => $aula->getId(),
+                    'acao' => 'alterar'
+                ),
+                'nomeAtual' => $aula->getNome(),
+                'descricaoAtual' => $aula->getDescricao(),
+                'txtBotaoEnviar' => 'Salvar!'
+            );
+
+            $dadosView = array(
+                'nomeAula' => $aula->getNome(),
+                'idModulo' => $aula->getModulo()->getId(),
+                'form' => $this->template->loadPartial(
+                    'form',
+                    $dadosPartial,
+                    'curso/conteudo/aula'
+                )
+            );
+
+            $this->_renderTemplateCurso(
+                $aula->getModulo()->getCurso(),
+                'curso/conteudo/aula/alterar',
+                $dadosView
+            );
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar exibir form de alteração de aula: '
+                                 . create_exception_description($e));
+
+            show_404();
+        }
+    }
+
+    public function salvar_posicoes($idModulo) {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
+            $modulo = $moduloDao->recuperar( $idModulo );
+
+            $this->_salvarAlteracoesOrdem( $this->input->get(), $modulo );
+
+            $this->load->helper('notificacao_js');
+
+            $notificacao = Zend_Json::encode(array(
+                'notificacao' => create_notificacao_array(
+                    'sucesso',
+                    'A nova ordem das aulas deste módulo foi salva com sucesso!'
+                )
+            ));
+
+            $json = create_json_feedback(true, '', $notificacao);
+        } catch (Exception $e) {
+            log_message('error', 'Ocorreu um erro ao salvar novas posicoes
+                        de aula de um módulo: ' . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro inesperado, já estamos tentando resolver.
+                Tente novamente mais tarde!'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    public function remover($idAula)
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        $this->load->helper('notificacao_js');
+
+        try {
+            $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
+            $aulaRemovida = $aulaDao->remover($idAula);
+
+            $this->_salvarAlteracoesOrdem(
+                $this->input->get(),
+                $aulaRemovida->getModulo()
+            );
+
+            $notificacao = Zend_Json::encode(array(
+                'notificacao' => create_notificacao_array(
+                    'sucesso',
+                    'A aula "<em>' . $aulaRemovida->getNome() .
+                        '</em>" foi removida com sucesso!'
+                )
+            ));
+
+            $json = create_json_feedback(true, '', $notificacao);
+        } catch (Exception $e) {
+            log_message('error', 'Ocorreu um erro ao tentar remover
+                         uma aula de um módulo: ' . create_exception_description($e));
+
+            $notificacoesFlash = create_notificacao_json(
+                'erro',
+                'Ocorreu um erro inesperado, já estamos tentando resolver.
+                Tente novamente mais tarde!'
+            );
+
+            $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
+            $json = create_json_feedback(false);
+        }
+
+        echo $json;
     }
 
     public function salvar()
     {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
         set_json_header();
 
         $this->load->library('form_validation');
@@ -159,7 +324,7 @@ class Aula extends WL_Controller
                             'sucesso',
                             'As alterações da aula foram salvas com sucesso!'
                         );
-                        $json = $this->_adicionar( $this->input->post() );
+                        $json = $this->_alterar( $this->input->post() );
                         break;
                     default:
                         throw new WeLearn_Base_Exception('Ação inválida ao salvar aula.');
@@ -203,7 +368,18 @@ class Aula extends WL_Controller
 
     private function _alterar(array $post)
     {
+        $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
+        $aula = $aulaDao->recuperar( $post['aulaId'] );
 
+        $aula->preencherPropriedades( $post );
+
+        $aulaDao->salvar( $aula );
+
+        $idModuloJson = Zend_Json::encode(array(
+            'idModulo' => $aula->getModulo()->getId()
+        ));
+
+        return create_json_feedback(true, '', $idModuloJson);
     }
 
     private function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null, $view = '', array $dados = null)
@@ -224,5 +400,21 @@ class Aula extends WL_Controller
         $this->template->setDefaultPartialVar('curso/barra_lateral_esquerda', $dadosBarraEsquerda)
                        ->setDefaultPartialVar('curso/barra_lateral_direita', $dadosBarraDireita)
                        ->render($view, $dados);
+    }
+
+    private function _salvarAlteracoesOrdem(array $arrayAlteracoes,
+                                            WeLearn_Cursos_Conteudo_Modulo $modulo)
+    {
+        $moduloUUID = CassandraUtil::import( $modulo->getId() );
+
+        $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
+        $aulaAuxiliar = $aulaDao->criarNovo();
+
+        foreach ($arrayAlteracoes as $idAula => $posicao) {
+            $aulaAuxiliar->setId( $idAula );
+            $aulaAuxiliar->setNroOrdem( $posicao );
+
+            $aulaDao->atualizarPosicao( $aulaAuxiliar, $moduloUUID );
+        }
     }
 }

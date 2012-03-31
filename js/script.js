@@ -16,6 +16,17 @@ window.WeLearn = {
         }
     },
     helpers: {
+        accordionToURLParamPosicoes: function ($accordion) {
+            var arrayPosicoes = $accordion.sortable('toArray'),
+                i,
+                parametrosGet = {};
+
+            for (i = 1; i <= arrayPosicoes.length; i++) {
+                parametrosGet[ arrayPosicoes[i - 1] ] = i;
+            }
+
+            return $.param(parametrosGet);
+        }
     },
     notificar : function(opcoes) {
         var opcoesPadrao = {

@@ -2,7 +2,7 @@
     <header>
         <hgroup>
             <h1>Alterar Módulo "<?php echo $nomeModulo ?>"</h1>
-            <h3>Altere os dados nos campos abaixo e depois clique em "salvar"
+            <h3>Altere os dados nos campos abaixo e depois clique em "Salvar"
                 para atualizar os dados deste módulo.</h3>
         </hgroup>
         <p>

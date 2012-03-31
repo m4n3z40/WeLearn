@@ -395,29 +395,27 @@ button, .button {
 
 
 
-.div-modulo-gerenciar-posicoes {
+.div-modulo-gerenciar-posicoes, .div-aula-gerenciar-posicoes {
     text-align: center;
     padding-bottom: 10px;
     padding-top: 10px;
-}
-
-.btn-modulo-salvar-posicoes {
     display: none;
 }
 
-#ul-modulo-listar-lista  {
+#ul-modulo-listar-lista, #ul-aula-listar-lista  {
     width: 605px;
 }
 
-#ul-modulo-listar-lista > li {
+#ul-modulo-listar-lista > li, #ul-aula-listar-lista > li {
     width: inherit;
 }
 
-#ul-modulo-listar-lista > li > h3 {
+#ul-modulo-listar-lista > li > h3, #ul-aula-listar-lista > li > h3 {
     line-height: 2em;
 }
 
-#ul-modulo-listar-lista > li.sortable-placeholder {
+#ul-modulo-listar-lista > li.sortable-placeholder,
+#ul-aula-listar-lista > li.sortable-placeholder {
     height: 3.5em;
 }
 

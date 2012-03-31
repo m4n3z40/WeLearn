@@ -18,13 +18,13 @@
             aparecerá logo acima e abaixo da lista.
         </p>
         <div class="div-modulo-gerenciar-posicoes">
-            <button class="btn-modulo-salvar-posicoes">Salvar ordem dos módulos</button>
+            <button>Salvar ordem dos módulos</button>
         </div>
         <ul id="ul-modulo-listar-lista" data-id-curso="<?php echo $idCurso ?>">
             <?php echo $listaModulos ?>
         </ul>
         <div class="div-modulo-gerenciar-posicoes">
-            <button class="btn-modulo-salvar-posicoes">Salvar ordem dos módulos</button>
+            <button>Salvar ordem dos módulos</button>
         </div>
     <?php else: ?>
         <h4>

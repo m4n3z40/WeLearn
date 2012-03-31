@@ -8,7 +8,14 @@
         <p>
             Quer criar uma nova aula para este módulo?
             <?php echo anchor('/curso/conteudo/aula/criar/' . $modulo->id, 'Clique aqui!') ?>
+            <br>
+            <br>
+            Quer gerenciar as aulas de outro módulo?
+            <?php echo anchor('#', 'Clique aqui!', array('id' => 'a-aula-alterar-modulo')) ?>
         </p>
+        <div id="div-aula-alterar-modulo" style="display: none;">
+            <?php echo $selectModulo ?>
+        </div>
     </header>
     <div>
     <?php if ($haAulas): ?>
@@ -19,13 +26,13 @@
             que aparecerá logo acima e abaixo da lista.
         </p>
         <div class="div-aula-gerenciar-posicoes">
-            <button class="btn-aula-salvar-posicoes">Salvar ordem das aulas</button>
+            <button>Salvar ordem das aulas</button>
         </div>
-        <ul id="ul-aula-listar-lista" data-id-curso="<?php echo $modulo->id ?>">
+        <ul id="ul-aula-listar-lista" data-id-modulo="<?php echo $modulo->id ?>">
             <?php echo $listaAulas ?>
         </ul>
         <div class="div-aula-gerenciar-posicoes">
-            <button class="btn-aula-salvar-posicoes">Salvar ordem das aulas</button>
+            <button>Salvar ordem das aulas</button>
         </div>
     <?php else: ?>
         <h4>

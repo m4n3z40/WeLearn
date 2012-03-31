@@ -201,6 +201,7 @@ class Modulo extends WL_Controller
 
             $dadosView = array(
                 'nomeModulo' => $modulo->getNome(),
+                'idCurso' => $modulo->getCurso()->getId(),
                 'form' => $this->template->loadPartial('form', $dadosPartial, 'curso/conteudo/modulo')
             );
 

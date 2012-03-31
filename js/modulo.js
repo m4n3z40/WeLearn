@@ -25,17 +25,10 @@
                 });
         },
         ulListaModuloToParam = function($ulListaModulo) {
-            var arrayPosicoes = $ulListaModulo.sortable('toArray'),
-                i,
-                parametrosGet = {};
-
-            for (i = 1; i <= arrayPosicoes.length; i++) {
-                parametrosGet[ arrayPosicoes[i - 1] ] = i;
-            }
-
-            return $.param(parametrosGet);
+            return WeLearn.helpers.accordionToURLParamPosicoes($ulListaModulo);
         },
-        $btnSalvarPosicoesModulo = $('.btn-modulo-salvar-posicoes'),
+        $divGerenciarPosicoesModulo = $('.div-modulo-gerenciar-posicoes'),
+        $btnSalvarPosicoesModulo = $divGerenciarPosicoesModulo.children('button'),
         accordionOptions = {
             header: '> li > h3',
             collapsible: true,
@@ -47,8 +40,8 @@
             axis: 'y',
             handle: 'h3',
             update: function(e) {
-                if( ! $btnSalvarPosicoesModulo.first().is(':visible') ) {
-                    $btnSalvarPosicoesModulo.show();
+                if( ! $divGerenciarPosicoesModulo.first().is(':visible') ) {
+                    $divGerenciarPosicoesModulo.show();
                 }
 
                 atualizarNroOrdem( $(this) );
@@ -81,7 +74,7 @@
                     $btnSalvarPosicoesModulo
                         .removeClass('disabled')
                         .removeAttr('disabled')
-                        .hide();
+                    .parent().hide();
 
                     WeLearn.notificar(res.notificacao);
                 } else {
@@ -114,6 +107,7 @@
             buttons: {
                 'Confirmar' : function() {
                     $this.parent()
+                         .parent()
                          .parent()
                          .parent()
                          .parent()
