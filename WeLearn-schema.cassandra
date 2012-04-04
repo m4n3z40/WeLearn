@@ -114,10 +114,10 @@ and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
 create column family usuarios_mensagem_pessoal_por_amigos
-with comparator = 'UTF8Type'                    //as keys sao ordenadas por utf8
-and column_type = 'Standard'                   //valor da coluna padrao
-and default_validation_class = 'TimeUUIDType' //index da coluna tem que ser timeuuidtype
-and key_validation_class = 'UTF8Type';  // tipo de dados da key utf8
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
 
 create column family usuarios_mensagem_pessoal_lista_amigos
 with comparator = 'UTF8Type'

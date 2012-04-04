@@ -18,8 +18,8 @@ class Mensagem extends WL_Controller
 
     public function index()
     {
-        $mensagemDao= WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
-        $dados=$mensagemDao->recuperarListaAmigosMensagens($this->autenticacao->getUsuarioAutenticado());
+        $mensagemDao = WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
+        $dados = $mensagemDao->recuperarListaAmigosMensagens($this->autenticacao->getUsuarioAutenticado());
         $dadosView = array(
             'mensagens' => $dados
         );
@@ -27,14 +27,32 @@ class Mensagem extends WL_Controller
         $this->_renderTemplateHome('mensagem/index', $dadosView);
     }
 
-    public function listar($idAmigo){
-        $usuario=$this->autenticacao->getUsuarioAutenticado();
-        $mensagemDao= WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
-        $chave=$mensagemDao->gerarChave($idAmigo,$usuario->getId());
-        $dados=$mensagemDao->recuperar($chave);
-        $dadosView = array(
-            'mensagens' => $dados
-        );
+    public function listar($idAmigo='', $de = '', $count = '')
+    {
+
+        if( $idAmigo=='' ) {
+            show_404();
+        }
+
+        if ($count == '') {
+            $count = 10;
+        }
+        $usuario = $this->autenticacao->getUsuarioAutenticado();
+        $destinatario = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idAmigo);
+        $mensagemDao = WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
+        try {
+            $dados = $mensagemDao->recuperarTodosPorUsuario($usuario, $destinatario, $de, '', $count + 1);
+            $this->load->helper('paginacao_cassandra');
+            $dadosPaginados = create_paginacao_cassandra($dados, $count);
+            $dadosView = array(
+                'mensagens' => $dados, 'paginacao' => $dadosPaginados, 'idAmigo' => $idAmigo, 'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],'haMensagens' => !empty($dadosPaginados)
+            );
+        } catch (UUIDException $e)
+        {
+            $dadosView = array(
+                'idAmigo' => $idAmigo,'haMensagens' => !empty($dadosPaginados)
+            );
+        }
 
         $this->_renderTemplateHome('mensagem/listar', $dadosView);
 
@@ -51,7 +69,7 @@ class Mensagem extends WL_Controller
         );
 
         $this->template->setDefaultPartialVar('home/barra_lateral_esquerda', $dadosBarraEsquerda)
-                       ->setDefaultPartialVar('home/barra_lateral_direita', $dadosBarraDireita)
-                       ->render($view, $dados);
+            ->setDefaultPartialVar('home/barra_lateral_direita', $dadosBarraDireita)
+            ->render($view, $dados);
     }
 }

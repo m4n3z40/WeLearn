@@ -39,6 +39,7 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
 
+
         $UUID = UUID::mint();
         $dto->setId($UUID->string);
         $dto->setDataEnvio(time());
@@ -48,7 +49,7 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
         $array_sort= array($remetente->getId(),$destinatario->getId());
         sort($array_sort);
         $chave_amizade=implode('::',$array_sort);
-        $this->_MPPorAmigosCF->insert($chave_amizade,array( $UUID->string => $UUID->bytes));
+        $this->_MPPorAmigosCF->insert($chave_amizade,array($UUID->bytes => ''));
         $this->_MPListaAmigosCF->insert($dto->getRemetente()->getId(), array($dto->getDestinatario()->getId() => $dto->getDestinatario()->getId()));
         $this->_MPListaAmigosCF->insert($dto->getDestinatario()->getId(), array($dto->getRemetente()->getId() => $dto->getRemetente()->getId()));
 
@@ -71,18 +72,32 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
      * @param array|null $filtros
      * @return array
      */
+
+
     public function recuperarTodos($de = '', $ate = '', array $filtros = null)
     {
-        if (isset($filtros['count'])) {
-            $count = $filtros['count'];
-        } else {
-            $count = 10;
-        }
 
-
-        return array();
     }
 
+
+    public function recuperarTodosPorUsuario($remetente, $destinatario, $de = '',$ate = '',$count = 10)
+    {
+        $chave = $this->gerarChave($remetente->getId(), $destinatario->getId());
+
+        if ($de != '') {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+
+        if ($ate != '') {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
+        $listaMensagens=array_keys($this->_MPPorAmigosCF->get($chave,null,$de,$ate,false,$count));
+
+        $resultado=$this->_cf->multiget($listaMensagens);
+
+        return $this->_criarVariosFromCassandra($resultado, $remetente, $destinatario);
+    }
 
 
 
@@ -116,10 +131,26 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
             $aux[]=$value;
         }
 
+       // $resultado = $this->_cf->get_range($key_start='row1');
+        //$rows = $column_family->get_indexed_slices($index_clause);
+
         $resultado=$this->_cf->multiget($aux);
         $cassandra=$this->_criarVariosFromCassandra($resultado);
         return $cassandra;
     }
+
+
+    // na primeira eu recupero todos exemplo: retorna 500 mensagens
+    // depois eu exibo 10 mensagens
+    //quando eu clicar em proximo eu faço o get de novo so que dessa vez eu passo o id da ultima mensagem que foi exibida
+
+    public function recuperarTeste()
+    {
+
+
+    }
+
+
 
     /**
      * @param mixed $de
