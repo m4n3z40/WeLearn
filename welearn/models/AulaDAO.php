@@ -193,15 +193,6 @@ class AulaDAO extends WeLearn_DAO_AbstractDAO
 
     /**
      * @param WeLearn_Cursos_Conteudo_Aula $Aula
-     * @return int
-     */
-    public function recuperarQtdPaginas(WeLearn_Cursos_Conteudo_Aula $aula)
-    {
-        // TODO: Implementar este metodo
-    }
-
-    /**
-     * @param WeLearn_Cursos_Conteudo_Aula $Aula
      * @param UUID $moduloUUID
      * @return void
      */

@@ -17,6 +17,7 @@ class WL_Template
     private $_base_url;
     private $_ci;
     private $_partialsVars = array();
+    private $_urlPattern = "/^(http:\/\/|https:\/\/)/";
 
     public function __construct()
     {
@@ -156,7 +157,11 @@ class WL_Template
         $cssLinks = '';
 
         foreach ($this->_cssLinks as $css) {
-            $cssLinks .= '<link rel="stylesheet" type="text/css" href="' . $this->_base_url .'css/' . $css . '" />';
+            if ( preg_match($this->_urlPattern, $css) ) {
+                $cssLinks .= '<link rel="stylesheet" type="text/css" href="' . $css . '" />';
+            } else {
+                $cssLinks .= '<link rel="stylesheet" type="text/css" href="' . $this->_base_url .'css/' . $css . '" />';
+            }
         }
 
         return $cssLinks;
@@ -167,7 +172,11 @@ class WL_Template
         $jsImports = '';
 
         foreach ($this->_jsImports as $js) {
-            $jsImports .= '<script type="text/javascript" src="' . $this->_base_url .'js/' . $js . '"></script>';
+            if ( preg_match($this->_urlPattern, $js) ) {
+                $jsImports .= '<script type="text/javascript" src="' . $js . '"></script>';
+            } else {
+                $jsImports .= '<script type="text/javascript" src="' . $this->_base_url .'js/' . $js . '"></script>';
+            }
         }
 
         return $jsImports;

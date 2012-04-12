@@ -17,6 +17,10 @@
             sua preferência e então clicar no botão "Salvar ordem dos módulos", que
             aparecerá logo acima e abaixo da lista.
         </p>
+        <p id="p-modulo-listar-qtdTotal">
+            Exibindo <strong><?php echo $totalModulos ?></strong> Módulo(s) -
+            (Máximo permitido: <strong><?php echo ModuloDAO::MAX_MODULOS ?></strong>)
+        </p>
         <div class="div-modulo-gerenciar-posicoes">
             <button>Salvar ordem dos módulos</button>
         </div>

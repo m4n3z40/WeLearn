@@ -16,6 +16,56 @@ class Aula extends WL_Controller
                        ->setTemplate('curso');
     }
 
+    public function recuperar_lista($idModulo)
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+
+            $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
+            $modulo = $moduloDao->recuperar($idModulo);
+
+            $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
+
+            try {
+                $listaAulas = $aulaDao->recuperarTodosPorModulo($modulo);
+            } catch (cassandra_NotFoundException $e) {
+                $listaAulas = array();
+            }
+
+            $arrayAulas = array();
+
+            if ( count( $listaAulas ) > 0 ) {
+                $i = 0;
+                foreach ($listaAulas as $aula) {
+                    $arrayAulas[] = array(
+                        'value' => $aula->getId(),
+                        'name' => 'Aula ' . ++$i . ': ' . $aula->getNome()
+                    );
+                }
+            }
+
+            $jsonAulas = Zend_Json::encode(array( 'aulas' => $arrayAulas ));
+
+            $json = create_json_feedback(true, '', $jsonAulas);
+
+        } catch (Exception $e) {
+            log_message('error', 'Ocorreu um erro ao tentar recuperar lista de
+                        aulas via ajax: ' . create_exception_description($e));
+
+            $error = create_json_feedback_error_json('Ocorreu um erro inesperado,
+                        já estamos tentando resolver. Tente novamente mais tarde!');
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
     public function index($idCurso)
     {
         if ( $idModulo = $this->input->get('m') ) {
@@ -29,11 +79,10 @@ class Aula extends WL_Controller
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
 
             try{
-                $listaModulos = $moduloDao->recuperarTodosPorCurso($curso);
+                $listaModulos = $moduloDao->recuperarTodosPorCurso( $curso );
             } catch (cassandra_NotFoundException $e) {
                 $listaModulos = array();
             }
-
 
             $this->load->helper('modulo');
 
@@ -85,8 +134,10 @@ class Aula extends WL_Controller
 
             try {
                 $listaAulas = $aulaDao->recuperarTodosPorModulo($modulo);
+                $totalAulas = count( $listaAulas );
             } catch ( cassandra_NotFoundException $e ) {
                 $listaAulas = array();
+                $totalAulas = 0;
             }
 
             $dadosPartial = array(
@@ -101,6 +152,7 @@ class Aula extends WL_Controller
                     'curso/conteudo'
                 ),
                 'haAulas' => ! empty( $listaAulas ),
+                'totalAulas' => $totalAulas,
                 'listaAulas' => $this->template->loadPartial(
                     'lista',
                     $dadosPartial,

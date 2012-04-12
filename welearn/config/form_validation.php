@@ -243,6 +243,28 @@ $config = array(
             'label' => 'Descrição',
             'rules' => 'required|max_length[1024]'
         )
+    ),
+    'recurso/salvar' => array(
+        array(
+            'field' => 'nome',
+            'label' => 'Nome',
+            'rules' => 'required|min_length[5]|max_length[125]'
+        ),
+        array(
+            'field' => 'descricao',
+            'label' => 'Descrição',
+            'rules' => 'required|max_length[1024]'
+        ),
+        array(
+            'field' => 'tipo',
+            'label' => 'Tipo',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'upload',
+            'label' => 'Arquivo',
+            'rules' => 'required'
+        )
     )
 );
 

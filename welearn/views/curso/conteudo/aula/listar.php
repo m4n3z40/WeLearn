@@ -25,6 +25,10 @@
             de sua preferência e então clicar no botão "Salvar ordem das aulas",
             que aparecerá logo acima e abaixo da lista.
         </p>
+        <p id="p-aula-listar-qtdTotal">
+            Exibindo <strong><?php echo $totalAulas ?></strong> Aulas(s) -
+            (Máximo permitido: <strong><?php echo AulaDAO::MAX_AULAS ?></strong>)
+        </p>
         <div class="div-aula-gerenciar-posicoes">
             <button>Salvar ordem das aulas</button>
         </div>

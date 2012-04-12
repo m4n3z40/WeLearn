@@ -11,71 +11,100 @@
 class WeLearn_Cursos_Recursos_Recurso extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var int
+     * @var string
      */
-    private $_id;
+    protected $_id;
 
     /**
      * @var string
      */
-    private $_nome;
+    protected $_nome;
 
     /**
      * @var string
      */
-    private $_descricao;
-
-    /**
-     * @var string
-     */
-    private $_dataInclusao;
-
-    /**
-     * @var string
-     */
-    private $_urlArquivo;
-
-    /**
-     * @var WeLearn_Usuarios_Moderador
-     */
-    private $_criador;
-
-    /**
-     * @var WeLearn_Cursos_Conteudo_Aula
-     */
-    private $_aula;
+    protected $_descricao;
 
     /**
      * @var int
      */
-    private $_tipo;
+    protected $_dataInclusao;
 
     /**
-     * @param \WeLearn_Cursos_Conteudo_Aula $aula
+     * @var WeLearn_Usuarios_Usuario
      */
-    public function setAula(WeLearn_Cursos_Conteudo_Aula $aula)
-    {
-        $this->_aula = $aula;
-    }
+    protected $_criador;
 
     /**
-     * @return \WeLearn_Cursos_Conteudo_Aula
+     * @var string
      */
-    public function getAula()
-    {
-        return $this->_aula;
-    }
+    protected $_url;
 
     /**
-     * @param \WeLearn_Usuarios_Moderador $criador
+     * @var string
      */
-    public function setCriador(WeLearn_Usuarios_Moderador $criador)
+    protected $_extensao;
+
+    /**
+     * @var string
+     */
+    protected $_assinatura;
+
+    /**
+     * @var string
+     */
+    protected $_caminho;
+
+    /**
+     * @var string
+     */
+    protected $_caminhoCompleto;
+
+    /**
+     * @var string
+     */
+    protected $_mimeType;
+
+    /**
+     * @var float KB
+     */
+    protected $_tamanho;
+
+    /**
+     * @var boolean
+     */
+    protected $_isImagem;
+
+    /**
+     * @var int
+     */
+    protected $_larguraImagem;
+
+    /**
+     * @var int
+     */
+    protected $_alturaImagem;
+
+    /**
+     * @var string
+     */
+    protected $_tipoImagem;
+
+    /**
+     * @var int
+     */
+    protected $_tipo = WeLearn_Cursos_Recursos_TipoRecurso::GERAL;
+
+    /**
+     * @param \WeLearn_Usuarios_Usuario $criador
+     */
+    public function setCriador(WeLearn_Usuarios_Usuario $criador)
     {
         $this->_criador = $criador;
     }
 
     /**
-     * @return \WeLearn_Usuarios_Moderador
+     * @return \WeLearn_Usuarios_Usuario
      */
     public function getCriador()
     {
@@ -83,15 +112,15 @@ class WeLearn_Cursos_Recursos_Recurso extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param string $dataInclusao
+     * @param int $dataInclusao
      */
     public function setDataInclusao($dataInclusao)
     {
-        $this->_dataInclusao = (string)$dataInclusao;
+        $this->_dataInclusao = (int)$dataInclusao;
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getDataInclusao()
     {
@@ -119,7 +148,7 @@ class WeLearn_Cursos_Recursos_Recurso extends WeLearn_DTO_AbstractDTO
      */
     public function setId($id)
     {
-        $this->_id = (int)$id;
+        $this->_id = (string)$id;
     }
 
     /**
@@ -163,19 +192,179 @@ class WeLearn_Cursos_Recursos_Recurso extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param string $urlArquivo
+     * @param int $alturaImagem
      */
-    public function setUrlArquivo($urlArquivo)
+    public function setAlturaImagem($alturaImagem)
     {
-        $this->_urlArquivo = (string)$urlArquivo;
+        $this->_alturaImagem = (int)$alturaImagem;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAlturaImagem()
+    {
+        return $this->_alturaImagem;
+    }
+
+    /**
+     * @param string $assinatura
+     */
+    public function setAssinatura($assinatura)
+    {
+        $this->_assinatura = (string)$assinatura;
     }
 
     /**
      * @return string
      */
-    public function getUrlArquivo()
+    public function getAssinatura()
     {
-        return $this->_urlArquivo;
+        return $this->_assinatura;
+    }
+
+    /**
+     * @param string $caminho
+     */
+    public function setCaminho($caminho)
+    {
+        $this->_caminho = (string)$caminho;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCaminho()
+    {
+        return $this->_caminho;
+    }
+
+    /**
+     * @param string $caminhoCompleto
+     */
+    public function setCaminhoCompleto($caminhoCompleto)
+    {
+        $this->_caminhoCompleto = (string)$caminhoCompleto;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCaminhoCompleto()
+    {
+        return $this->_caminhoCompleto;
+    }
+
+    /**
+     * @param string $extensao
+     */
+    public function setExtensao($extensao)
+    {
+        $this->_extensao = (string)$extensao;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExtensao()
+    {
+        return $this->_extensao;
+    }
+
+    /**
+     * @param boolean $isImagem
+     */
+    public function setIsImagem($isImagem)
+    {
+        $this->_isImagem = (boolean)$isImagem;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isImagem()
+    {
+        return $this->_isImagem;
+    }
+
+    /**
+     * @param int $larguraImagem
+     */
+    public function setLarguraImagem($larguraImagem)
+    {
+        $this->_larguraImagem = (int)$larguraImagem;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLarguraImagem()
+    {
+        return $this->_larguraImagem;
+    }
+
+    /**
+     * @param string $mimeType
+     */
+    public function setMimeType($mimeType)
+    {
+        $this->_mimeType = (string)$mimeType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMimeType()
+    {
+        return $this->_mimeType;
+    }
+
+    /**
+     * @param float $tamanho
+     */
+    public function setTamanho($tamanho)
+    {
+        $this->_tamanho = (float)$tamanho;
+    }
+
+    /**
+     * @return float
+     */
+    public function getTamanho()
+    {
+        return $this->_tamanho;
+    }
+
+    /**
+     * @param string $tipoImagem
+     */
+    public function setTipoImagem($tipoImagem)
+    {
+        $this->_tipoImagem = (string)$tipoImagem;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTipoImagem()
+    {
+        return $this->_tipoImagem;
+    }
+
+    /**
+     * @param string $url
+     */
+    public function setUrl($url)
+    {
+        $this->_url = (string)$url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->_url;
     }
 
     /**
@@ -208,11 +397,68 @@ class WeLearn_Cursos_Recursos_Recurso extends WeLearn_DTO_AbstractDTO
             'nome' => $this->getNome(),
             'descricao' => $this->getDescricao(),
             'dataInclusao' => $this->getDataInclusao(),
-            'urlArquivo' => $this->getUrlArquivo(),
-            'criador' => $this->getCriador()->toArray(),
-            'aula' => $this->getAula()->toArray(),
+            'url' => $this->getUrl(),
+            'criador' => ($this->_criador instanceof WeLearn_Usuarios_Usuario)
+                             ? $this->getCriador()->getId() : '',
             'tipo' => $this->getTipo(),
+            'extensao' => $this->getExtensao(),
+            'assinatura' => $this->getAssinatura(),
+            'caminho' => $this->getCaminho(),
+            'caminhoCompleto' => $this->getCaminhoCompleto(),
+            'mimeType' => $this->getMimeType(),
+            'tamanho' => $this->getTamanho(),
+            'isImagem' => $this->isImagem(),
+            'alturaImagem' => $this->getAlturaImagem(),
+            'larguraImagem' => $this->getLarguraImagem(),
+            'tipoImagem' => $this->getTipoImagem(),
             'persistido' => $this->isPersistido()
         );
+    }
+
+    public function toCassandra()
+    {
+        $selfArray = $this->toArray();
+
+        unset( $selfArray['persistido'] );
+
+        return $selfArray;
+    }
+
+    public function preencherPropriedades(array $dados = null)
+    {
+        parent::preencherPropriedades($dados);
+
+        if ( isset( $dados['file_ext'] ) ) $this->setExtensao( $dados['file_ext'] );
+        if ( isset( $dados['orig_name'] ) ) $this->setAssinatura( $dados['orig_name'] );
+        if ( isset( $dados['file_path'] ) ) $this->setCaminho( $dados['file_path'] );
+        if ( isset( $dados['full_path'] ) ) $this->setCaminhoCompleto( $dados['full_path'] );
+        if ( isset( $dados['file_type'] ) ) $this->setMimeType( $dados['file_type'] );
+        if ( isset( $dados['file_size'] ) ) $this->setTamanho( $dados['file_size'] );
+        if ( isset( $dados['is_image'] ) ) $this->setIsImagem( $dados['is_image'] );
+        if ( isset( $dados['image_height'] ) ) $this->setAlturaImagem( $dados['image_height'] );
+        if ( isset( $dados['image_width'] ) ) $this->setLarguraImagem( $dados['image_width'] );
+        if ( isset( $dados['image_type'] ) ) $this->setTipoImagem( $dados['image_type'] );
+    }
+
+    function __toString()
+    {
+        $class = 'filetype-' . str_replace('.', '', strtolower($this->getExtensao()));
+        $link = anchor( $this->getUrl(), $this->getAssinatura() );
+        $extensao = strtoupper( $this->getExtensao() );
+        $tamanho = $this->getTamanho() . 'KB';
+        $tipo = $this->getMimeType();
+
+        return
+
+            "<dl class='{$class}'>
+                <dt>Arquivo:</dt>
+                <dd>{$link}</dd>
+                <dt>Extensão do arquivo:</dt>
+                <dd>{$extensao}</dd>
+                <dt>Tipo do Arquivo</dt>
+                <dd>{$tipo}</dd>
+                <dt>Tamanho do arquivo:</dt>
+                <dd>{$tamanho}</dd>
+            </dl>";
     }
 }

@@ -81,7 +81,7 @@
                         WeLearn.notificar({
                             nivel: 'error',
                             msg: res.error_msg,
-                            tempo: 10000
+                            tempo: 5000
                         });
                     }
                 },
@@ -89,7 +89,7 @@
                     WeLearn.notificar({
                         nivel: 'error',
                         msg: 'Ocorreu um erro inesperado! Já estamos verificando, tente novamente mais tarde.',
-                        tempo: 10000
+                        tempo: 5000
                     });
                 }
             });

@@ -56,43 +56,47 @@ window.WeLearn = {
 
         $.noty(opcoesNoty);
     },
+    exibirErros : function (errors) {
+        var erro,
+            elems;
+
+        for (var i = 0; i < errors.length; i++) {
+            erro = errors[i];
+
+            if (erro.field_name == "noField") {
+                WeLearn.notificar({msg: erro.error_msg, nivel: 'error', tempo: 5000});
+                continue;
+            }
+
+            elems = 'input[name=' + erro.field_name + '],' +
+                    'select[name=' + erro.field_name + '],' +
+                    'textarea[name=' + erro.field_name + ']';
+
+            var $campos = $(elems);
+
+            if( $campos.length > 0 ) {
+                $campos.after(
+                    '<p class="validation-error">' + erro.error_msg + '</p>'
+                );
+
+                $campos.change(function(evt){
+                    $(this).next('p.validation-error').remove();
+                });
+            } else {
+                WeLearn.notificar({
+                    msg: erro.error_msg,
+                    nivel: 'error',
+                    tempo: 5000
+                });
+            }
+        }
+    },
     validarForm : function(form, url_validacao, onValidationPass, onValidationFail) {
         var $form = $(form);
         var processarResultado = function(result) {
             if ( ! result.success ) {
-                var erro,
-                    elems;
 
-                for (var i = 0; i < result.errors.length; i++) {
-                    erro = result.errors[i];
-
-                    if (erro.field_name == "noField") {
-                        WeLearn.notificar({msg: erro.error_msg, nivel: 'error', tempo: 10000});
-                        continue;
-                    }
-
-                    elems = 'input[name=' + erro.field_name + '],' +
-                            'select[name=' + erro.field_name + '],' +
-                            'textarea[name=' + erro.field_name + ']';
-
-                    var $campos = $(elems);
-
-                    if( $campos.length > 0 ) {
-                        $campos.after(
-                            '<p class="validation-error">' + erro.error_msg + '</p>'
-                        );
-
-                        $campos.change(function(evt){
-                            $(this).next('p.validation-error').remove();
-                        });
-                    } else {
-                        WeLearn.notificar({
-                            msg: erro.error_msg,
-                            nivel: 'error',
-                            tempo: 10000
-                        });
-                    }
-                }
+                WeLearn.exibirErros( result.errors );
 
                 if (onValidationFail) {
                    onValidationFail(result);

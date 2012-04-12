@@ -42,6 +42,11 @@ class WeLearn_Cursos_Conteudo_Modulo extends WeLearn_DTO_AbstractDTO
     private $_curso;
 
     /**
+     * @var int
+     */
+    private $_qtdTotalAulas;
+
+    /**
      * @param string $descricao
      */
     public function setDescricao($descricao)
@@ -135,6 +140,22 @@ class WeLearn_Cursos_Conteudo_Modulo extends WeLearn_DTO_AbstractDTO
     public function getCurso()
     {
         return $this->_curso;
+    }
+
+    /**
+     * @param int $qtdTotalAulas
+     */
+    public function setQtdTotalAulas($qtdTotalAulas)
+    {
+        $this->_qtdTotalAulas = (int)$qtdTotalAulas;
+    }
+
+    /**
+     * @return int
+     */
+    public function getQtdTotalAulas()
+    {
+        return $this->_qtdTotalAulas;
     }
 
     /**

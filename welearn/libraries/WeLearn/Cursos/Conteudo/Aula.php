@@ -121,6 +121,14 @@ class WeLearn_Cursos_Conteudo_Aula extends WeLearn_DTO_AbstractDTO
     }
 
     /**
+     * @param int $qtdTotalPaginas
+     */
+    public function setQtdTotalPaginas($qtdTotalPaginas)
+    {
+        $this->_qtdTotalPaginas = (int)$qtdTotalPaginas;
+    }
+
+    /**
      * @return int
      */
     public function getQtdTotalPaginas()

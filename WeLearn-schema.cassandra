@@ -371,6 +371,24 @@ and column_type = 'Standard'
 and default_validation_class = 'IntegerType'
 and key_validation_class = 'TimeUUIDType';
 
+create column family cursos_recurso
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_recurso_geral
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_recurso_restrito
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
 create column family contadores_timeuuid
 with comparator = 'TimeUUIDType'
 and column_type = 'Standard'

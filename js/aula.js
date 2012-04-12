@@ -109,7 +109,8 @@
                                    '<p>Tem certeza que deseja remover esta aula?<br/>' +
                                    'Esta ação <strong>NÃO</strong> poderá ser desfeita!<br/>' +
                                    '<strong>TODAS</strong> as páginas vinculadas a esta ' +
-                                   'aula também serão <strong>PERDIDAS!</strong></p></div>');
+                                   'aula também serão <strong>PERDIDAS!</strong></p></div>'),
+        $qtdTotalAulas = $('#p-aula-listar-qtdTotal > strong').first();
     $('.a-aula-remover').live('click', function(e){
         e.preventDefault();
 
@@ -150,6 +151,8 @@
                     atualizarNroOrdem($ulListaAula);
                     $ulListaAula.accordion('destroy');
                     $ulListaAula.accordion(accordionOptions);
+
+                    $qtdTotalAulas.text( parseInt( $qtdTotalAulas.text() ) - 1 );
                 },
                 'Cancelar' : function() {
                     $( this ).dialog('close');

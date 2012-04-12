@@ -92,7 +92,8 @@
                                    '<p>Tem certeza que deseja remover este módulo?<br/>' +
                                    'Esta ação <strong>NÃO</strong> poderá ser desfeita!<br/>' +
                                    '<strong>TODAS</strong> as aulas vinculadas a este ' +
-                                   'módulo serão <strong>PERDIDAS!</strong></p></div>');
+                                   'módulo serão <strong>PERDIDAS!</strong></p></div>'),
+        $qtdTotalModulos = $('#p-modulo-listar-qtdTotal > strong').first();
     $('.a-modulo-remover').live('click', function(e){
         e.preventDefault();
 
@@ -133,6 +134,8 @@
                     atualizarNroOrdem($ulListaModulo);
                     $ulListaModulo.accordion('destroy');
                     $ulListaModulo.accordion(accordionOptions);
+
+                    $qtdTotalModulos.text( parseInt( $qtdTotalModulos.text() ) - 1 );
                 },
                 'Cancelar' : function() {
                     $( this ).dialog('close');

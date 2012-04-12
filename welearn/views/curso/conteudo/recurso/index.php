@@ -22,6 +22,9 @@
             </ul>
             <p>
                 Escolha sua opção abaixo.
+                <br><br>
+                Ou <?php echo anchor('/curso/conteudo/recurso/criar/' . $idCurso,
+                                     'Clique aqui para criar um novo recurso.') ?>
             </p>
         </div>
     </header>

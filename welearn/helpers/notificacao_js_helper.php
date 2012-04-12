@@ -1,6 +1,6 @@
 <?php
 
-function create_notificacao_array ($nivel = 'sucesso', $msg = '', $tempo = 10000,
+function create_notificacao_array ($nivel = 'sucesso', $msg = '', $tempo = 5000,
                                    $fechavel = true, $redirecionarAoFechar = false,
                                    $redirecionarParaUrl = '')
 {
@@ -29,7 +29,7 @@ function create_notificacao_array ($nivel = 'sucesso', $msg = '', $tempo = 10000
     return $notificacao;
 }
 
-function create_notificacao_json ($nivel = 'sucesso', $msg = '', $tempo = 10000,
+function create_notificacao_json ($nivel = 'sucesso', $msg = '', $tempo = 5000,
                                    $fechavel = true, $redirecionarAoFechar = false,
                                    $redirecionarParaUrl = '')
 {

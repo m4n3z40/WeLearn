@@ -36,7 +36,8 @@
                         <?php echo anchor('/curso/conteudo/aula/'
                                               . $modulo->curso->id
                                               . '?m=' . $modulo->id,
-                                          'Gerenciar Aulas',
+                                          'Gerenciar Aulas ('
+                                              . $modulo->qtdTotalAulas . ')',
                                           array('class' => 'button')
                         ) ?>
                     </li>

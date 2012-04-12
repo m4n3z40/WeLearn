@@ -10,7 +10,8 @@
  
 abstract class WeLearn_Cursos_Recursos_TipoRecurso implements WeLearn_Base_IEnum
 {
-    //@TODO: Definir tipos permitidos dos recursos extras
+    const GERAL = 0;
+    const RESTRITO = 1;
 
     /**
      * Retorna a descrição do Enum passado por parametru.
@@ -21,6 +22,13 @@ abstract class WeLearn_Cursos_Recursos_TipoRecurso implements WeLearn_Base_IEnum
      */
     public static function getDescricao($codigo)
     {
-        // TODO: Implement getDescricao() method.
+        switch ($codigo) {
+            case 0:
+                return 'Recurso Geral'; break;
+            case 1:
+                return 'Recurso Restrito'; break;
+            default:
+                throw new WeLearn_Base_CodigoEnumIncorretoException();
+        }
     }
 }
