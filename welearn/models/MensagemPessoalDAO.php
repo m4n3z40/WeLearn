@@ -6,17 +6,18 @@
  * Time: 20:57
  * To change this template use File | Settings | File Templates.
  */
- 
+
 class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
 
     protected $_nomeCF = 'usuarios_mensagem_pessoal';
 
     //indexes
-    private $_nomeMPPorRemetenteCF = 'usuarios_mensagem_pessoal_por_remetente';
-    private $_nomeMPPorDestinatarioCF = 'usuarios_mensagem_pessoal_por_destinatario';
+    private $_nomeMPPorAmigosCF = 'usuarios_mensagem_pessoal_por_amigos';
+    private $_nomeMPListaAmigosCF = 'usuarios_mensagem_pessoal_lista_amigos';
 
-    private $_MPPorRemetenteCF;
-    private $_MPPorDestinatarioCF;
+
+    private $_MPPorAmigosCF;
+    private $_MPListaAmigosCF;
 
     /**
      * @var UsuarioDAO
@@ -25,13 +26,9 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
 
     function __construct()
     {
-        parent::__construct();
-
         $phpCassa = WL_Phpcassa::getInstance();
-
-        $this->_MPPorRemetenteCF = $phpCassa->getColumnFamily($this->_nomeMPPorRemetenteCF);
-        $this->_MPPorDestinatarioCF = $phpCassa->getColumnFamily($this->_nomeMPPorDestinatarioCF);
-
+        $this->_MPPorAmigosCF = $phpCassa->getColumnFamily($this->_nomeMPPorAmigosCF);
+        $this->_MPListaAmigosCF = $phpCassa->getColumnFamily($this->_nomeMPListaAmigosCF);
         $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
     }
 
@@ -42,14 +39,17 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
         $UUID = UUID::mint();
-
         $dto->setId($UUID->string);
         $dto->setDataEnvio(time());
-
         $this->_cf->insert($UUID->bytes, $dto->toCassandra());
-
-        $this->_MPPorRemetenteCF->insert($dto->getRemetente()->getId(), array($UUID->bytes => ''));
-        $this->_MPPorDestinatarioCF->insert($dto->getDestinatario()->getId(), array($UUID->bytes => ''));
+        $remetente=$dto->getRemetente();
+        $destinatario=$dto->getDestinatario();
+        $array_sort= array($remetente->getId(),$destinatario->getId());
+        sort($array_sort);
+        $chave_amizade=implode('::',$array_sort);
+        $this->_MPPorAmigosCF->insert($chave_amizade,array($UUID->bytes => ''));
+        $this->_MPListaAmigosCF->insert($dto->getRemetente()->getId(), array($dto->getDestinatario()->getId() => $dto->getDestinatario()->getId()));
+        $this->_MPListaAmigosCF->insert($dto->getDestinatario()->getId(), array($dto->getRemetente()->getId() => $dto->getRemetente()->getId()));
     }
 
     /**
@@ -69,70 +69,62 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
      * @param array|null $filtros
      * @return array
      */
+
+
     public function recuperarTodos($de = '', $ate = '', array $filtros = null)
     {
-        if (isset($filtros['count'])) {
-            $count = $filtros['count'];
-        } else {
-            $count = 10;
-        }
 
-        if (isset($filtros['remetente']) && $filtros['remetente'] instanceof WeLearn_Usuarios_Usuario) {
-            return $this->recuperarTodosPorRemetente($filtros['remerente'], $de, $ate, $count);
-        }
-
-        if (isset($filtros['destinatario']) && $filtros['destinatario'] instanceof WeLearn_Usuarios_Usuario) {
-            return $this->recuperarTodosPorDestinatario($filtros['destinatario'], $de, $ate, $count);
-        }
-
-        return array();
     }
 
-    public function recuperarTodosPorRemetente(WeLearn_Usuarios_Usuario $remetente, $de = '', $ate = '', $count = 10)
+
+    public function recuperarTodosPorUsuario($remetente, $destinatario, $de = '',$ate = '',$count = 10)
     {
-        if ( $de != '' ) {
+        $chave = $this->gerarChave($remetente->getId(), $destinatario->getId());
+
+        if ($de != '') {
             $de = CassandraUtil::import($de)->bytes;
         }
-        if ( $ate != '' ) {
+
+        if ($ate != '') {
             $ate = CassandraUtil::import($ate)->bytes;
         }
 
-        $idsMensagens = $this->_MPPorRemetenteCF->get($remetente->getId(), null, $de, $ate, true, $count);
+        $listaMensagens=array_keys($this->_MPPorAmigosCF->get($chave,null,$de,$ate,true,$count));
 
-        $columns = $this->_cf->multiget($idsMensagens);
-
-        return $this->_criarVariosFromCassandra($columns, $remetente);
-    }
-
-    public function recuperarTodosPorDestinatario(WeLearn_Usuarios_Usuario $destinatario, $de = '', $ate = '', $count = 10)
-    {
-        if ( $de != '' ) {
-            $de = CassandraUtil::import($de)->bytes;
-        }
-        if ( $ate != '' ) {
-            $ate = CassandraUtil::import($ate)->bytes;
-        }
-
-        $idsMensagens = $this->_MPPorDestinatarioCF->get($destinatario->getId(), null, $de, $ate, true, $count);
-
-        $columns = $this->_cf->multiget($idsMensagens);
-
-        return $this->_criarVariosFromCassandra($columns, null, $destinatario);
+        $resultado=$this->_cf->multiget($listaMensagens);
+        return $this->_criarVariosFromCassandra($resultado, $remetente, $destinatario);
     }
 
     /**
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
      */
-    public function recuperar($id)
+
+    public function recuperarListaAmigosMensagens(WeLearn_DTO_IDTO &$dto)
     {
-        if ( ! ($id instanceof UUID) ) {
-            $id = CassandraUtil::import($id);
+        return $this->_MPListaAmigosCF->get($dto->getID());
+    }
+
+
+    public function gerarChave($idAmigo,$idUsuario)
+    {
+        $Array= array($idAmigo,$idUsuario);
+        sort($Array);
+        $chave=implode('::',$Array);
+        return $chave;
+    }
+
+    public function recuperar($chave)
+    {
+        $listaMensagens=$this->_MPPorAmigosCF->get($chave);
+        $aux=array();
+        foreach($listaMensagens as $key=>$value)
+        {
+            $aux[]=$value;
         }
-
-        $column = $this->_cf->get($id->bytes);
-
-        return $this->_criarFromCassandra($column);
+        $resultado=$this->_cf->multiget($aux);
+        $cassandra=$this->_criarVariosFromCassandra($resultado);
+        return $cassandra;
     }
 
     /**
@@ -145,36 +137,25 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
         return 0;
     }
 
-    public function recuperarQtdPorRemetente(WeLearn_Usuarios_Usuario $remetente)
-    {
-        return $this->_MPPorRemetenteCF->get_count($remetente->getId());
-    }
-
-    public function recuperarQtdPorDestinatario(WeLearn_Usuarios_Usuario $destinatario)
-    {
-        return $this->_MPPorDestinatarioCF->get_count($destinatario->getId());
-    }
-
     /**
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
      */
     public function remover($id)
     {
-        if ( ! ($id instanceof UUID) ) {
-            $id = CassandraUtil::import($id);
+        $UUID = CassandraUtil::import($id)->bytes;
+        $mensagem=$this->_cf->get($UUID);
+        $validador=$this->verificarSeHaMensagens($mensagem['remetente'],$mensagem['destinatario']);
+        if($validador==1)
+        {
+         $this->_MPListaAmigosCF->remove($mensagem['remetente'],array($mensagem['destinatario']));
+         $this->_MPListaAmigosCF->remove($mensagem['destinatario'],array($mensagem['remetente']));
         }
-
-        $mensagem = $this->recuperar($id);
-
-        $this->_cf->remove($id->bytes);
-
-        $this->_MPPorRemetenteCF->remove($mensagem->getRemetente()->getId(), array($id->bytes));
-        $this->_MPPorDestinatarioCF->remove($mensagem->getDestinatario()->getId(), array($id->bytes));
-
-        $mensagem->setPersistido(false);
-
-        return $mensagem;
+        $array_sort= array($mensagem['remetente'],$mensagem['destinatario']);
+        sort($array_sort);
+        $chave_amizade=implode('::',$array_sort);
+        $this->_cf->remove($UUID);
+        $this->_MPPorAmigosCF->remove($chave_amizade,array($UUID));
     }
 
     /**
@@ -219,5 +200,15 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
         }
 
         return $arrayMensagens;
+    }
+
+
+    private function verificarSeHaMensagens($amigo,$usuario)
+    {
+        $array_sort= array($amigo,$usuario);
+        sort($array_sort);
+        $chave_amizade=implode('::',$array_sort);
+        $qtd=$this->_MPPorAmigosCF->get_count($chave_amizade);
+        return $qtd;
     }
 }

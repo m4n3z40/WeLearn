@@ -16,7 +16,22 @@ class Home extends WL_Controller {
 
     public function index()
     {
-        $this->template->render('usuario/home/index');
+        $this->_renderTemplateHome('usuario/home/index');
+    }
+
+    private function _renderTemplateHome($view = '', $dados = array())
+    {
+        $dadosBarraEsquerda = array(
+            'usuario' => $this->autenticacao->getUsuarioAutenticado()
+        );
+
+        $dadosBarraDireita = array(
+
+        );
+
+        $this->template->setDefaultPartialVar('home/barra_lateral_esquerda', $dadosBarraEsquerda)
+            ->setDefaultPartialVar('home/barra_lateral_direita', $dadosBarraDireita)
+            ->render($view, $dados);
     }
 }
 

@@ -265,6 +265,13 @@ $config = array(
             'label' => 'Arquivo',
             'rules' => 'required'
         )
+    ),
+    'mensagem/criar' => array(
+        array(
+            'field'=>'mensagem',
+            'label'=>'Mensagem',
+            'rules'=>'required|max_length[1024]'
+        )
     )
 );
 

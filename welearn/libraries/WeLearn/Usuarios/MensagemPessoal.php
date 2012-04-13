@@ -183,8 +183,8 @@ class WeLearn_Usuarios_MensagemPessoal extends WeLearn_DTO_AbstractDTO
             'id' => $this->getId(),
             'mensagem' => $this->getMensagem(),
             'dataEnvio' => $this->getDataEnvio(),
-            'remetente' => ($this->_remetente instanceof WeLearn_Usuarios_Usuario) ? $this->getRemetente() : '',
-            'destinatario' => ($this->_destinatario instanceof WeLearn_Usuarios_Usuario) ? $this->getDestinatario() : '',
+            'remetente' => ($this->_remetente instanceof WeLearn_Usuarios_Usuario) ? $this->getRemetente()->getId() : '',
+            'destinatario' => ($this->_destinatario instanceof WeLearn_Usuarios_Usuario) ? $this->getDestinatario()->getId() : '',
             'status' => $this->getStatus()
         );
     }

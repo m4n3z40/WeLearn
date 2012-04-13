@@ -67,6 +67,8 @@ $route['curso/conteudo/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]
 $route['curso/conteudo/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/conteudo/$1/$2';
 $route['usuario/perfil'] = 'usuario/perfil/index';
 $route['usuario/perfil/([a-z_]+)'] = 'usuario/perfil/$1';
+$route['usuario/mensagem'] = 'usuario/mensagem/index';
+$route['usuario/mensagem/listar/([a-z_]+)'] = 'usuario/mensagem/listar/$1';
 $route['usuario/([a-z_]+)'] = 'usuario/usuario/$1';
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */
