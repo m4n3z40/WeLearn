@@ -92,10 +92,9 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
             $ate = CassandraUtil::import($ate)->bytes;
         }
 
-        $listaMensagens=array_keys($this->_MPPorAmigosCF->get($chave,null,$de,$ate,false,$count));
+        $listaMensagens=array_keys($this->_MPPorAmigosCF->get($chave,null,$de,$ate,true,$count));
 
         $resultado=$this->_cf->multiget($listaMensagens);
-
         return $this->_criarVariosFromCassandra($resultado, $remetente, $destinatario);
     }
 
@@ -130,25 +129,12 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
         {
             $aux[]=$value;
         }
-
-       // $resultado = $this->_cf->get_range($key_start='row1');
-        //$rows = $column_family->get_indexed_slices($index_clause);
-
         $resultado=$this->_cf->multiget($aux);
         $cassandra=$this->_criarVariosFromCassandra($resultado);
         return $cassandra;
     }
 
 
-    // na primeira eu recupero todos exemplo: retorna 500 mensagens
-    // depois eu exibo 10 mensagens
-    //quando eu clicar em proximo eu faço o get de novo so que dessa vez eu passo o id da ultima mensagem que foi exibida
-
-    public function recuperarTeste()
-    {
-
-
-    }
 
 
 
@@ -170,20 +156,19 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
      */
     public function remover($id)
     {
-        if ( ! ($id instanceof UUID) ) {
-            $id = CassandraUtil::import($id);
+        $UUID = CassandraUtil::import($id)->bytes;
+        $mensagem=$this->_cf->get($UUID);
+        $validador=$this->verificarSeHaMensagens($mensagem['remetente'],$mensagem['destinatario']);
+        if($validador==1)
+        {
+         $this->_MPListaAmigosCF->remove($mensagem['remetente'],array($mensagem['destinatario']));
+         $this->_MPListaAmigosCF->remove($mensagem['destinatario'],array($mensagem['remetente']));
         }
-
-        $mensagem = $this->recuperar($id);
-
-        $this->_cf->remove($id->bytes);
-
-        $this->_MPPorRemetenteCF->remove($mensagem->getRemetente()->getId(), array($id->bytes));
-        $this->_MPPorDestinatarioCF->remove($mensagem->getDestinatario()->getId(), array($id->bytes));
-
-        $mensagem->setPersistido(false);
-
-        return $mensagem;
+        $array_sort= array($mensagem['remetente'],$mensagem['destinatario']);
+        sort($array_sort);
+        $chave_amizade=implode('::',$array_sort);
+        $this->_cf->remove($UUID);
+        $this->_MPPorAmigosCF->remove($chave_amizade,array($UUID));
     }
 
     /**
@@ -229,4 +214,16 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
 
         return $arrayMensagens;
     }
+
+
+    private function verificarSeHaMensagens($amigo,$usuario)
+    {
+        $array_sort= array($amigo,$usuario);
+        sort($array_sort);
+        $chave_amizade=implode('::',$array_sort);
+        $qtd=$this->_MPPorAmigosCF->get_count($chave_amizade);
+        return $qtd;
+    }
+
+
 }

@@ -1,6 +1,7 @@
 <?php
 
-function create_paginacao_cassandra(array &$dataset, $por_pagina = 10)
+
+function create_paginacao_cassandra(array &$dataset, $por_pagina = '')
 {
     $resultado = array (
         'proxima_pagina' => false,

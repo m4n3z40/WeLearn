@@ -88,7 +88,7 @@ class Enquete extends WL_Controller {
 
             $response = array(
                 'success' => true,
-                'htmlListaEnquetes' => $this->template->loadPartial('lista', array('listaEnquetes' => $listaEnquetes), 'curso/enquete/enquete'),
+                'htmlListaEnquetes' => $this->template->loadPartial('lista', array('listaEnquetes' => $listaEnquetes), 'mensagem'),
                 'paginacao' => $paginacao
             );
 

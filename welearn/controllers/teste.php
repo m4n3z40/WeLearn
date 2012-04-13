@@ -19,7 +19,7 @@ class Teste extends CI_Controller
 
 
 
-        for($i=10;$i<20;$i++)
+        for($i=0;$i<15;$i++)
         {
         $usuarioDao=WeLearn_DAO_DAOFactory::create('UsuarioDAO');
         $usuarioDestinatario=$usuarioDao->criarNovo();
@@ -29,7 +29,7 @@ class Teste extends CI_Controller
         $mensagemDao=WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
         $mensagemPessoal=$mensagemDao->criarNovo();
         $mensagemPessoal->setId('1');
-        $mensagemPessoal->setMensagem('mensagem de teste'.$i);
+        $mensagemPessoal->setMensagem('mensagem enviada por usuario thiago'.$i);
         $mensagemPessoal->setRemetente($usuarioRemente);
         $mensagemPessoal->setDestinatario($usuarioDestinatario);
         $mensagemPessoal->setStatus(0);

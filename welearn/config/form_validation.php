@@ -243,6 +243,13 @@ $config = array(
             'label' => 'Descrição',
             'rules' => 'required|max_length[1024]'
         )
+    ),
+    'mensagem/criar' => array(
+        array(
+            'field'=>'mensagem',
+            'label'=>'Mensagem',
+            'rules'=>'required|max_length[1024]'
+        )
     )
 );
 

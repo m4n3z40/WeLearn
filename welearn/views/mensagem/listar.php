@@ -1,25 +1,23 @@
 <div id="mensagem-listar-content">
     <header>
         <hgroup>
-            <h1>mensagens de <?=$idAmigo?></h1>
+            <h1 >mensagens de <?=$idAmigo?></h1>
+            <input type="hidden" value='<?=$idAmigo?>' id='id-amigo-mensagens'/>
         </hgroup>
     </header>
-    <?php if ($haMensagens): ?>
-            <header id="paginacao-lista-mensagens">
-                    <?php foreach($mensagens as $row):?>
-                    <li><?=$row->getMensagem()?></br></li>
-                    <li><?=$row->getRemetente()->getId()?></li>
-                    <li><?=$row->getDataEnvio()?></li>
-                    <?php $de=$row->getId(); ?>
-                    <?php endforeach; ?>
-                    <?php
+</div>
+<div>
+    <?php if($haMensagens){ ?>
+    <a href="#" data-proximo="<?php echo $inicioProxPagina ?>" data-id-amigo="<?php echo $idAmigo ?>" id="paginacaoMensagem">mensagens mais recentes</a>
+    <input type='hidden' value='<?=$inicioProxPagina?>' id='id-prox-pagina'/>
+   <?php }?>
+</div>
+<?php
+echo $listaMensagens;
+?>
+<?php echo $enviarMensagem;  ?>
 
-                    echo anchor('/mensagem/listar/'.$idAmigo.'/'.$inicioProxPagina.'/10','proximo');
-                    ?>
-            </header>
-    <?php else:?>
-                <h1>Não existem novas mensagens</h1>
-    <?php endif;?>
-    </div>
+
+
           
 
