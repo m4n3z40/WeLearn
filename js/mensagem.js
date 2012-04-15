@@ -40,7 +40,23 @@
             formPost,
             $(formPost).attr('action'),
             function(res){
-                log(res);
+                if(res.success==true)
+                {
+                    $('#mensagem-lista-mensagens').append(
+                                                            '<li class="item-lista-mensagem">'+
+                                                            '<div class="teste">'+res.success+'</div>'+
+                                                            '<input type="hidden" id="id-mensagem" value="'
+                                                             +res.mensagemId+'">'+
+                                                            '<div class="imagem-remetente">imagem remetente</div>'+
+                                                            '<div class="id-remetente">'+res.remetenteId+'</div>'+
+                                                            '<div class="mensagem-texto">'+res.mensagemTexto+'</div>'+
+                                                            '<div class="data-envio">'+res.dataEnvio+'</div>'+
+                                                            '<a href="usuario/mensagem/remover" class="remover-mensagem">'
+                                                             +'remover</a>'+
+                                                            '</li>'+
+                                                            '</div>'
+                    );
+                }
             }
         );
     });

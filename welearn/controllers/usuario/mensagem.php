@@ -42,19 +42,19 @@ class Mensagem extends WL_Controller
         try{
 
             if( $idAmigo=='' ) {
-                show_404();
-            }
+                redirect($this->index());
+            }else{
 
             $count=10;
 
             $usuario = $this->autenticacao->getUsuarioAutenticado();
-            $destinatario = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idAmigo);
+            $amigo = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idAmigo);
             $mensagemDao = WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
 
 
             try {
                 $listaMensagens = $mensagemDao->recuperarTodosPorUsuario($usuario,
-                                                                         $destinatario,
+                                                                         $amigo,
                                                                          '', '',
                                                                          $count + 1);
             } catch (cassandra_NotFoundException $e) {
@@ -70,7 +70,8 @@ class Mensagem extends WL_Controller
                 array(
                     'mensagens' => $listaMensagens,
                     'paginacao' => $dadosPaginados,
-                    'idAmigo' => $idAmigo,
+                    'idAmigo' => $amigo->getId(),
+                    'nomeAmigo'=>$amigo->getNome(),
                     'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
                     'haMensagens' => $dadosPaginados['proxima_pagina']
                 ),
@@ -89,13 +90,14 @@ class Mensagem extends WL_Controller
             );
 
             $this->_renderTemplateHome('usuario/mensagem/listar', $dadosView);
-
+        }
         }catch(Exception $e) {
             log_message('error', 'Erro ao tentar exibir lista de Enquetes: '
                 . create_exception_description($e));
 
             show_404();
         }
+
     }
 
 
@@ -192,10 +194,18 @@ class Mensagem extends WL_Controller
         $mensagemObj->setMensagem($mensagem);
         $mensagemObj->setDestinatario($destinatario);
         $mensagemObj->setRemetente($remetente);
-
         $mensagemDao->salvar($mensagemObj);
 
-        $json = Zend_Json::encode(array( 'success' => true ));
+
+        $response = array(
+            'success' => true,
+             'mensagemId'=>$mensagemObj->getId(),
+             'remetenteId'=>$mensagemObj->getRemetente()->getId(),
+             'mensagemTexto'=>$mensagemObj->getMensagem(),
+             'dataEnvio'=>$mensagemObj->getDataEnvio()
+        );
+
+        $json = Zend_Json::encode($response);
 
         echo $json;
     }
