@@ -29,7 +29,6 @@ class Recurso extends WL_Controller
                 'listaAulas' => array()
             );
 
-
             $this->_renderTemplateCurso($curso, 'curso/conteudo/recurso/index', $dadosView);
         } catch (Exception $e) {
             log_message('error', 'Erro ao tentar exibir a index de recursos

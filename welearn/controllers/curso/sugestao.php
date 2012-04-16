@@ -10,8 +10,9 @@ class Sugestao extends WL_Controller {
     {
         parent::__construct();
 
-        $this->template->appendJSImport('curso.js')
-                ->appendJSImport('sugestao_curso.js');
+        $this->template->setTemplate('home')
+                       ->appendJSImport('curso.js')
+                       ->appendJSImport('sugestao_curso.js');
     }
 
 	public function index()
@@ -100,7 +101,7 @@ class Sugestao extends WL_Controller {
                 'primeiroProximos' => $paginacao['inicio_proxima_pagina']
             );
 
-            $this->template->render('curso/sugestao/lista', $dadosView);
+            $this->_renderTemplateHome('curso/sugestao/lista', $dadosView);
         } catch (Exception $e) {
             log_message('error', 'Erro ao retornar outra página de sugestões de curso: '
                                  . create_exception_description($e));
@@ -333,7 +334,7 @@ class Sugestao extends WL_Controller {
 
         $formCriar = $this->template->loadPartial('form', $dadosFormPartial, 'curso/sugestao');
 
-        $this->template->render('curso/sugestao/criar', array('formCriar' => $formCriar));
+        $this->_renderTemplateHome('curso/sugestao/criar', array('formCriar' => $formCriar));
     }
 
     public function votar($sugestaoId)
@@ -400,7 +401,7 @@ class Sugestao extends WL_Controller {
                 $notificacoesFlash = create_notificacao_json(
                     'sucesso',
                     'A sugestão de curso foi enviada com sucesso! Obrigado pela participação!',
-                    10000
+                    5000
                 );
                 $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
 
@@ -415,6 +416,21 @@ class Sugestao extends WL_Controller {
         }
 
         echo $json;
+    }
+
+    private function _renderTemplateHome($view = '', $dados = array())
+    {
+        $dadosBarraEsquerda = array(
+            'usuario' => $this->autenticacao->getUsuarioAutenticado()
+        );
+
+        $dadosBarraDireita = array(
+
+        );
+
+        $this->template->setDefaultPartialVar('home/barra_lateral_esquerda', $dadosBarraEsquerda)
+                      ->setDefaultPartialVar('home/barra_lateral_direita', $dadosBarraDireita)
+                      ->render($view, $dados);
     }
 }
 

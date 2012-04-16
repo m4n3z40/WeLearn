@@ -245,9 +245,15 @@
             $(formRecurso).attr('action'),
             function(res) {
                 if (res.tipoRecurso == 1) {
-                    window.location = WeLearn.url.siteURL('/curso/conteudo/recurso/restrito/' + res.idCurso);
+                    window.location = WeLearn.url.siteURL(
+                        '/curso/conteudo/recurso/restrito/'
+                            + res.idCurso
+                            + '?a=' + res.idAula
+                    );
                 } else {
-                    window.location = WeLearn.url.siteURL('/curso/conteudo/recurso/geral/' + res.idCurso);
+                    window.location = WeLearn.url.siteURL(
+                        '/curso/conteudo/recurso/geral/' + res.idCurso
+                    );
                 }
             }
         )

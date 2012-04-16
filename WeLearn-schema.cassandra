@@ -371,6 +371,18 @@ and column_type = 'Standard'
 and default_validation_class = 'IntegerType'
 and key_validation_class = 'TimeUUIDType';
 
+create column family cursos_pagina
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_pagina_por_aula
+with comparator = 'IntegerType'
+and column_type = 'Standard'
+and default_validation_class = 'TimeUUIDType'
+and key_validation_class = 'TimeUUIDType';
+
 create column family cursos_recurso
 with comparator = 'UTF8Type'
 and column_type = 'Standard'

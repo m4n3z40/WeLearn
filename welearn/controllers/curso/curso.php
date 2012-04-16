@@ -110,8 +110,6 @@ class Curso extends WL_Controller {
 
     public function criar()
     {
-        $this->template->setTemplate('perfil');
-
         $idSugestao = $this->input->get('s');
         $listaAreas = null;
         $listaSegmentos = null;
@@ -190,7 +188,7 @@ class Curso extends WL_Controller {
             'textoBotaoSubmit' => $textoBotaoSubmit
         );
 
-        $this->template->render('curso/curso/criar', $dadosCriar);
+        $this->_renderTemplateHome('curso/curso/criar', $dadosCriar);
     }
 
     public function salvar()
@@ -288,6 +286,22 @@ class Curso extends WL_Controller {
 
         $this->template->setDefaultPartialVar('curso/barra_lateral_esquerda', $dadosBarraEsquerda)
                        ->setDefaultPartialVar('curso/barra_lateral_direita', $dadosBarraDireita)
+                       ->render($view, $dados);
+    }
+
+    private function _renderTemplateHome($view = '', $dados = array())
+    {
+        $dadosBarraEsquerda = array(
+            'usuario' => $this->autenticacao->getUsuarioAutenticado()
+        );
+
+        $dadosBarraDireita = array(
+
+        );
+
+        $this->template->setTemplate('home')
+                       ->setDefaultPartialVar('home/barra_lateral_esquerda', $dadosBarraEsquerda)
+                       ->setDefaultPartialVar('home/barra_lateral_direita', $dadosBarraDireita)
                        ->render($view, $dados);
     }
 
