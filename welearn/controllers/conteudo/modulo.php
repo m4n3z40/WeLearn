@@ -33,21 +33,23 @@ class Modulo extends WL_Controller
             try {
                 $listaModulos = $moduloDAO->recuperarTodosPorCurso( $curso );
                 $totalModulos = count( $listaModulos );
-            } catch (cassandra_NotFoundException $e) {
-                $listaModulos = array();
-                $totalModulos = 0;
-            }
 
-            if ( $totalModulos > 0 ) { //recuperar total de aulas para cada módulo
                 $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
+                $avaliacaoDao = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO');
 
-                foreach ($listaModulos as $modulo) {
+                foreach ($listaModulos as $modulo) {  //recuperar total de aulas e se existe avaliação para cada módulo
                     $modulo->setQtdTotalAulas(
                         $aulaDao->recuperarQtdTotalPorModulo( $modulo )
                     );
+
+                    $modulo->setExisteAvaliacao(
+                        $avaliacaoDao->existeAvaliacao( $modulo )
+                    );
                 }
 
-                unset($modulo);
+            } catch (cassandra_NotFoundException $e) {
+                $listaModulos = array();
+                $totalModulos = 0;
             }
 
             $dadosPartial = array(

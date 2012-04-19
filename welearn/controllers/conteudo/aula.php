@@ -77,27 +77,26 @@ class Aula extends WL_Controller
             $curso = $cursoDao->recuperar($idCurso);
 
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
+            $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
 
             try{
                 $listaModulos = $moduloDao->recuperarTodosPorCurso( $curso );
+                $totalModulos = count( $listaModulos );
+
+                foreach ($listaModulos as $modulo) {
+                    $modulo->setQtdTotalAulas(
+                        $aulaDao->recuperarQtdTotalPorModulo( $modulo )
+                    );
+                }
             } catch (cassandra_NotFoundException $e) {
                 $listaModulos = array();
+                $totalModulos = 0;
             }
 
-            $this->load->helper('modulo');
-
-            $dadosPartial = array(
-                'listaModulos' => lista_modulos_para_dados_dropdown($listaModulos),
-                'moduloSelecionado' => '0',
-                'extra' => 'id="slt-aula-modulos"'
-            );
-
             $dadosView = array(
-                'selectModulos' => $this->template->loadPartial(
-                    'select_modulos',
-                    $dadosPartial,
-                    'curso/conteudo'
-                ),
+                'haModulos' => $totalModulos > 0,
+                'totalModulos' => $totalModulos,
+                'listaModulos' => $listaModulos,
                 'idCurso' => $idCurso
             );
 

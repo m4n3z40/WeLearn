@@ -3,9 +3,17 @@
     <h3><a href="#">Aula <em><?php echo $aula->nroOrdem ?></em>:
         <?php echo $aula->nome ?></a></h3>
     <div>
-        <header>
+        <div>
+            <h4>Descrição:</h4>
+            <p><?php echo nl2br($aula->descricao) ?></p>
+        </div>
+        <footer>
             <nav class="aula-adminpanel">
                 <ul>
+                    <li>
+                        <?php echo anchor('curso/conteudo/aula/exibir/' . $aula->id,
+                                          'Visualizar') ?>
+                    </li>
                     <li>
                         <?php echo anchor(
                             '/curso/conteudo/aula/alterar/' . $aula->id,
@@ -20,35 +28,19 @@
                             array('class' => 'a-aula-remover')
                         ) ?>
                     </li>
-                </ul>
-            </nav>
-        </header>
-        <div>
-            <h4>Descrição:</h4>
-            <p><?php echo nl2br($aula->descricao) ?></p>
-        </div>
-        <footer>
-            <nav>
-                <ul>
-                    <li>
-                        <?php echo anchor('curso/conteudo/aula/exibir/' . $aula->id,
-                                          'Visualizar',
-                                          array('class' => 'button')) ?>
-                    </li>
                     <li>
                         <?php echo anchor('/curso/conteudo/pagina/' . $aula->id,
-                                          'Gerenciar Páginas ('
-                                              . $aula->qtdTotalPaginas . ')',
-                                          array('class' => 'button')) ?>
+                                          'Gerenciar Páginas')
+                                          . ' - ('. $aula->qtdTotalPaginas . ' páginas)'
+                        ?>
                     </li>
                     <li>
                         <?php echo anchor('/curso/conteudo/recurso/restrito/'
                                               . $aula->modulo->curso->id
                                               . '?a=' . $aula->id,
-                                          'Gerenciar Recursos ('
-                                              . $aula->qtdTotalRecursos . ')',
-                                          array('class' => 'button')
-                        ) ?>
+                                          'Gerenciar Recursos')
+                                          . ' - ('. $aula->qtdTotalRecursos . ' recursos)'
+                        ?>
                     </li>
                 </ul>
             </nav>

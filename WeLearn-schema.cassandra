@@ -383,6 +383,36 @@ and column_type = 'Standard'
 and default_validation_class = 'TimeUUIDType'
 and key_validation_class = 'TimeUUIDType';
 
+create column family cursos_avaliacao
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_avaliacao_questao
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_avaliacao_questao_por_avaliacao
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_avaliacao_alternativa
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_avaliacao_alternativa_por_questao
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
 create column family cursos_recurso
 with comparator = 'UTF8Type'
 and column_type = 'Standard'

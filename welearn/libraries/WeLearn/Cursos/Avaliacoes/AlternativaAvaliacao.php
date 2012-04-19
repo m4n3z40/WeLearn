@@ -31,24 +31,6 @@ class WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao extends WeLearn_DTO_Abstrac
     private $_questaoId;
 
     /**
-     * @param int $id
-     * @param bool $correta
-     * @param string $txtAlternativa
-     * @param null|WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao $questao
-     */
-    public function __construct($id = 0, $correta = false, $txtAlternativa = '', $questaoId = '')
-    {
-        $dados = array(
-            'id' => $id,
-            'correta' => $correta,
-            'txtAlternativa' => $txtAlternativa,
-            'questaoId' => $questaoId
-        );
-
-        parent::__construct($dados);
-    }
-
-    /**
      * @param boolean $correta
      */
     public function setCorreta($correta)
@@ -65,15 +47,15 @@ class WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao extends WeLearn_DTO_Abstrac
     }
 
     /**
-     * @param int $id
+     * @param string $id
      */
     public function setId($id)
     {
-        $this->_id = (int)$id;
+        $this->_id = (string)$id;
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
@@ -127,5 +109,19 @@ class WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao extends WeLearn_DTO_Abstrac
             'questaoId' => $this->getQuestaoId(),
             'persistido' => $this->isPersistido()
         );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        $selfArray  = $this->toArray();
+
+        unset( $selfArray['persistido'] );
+
+        return $selfArray;
     }
 }

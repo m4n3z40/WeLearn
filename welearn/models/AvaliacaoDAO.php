@@ -9,88 +9,165 @@
  
 class AvaliacaoDAO extends WeLearn_DAO_AbstractDAO
 {
-         /**
-         * @param mixed $id
-         * @return WeLearn_DTO_IDTO
-         */
-        public function recuperar($id)
-        {
-            // TODO: Implementar este metodo
+    protected $_nomeCF = 'cursos_avaliacao';
+
+    /**
+     * @var ModuloDAO
+     */
+    private $_moduloDao;
+
+    /**
+     * @var QuestaoAvaliacaoDAO
+     */
+    private $_questaoDao;
+
+    function __construct()
+    {
+        $this->_moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
+        $this->_questaoDao = WeLearn_DAO_DAOFactory::create('QuestaoAvaliacaoDAO');
+    }
+
+    /**
+     * @param mixed $id
+     * @return WeLearn_DTO_IDTO
+     */
+    public function recuperar($id)
+    {
+        $UUID = CassandraUtil::import( $id );
+
+        $column = $this->_cf->get( $UUID->bytes );
+
+        return $this->_criarFromCassandra( $column );
+    }
+
+    /**
+     * @param mixed $de
+     * @param mixed $ate
+     * @param array|null $filtros
+     * @return array
+     */
+    public function recuperarTodos($de = '', $ate = '', array $filtros = null)
+    {
+        if ( isset($filtros['modulo']) ) {
+            return array( $this->recuperar( $filtros['modulo']->getId() ) );
         }
 
-        /**
-         * @param mixed $de
-         * @param mixed $ate
-         * @param array|null $filtros
-         * @return array
-         */
-        public function recuperarTodos($de = null, $ate = null, array $filtros = null)
-        {
-             // TODO: Implementar este metodo
+        return array();
+    }
+
+    /**
+     * @param mixed $de
+     * @param mixed $ate
+     * @return int
+     */
+    public function recuperarQtdTotal($de = null, $ate = null)
+    {
+        if ( $de instanceof WeLearn_Cursos_Conteudo_Modulo ) {
+            try {
+                $this->_cf->get( CassandraUtil::import( $de->getId() )->bytes );
+
+                return 1;
+            } catch (cassandra_NotFoundException $e) {
+                return 0;
+            }
         }
 
-        /**
-         * @param mixed $de
-         * @param mixed $ate
-         * @return int
-         */
-        public function recuperarQtdTotal($de = null, $ate = null)
-        {
-             // TODO: Implementar este metodo
-        }
+        return 0;
+    }
 
-        /**
-         * @param mixed $id
-         * @return WeLearn_DTO_IDTO
-         */
-        public function remover($id)
-        {
-            // TODO: Implementar este metodo
-        }
+    public function existeAvaliacao(WeLearn_Cursos_Conteudo_Modulo $modulo)
+    {
+        try {
+            $this->_cf->get( CassandraUtil::import( $modulo->getId() )->bytes );
 
-         /**
-         * @param array|null $dados
-         * @return WeLearn_DTO_IDTO
-         */
-        public function criarNovo(array $dados = null)
-        {
-            // TODO: Implementar este metodo
+            return true;
+        } catch (cassandra_NotFoundException $e) {
+            return false;
         }
+    }
 
-        /**
-         * @param WeLearn_DTO_IDTO $dto
-         * @return boolean
-         */
-        protected function _atualizar(WeLearn_DTO_IDTO $dto)
-        {
-            // TODO: Implementar este metodo
-        }
+    /**
+     * @param mixed $id
+     * @return WeLearn_DTO_IDTO
+     */
+    public function remover($id)
+    {
+        $UUID = CassandraUtil::import( $id );
 
-        /**
-         * @param WeLearn_DTO_IDTO $dto
-         * @return boolean
-         */
-        protected function _adicionar(WeLearn_DTO_IDTO &$dto)
-        {
-            // TODO: Implementar este metodo
-        }
+        $avaliacaoRemovida = $this->recuperar( $id );
 
-        /**
-         * @param WeLearn_Cursos_Avaliacoes_Avaliacao $Avaliacao
-         * @return Array
-         */
-        public function recuperarQuestoes(WeLearn_Cursos_Avaliacoes_Avaliacao $Avaliacao)
-        {
-            // TODO: Implementar este metodo
-        }
+        $questoesRemovidas = $this->_questaoDao->removerTodosPorAvaliacao( $avaliacaoRemovida );
+        $this->_cf->remove( $UUID->bytes );
 
-        /**
-         * @param WeLearn_Cursos_Avaliacoes_Avaliacao $Avaliacao
-         * @param int $posicao
-         * @return void
-         */
-        public function alterarPosicao(WeLearn_Cursos_Avaliacoes_Avaliacao $Avaliacao, int $posicao)
-        {
-            // TODO: Implementar este metodo
-        }
+        $avaliacaoRemovida->setQuestoes( $questoesRemovidas );
+        $avaliacaoRemovida->setPersistido( false );
+
+        return $avaliacaoRemovida;
+    }
+
+     /**
+     * @param array|null $dados
+     * @return WeLearn_DTO_IDTO
+     */
+    public function criarNovo(array $dados = null)
+    {
+        return new WeLearn_Cursos_Avaliacoes_Avaliacao($dados);
+    }
+
+    /**
+     * @param WeLearn_DTO_IDTO $dto
+     * @return boolean
+     */
+    protected function _atualizar(WeLearn_DTO_IDTO $dto)
+    {
+        $UUID = CassandraUtil::import( $dto->getId() );
+
+        $this->_cf->insert($UUID->bytes, $dto->toCassandra());
+    }
+
+    /**
+     * @param WeLearn_DTO_IDTO $dto
+     * @return boolean
+     */
+    protected function _adicionar(WeLearn_DTO_IDTO &$dto)
+    {
+        $dto->setId( $dto->getModulo()->getId() );
+
+        $UUID = CassandraUtil::import( $dto->getId() );
+
+        $this->_cf->insert($UUID->bytes, $dto->toCassandra());
+
+        $dto->setPersistido(true);
+    }
+
+    /**
+     * @param WeLearn_Cursos_Avaliacoes_Avaliacao $Avaliacao
+     * @return Array
+     */
+    public function recuperarQuestoes(WeLearn_Cursos_Avaliacoes_Avaliacao $Avaliacao)
+    {
+        return $this->_questaoDao->recuperarTodosPorAvaliacao($Avaliacao);
+    }
+
+    /**
+     * @return \QuestaoAvaliacaoDAO
+     */
+    public function getQuestaoDao()
+    {
+        return $this->_questaoDao;
+    }
+
+    private  function _criarFromCassandra (array $column,
+                                           WeLearn_Cursos_Conteudo_Modulo $moduloPadrao = null)
+    {
+        $column['modulo'] = ($moduloPadrao instanceof WeLearn_Cursos_Conteudo_Modulo)
+                            ? $moduloPadrao
+                            : $this->_moduloDao->recuperar( $column['modulo'] );
+
+        $avaliacao = $this->criarNovo();
+
+        $avaliacao->fromCassandra( $column );
+
+        return $avaliacao;
+    }
 }

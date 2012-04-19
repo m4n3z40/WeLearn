@@ -47,6 +47,11 @@ class WeLearn_Cursos_Conteudo_Modulo extends WeLearn_DTO_AbstractDTO
     private $_qtdTotalAulas;
 
     /**
+     * @var boolean
+     */
+    private $_existeAvaliacao;
+
+    /**
      * @param string $descricao
      */
     public function setDescricao($descricao)
@@ -159,6 +164,22 @@ class WeLearn_Cursos_Conteudo_Modulo extends WeLearn_DTO_AbstractDTO
     }
 
     /**
+     * @param boolean $existeAvaliacao
+     */
+    public function setExisteAvaliacao($existeAvaliacao)
+    {
+        $this->_existeAvaliacao = (boolean)$existeAvaliacao;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getExisteAvaliacao()
+    {
+        return $this->_existeAvaliacao;
+    }
+
+    /**
      * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
      * em um array.
      *
@@ -173,6 +194,8 @@ class WeLearn_Cursos_Conteudo_Modulo extends WeLearn_DTO_AbstractDTO
             'objetivos' => $this->getObjetivos(),
             'nroOrdem' => $this->getNroOrdem(),
             'curso' => $this->getCurso()->toArray(),
+            'qtdTotalAulas' => $this->getQtdTotalAulas(),
+            'existeAvaliacao' => $this->getExisteAvaliacao(),
             'persistido' => $this->isPersistido()
         );
     }

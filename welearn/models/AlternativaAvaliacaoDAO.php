@@ -7,7 +7,27 @@
  * To change this template use File | Settings | File Templates.
  */
  
-class WeLearn_DAO_AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO {
+class AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
+{
+    protected $_nomeCF = 'cursos_avaliacao_alternativa';
+
+    private $_nomeAlternativaPorQuestaoCF = 'cursos_avaliacao_alternativa_por_questao';
+
+    /**
+     * @var ColumnFamily|null
+     */
+    private $_alternativaPorQuestaoCF;
+
+    const MIN_ALTERNATIVAS = 2;
+    const MAX_ALTERNATIVAS = 12;
+
+    function __construct()
+    {
+        $this->_alternativaPorQuestaoCF = WL_Phpcassa::getInstance()
+                                                       ->getColumnFamily(
+            $this->_nomeAlternativaPorQuestaoCF
+        );
+    }
 
     /**
      * @param mixed $de
@@ -15,11 +35,50 @@ class WeLearn_DAO_AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO {
      * @param array|null $filtros
      * @return array
      */
-    public function recuperarTodos($de = null, $ate = null, array $filtros = null)
+    public function recuperarTodos($de = '', $ate = '', array $filtros = null)
     {
-        /*
-         * implementar metodo
-         * */
+        if (isset( $filtros['questao'] )
+            && $filtros['questao'] instanceof WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao) {
+
+            $count = isset( $filtros['count'] )
+                     ? $filtros['count']
+                     : AlternativaAvaliacaoDAO::MAX_ALTERNATIVAS;
+
+            return $this->recuperarQtdTotalPorQuestao( $filtros['questao'], $de, $ate, $count );
+        }
+
+        return array();
+    }
+
+    public function recuperarTodosPorQuestao (
+        WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao $questao,
+        $de = '',
+        $ate = '',
+        $count = AlternativaAvaliacaoDAO::MAX_ALTERNATIVAS
+    )
+    {
+        if ($de != '') {
+            $de = CassandraUtil::import( $de )->bytes;
+        }
+
+        if ($ate != '') {
+            $ate = CassandraUtil::import( $ate )->bytes;
+        }
+
+        $questaoUUID = CassandraUtil::import( $questao->getId() );
+
+        $ids = $this->_alternativaPorQuestaoCF->get(
+            $questaoUUID->bytes,
+            null,
+            $de,
+            $ate,
+            false,
+            $count
+        );
+
+        $columns = $this->_cf->multiget( $ids );
+
+        $this->_criarVariosfromCassandra( $columns );
     }
 
     /**
@@ -28,9 +87,11 @@ class WeLearn_DAO_AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO {
      */
     public function recuperar($id)
     {
-        /*
-         * implementar metodo
-         */
+        $UUID = CassandraUtil::import( $id );
+
+        $column = $this->_cf->get( $UUID->bytes );
+
+        return $this->_criarFromCassandra( $column );
     }
 
     /**
@@ -40,20 +101,19 @@ class WeLearn_DAO_AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO {
      */
     public function recuperarQtdTotal($de = null, $ate = null)
     {
-        /*
-         * implementar metodo
-         */
+        if ($de instanceof WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao) {
+            return $this->recuperarQtdTotalPorQuestao( $de );
+        }
+
+        return 0;
     }
 
-    /**
-     * @param WeLearn_DTO_IDTO $dto
-     * @return boolean
-     */
-    public function salvar()
+    public function recuperarQtdTotalPorQuestao (
+        WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao $questao
+    )
     {
-        /*
-         * implementar metodo
-         */
+        $questaoUUID = CassandraUtil::import( $questao->getId() );
+        return $this->_alternativaPorQuestaoCF->get_count( $questaoUUID->bytes );
     }
 
      /**
@@ -62,9 +122,39 @@ class WeLearn_DAO_AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO {
      */
     public function remover($id)
     {
-        /*
-         * implementar metodo
-         */
+        $alternativaRemovida = $this->recuperar( $id );
+
+        $UUID = CassandraUtil::import( $id );
+        $questaoUUID = CassandraUtil::import( $alternativaRemovida->getQuestaoId() );
+
+        $this->_cf->remove($UUID->bytes);
+        $this->_alternativaPorQuestaoCF->remove( $questaoUUID->bytes, array($UUID->bytes) );
+
+        $alternativaRemovida->setPersistido( false );
+
+        return $alternativaRemovida;
+    }
+
+    public function removerTodosPorQuestao(WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao $questao)
+    {
+        try {
+            $alternativasRemovidas = $this->recuperarTodosPorQuestao( $questao );
+        } catch (cassandra_NotFoundException $e) {
+            return array();
+        }
+
+        foreach ($alternativasRemovidas as $alternativa) {
+            $alternativaUUID = UUID::import( $alternativa->getId() );
+
+            $this->_cf->remove( $alternativaUUID->bytes );
+
+            $alternativa->setPersistido( false );
+        }
+
+        $questaoUUID = CassandraUtil::import( $questao->getId() );
+        $this->_alternativaPorQuestaoCF->remove( $questaoUUID->bytes );
+
+        return $alternativasRemovidas;
     }
 
      /**
@@ -73,9 +163,7 @@ class WeLearn_DAO_AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO {
      */
     public function criarNovo(array $dados = null)
     {
-       /*
-         * implementar metodo
-         */
+       return new WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao($dados);
     }
 
     /**
@@ -84,9 +172,19 @@ class WeLearn_DAO_AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO {
      */
     public function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-       /*
-         * implementar metodo
-         */
+        $UUID = UUID::mint();
+        $questaoUUID = CassandraUtil::import( $dto->getQuestaoId() );
+
+        $dto->setId( $UUID->string );
+
+        $this->_cf->insert( $UUID->bytes, $dto->toCassandra() );
+
+        $this->_alternativaPorQuestaoCF->insert(
+            $questaoUUID->bytes,
+            array( $UUID->bytes => '' )
+        );
+
+        $dto->setPersistido(true);
     }
 
      /**
@@ -95,9 +193,27 @@ class WeLearn_DAO_AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO {
      */
     public function _atualizar(WeLearn_DTO_IDTO $dto)
     {
-        /*
-         * implementar metodo
-         */
+        $UUID = CassandraUtil::import( $dto->getId() );
+
+        $this->_cf->insert( $UUID->bytes, $dto->toCassandra() );
     }
 
+    public function _criarFromCassandra (array $column)
+    {
+        $alternativa = $this->criarNovo();
+        $alternativa->fromCassandra( $column );
+
+        return $alternativa;
+    }
+
+    public function _criarVariosfromCassandra (array $columns)
+    {
+        $listaAlternativas = array();
+
+        foreach ( $columns as $column ) {
+            $listaAlternativas[] = $this->_criarFromCassandra( $column );
+        }
+
+        return $listaAlternativas;
+    }
 }

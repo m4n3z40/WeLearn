@@ -3,7 +3,13 @@
     <h3><a href="#">Módulo <em><?php echo $modulo->nroOrdem ?></em>:
         <?php echo $modulo->nome ?></a></h3>
     <div>
-        <header>
+        <div>
+            <h4>Descrição:</h4>
+            <p><?php echo nl2br($modulo->descricao) ?></p>
+            <h4>Objetivos:</h4>
+            <p><?php echo nl2br($modulo->objetivos) ?></p>
+        </div>
+        <footer>
             <nav class="modulo-adminpanel">
                 <ul>
                     <li>
@@ -20,33 +26,27 @@
                             array('class' => 'a-modulo-remover')
                         ) ?>
                     </li>
-                </ul>
-            </nav>
-        </header>
-        <div>
-            <h4>Descrição:</h4>
-            <p><?php echo nl2br($modulo->descricao) ?></p>
-            <h4>Objetivos:</h4>
-            <p><?php echo nl2br($modulo->objetivos) ?></p>
-        </div>
-        <footer>
-            <nav>
-                <ul>
+                    <li>
+                        <?php echo anchor(
+                            '/curso/conteudo/avaliacao/exibir/' . $modulo->id,
+                            'Gerenciar Avaliação') . ' - (';
+                            echo ($modulo->existeAvaliacao) ? 'com' : 'sem';
+                            echo ' avaliação)';
+                        ?>
+                    </li>
                     <li>
                         <?php echo anchor('/curso/conteudo/aula/'
                                               . $modulo->curso->id
                                               . '?m=' . $modulo->id,
-                                          'Gerenciar Aulas ('
-                                              . $modulo->qtdTotalAulas . ')',
-                                          array('class' => 'button')
-                        ) ?>
+                                          'Gerenciar Aulas')
+                                          . ' - (' . $modulo->qtdTotalAulas . ' aulas)'
+                        ?>
                     </li>
                     <li>
                         <?php echo anchor('/curso/conteudo/recurso/restrito/'
                                               . $modulo->curso->id
                                               . '?m=' . $modulo->id,
-                                          'Gerenciar Recursos',
-                                          array('class' => 'button')
+                                          'Gerenciar Recursos'
                         ) ?>
                     </li>
                 </ul>

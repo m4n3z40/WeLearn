@@ -11,7 +11,7 @@
 class WeLearn_Cursos_Avaliacoes_Avaliacao extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var int
+     * @var string
      */
     private $_id;
 
@@ -31,7 +31,7 @@ class WeLearn_Cursos_Avaliacoes_Avaliacao extends WeLearn_DTO_AbstractDTO
     private $_qtdQuestoesExibir;
 
     /**
-     * @var double
+     * @var float
      */
     private $_notaMinima;
 
@@ -46,11 +46,6 @@ class WeLearn_Cursos_Avaliacoes_Avaliacao extends WeLearn_DTO_AbstractDTO
     private $_qtdTentativasPermitidas;
 
     /**
-     * @var int
-     */
-    private $_nroOrdem;
-
-    /**
      * @var WeLearn_Cursos_Conteudo_Modulo
      */
     private $_modulo;
@@ -61,15 +56,15 @@ class WeLearn_Cursos_Avaliacoes_Avaliacao extends WeLearn_DTO_AbstractDTO
     private $_questoes;
 
     /**
-     * @param int $id
+     * @param string $id
      */
     public function setId($id)
     {
-        $this->_id = $id;
+        $this->_id = (string)$id;
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
@@ -109,35 +104,19 @@ class WeLearn_Cursos_Avaliacoes_Avaliacao extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param \double $notaMinima
+     * @param float $notaMinima
      */
     public function setNotaMinima($notaMinima)
     {
-        $this->_notaMinima = (double)$notaMinima;
+        $this->_notaMinima = (float)$notaMinima;
     }
 
     /**
-     * @return \double
+     * @return float
      */
     public function getNotaMinima()
     {
         return $this->_notaMinima;
-    }
-
-    /**
-     * @param int $nroOrdem
-     */
-    public function setNroOrdem($nroOrdem)
-    {
-        $this->_nroOrdem = (int)$nroOrdem;
-    }
-
-    /**
-     * @return int
-     */
-    public function getNroOrdem()
-    {
-        return $this->_nroOrdem;
     }
 
     /**
@@ -243,10 +222,29 @@ class WeLearn_Cursos_Avaliacoes_Avaliacao extends WeLearn_DTO_AbstractDTO
             'notaMinima' => $this->getNotaMinima(),
             'tempoDuracaoMax' => $this->getTempoDuracaoMax(),
             'qtdTentativasPermitidas' => $this->getQtdTentativasPermitidas(),
-            'nroOrdem' => $this->getNroOrdem(),
             'modulo' => $this->getModulo()->toArray(),
             'questoes' => $questoes,
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'qtdQuestoes' => $this->getQtdQuestoes(),
+            'qtdQuestoesExibir' => $this->getQtdQuestoesExibir(),
+            'notaMinima' => $this->getNotaMinima(),
+            'tempoDuracaoMax' => $this->getTempoDuracaoMax(),
+            'qtdTentativasPermitidas' => $this->getQtdTentativasPermitidas(),
+            'modulo' => ($this->_modulo instanceof WeLearn_Cursos_Conteudo_Modulo)
+                        ? $this->getModulo()->getId() : ''
         );
     }
 }
