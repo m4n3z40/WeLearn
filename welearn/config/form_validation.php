@@ -266,6 +266,18 @@ $config = array(
             'rules' => 'required'
         )
     ),
+    'pagina/salvar' => array(
+        array(
+            'field' => 'nome',
+            'label' => 'Nome',
+            'rules' => 'required|min_length[5]|max_length[125]'
+        ),
+        array(
+            'field' => 'conteudo',
+            'label' => 'Conteúdo',
+            'rules' => 'required'
+        )
+    ),
     'mensagem/criar' => array(
         array(
             'field'=>'mensagem',

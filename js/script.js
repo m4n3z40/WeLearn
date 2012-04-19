@@ -16,8 +16,8 @@ window.WeLearn = {
         }
     },
     helpers: {
-        accordionToURLParamPosicoes: function ($accordion) {
-            var arrayPosicoes = $accordion.sortable('toArray'),
+        sortableToURLParamPosicoes: function ($sortable) {
+            var arrayPosicoes = $sortable.sortable('toArray'),
                 i,
                 parametrosGet = {};
 

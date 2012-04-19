@@ -13,6 +13,7 @@
                 '/curso/conteudo/aula/listar/' . $modulo->id,
                 'Volte para a lista de aulas deste módulo'
             ) ?>
+        </p>
     </header>
     <div>
     <?php if ($ultrapassouLimite): ?>

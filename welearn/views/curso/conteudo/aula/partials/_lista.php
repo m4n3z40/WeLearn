@@ -37,14 +37,16 @@
                     </li>
                     <li>
                         <?php echo anchor('/curso/conteudo/pagina/' . $aula->id,
-                                          'Gerenciar Páginas',
+                                          'Gerenciar Páginas ('
+                                              . $aula->qtdTotalPaginas . ')',
                                           array('class' => 'button')) ?>
                     </li>
                     <li>
                         <?php echo anchor('/curso/conteudo/recurso/restrito/'
                                               . $aula->modulo->curso->id
                                               . '?a=' . $aula->id,
-                                          'Gerenciar Recursos',
+                                          'Gerenciar Recursos ('
+                                              . $aula->qtdTotalRecursos . ')',
                                           array('class' => 'button')
                         ) ?>
                     </li>

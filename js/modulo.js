@@ -25,7 +25,7 @@
                 });
         },
         ulListaModuloToParam = function($ulListaModulo) {
-            return WeLearn.helpers.accordionToURLParamPosicoes($ulListaModulo);
+            return WeLearn.helpers.sortableToURLParamPosicoes($ulListaModulo);
         },
         $divGerenciarPosicoesModulo = $('.div-modulo-gerenciar-posicoes'),
         $btnSalvarPosicoesModulo = $divGerenciarPosicoesModulo.children('button'),
@@ -136,6 +136,10 @@
                     $ulListaModulo.accordion(accordionOptions);
 
                     $qtdTotalModulos.text( parseInt( $qtdTotalModulos.text() ) - 1 );
+
+                    if ( $divGerenciarPosicoesModulo.first().is(':visible') ) {
+                        $divGerenciarPosicoesModulo.hide();
+                    }
                 },
                 'Cancelar' : function() {
                     $( this ).dialog('close');

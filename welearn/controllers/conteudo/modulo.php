@@ -38,11 +38,16 @@ class Modulo extends WL_Controller
                 $totalModulos = 0;
             }
 
-            $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
-            foreach ($listaModulos as $modulo) {
-                $modulo->setQtdTotalAulas(
-                    $aulaDao->recuperarQtdTotalPorModulo( $modulo )
-                );
+            if ( $totalModulos > 0 ) { //recuperar total de aulas para cada módulo
+                $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
+
+                foreach ($listaModulos as $modulo) {
+                    $modulo->setQtdTotalAulas(
+                        $aulaDao->recuperarQtdTotalPorModulo( $modulo )
+                    );
+                }
+
+                unset($modulo);
             }
 
             $dadosPartial = array(

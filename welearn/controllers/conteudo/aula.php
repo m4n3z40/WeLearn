@@ -140,6 +140,23 @@ class Aula extends WL_Controller
                 $totalAulas = 0;
             }
 
+            if ( $totalAulas > 0 ) {
+                $paginaDao = WeLearn_DAO_DAOFactory::create('PaginaDAO');
+                $recursoDao = WeLearn_DAO_DAOFactory::create('RecursoDAO');
+
+                foreach ($listaAulas as $aula) {
+                    $aula->setQtdTotalPaginas(
+                        $paginaDao->recuperarQtdTotalPorAula( $aula )
+                    );
+
+                    $aula->setQtdTotalRecursos(
+                        $recursoDao->recuperarQtdTotalRestritoS( $aula )
+                    );
+                }
+
+                unset($aula);
+            }
+
             $dadosPartial = array(
                 'listaAulas' => $listaAulas
             );

@@ -150,7 +150,31 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
     {
         $aulaUUID = CassandraUtil::import( $aula->getId() );
 
-        return $this->_cf->get_count( $aulaUUID->bytes );
+        return $this->_paginaPorAulaCF->get_count( $aulaUUID->bytes );
+    }
+
+    /**
+     * @param WeLearn_Cursos_Conteudo_Aula $aula
+     * @param array $novasPosicoes
+     */
+    public function atualizarPosicoes(WeLearn_Cursos_Conteudo_Aula $aula,
+                                      array $novasPosicoes)
+    {
+        $posicoes = array();
+        foreach ($novasPosicoes as $posicao => $id) {
+            $posicoes[ $posicao ] = UUID::import( $id )->bytes;
+
+            $this->_cf->insert(
+                $posicoes[ $posicao ],
+                array( 'nroOrdem' => $posicao )
+            );
+        }
+
+        $aulaUUID = UUID::import( $aula->getId() )->bytes;
+
+        $this->_paginaPorAulaCF->remove( $aulaUUID );
+
+        $this->_paginaPorAulaCF->insert( $aulaUUID, $posicoes );
     }
 
     /**

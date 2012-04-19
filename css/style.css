@@ -395,7 +395,7 @@ button, .button {
 
 
 
-.div-modulo-gerenciar-posicoes, .div-aula-gerenciar-posicoes {
+.div-modulo-gerenciar-posicoes, .div-aula-gerenciar-posicoes, .div-pagina-gerenciar-posicoes {
     text-align: center;
     padding-bottom: 10px;
     padding-top: 10px;
@@ -417,6 +417,43 @@ button, .button {
 #ul-modulo-listar-lista > li.sortable-placeholder,
 #ul-aula-listar-lista > li.sortable-placeholder {
     height: 3.5em;
+}
+
+#ul-pagina-listar-lista {
+    list-style: none;
+    padding-left: 0;
+    overflow: hidden;
+}
+
+#ul-pagina-listar-lista > li {
+    background: #ffedad;
+    width: 104px;
+    height: 150px;
+    padding: 0 5px 5px;
+    border: #f5f3e5 solid 1px;
+    float: left;
+    margin: 5px 5px 5px 0;
+    box-shadow: 2px 2px 7px #000;
+    border-radius: 5px;
+}
+
+#ul-pagina-listar-lista > li.ui-state-highlight {
+    background: #f5f3e5;
+    box-shadow: none;
+}
+
+#ul-pagina-listar-lista > li > h4 {
+    margin-top: 5px;
+    text-align: center;
+}
+
+#ul-pagina-listar-lista > li > h4:hover {
+    cursor: crosshair;
+    text-decoration: underline;
+}
+
+#div-dialogo-gerenciar-pagina {
+    overflow: scroll;
 }
 
 /* =============================================================================

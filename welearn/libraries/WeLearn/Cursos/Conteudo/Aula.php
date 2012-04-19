@@ -41,6 +41,11 @@ class WeLearn_Cursos_Conteudo_Aula extends WeLearn_DTO_AbstractDTO
     private $_qtdTotalPaginas;
 
     /**
+     * @var int
+     */
+    private $_qtdTotalRecursos;
+
+    /**
      * @param string $descricao
      */
     public function setDescricao($descricao)
@@ -137,6 +142,22 @@ class WeLearn_Cursos_Conteudo_Aula extends WeLearn_DTO_AbstractDTO
     }
 
     /**
+     * @param int $qtdTotalRecursos
+     */
+    public function setQtdTotalRecursos($qtdTotalRecursos)
+    {
+        $this->_qtdTotalRecursos = (int)$qtdTotalRecursos;
+    }
+
+    /**
+     * @return int
+     */
+    public function getQtdTotalRecursos()
+    {
+        return $this->_qtdTotalRecursos;
+    }
+
+    /**
      * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
      * em um array.
      *
@@ -151,6 +172,7 @@ class WeLearn_Cursos_Conteudo_Aula extends WeLearn_DTO_AbstractDTO
             'nroOrdem' => $this->getNroOrdem(),
             'modulo' => $this->getModulo()->toArray(),
             'qtdTotalPaginas' => $this->getQtdTotalPaginas(),
+            'qtdTotalRecursos' => $this->getQtdTotalRecursos(),
             'persistido' => $this->isPersistido()
         );
     }

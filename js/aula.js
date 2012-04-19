@@ -42,7 +42,7 @@
                 });
         },
         ulListaAulaToParam = function($ulListaAula) {
-            return WeLearn.helpers.accordionToURLParamPosicoes($ulListaAula);
+            return WeLearn.helpers.sortableToURLParamPosicoes($ulListaAula);
         },
         $divGerenciarPosicoesAula = $('.div-aula-gerenciar-posicoes'),
         $btnSalvarPosicoesAula = $divGerenciarPosicoesAula.children('button'),
@@ -141,7 +141,11 @@
                             if (res.success) {
                                 WeLearn.notificar(res.notificacao);
                             } else {
-                                log(res);
+                                WeLearn.notificar({
+                                    nivel: 'error',
+                                    msg: res.errors[0].error_msg,
+                                    tempo: 5000
+                                });
                             }
                         }
                     );
@@ -153,6 +157,10 @@
                     $ulListaAula.accordion(accordionOptions);
 
                     $qtdTotalAulas.text( parseInt( $qtdTotalAulas.text() ) - 1 );
+
+                    if ( $divGerenciarPosicoesAula.first().is(':visible') ) {
+                        $divGerenciarPosicoesAula.hide();
+                    }
                 },
                 'Cancelar' : function() {
                     $( this ).dialog('close');

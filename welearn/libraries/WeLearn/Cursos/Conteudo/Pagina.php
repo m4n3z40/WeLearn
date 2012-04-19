@@ -145,7 +145,9 @@ class WeLearn_Cursos_Conteudo_Pagina extends WeLearn_DTO_AbstractDTO
             'nome' => $this->getNome(),
             'conteudo' => $this->getConteudo(),
             'nroOrdem' => $this->getNroOrdem(),
-            'aula' => $this->getAula()->getId()
+            'aula' => ($this->_aula instanceof WeLearn_Cursos_Conteudo_Aula)
+                       ? $this->getAula()->getId()
+                       : ''
         );
     }
 }
