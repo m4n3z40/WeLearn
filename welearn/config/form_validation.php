@@ -272,6 +272,13 @@ $config = array(
             'label'=>'Mensagem',
             'rules'=>'required|max_length[1024]'
         )
+    ),
+    'usuario/buscar' => array(
+        array(
+            'field' => 'txt-search',
+            'label' => 'txt-search',
+            'rules' => 'required|max_length[50]'
+        )
     )
 );
 

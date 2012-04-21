@@ -3,15 +3,16 @@
  * Created by Allan Marques
  * Date: 27/07/11
  * Time: 18:15
- * 
+ *
  * Description:
  *
  */
- 
+
 class UsuarioDAO extends WeLearn_DAO_AbstractDAO
 {
     protected $_nomeCF = 'usuarios_usuario';
 
+    private $_mysql_tbl_name = 'usuarios';
     /**
      * @var ImagemUsuarioDAO
      */
@@ -76,6 +77,9 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
             $this->salvarConfiguracao( $dto->getConfiguracao() );
         }
 
+        $indexMySqlUsuario=array('id' => $dto->getId(), 'nome' => $dto->getNome(), 'sobrenome' => $dto->getSobrenome(),
+        'email' => $dto->getEmail());
+        get_instance()->db->insert($this->_mysql_tbl_name,$indexMySqlUsuario);
         $dto->setPersistido(true);
     }
 
@@ -86,7 +90,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     protected function _atualizar(WeLearn_DTO_IDTO $dto)
     {
         if (strlen($dto->getSenha()) <= 24) { //Se a senha foi modificada, necessita encriptar novamente.
-           $dto->setSenha(md5($dto->getSenha()));
+            $dto->setSenha(md5($dto->getSenha()));
         }
 
         $this->_cf->insert($dto->getId(), $dto->toCassandra());
@@ -132,7 +136,26 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperarTodos($de = null, $ate = null, array $filtros = null)
     {
-        // TODO: Implement recuperarTodos() method.
+        $sql=get_instance();
+        $sql->db->like('id',$filtros['id']);
+        $sql->db->or_like('nome', $filtros['id']);
+        $sql->db->or_like('sobrenome',$filtros['id']);
+        $sql->db->or_like('email',$filtros['id']);
+        $sql->db->distinct();
+        $sql->db->select('id, nome, sobrenome');
+        $sql->db->limit($filtros['qtd'],$de); //recuperar $qtd registros a partir do $de
+        $sqlData = $sql->db->get($this->_mysql_tbl_name)->result_array();
+        $idArray=array();
+        foreach ($sqlData as $row) {
+            $idArray[]=$row['id'];
+        }
+
+        $arrayUsuarios= array();
+        foreach($idArray as $row)
+        {
+            $arrayUsuarios[$row]=$this->recuperar($row);
+        }
+        return $arrayUsuarios;
     }
 
     /**
@@ -151,6 +174,35 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
 
         $usuario->setPersistido(true);
         return $usuario;
+    }
+
+    /*
+     * realiza a busca utilizando função like mysql a partir de uma string que contem o nome, email, sobrenome do usuario
+     */
+    public function recuperarPorCaracter($id,$de,$qtd)
+    {
+        $sql=get_instance();
+        $sql->db->like('id',$id);
+        $sql->db->or_like('nome', $id);
+        $sql->db->or_like('sobrenome',$id);
+        $sql->db->or_like('email',$id);
+        $sql->db->distinct();
+        $sql->db->select('id, nome, sobrenome');
+        $sql->db->limit($qtd,$de); //recuperar $qtd registros a partir do $de
+        $sqlData = $sql->db->get($this->_mysql_tbl_name)->result_array();
+        $idArray=array();
+        foreach ($sqlData as $row) {
+            $idArray[]=$row['id'];
+        }
+
+        $arrayUsuarios= array();
+        foreach($idArray as $row)
+        {
+            $arrayUsuarios[$row]=$this->recuperar($row);
+        }
+        return $arrayUsuarios;
+
+        //return $sqlData;
     }
 
     /**
@@ -343,7 +395,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
 
             //Caso a senha for menor que 24 caracteres não é md5, necessário encriptar.
             $senha = (strlen($senha) <= 24) ? md5($senha) : $senha;
-            
+
             if ($objUsuario->getSenha() == $senha) {
                 return $objUsuario;
             } else {
@@ -400,7 +452,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     private function _extrairDadosUsuarioParaArray(WeLearn_Usuarios_Usuario $usuario)
     {
-        $usuarioArray =  array(
+        $usuarioArray = array(
             'id' => $usuario->getId(),
             'nome' => $usuario->getNome(),
             'sobrenome' => $usuario->getSobrenome(),

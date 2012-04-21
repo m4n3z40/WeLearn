@@ -1,6 +1,6 @@
 <?php
 
-function create_paginacao_mysql(array &$dataset, $inicio_pagina_atual = 0, $por_pagina = 10) {
+function create_paginacao_mysql(array &$dataset, $inicio_pagina_atual = 0, $por_pagina = 5) {
     $paginacao = array (
         'proxima_pagina' => false,
         'inicio_proxima_pagina' => null
