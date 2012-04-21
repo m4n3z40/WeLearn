@@ -4,6 +4,6 @@
     <section id="user-info"><?php echo $nomeUsuario ?></section>
     <?php echo form_open('usuario/busca/buscar')?>
     <input type="text" name="txt-search" id="txt-search"/>
-    <?php echo form_submit('enviar','procurar')?>
+    <?php echo form_submit('enviar','procurar', 'id="btn-submit-search"')?>
     <?php echo form_close();?>
 </div>

@@ -175,9 +175,10 @@ window.WeLearn = {
         }
     },
     bindDefaultEvents : function (){
+        var $txtSearch = $('#txt-search');
 
-        $('#txt-search').click(function(e){
-            if ( ! $(this).val() ) {
+        $('#btn-submit-search').click(function(e){
+            if ( ! $txtSearch.val() ) {
                 e.preventDefault();
             }
         });
