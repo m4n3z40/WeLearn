@@ -306,6 +306,13 @@ $config = array(
             'label' => 'Qtd. de Tentativas Permitidas',
             'rules' => 'required|numeric|greater_than[-1]|less_than[6]'
         ),
+    ),
+    'usuario/buscar' => array(
+        array(
+            'field' => 'txt-search',
+            'label' => 'txt-search',
+            'rules' => 'required|max_length[50]'
+        )
     )
 );
 

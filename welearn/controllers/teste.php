@@ -25,7 +25,7 @@ class Teste extends CI_Controller
         $usuarioDestinatario=$usuarioDao->criarNovo();
         $usuarioDestinatario->setId('thiago');
         $usuarioRemente=$usuarioDao->criarNovo();
-        $usuarioRemente->setId('m4n3z40');
+        $usuarioRemente->setId('keith');
         $mensagemDao=WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
         $mensagemPessoal=$mensagemDao->criarNovo();
         $mensagemPessoal->setMensagem('mensagem enviada por usuario thiago'.$i);

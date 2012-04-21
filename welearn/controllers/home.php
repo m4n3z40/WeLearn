@@ -33,6 +33,8 @@ class Home extends WL_Controller {
             ->setDefaultPartialVar('home/barra_lateral_direita', $dadosBarraDireita)
             ->render($view, $dados);
     }
+
+
 }
 
 /* End of file home.php */
