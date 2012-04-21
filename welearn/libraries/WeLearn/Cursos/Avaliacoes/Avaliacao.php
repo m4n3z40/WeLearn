@@ -23,12 +23,12 @@ class WeLearn_Cursos_Avaliacoes_Avaliacao extends WeLearn_DTO_AbstractDTO
     /**
      * @var int
      */
-    private $_qtdQuestoes;
+    private $_qtdQuestoes = 0;
 
     /**
      * @var int
      */
-    private $_qtdQuestoesExibir;
+    private $_qtdQuestoesExibir = 0;
 
     /**
      * @var float
@@ -238,7 +238,6 @@ class WeLearn_Cursos_Avaliacoes_Avaliacao extends WeLearn_DTO_AbstractDTO
         return array(
             'id' => $this->getId(),
             'nome' => $this->getNome(),
-            'qtdQuestoes' => $this->getQtdQuestoes(),
             'qtdQuestoesExibir' => $this->getQtdQuestoesExibir(),
             'notaMinima' => $this->getNotaMinima(),
             'tempoDuracaoMax' => $this->getTempoDuracaoMax(),

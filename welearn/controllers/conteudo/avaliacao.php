@@ -72,8 +72,14 @@ class Avaliacao extends WL_Controller
                 $avaliacaoDao->existeAvaliacao( $modulo )
             );
 
+            $avaliacao = null;
+            if ( $modulo->getExisteAvaliacao() ) {
+                $avaliacao = $avaliacaoDao->recuperar( $modulo->getId() );
+            }
+
             $dadosView = array(
-                'modulo' => $modulo
+                'modulo' => $modulo,
+                'avaliacao' => $avaliacao
             );
 
             $this->_renderTemplateCurso(
@@ -101,8 +107,23 @@ class Avaliacao extends WL_Controller
                 $avaliacaoDao->existeAvaliacao( $modulo )
             );
 
-            $dadosForm = array(//TODO: Continuar implementação do módulo de avaliações pela criação da avaliação.
+            if ( $modulo->getExisteAvaliacao() ) {
+                //Se já houver uma avaliação cadastrada, redirecionar para visualização da mesma
+                redirect('/curso/conteudo/avaliacao/exibir/' . $modulo->getId());
+            }
 
+            $dadosForm = array(
+                'formAction' => '/conteudo/avaliacao/salvar',
+                'extraOpenForm' => 'id="form-avaliacao-criar"',
+                'formHidden' => array(
+                    'acao' => 'criar',
+                    'moduloId' => $modulo->getId()
+                ),
+                'nomeAtual' => '',
+                'notaMinimaAtual' => '',
+                'tempoDuracaoMaxAtual' => '',
+                'qtdTentativasPermitidasAtual' => '',
+                'txtBotaoEnviar' => 'Criar!'
             );
 
             $dadosView = array(
@@ -129,11 +150,57 @@ class Avaliacao extends WL_Controller
 
     public function alterar ( $idAvaliacao )
     {
+        try {
+            $avaliacaoDao = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO');
+            $avaliacao = $avaliacaoDao->recuperar( $idAvaliacao );
+
+            $dadosForm = array(
+                'formAction' => '/conteudo/avaliacao/salvar',
+                'extraOpenForm' => 'id="form-avaliacao-alterar"',
+                'formHidden' => array(
+                    'acao' => 'alterar',
+                    'avaliacaoId' => $avaliacao->getId()
+                ),
+                'nomeAtual' => $avaliacao->getNome(),
+                'notaMinimaAtual' => $avaliacao->getNotaMinima(),
+                'tempoDuracaoMaxAtual' => $avaliacao->getTempoDuracaoMax(),
+                'qtdTentativasPermitidasAtual' => $avaliacao->getQtdTentativasPermitidas(),
+                'txtBotaoEnviar' => 'Salvar!'
+            );
+
+            $dadosView = array(
+                'avaliacao' => $avaliacao,
+                'form' => $this->template->loadPartial(
+                    'form',
+                    $dadosForm,
+                    'curso/conteudo/avaliacao'
+                )
+            );
+
+            $this->_renderTemplateCurso(
+                $avaliacao->getModulo()->getCurso(),
+                'curso/conteudo/avaliacao/alterar',
+                $dadosView
+            );
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar exibir formulário de criação de avaliação: '
+                . create_exception_description($e));
+
+            show_404();
+        }
+    }
+
+    public function remover($idAvaliacao)
+    {
 
     }
 
     public function salvar ()
     {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
         set_json_header();
 
         $this->load->library('form_validation');
@@ -141,6 +208,7 @@ class Avaliacao extends WL_Controller
         if ( ! $this->form_validation->run() ) {
             $json = create_json_feedback(false, validation_errors_json());
         } else {
+            $this->load->helper('notificacao_js');
             try {
                 switch ( $this->input->post('acao') ) {
                     case 'criar':
@@ -172,12 +240,53 @@ class Avaliacao extends WL_Controller
 
     private function _criar ( $post )
     {
+        $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
+        $modulo = $moduloDao->recuperar( $post['moduloId'] );
 
+        $avaliacaoDao = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO');
+        $avaliacao = $avaliacaoDao->criarNovo( $post );
+        $avaliacao->setModulo( $modulo );
+
+        $avaliacaoDao->salvar( $avaliacao );
+
+        $notificacoesFlash = create_notificacao_json(
+            'sucesso',
+            'A avaliação <em>"' . $avaliacao->getNome()
+                . '"</em> foi criada com sucesso no módulo  '
+                . $modulo->getNroOrdem() . '!'
+        );
+
+        $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
+        $response = Zend_Json::encode(array(
+            'idAvaliacao' => $avaliacao->getId()
+        ));
+
+        return create_json_feedback(true, '', $response);
     }
 
     private function _alterar ( $post )
     {
+        $avaliacaoDao = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO');
+        $avaliacao = $avaliacaoDao->recuperar( $post['avaliacaoId'] );
 
+        $avaliacao->preencherPropriedades( $post );
+
+        $avaliacaoDao->salvar( $avaliacao );
+
+        $notificacoesFlash = create_notificacao_json(
+            'sucesso',
+            'A avaliação <em>"' . $avaliacao->getNome()
+                . '"</em> foi salva com sucesso!'
+        );
+
+        $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
+        $response = Zend_Json::encode(array(
+            'idAvaliacao' => $avaliacao->getId()
+        ));
+
+        return create_json_feedback(true, '', $response);
     }
 
     private function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null, $view = '', array $dados = null)

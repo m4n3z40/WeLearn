@@ -284,6 +284,28 @@ $config = array(
             'label'=>'Mensagem',
             'rules'=>'required|max_length[1024]'
         )
+    ),
+    'avaliacao/salvar' => array(
+        array(
+            'field' => 'nome',
+            'label' => 'Nome',
+            'rules' => 'required|max_length[155]'
+        ),
+        array(
+            'field' => 'notaMinima',
+            'label' => 'Nota Mínima',
+            'rules' => 'required|numeric|greater_than[-1]|less_than[11]'
+        ),
+        array(
+            'field' => 'tempoDuracaoMax',
+            'label' => 'Tempo Máximo de Duração',
+            'rules' => 'required|numeric|greater_than[-1]|less_than[181]'
+        ),
+        array(
+            'field' => 'qtdTentativasPermitidas',
+            'label' => 'Qtd. de Tentativas Permitidas',
+            'rules' => 'required|numeric|greater_than[-1]|less_than[6]'
+        ),
     )
 );
 

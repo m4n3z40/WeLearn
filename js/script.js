@@ -174,10 +174,20 @@ window.WeLearn = {
             this.url.queryString = queryString;
         }
     },
+    bindDefaultEvents : function (){
+
+        $('#txt-search').click(function(e){
+            if ( ! $(this).val() ) {
+                e.preventDefault();
+            }
+        });
+
+    },
     init : function(){
         this.initUrl();
         this.initAjax();
         this.initNotificacoes();
+        this.bindDefaultEvents();
 
         $.datepicker.setDefaults({
             closeText:"Pronto",

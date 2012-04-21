@@ -12,11 +12,7 @@
         </p>
     </header>
     <div>
-        <?php if ($modulo->existeAvaliacao): ?>
-        <!--TODO: Implementar exibição de avaliacao. -->
-        <?php else: ?>
         <?php echo $form; ?>
-        <?php endif; ?>
     </div>
     <footer>
     </footer>
