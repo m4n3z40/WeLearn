@@ -16,6 +16,25 @@ window.WeLearn = {
         }
     },
     helpers: {
+        initSelectableRadios: function($selectable) {
+            $selectable.find('input[type=radio]').hide();
+            $selectable.selectable({
+                tolerance: 'fit',
+                start: function(e, ui) {
+                    var $selected = $(this).children('li.ui-selected');
+                    $selected.find('input[type=radio]').removeAttr('checked');
+                    $selected.removeClass('ui-selected');
+                },
+                stop: function(e, ui) {
+                    $(this).children('li.ui-selected').first()
+                                                      .find('input[type=radio]')
+                                                      .attr('checked', true);
+                }
+            });
+        },
+        initAllSelectablesRadios: function() {
+            this.initSelectableRadios( $('ul.selectable-radios') );
+        },
         sortableToURLParamPosicoes: function ($sortable) {
             var arrayPosicoes = $sortable.sortable('toArray'),
                 i,

@@ -298,18 +298,7 @@
     });
 
     var $ulListaAlternativas = $('#ul-enquete-alternativas');
-    $ulListaAlternativas.find('input[type=radio]').hide();
-    $ulListaAlternativas.selectable({
-        tolerance: 'fit',
-        start: function(e, ui) {
-            var $selected = $(this).children('li.ui-selected');
-            $selected.find('input[type=radio]').removeAttr('checked');
-            $selected.removeClass('ui-selected');
-        },
-        stop: function(e, ui) {
-            $(this).children('li.ui-selected').first().find('input[type=radio]').attr('checked', true);
-        }
-    });
+    WeLearn.helpers.initSelectableRadios( $ulListaAlternativas );
 
     var $formVotar = $(document.getElementById('form-enquete-votar'));
     $('#btn-votar-enquete').click(function(e){

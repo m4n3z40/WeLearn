@@ -32,13 +32,11 @@
         <ul>
             <li>
                 <?php echo anchor('/curso/conteudo/recurso/geral/' . $idCurso,
-                                  'Recursos Gerais',
-                                  array('class'=>'button')) ?>
+                                  'Recursos Gerais') ?>
             </li>
             <li>
                 <?php echo anchor('/curso/conteudo/recurso/restrito/' . $idCurso,
-                                  'Recursos Restritos',
-                                  array('class'=>'button')) ?>
+                                  'Recursos Restritos') ?>
                 <div id="div-recurso-select-modulos"
                      <?php echo empty($listaModulos) ? 'style="display:none;"' : '' ?>
                     >

@@ -13,6 +13,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     protected $_nomeCF = 'usuarios_usuario';
 
     private $_mysql_tbl_name = 'usuarios';
+
     /**
      * @var ImagemUsuarioDAO
      */
@@ -77,9 +78,15 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
             $this->salvarConfiguracao( $dto->getConfiguracao() );
         }
 
-        $indexMySqlUsuario=array('id' => $dto->getId(), 'nome' => $dto->getNome(), 'sobrenome' => $dto->getSobrenome(),
-        'email' => $dto->getEmail());
-        get_instance()->db->insert($this->_mysql_tbl_name,$indexMySqlUsuario);
+        $indexMySqlUsuario = array(
+            'id' => $dto->getId(),
+            'nome' => $dto->getNome(),
+            'sobrenome' => $dto->getSobrenome(),
+            'email' => $dto->getEmail()
+        );
+
+        get_instance()->db->insert( $this->_mysql_tbl_name, $indexMySqlUsuario );
+
         $dto->setPersistido(true);
     }
 

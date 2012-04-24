@@ -11,7 +11,7 @@
 class WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var int
+     * @var string
      */
     private $_id;
 

@@ -67,18 +67,18 @@ class AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
 
         $questaoUUID = CassandraUtil::import( $questao->getId() );
 
-        $ids = $this->_alternativaPorQuestaoCF->get(
+        $ids = array_keys($this->_alternativaPorQuestaoCF->get(
             $questaoUUID->bytes,
             null,
             $de,
             $ate,
             false,
             $count
-        );
+        ));
 
         $columns = $this->_cf->multiget( $ids );
 
-        $this->_criarVariosfromCassandra( $columns );
+        return $this->_criarVariosfromCassandra( $columns );
     }
 
     /**
@@ -157,6 +157,32 @@ class AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
         return $alternativasRemovidas;
     }
 
+    public function removerTodosPorLista(array $listaAlternativas)
+    {
+        if ($listaAlternativas[0] instanceof WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao) {
+            $questaoId = UUID::import( $listaAlternativas[0]->getQuestaoId() )->bytes;
+        } else {
+            return array();
+        }
+
+        $arrayIds = array();
+        foreach ($listaAlternativas as $alternativa) {
+            if ($alternativa instanceof WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao) {
+                $alternativaId = UUID::import( $alternativa->getId() )->bytes;
+
+                $this->_cf->remove($alternativaId);
+
+                $alternativa->setPersistido(false);
+
+                $arrayIds[] = $alternativaId;
+            }
+        }
+
+        $this->_alternativaPorQuestaoCF->remove($questaoId, $arrayIds);
+
+        return $listaAlternativas;
+    }
+
      /**
      * @param array|null $dados
      * @return WeLearn_DTO_IDTO
@@ -167,15 +193,72 @@ class AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param $txtAlternativa
+     * @param string $questaoId
+     * @return WeLearn_DTO_IDTO
+     */
+    public function criarNovaAlternativaCorreta($txtAlternativa, $questaoId = '')
+    {
+        $arrayDados = array(
+            'id' => UUID::mint()->string,
+            'correta' => true,
+            'txtAlternativa' => (string) $txtAlternativa,
+            'questaoId' => (string) $questaoId
+        );
+
+        return $this->criarNovo( $arrayDados );
+    }
+
+    /**
+     * @param $txtAlternativa
+     * @param string $questaoId
+     * @return WeLearn_DTO_IDTO
+     */
+    public function criarNovaAlternativaIncorreta($txtAlternativa, $questaoId = '')
+    {
+        $arrayDados = array(
+            'id' => UUID::mint()->string,
+            'correta' => false,
+            'txtAlternativa' => (string) $txtAlternativa,
+            'questaoId' => (string) $questaoId
+        );
+
+        return $this->criarNovo( $arrayDados );
+    }
+
+    /**
+     * @param array $txtsAlternativas
+     * @param string $questaoId
+     * @return array
+     */
+    public function criarVariasAlternativasIncorretas(array $txtsAlternativas, $questaoId = '')
+    {
+        $arrayAlternativas = array();
+
+        foreach ($txtsAlternativas as $txtAlternativa) {
+            $arrayAlternativas[] = $this->criarNovaAlternativaIncorreta(
+                $txtAlternativa,
+                $questaoId
+            );
+        }
+
+        return $arrayAlternativas;
+    }
+
+    /**
      * @param WeLearn_DTO_IDTO $dto
      * @return boolean
      */
-    public function _adicionar(WeLearn_DTO_IDTO &$dto)
+    protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        $UUID = UUID::mint();
-        $questaoUUID = CassandraUtil::import( $dto->getQuestaoId() );
+        if ( ! $dto->getId() ) {
+            $UUID = UUID::mint();
+            $dto->setId( $UUID->string );
+        } else {
+            $UUID = CassandraUtil::import( $dto->getId() );
+        }
 
-        $dto->setId( $UUID->string );
+        $questaoUUID = CassandraUtil::import( $dto->getQuestaoId() );
 
         $this->_cf->insert( $UUID->bytes, $dto->toCassandra() );
 
@@ -191,7 +274,7 @@ class AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
      * @param WeLearn_DTO_IDTO $dto
      * @return boolean
      */
-    public function _atualizar(WeLearn_DTO_IDTO $dto)
+    protected function _atualizar(WeLearn_DTO_IDTO $dto)
     {
         $UUID = CassandraUtil::import( $dto->getId() );
 

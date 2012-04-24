@@ -290,8 +290,6 @@ class Enquete extends WL_Controller {
 
         $this->load->library('form_validation');
 
-        $this->form_validation->set_message('_validarQtdAlternativas', 'O número de %s contidas nesta enquete é inválido.');
-
         if ( ! $this->form_validation->run() ) {
 
             $json = create_json_feedback(false, validation_errors_json());
@@ -604,6 +602,11 @@ class Enquete extends WL_Controller {
 
     public function _validarQtdAlternativas($alternativas)
     {
+        $this->form_validation->set_message(
+            '_validarQtdAlternativas',
+            'O número de %s contidas nesta enquete é inválido.'
+        );
+
         return (count($alternativas) >= 2) && (count($alternativas) <= 10);
     }
 }

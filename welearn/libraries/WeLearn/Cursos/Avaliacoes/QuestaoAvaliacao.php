@@ -36,25 +36,14 @@ class WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao extends WeLearn_DTO_AbstractDTO
     private $_avaliacaoId;
 
     /**
-     * @var array
+     * @var WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao
      */
-    private $_alternativas;
+    private $_alternativaCorreta;
 
     /**
-     * @param array $alternativas
+     * @var array(WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao)
      */
-    public function setAlternativas(array $alternativas)
-    {
-        $this->_alternativas = $alternativas;
-    }
-
-    /**
-     * @return array
-     */
-    public function getAlternativas()
-    {
-        return $this->_alternativas;
-    }
+    private $_alternativasIncorretas;
 
     /**
      * @param string $avaliacaoId
@@ -137,6 +126,64 @@ class WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao extends WeLearn_DTO_AbstractDTO
     }
 
     /**
+     * @param \WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao $alternativaCorreta
+     */
+    public function setAlternativaCorreta(WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao $alternativaCorreta)
+    {
+        $this->_alternativaCorreta = $alternativaCorreta;
+    }
+
+    /**
+     * @return \WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao
+     */
+    public function getAlternativaCorreta()
+    {
+        return $this->_alternativaCorreta;
+    }
+
+    /**
+     * @param \array(WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao) $alternativasIncorretas
+     */
+    public function setAlternativasIncorretas(array $alternativasIncorretas)
+    {
+        $this->_alternativasIncorretas = $alternativasIncorretas;
+    }
+
+    /**
+     * @return \array(WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao)
+     */
+    public function getAlternativasIncorretas()
+    {
+        return $this->_alternativasIncorretas;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAlternativasRandomizadas()
+    {
+        if ( !($this->_alternativaCorreta instanceof WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao)
+           || empty($this->_alternativasIncorretas)) {
+
+            return array();
+        }
+
+        $alternativasIncorretas = $this->getAlternativasIncorretas();
+        shuffle($alternativasIncorretas);
+
+        $alternativasRandomizadas = array_slice(
+            $alternativasIncorretas,
+            0,
+            $this->getQtdAlternativasExibir() - 1
+        );
+
+        array_push($alternativasRandomizadas, $this->getAlternativaCorreta());
+        shuffle($alternativasRandomizadas);
+
+        return $alternativasRandomizadas;
+    }
+
+    /**
      * @return void
      */
     public function recuperarAlternativas()
@@ -152,10 +199,10 @@ class WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao extends WeLearn_DTO_AbstractDTO
      */
     public function toArray()
     {
-        $alternativas = array();
-        if  (!is_null($this->_alternativas)) {
-            foreach ($this->getAlternativas() as $alternativa) {
-                $alternativas[] = $alternativa->toArray();
+        $alternativasIncorretas = array();
+        if  (!is_null($this->_alternativasIncorretas)) {
+            foreach ($this->getAlternativasIncorretas() as $alternativaIncorreta) {
+                $alternativasIncorretas[] = $alternativaIncorreta->toArray();
             }
         }
 
@@ -165,7 +212,10 @@ class WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao extends WeLearn_DTO_AbstractDTO
             'qtdAlternativas' => $this->getQtdAlternativas(),
             'qtdAlternativasExibir' => $this->getQtdAlternativasExibir(),
             'avaliacaoId' => $this->getAvaliacaoId(),
-            'alternativas' => $alternativas,
+            'alternativaCorreta' => ($this->_alternativaCorreta instanceof
+                                     WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao)
+                                     ? $this->getAlternativaCorreta()->toArray() : '',
+            'alternativasIncorretas' => $alternativasIncorretas,
             'persistido' => $this->isPersistido()
         );
     }
@@ -182,7 +232,27 @@ class WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao extends WeLearn_DTO_AbstractDTO
             'enunciado' => $this->getEnunciado(),
             'qtdAlternativas' => $this->getQtdAlternativas(),
             'qtdAlternativasExibir' => $this->getQtdAlternativasExibir(),
+            'alternativaCorreta' => ($this->_alternativaCorreta instanceof
+                                     WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao)
+                                     ? $this->getAlternativaCorreta()->getId() : '',
+            'alternativasIncorretas' => $this->_compilarIdsAlternativasIncorretas(),
             'avaliacaoId' => $this->getAvaliacaoId()
         );
+    }
+
+    private function _compilarIdsAlternativasIncorretas()
+    {
+        if ( empty($this->_alternativasIncorretas) ) {
+            return '';
+        }
+
+        $arrayIds = array();
+        foreach ($this->getAlternativasIncorretas() as $alternativaIncorreta) {
+            if ($alternativaIncorreta instanceof WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao) {
+                $arrayIds[] = $alternativaIncorreta->getId();
+            }
+        }
+
+        return implode('|', $arrayIds);
     }
 }

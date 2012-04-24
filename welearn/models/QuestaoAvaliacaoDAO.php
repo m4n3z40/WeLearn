@@ -40,11 +40,15 @@ class QuestaoAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        $UUID = UUID::mint();
+        if ( ! $dto->getId() ) {
+            $UUID = UUID::mint();
+
+            $dto->setId( $UUID->string );
+        } else {
+            $UUID = CassandraUtil::import( $dto->getId() );
+        }
 
         $avaliacaoUUID = CassandraUtil::import( $dto->getAvaliacaoId() );
-
-        $dto->setId( $UUID->string );
 
         $this->_cf->insert( $UUID->bytes, $dto->toCassandra() );
 
@@ -108,14 +112,14 @@ class QuestaoAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
 
         $avaliacaoUUID = CassandraUtil::import( $avaliacao->getId() );
 
-        $ids = $this->_questaoPorAvaliacaoCF->get(
+        $ids = array_keys($this->_questaoPorAvaliacaoCF->get(
             $avaliacaoUUID->bytes,
             null,
             $de,
             $ate,
             false,
             $count
-        );
+        ));
 
         $columns = $this->_cf->multiget( $ids );
 
@@ -171,9 +175,17 @@ class QuestaoAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
         $this->_cf->remove( $UUID->bytes );
         $this->_questaoPorAvaliacaoCF->remove( $avaliacaoUUID->bytes, array( $UUID->bytes ) );
 
-        $alternativasRemovidas = $this->_alternativaDAO->removerTodosPorQuestao( $id );
+        $alternativasRemovidas = $this->_alternativaDAO->removerTodosPorQuestao( $questaoRemovida );
 
-        $questaoRemovida->setAlternativas( $alternativasRemovidas );
+        for ($i = 0; $i < count($alternativasRemovidas); $i++) {
+            if ( $alternativasRemovidas[$i]->isCorreta() ) {
+                $questaoRemovida->setAlternativaCorreta( $alternativasRemovidas[$i] );
+                unset($alternativasRemovidas[$i]);
+                break;
+            }
+        }
+
+        $questaoRemovida->setAlternativasIncorretas( $alternativasRemovidas );
 
         $questaoRemovida->setPersistido( false );
 
@@ -194,7 +206,16 @@ class QuestaoAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
             $alternativasRemovidas = $this->_alternativaDAO->removerTodosPorQuestao( $questao );
             $this->_cf->remove( $questaoUUID->bytes );
 
-            $questao->setAlternativas( $alternativasRemovidas );
+            $alternativaCorreta = null;
+            for ($i = 0; $i < count($alternativasRemovidas); $i++) {
+                if ( $alternativasRemovidas[$i]->isCorreta() ) {
+                    $questao->setAlternativaCorreta( $alternativasRemovidas[$i] );
+                    unset($alternativasRemovidas[$i]);
+                    break;
+                }
+            }
+
+            $questao->setAlternativasIncorretas( $alternativasRemovidas );
             $questao->setPersistido( false );
         }
 
@@ -223,6 +244,17 @@ class QuestaoAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
     private function _criarFromCassandra (array $column)
     {
         $questao = $this->criarNovo();
+
+        $column['alternativaCorreta'] = $this->_alternativaDAO->recuperar(
+            $column['alternativaCorreta']
+        );
+
+        $alternativasIncorretas = array();
+        foreach ( explode('|', $column['alternativasIncorretas']) as $alternativaId) {
+            $alternativasIncorretas[] = $this->_alternativaDAO->recuperar($alternativaId);
+        }
+        $column['alternativasIncorretas'] = $alternativasIncorretas;
+
         $questao->fromCassandra( $column );
 
         return $questao;

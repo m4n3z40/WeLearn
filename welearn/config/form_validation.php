@@ -307,13 +307,35 @@ $config = array(
             'rules' => 'required|numeric|greater_than[-1]|less_than[6]'
         ),
     ),
+    'avaliacao/salvar_questao' => array(
+        array(
+            'field' => 'enunciado',
+            'label' => 'Enunciado',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'qtdAlternativasExibir',
+            'label' => 'Qtd. de Alternativas a Exibir',
+            'rules' => 'required|numeric|greater_than[1]|less_than[13]'
+        ),
+        array(
+            'field' => 'alternativaCorreta',
+            'label' => 'Alternativa Correta',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'alternativaIncorreta',
+            'label' => 'Alternativas Incorretas',
+            'rules' => 'required|callback__validarQtdAlternativasIncorretas'
+        )
+    ),
     'usuario/buscar' => array(
         array(
             'field' => 'txt-search',
             'label' => 'txt-search',
             'rules' => 'required|max_length[50]'
         )
-    )
+    ),
 );
 
 

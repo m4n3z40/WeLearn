@@ -32,7 +32,7 @@
         </nav>
         <?php echo form_open($formAction, $extraOpenForm, $formHidden); ?>
             <h2><?php echo $enquete->questao ?></h2>
-            <ul id="ul-enquete-alternativas">
+            <ul id="ul-enquete-alternativas" class="selectable-radios">
             <?php foreach ($enquete->alternativas as $alternativa): ?>
                 <li>
                     <input type="radio"
