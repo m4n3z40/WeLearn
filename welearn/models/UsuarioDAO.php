@@ -176,34 +176,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         return $usuario;
     }
 
-    /*
-     * realiza a busca utilizando função like mysql a partir de uma string que contem o nome, email, sobrenome do usuario
-     */
-    public function recuperarPorCaracter($id,$de,$qtd)
-    {
-        $sql=get_instance();
-        $sql->db->like('id',$id);
-        $sql->db->or_like('nome', $id);
-        $sql->db->or_like('sobrenome',$id);
-        $sql->db->or_like('email',$id);
-        $sql->db->distinct();
-        $sql->db->select('id, nome, sobrenome');
-        $sql->db->limit($qtd,$de); //recuperar $qtd registros a partir do $de
-        $sqlData = $sql->db->get($this->_mysql_tbl_name)->result_array();
-        $idArray=array();
-        foreach ($sqlData as $row) {
-            $idArray[]=$row['id'];
-        }
 
-        $arrayUsuarios= array();
-        foreach($idArray as $row)
-        {
-            $arrayUsuarios[$row]=$this->recuperar($row);
-        }
-        return $arrayUsuarios;
-
-        //return $sqlData;
-    }
 
     /**
      * @param WeLearn_Usuarios_Usuario $usuario

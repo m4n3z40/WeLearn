@@ -126,6 +126,11 @@ class WeLearn_Convites_ConviteBasico extends WeLearn_DTO_AbstractDTO
         //@todo : implementar este metodo!
     }
 
+    public function getConviteBasicoToCassandra()
+    {
+        return $this->toCassandra();
+    }
+
     /**
      * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
      * em um array.
@@ -142,4 +147,16 @@ class WeLearn_Convites_ConviteBasico extends WeLearn_DTO_AbstractDTO
             'persistido' => $this->isPersistido()
         );
     }
+
+    public function toCassandra()
+    {
+        return array(
+            'id' => $this->getId(),
+            'msgConvite' => $this->getMsgConvite(),
+            'remetente' => $this->getRemetente()->getId(),
+            'status' => $this->getStatus()
+        );
+    }
+
+
 }

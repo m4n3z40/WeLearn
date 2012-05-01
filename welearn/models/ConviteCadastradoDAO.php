@@ -9,6 +9,25 @@
  
 class ConviteCadastradoDAO extends WeLearn_DAO_AbstractDAO
 {
+
+    protected $_nomeCF = 'convites_convite_cadastrado';
+    protected $_nomeConvitePorUsuario= 'convites_convite_por_usuario';
+
+    /**
+     * @var ConviteDAO
+     */
+    protected $_conviteDao;
+    protected $_convitePorUsuarioCF;
+
+
+    public function __construct()
+    {
+        $this->_conviteDao= WeLearn_DAO_DAOFactory::create('ConviteDAO');
+        $phpCassa = WL_Phpcassa::getInstance();
+        $this->_convitePorUsuarioCF = $phpCassa->getColumnFamily($this->_nomeConvitePorUsuario);
+    }
+
+
      /**
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
@@ -54,7 +73,7 @@ class ConviteCadastradoDAO extends WeLearn_DAO_AbstractDAO
      */
     public function criarNovo(array $dados = null)
     {
-        // TODO: Implementar este metodo
+        return new WeLearn_Convites_ConviteCadastrado($dados);
     }
 
     /**
@@ -72,6 +91,27 @@ class ConviteCadastradoDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        // TODO: Implementar este metodo
+        $chave=$this->gerarChave($dto);
+        $dto->setId($chave);
+        $this->_cf->insert($dto->getDestinatario()->getId(),array($dto->getId() => ''));
+        $this->_conviteDao->salvar($dto);
+        $this->_convitePorUsuarioCF->insert($chave,array(CassandraUtil::import($dto->getId())->bytes=>''));
+
     }
+
+    public function recuperar_por_chave($dto)
+    {
+        $chave=$this->gerarChave($dto);
+        $resultado=$this->_convitePorUsuarioCF->get($chave);
+        return $resultado;
+    }
+
+    private function gerarChave($dto)
+    {
+        $Array= array($dto->getDestinatario()->getId(),$dto->getRemetente()->getId());
+        sort($Array);
+        $chave=implode('::',$Array);
+        return $chave;
+    }
+
 }

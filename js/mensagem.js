@@ -55,9 +55,11 @@
                                                             '</li>'+
                                                             '</div>'
                     );
+                    $('#txt-mensagem').val('');
                 }
             }
         );
+
     });
 
     $('.remover-mensagem').live('click', function(e) {

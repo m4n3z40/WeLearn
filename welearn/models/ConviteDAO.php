@@ -9,10 +9,22 @@
  
 class ConviteDAO extends WeLearn_DAO_AbstractDAO
 {
+    protected $_nomeCF = 'convites_convite_basico';
+
+
      /**
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
      */
+
+
+    public function __construct()
+    {
+
+    }
+
+
+
     public function recuperar($id)
     {
         // TODO: Implementar este metodo
@@ -54,7 +66,7 @@ class ConviteDAO extends WeLearn_DAO_AbstractDAO
      */
     public function criarNovo(array $dados = null)
     {
-        // TODO: Implementar este metodo
+        return new WeLearn_Convites_ConviteBasico($dados);
     }
 
     /**
@@ -72,7 +84,10 @@ class ConviteDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        // TODO: Implementar este metodo
+        $UUID = UUID::mint();
+        $dto->setId($UUID->string);
+        $this->_cf->insert($UUID->bytes, $dto->getConviteBasicoToCassandra());
+
     }
 
     /**
@@ -114,4 +129,6 @@ class ConviteDAO extends WeLearn_DAO_AbstractDAO
     {
         // TODO: Implementar este metodo
     }
+
+
 }
