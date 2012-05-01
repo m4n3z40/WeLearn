@@ -389,7 +389,7 @@ button, .button {
 
 
 
-#forum-lista-posts article {
+#forum-lista-posts article, #ul-lista-comentario article {
     overflow: hidden;
 }
 

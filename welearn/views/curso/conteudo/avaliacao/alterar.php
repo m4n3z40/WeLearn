@@ -1,4 +1,4 @@
-<div id="avaliacao-criar-content">
+<div id="avaliacao-alterar-content">
     <header>
         <hgroup>
             <h1>Alterar avaliação do Módulo <?php echo $avaliacao->modulo->nroOrdem ?></h1>

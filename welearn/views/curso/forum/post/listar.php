@@ -31,9 +31,9 @@
             <h4>Não há mais posts a serem exibidos.</h4>
             <?php endif; ?>
         </header>
-        <div id="forum-lista-posts">
+        <ul id="forum-lista-posts">
             <?php echo $listaPosts ?>
-        </div>
+        </ul>
         <?php else: ?>
         <h4 id="forum-lista-posts-vazio">Nenhum post foi criado neste fórum até o momento. Aguarde ou <a href="#" class="a-forum-post-criar">Seja o primeiro a postar!</a></h4>
         <?php endif; ?>

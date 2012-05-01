@@ -2,13 +2,15 @@
     <nav>
         <h3>Principal</h3>
         <ul>
-            <li><?php echo anchor('curso/' . $idCurso, 'Home') ?></li>
-            <li><?php echo anchor('curso/conteudo/' . $idCurso, 'Gerenciamento de conteúdo') ?></li>
-            <li><?php echo anchor('curso/aluno/' . $idCurso, 'Alunos') ?></li>
-            <li><?php echo anchor('curso/enquete/' . $idCurso, 'Enquetes') ?></li>
-            <li><?php echo anchor('curso/forum/' . $idCurso, 'Fóruns') ?></li>
-            <li><?php echo anchor('curso/gerenciador/' . $idCurso, 'Gerenciadores') ?></li>
-            <li><?php echo anchor('curso/configurar/' . $idCurso, 'Configurações do curso') ?></li>
+            <li><?php echo anchor('/curso/' . $idCurso, 'Home') ?></li>
+            <li><?php echo anchor('/curso/aluno/' . $idCurso, 'Alunos') ?></li>
+            <li><?php echo anchor('/curso/enquete/' . $idCurso, 'Enquetes') ?></li>
+            <li><?php echo anchor('/curso/forum/' . $idCurso, 'Fóruns') ?></li>
+            <li><?php echo anchor('/curso/gerenciador/' . $idCurso, 'Gerenciadores') ?></li>
+            <li><?php echo anchor('/curso/conteudo/' . $idCurso, 'Gerenciamento de Conteúdo') ?></li>
+            <li><?php echo anchor('/curso/certificado/' . $idCurso, 'Gerenciamento de Certificados') ?></li>
+            <li><?php echo anchor('/curso/review/' . $idCurso, 'Reputação do Curso') ?></li>
+            <li><?php echo anchor('/curso/configurar/' . $idCurso, 'Configurações do Curso') ?></li>
         </ul>
     </nav>
     <hr>

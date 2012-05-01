@@ -329,6 +329,18 @@ $config = array(
             'rules' => 'required|callback__validarQtdAlternativasIncorretas'
         )
     ),
+    'comentario/salvar' => array(
+        array(
+            'field' => 'assunto',
+            'label' => 'Assunto',
+            'rules' => 'max_length[155]'
+        ),
+        array(
+            'field' => 'txtComentario',
+            'label' => 'Comentário',
+            'rules' => 'required|max_length[2048]'
+        )
+    ),
     'usuario/buscar' => array(
         array(
             'field' => 'txt-search',

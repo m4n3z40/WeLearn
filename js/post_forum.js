@@ -107,9 +107,8 @@
                                      .parent()
                                      .parent()
                                      .parent()
-                                     .next()
-                                     .andSelf()
-                                     .fadeOut(600, function(){
+                                     .parent()
+                                     .fadeOut(function(){
                                          $( this ).remove();
                                      });
 
@@ -120,7 +119,7 @@
                                 WeLearn.notificar({
                                     nivel: 'error',
                                     msg: res.errors[0].error_msg,
-                                    tempo: 10000
+                                    tempo: 5000
                                 });
                             }
                         },
@@ -160,7 +159,7 @@
                     WeLearn.notificar({
                         nivel: 'error',
                         msg: res.errors[0].error_msg,
-                        tempo: 10000
+                        tempo: 5000
                     });
                 }
             },

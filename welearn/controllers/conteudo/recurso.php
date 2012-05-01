@@ -23,10 +23,7 @@ class Recurso extends WL_Controller
             $curso = $cursoDao->recuperar($idCurso);
 
             $dadosView = array(
-                'idCurso' => $curso->getId(),
-                'listaModulos' => array(),
-                'moduloSelecionado' => '',
-                'listaAulas' => array()
+                'idCurso' => $curso->getId()
             );
 
             $this->_renderTemplateCurso($curso, 'curso/conteudo/recurso/index', $dadosView);

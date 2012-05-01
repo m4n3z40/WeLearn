@@ -45,6 +45,23 @@ window.WeLearn = {
             }
 
             return $.param(parametrosGet);
+        },
+        objectListToSelectOptions: function (objList) {
+            if ( ! $.isArray(objList) ) { return ''; }
+
+            var htmlOptions = '',
+                i,
+                obj;
+
+            for (i = 0; i < objList.length; i++) {
+                obj = objList[i];
+
+                if ( obj.hasOwnProperty('name') && obj.hasOwnProperty('value') ) {
+                    htmlOptions += '<option value="' + obj.value + '">' + obj.name + '</option>'
+                }
+            }
+
+            return htmlOptions;
         }
     },
     notificar : function(opcoes) {

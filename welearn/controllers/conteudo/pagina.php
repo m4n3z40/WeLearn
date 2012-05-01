@@ -17,6 +17,55 @@ class Pagina extends WL_Controller
                        ->appendJSImport('pagina.js');
     }
 
+    public function recuperar_lista( $idAula )
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
+            $aula = $aulaDao->recuperar( $idAula );
+
+            $paginaDao = WeLearn_DAO_DAOFactory::create('PaginaDAO');
+
+            try {
+                $listaPaginas = $paginaDao->recuperarTodosPorAula( $aula );
+            } catch (cassandra_NotFoundException $e) {
+                $listaPaginas = array();
+            }
+
+            $arrayPaginas = array();
+
+            if ( count( $listaPaginas ) > 0 ) {
+                $i = 0;
+                foreach ($listaPaginas as $pagina) {
+                    $arrayPaginas[] = array(
+                        'value' => $pagina->getId(),
+                        'name' => 'Página ' . ++$i . ': ' . $pagina->getNome()
+                    );
+                }
+            }
+
+            $jsonPagina = Zend_Json::encode(array( 'paginas' => $arrayPaginas ));
+
+            $json = create_json_feedback(true, '', $jsonPagina);
+
+        } catch (Exception $e) {
+            log_message('error', 'Ocorreu um erro ao tentar recuperar lista de
+                        páginas via ajax: ' . create_exception_description($e));
+
+            $error = create_json_feedback_error_json('Ocorreu um erro inesperado,
+                        já estamos tentando resolver. Tente novamente mais tarde!');
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
     public function index($idAula)
     {
         $this->listar($idAula);

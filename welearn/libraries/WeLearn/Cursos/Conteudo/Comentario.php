@@ -11,7 +11,7 @@
 class WeLearn_Cursos_Conteudo_Comentario extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var int
+     * @var string
      */
     private $_id;
 
@@ -26,19 +26,14 @@ class WeLearn_Cursos_Conteudo_Comentario extends WeLearn_DTO_AbstractDTO
     private $_txtComentario;
 
     /**
-     * @var string
+     * @var int
      */
     private $_dataEnvio;
 
     /**
-     * @var string
+     * @var int
      */
     private $_dataAlteracao;
-
-    /**
-     * @var WeLearn_Cursos_Conteudo_Aula
-     */
-    private $_aula;
 
     /**
      * @var WeLearn_Cursos_Conteudo_Pagina
@@ -49,16 +44,6 @@ class WeLearn_Cursos_Conteudo_Comentario extends WeLearn_DTO_AbstractDTO
      * @var WeLearn_Usuarios_Usuario
      */
     private $_criador;
-
-    /**
-     * @var WeLearn_Cursos_Conteudo_Comentario
-     */
-    private $_respostaDe;
-
-    /**
-     * @var array
-     */
-    private $_respostas;
 
     /**
      * @param string $assunto
@@ -74,22 +59,6 @@ class WeLearn_Cursos_Conteudo_Comentario extends WeLearn_DTO_AbstractDTO
     public function getAssunto()
     {
         return $this->_assunto;
-    }
-
-    /**
-     * @param \WeLearn_Cursos_Conteudo_Aula $aula
-     */
-    public function setAula(WeLearn_Cursos_Conteudo_Aula $aula)
-    {
-        $this->_aula = $aula;
-    }
-
-    /**
-     * @return \WeLearn_Cursos_Conteudo_Aula
-     */
-    public function getAula()
-    {
-        return $this->_aula;
     }
 
     /**
@@ -109,15 +78,15 @@ class WeLearn_Cursos_Conteudo_Comentario extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param string $dataAlteracao
+     * @param int $dataAlteracao
      */
     public function setDataAlteracao($dataAlteracao)
     {
-        $this->_dataAlteracao = (string)$dataAlteracao;
+        $this->_dataAlteracao = (int)$dataAlteracao;
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getDataAlteracao()
     {
@@ -125,15 +94,15 @@ class WeLearn_Cursos_Conteudo_Comentario extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param string $dataEnvio
+     * @param int $dataEnvio
      */
     public function setDataEnvio($dataEnvio)
     {
-        $this->_dataEnvio = (string)$dataEnvio;
+        $this->_dataEnvio = (int)$dataEnvio;
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getDataEnvio()
     {
@@ -141,15 +110,15 @@ class WeLearn_Cursos_Conteudo_Comentario extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param int $id
+     * @param string $id
      */
     public function setId($id)
     {
-        $this->_id = (int)$id;
+        $this->_id = (string)$id;
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
@@ -170,38 +139,6 @@ class WeLearn_Cursos_Conteudo_Comentario extends WeLearn_DTO_AbstractDTO
     public function getPagina()
     {
         return $this->_pagina;
-    }
-
-    /**
-     * @param \WeLearn_Cursos_Conteudo_Comentario $respostaDe
-     */
-    public function setRespostaDe(WeLearn_Cursos_Conteudo_Comentario $respostaDe)
-    {
-        $this->_respostaDe = $respostaDe;
-    }
-
-    /**
-     * @return \WeLearn_Cursos_Conteudo_Comentario
-     */
-    public function getRespostaDe()
-    {
-        return $this->_respostaDe;
-    }
-
-    /**
-     * @param array $respostas
-     */
-    public function setRespostas(array $respostas)
-    {
-        $this->_respostas = $respostas;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRespostas()
-    {
-        return $this->_respostas;
     }
 
     /**
@@ -228,25 +165,36 @@ class WeLearn_Cursos_Conteudo_Comentario extends WeLearn_DTO_AbstractDTO
      */
     public function toArray()
     {
-        $respostas = array();
-        if (!is_null($this->_respostas)) {
-            foreach ($respostas as $resposta) {
-                $respostas[] = $resposta->toArray();
-            }
-        }
-
         return array(
             'id' => $this->getId(),
             'assunto' => $this->getAssunto(),
             'txtComentario' => $this->getTxtComentario(),
             'dataEnvio' => $this->getDataEnvio(),
             'dataAlteracao' => $this->getDataAlteracao(),
-            'aula' => is_null($this->_aula) ? '' : $this->getAula()->toArray(),
             'pagina' => is_null($this->_pagina) ? '' : $this->getPagina()->toArray(),
-            'criador' => $this->getCriador()->toArray(),
-            'respostaDe' => $this->getRespostaDe()->getId(),
-            'respostas' => $respostas,
+            'criador' => is_null($this->_criador) ? '' : $this->getCriador()->toArray(),
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'id' => $this->getId(),
+            'assunto' => $this->getAssunto(),
+            'txtComentario' => $this->getTxtComentario(),
+            'dataEnvio' => $this->getDataEnvio(),
+            'dataAlteracao' => ( ! $this->_dataAlteracao )
+                                ? '' : $this->getDataAlteracao(),
+            'pagina' => ($this->_pagina instanceof WeLearn_Cursos_Conteudo_Pagina)
+                        ? $this->getPagina()->getId() : '',
+            'criador' => ($this->_criador instanceof WeLearn_Usuarios_Usuario)
+                        ? $this->getCriador()->getId() : ''
         );
     }
 }

@@ -57,7 +57,6 @@
             function (res) {
                 if (res.success) {
                     var htmlOptionsAulas = '',
-                        i,
                         aulas = res.aulas;
 
                     if ( aulas.length < 1 ) {
@@ -69,10 +68,7 @@
                         }
                     } else {
                         htmlOptionsAulas += '<option value="0">Selecione uma aula...</option>';
-
-                        for( i = 0; i < res.aulas.length; i++ ) {
-                            htmlOptionsAulas += '<option value="' + aulas[i].value + '">' + aulas[i].name + '</option>';
-                        }
+                        htmlOptionsAulas += WeLearn.helpers.objectListToSelectOptions( aulas );
                     }
 
                     $sltAulas.html(htmlOptionsAulas);

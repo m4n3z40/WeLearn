@@ -37,22 +37,6 @@
             <li>
                 <?php echo anchor('/curso/conteudo/recurso/restrito/' . $idCurso,
                                   'Recursos Restritos') ?>
-                <div id="div-recurso-select-modulos"
-                     <?php echo empty($listaModulos) ? 'style="display:none;"' : '' ?>
-                    >
-                    <?php echo form_dropdown('modulos',
-                                             $listaModulos,
-                                             $moduloSelecionado,
-                                             'id="slt-recurso-modulos"') ?>
-                </div>
-                <div id="div-recurso-select-aulas"
-                     <?php echo empty($listaAulas) ? 'style="display:none;"' : '' ?>
-                    >
-                    <?php echo form_dropdown('aulas',
-                                             $listaAulas,
-                                             '',
-                                             'id="slt-recurso-aulas"') ?>
-                </div>
             </li>
         </ul>
     </div>
