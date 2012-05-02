@@ -136,9 +136,16 @@ class Pagina extends WL_Controller
             );
 
             $paginaDao = WeLearn_DAO_DAOFactory::create('PaginaDAO');
+            $comentarioDao = WeLearn_DAO_DAOFactory::create('ComentarioDAO');
 
             try {
                 $listaPaginas = $paginaDao->recuperarTodosPorAula( $aula );
+
+                foreach ($listaPaginas as $pagina) {
+                    $pagina->setQtdTotalComentarios(
+                        $comentarioDao->recuperarQtdTotalPorPagina( $pagina )
+                    );
+                }
             } catch (cassandra_NotFoundException $e) {
                 $listaPaginas = array();
             }

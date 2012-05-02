@@ -31,7 +31,7 @@
                     <li>
                         <?php echo anchor('/curso/conteudo/pagina/' . $aula->id,
                                           'Gerenciar Páginas')
-                                          . ' - ('. $aula->qtdTotalPaginas . ' páginas)'
+                                          . ' <span>('. $aula->qtdTotalPaginas . ')</span>'
                         ?>
                     </li>
                     <li>
@@ -39,7 +39,7 @@
                                               . $aula->modulo->curso->id
                                               . '?a=' . $aula->id,
                                           'Gerenciar Recursos')
-                                          . ' - ('. $aula->qtdTotalRecursos . ' recursos)'
+                                          . ' <span>('. $aula->qtdTotalRecursos . ')</span>'
                         ?>
                     </li>
                 </ul>

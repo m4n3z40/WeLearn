@@ -134,7 +134,7 @@
     $(document).ready(function(){
         //Se estiver na página de listagem de recursos restritos
 
-        if ( $divContainerModulosDataTable.length > 0 ) {
+        if ( $divContainerModulosDataTable.length > 0 && WeLearn.url.params.a ) {
             $sltAulas.trigger('change');
         }
     });

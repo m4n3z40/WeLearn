@@ -17,11 +17,11 @@
                     <h4>Escolha o Módulo:</h4>
                     <?php echo $selectModulos ?>
                 </li>
-                <li style="display: none;">
+                <li <?php echo ( $paginaSelecionada ) ? '' : 'style="display: none;"' ?>>
                     <h4>Escolha a Aula:</h4>
                     <?php echo $selectAulas ?>
                 </li>
-                <li style="display: none">
+                <li <?php echo ( $paginaSelecionada ) ? '' : 'style="display: none;"' ?>>
                     <h4>Escolha a Página:</h4>
                     <?php echo $selectPaginas ?>
                 </li>

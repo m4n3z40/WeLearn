@@ -2,7 +2,7 @@
     <div class="div-questao-exibir-enunciado">
         <input type="hidden" name="questaoId" value="<?php echo $questao->id ?>">
         <h4>Enunciado:</h4>
-        <p><?php echo nl2br($questao->enunciado) ?></p>
+        <p><?php echo '<pre>' . $questao->enunciado . '</pre>' ?></p>
     </div>
     <div class="div-questao-exibir-alternativas">
         <h4>Alternativas:</h4>

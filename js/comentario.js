@@ -114,6 +114,8 @@
     $sltPaginas.change(function(e){
         var $this = $(this);
 
+        if ( $this.val() == '0' ) { return; }
+
         $.get(
             WeLearn.url.siteURL('/conteudo/comentario/recuperar_lista/' + $this.val()),
             {},
@@ -363,6 +365,12 @@
                 }
             }
         });
+    });
+
+    $(document).ready(function(){
+        if ( WeLearn.url.params.p ) {
+            $sltPaginas.trigger('change');
+        }
     });
 
 })();

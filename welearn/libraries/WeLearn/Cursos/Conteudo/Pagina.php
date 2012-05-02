@@ -36,6 +36,11 @@ class WeLearn_Cursos_Conteudo_Pagina extends WeLearn_DTO_AbstractDTO
     private $_aula;
 
     /**
+     * @var int
+     */
+    private $_qtdTotalComentarios;
+
+    /**
      * @param \WeLearn_Cursos_Conteudo_Aula $aula
      */
     public function setAula(WeLearn_Cursos_Conteudo_Aula $aula)
@@ -116,6 +121,22 @@ class WeLearn_Cursos_Conteudo_Pagina extends WeLearn_DTO_AbstractDTO
     }
 
     /**
+     * @param int $qtdTotalComentarios
+     */
+    public function setQtdTotalComentarios($qtdTotalComentarios)
+    {
+        $this->_qtdTotalComentarios = $qtdTotalComentarios;
+    }
+
+    /**
+     * @return int
+     */
+    public function getQtdTotalComentarios()
+    {
+        return $this->_qtdTotalComentarios;
+    }
+
+    /**
      * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
      * em um array.
      *
@@ -129,6 +150,7 @@ class WeLearn_Cursos_Conteudo_Pagina extends WeLearn_DTO_AbstractDTO
             'conteudo' => $this->getConteudo(),
             'nroOrdem' => $this->getNroOrdem(),
             'aula' => $this->getAula()->toArray(),
+            'qtdTotalComentarios' => $this->getQtdTotalComentarios(),
             'persistido' => $this->isPersistido()
         );
     }

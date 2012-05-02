@@ -29,9 +29,9 @@
                     <li>
                         <?php echo anchor(
                             '/curso/conteudo/avaliacao/exibir/' . $modulo->id,
-                            'Gerenciar Avaliação') . ' - (';
-                            echo ($modulo->existeAvaliacao) ? 'com' : 'sem';
-                            echo ' avaliação)';
+                            'Gerenciar Avaliação') . ' <span>(';
+                            echo ($modulo->existeAvaliacao) ? 'sim' : 'não';
+                            echo ')</span>';
                         ?>
                     </li>
                     <li>
@@ -39,7 +39,7 @@
                                               . $modulo->curso->id
                                               . '?m=' . $modulo->id,
                                           'Gerenciar Aulas')
-                                          . ' - (' . $modulo->qtdTotalAulas . ' aulas)'
+                                          . ' <span>(' . $modulo->qtdTotalAulas . ')</span>'
                         ?>
                     </li>
                     <li>

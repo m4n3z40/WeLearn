@@ -30,24 +30,52 @@ class Comentario extends WL_Controller
                 $listaModulos = array();
             }
 
+            $listaAulas = array();
+            $listaPaginas = array();
+            $moduloSelecionado = '0';
+            $aulaSelecionada = '0';
+            $paginaSelecionada = '0';
+            if ( $paginaId = $this->input->get('p') ) {
+                $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
+                $paginaDao = WeLearn_DAO_DAOFactory::create('PaginaDAO');
+
+                $pagina = $paginaDao->recuperar( $paginaId );
+
+                try {
+                    $listaAulas = $aulaDao->recuperarTodosPorModulo( $pagina->getAula()->getModulo() );
+                } catch (cassandra_NotFoundException $e) {
+                    $listaAulas = array();
+                }
+
+                try {
+                    $listaPaginas = $paginaDao->recuperarTodosPorAula( $pagina->getAula() );
+                } catch (cassandra_NotFoundException $e) {
+                    $listaPaginas = array();
+                }
+
+                $moduloSelecionado = $pagina->getAula()->getModulo()->getId();
+                $aulaSelecionada = $pagina->getAula()->getId();
+                $paginaSelecionada = $pagina->getId();
+            }
+
             $this->load->helper('modulo');
             $dadosSelectModulo = array(
                 'listaModulos' => lista_modulos_para_dados_dropdown( $listaModulos ),
-                'moduloSelecionado' => '0',
+                'moduloSelecionado' => $moduloSelecionado,
                 'extra' => 'id="slt-modulos"'
             );
 
             $this->load->helper('aula');
             $dadosSelectAulas = array(
-                'listaAulas' => lista_aulas_para_dados_dropdown( array() ),
-                'aulaSelecionada' => '0',
+                'listaAulas' => lista_aulas_para_dados_dropdown( $listaAulas ),
+                'aulaSelecionada' => $aulaSelecionada,
                 'extra' => 'id="slt-aulas"'
             );
 
             $this->load->helper('pagina');
             $dadosSelectPaginas = array(
-                'listaPaginas' => lista_paginas_para_dados_dropdown( array() ),
-                'paginaSelecionada' => '0',
+                'listaPaginas' => lista_paginas_para_dados_dropdown( $listaPaginas ),
+                'paginaSelecionada' => $paginaSelecionada,
                 'extra' => 'id="slt-paginas"'
             );
 
@@ -62,6 +90,7 @@ class Comentario extends WL_Controller
             );
 
             $dadosView = array(
+                'paginaSelecionada' => ( $paginaId ) ? true : false,
                 'selectModulos' => $this->template->loadPartial(
                     'select_modulos',
                     $dadosSelectModulo,
