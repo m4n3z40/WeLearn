@@ -32,7 +32,7 @@
                                     if(res.success)
                                     {
                                        $('#convite-form').dialog("close");
-                                       location.reload();
+                                       //slocation.reload();
                                     }
                                 }
         )});

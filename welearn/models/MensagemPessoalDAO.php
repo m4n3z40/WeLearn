@@ -90,9 +90,9 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
         }
 
         $listaMensagens=array_keys($this->_MPPorAmigosCF->get($chave,null,$de,$ate,true,$count));
-
         $resultado=$this->_cf->multiget($listaMensagens);
-        return $this->_criarVariosFromCassandra($resultado, $remetente, $destinatario);
+        return $this->_criarVariosFromCassandra($resultado);
+
     }
 
     /**
@@ -167,36 +167,22 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
         return new WeLearn_Usuarios_MensagemPessoal($dados);
     }
 
-    private function _criarFromCassandra(array $column,
-                                         WeLearn_Usuarios_Usuario $remetentePadrao = null,
-                                         WeLearn_Usuarios_Usuario $destinatarioPadrao = null)
+    private function _criarFromCassandra(array $column)
     {
-        if ($remetentePadrao instanceof WeLearn_Usuarios_Usuario) {
-            $column['remetente'] = $remetentePadrao;
-        } else {
-            $column['remetente'] = $this->_usuarioDao->recuperar($column['remetente']);
-        }
-
-        if ($destinatarioPadrao instanceof WeLearn_Usuarios_Usuario) {
-            $column['destinatario'] = $destinatarioPadrao;
-        } else {
-            $column['destinatario'] = $this->_usuarioDao->recuperar($column['destinatario']);
-        }
-
+        $column['remetente'] = $this->_usuarioDao->recuperar($column['remetente']);
+        $column['destinatario'] = $this->_usuarioDao->recuperar($column['destinatario']);
         $mensagem = $this->criarNovo();
         $mensagem->fromCassandra($column);
 
         return $mensagem;
     }
 
-    private function _criarVariosFromCassandra(array $columns,
-                                               WeLearn_Usuarios_Usuario $remetentePadrao = null,
-                                               WeLearn_Usuarios_Usuario $destinatarioPadrao = null)
+    private function _criarVariosFromCassandra(array $columns)
     {
         $arrayMensagens = array();
 
         foreach ( $columns as $column ) {
-            $arrayMensagens[] = $this->_criarFromCassandra($column, $remetentePadrao, $destinatarioPadrao);
+            $arrayMensagens[] = $this->_criarFromCassandra($column);
         }
 
         return $arrayMensagens;

@@ -110,7 +110,7 @@ class ConviteCadastradoDAO extends WeLearn_DAO_AbstractDAO
         $dto->setId($UUID->string);
         $this->_cf->insert($UUID->bytes,$dto->toCassandra());
         $this->_convitePorDestinatario->insert($dto->getDestinatario()->getId(),array($dto->getRemetente()->getId() => $UUID->bytes));
-        //$this->_convitePorRemetente->insert($dto->getRemetente()->getId(),array($dto->getDestinatario()->getId() => $UUID->bytes));
+        $this->_convitePorRemetente->insert($dto->getRemetente()->getId(),array($dto->getDestinatario()->getId() => $UUID->bytes));
     }
 
 

@@ -8,7 +8,7 @@
 </div>
 <div>
     <?php if($haMensagens){ ?>
-    <a href="#" data-proximo="<?php echo $inicioProxPagina ?>" data-id-amigo="<?php echo $idAmigo ?>" id="paginacaoMensagem">mensagens mais recentes</a>
+    <a href="#" data-proximo="<?php echo $inicioProxPagina ?>" data-id-amigo="<?php echo $idAmigo ?>" id="paginacaoMensagem">mensagens mais antigas</a>
     <input type='hidden' value='<?=$inicioProxPagina?>' id='id-prox-pagina'/>
    <?php }?>
 </div>

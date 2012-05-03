@@ -39,6 +39,7 @@ class Mensagem extends WL_Controller
 
     public function listar($idAmigo='')
     {
+
         try{
 
             if( $idAmigo=='' ) {
