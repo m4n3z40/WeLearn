@@ -208,10 +208,14 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        $UUID = UUID::mint();
-        $cursoUUID = UUID::import( $dto->getCurso()->getId() );
+        if ( ! $dto->getId() ) {
+            $UUID = UUID::mint();
+            $dto->setId( $UUID->string );
+        } else {
+            $UUID = UUID::import( $dto->getId() );
+        }
 
-        $dto->setId( $UUID->string );
+        $cursoUUID = UUID::import( $dto->getCurso()->getId() );
 
         $this->_cf->insert( $UUID->bytes, $dto->toCassandra() );
         $this->_certificadosPorCursoCF->insert(
@@ -241,7 +245,6 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
             $cursoUUID->bytes,
             array('certificado')
         );
-
         $idCertificadoAtivo = $idCertificadoAtivo['certificado'];
 
         if ( $certificado->isAtivo() ) {
