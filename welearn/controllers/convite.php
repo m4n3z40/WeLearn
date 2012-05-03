@@ -15,34 +15,40 @@ class Convite extends WL_Controller
             ->appendJSImport('convite.js');
     }
 
-    public function index(){
+    public function index($param){
         try{
-        $conviteCadastradoDao= WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
-        $filtros=array('idUsuario' => $this->autenticacao->getUsuarioAutenticado()->getId(),'count' => 10);
-        $listaConvites=$conviteCadastradoDao->recuperarTodos('','',$filtros);
-        $this->load->helper('paginacao_cassandra');
-        $dadosPaginados = create_paginacao_cassandra($listaConvites, $filtros['count']);
-        $partialListaConvites = $this->template->loadPartial(
-            'lista',
-            array(
-                'success'=>true,
-                'convites' => $listaConvites,
-                'paginacao' => $dadosPaginados,
-                'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
-                'haConvites' => $dadosPaginados['proxima_pagina']
-            ),
-            'usuario/convite'
-        );
-        $dadosView = array(
-            'partialListaConvites' => $partialListaConvites
+            if( $param != 'enviados' && $param != 'recebidos') {
+                redirect(site_url('usuario/amigos'));
+            }else{
+                $count=10;
+                $conviteCadastradoDao= WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
+                $filtros=array('usuarioObj' => $this->autenticacao->getUsuarioAutenticado(),'count' => $count+1,'tipoConvite' => $param);
+                $listaConvites=$conviteCadastradoDao->recuperarTodos('','',$filtros);
+                $this->load->helper('paginacao_cassandra');
+                $dadosPaginados = create_paginacao_cassandra($listaConvites, $count);
+                $partialListaConvites = $this->template->loadPartial(
+                    'lista',
+                    array(
+                        'success'=>true,
+                        'convites' => $listaConvites,
+                        'paginacao' => $dadosPaginados,
+                        'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
+                        'haConvites' => $dadosPaginados['proxima_pagina'],
+                        'tipo'=>$param
+                    ),
+                    'usuario/convite'
+                );
+                $dadosView = array(
+                    'partialListaConvites' => $partialListaConvites
 
-        );
-
+                );
+            }
         }catch(cassandra_NotFoundException $e)
         {
           $dadosView['success'] =false;
         }
         $this->_renderTemplateHome('usuario/convite/index', $dadosView);
+
     }
 
     public function enviar(){
@@ -117,7 +123,7 @@ class Convite extends WL_Controller
         );
 
         $dadosBarraDireita = array(
-
+            'menuContexto' => $this->template->loadPartial('menu', array(), 'usuario/convite')
         );
 
         $this->template->setDefaultPartialVar('home/barra_lateral_esquerda', $dadosBarraEsquerda)

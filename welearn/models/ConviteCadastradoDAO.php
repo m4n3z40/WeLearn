@@ -21,11 +21,19 @@ class ConviteCadastradoDAO extends WeLearn_DAO_AbstractDAO
     protected $_convitePorDestinatario;
 
 
+    /**
+     * @var UsuarioDAO
+     */
+    private $_cursoDao;
+    private $_usuarioDao;
+
     public function __construct()
     {
         $phpCassa = WL_Phpcassa::getInstance();
         $this->_convitePorRemetente = $phpCassa->getColumnFamily($this->_nomeConvitePorRemetente);
         $this->_convitePorDestinatario=$phpCassa->getColumnFamily($this->_nomeConvitePorDestinatario);
+        $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
     }
 
 
@@ -46,18 +54,22 @@ class ConviteCadastradoDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperarTodos($de = '', $ate = '', array $filtros = null)
     {
-        $chavesConvite=array_keys($this->_cf->get($filtros['idUsuario'], null, $de, $ate, true, $filtros['count']));// recupera as chaves dos convites recebidos pelo usuario
-        $idConvites=$this->_convitePorUsuarioCF->multiget($chavesConvite);
-        $aux=array();
-        foreach($idConvites as $key => $value)
+
+        if($filtros['tipoConvite'] == 'enviados')
         {
-            foreach ($value as $chave => $valor)
-            {
-                $aux[]=$chave;
-            }
+            $convitesEnviados=$this->_convitePorRemetente->get($filtros['usuarioObj']->getId(),null,$de,$ate,true,$filtros['count']);
+            $cassandra=$this->_cf->multiget($convitesEnviados);
+            $convites=$this->_criarVariosFromCassandra($cassandra,null,$filtros['usuarioObj']);
         }
-        $filtros['convites']=$aux;
-        $convites=$this->_conviteDao->recuperarTodos($de='',$ate='',$filtros);
+
+        if($filtros['tipoConvite'] == 'recebidos')
+        {
+            $convitesRecebidos=$this->_convitePorDestinatario->get($filtros['usuarioObj']->getId(),null,$de,$ate,true,$filtros['count']);
+            $cassandra=$this->_cf->multiget($convitesRecebidos);
+            $convites=$this->_criarVariosFromCassandra($cassandra,null,$filtros['usuarioObj']);
+        }
+
+
         return $convites;
 
     }
@@ -110,24 +122,48 @@ class ConviteCadastradoDAO extends WeLearn_DAO_AbstractDAO
         $dto->setId($UUID->string);
         $this->_cf->insert($UUID->bytes,$dto->toCassandra());
         $this->_convitePorDestinatario->insert($dto->getDestinatario()->getId(),array($dto->getRemetente()->getId() => $UUID->bytes));
-        $this->_convitePorRemetente->insert($dto->getRemetente()->getId(),array($dto->getDestinatario()->getId() => $UUID->bytes));
+        $this->_convitePorRemetente->insert($dto->getRemetente()->getId(),array($dto->getDestinatario()->getId()=> $UUID->bytes));
     }
 
 
-/*
-    public function recuperar_por_chave($dto)
+    private function _criarFromCassandra(array $column, WeLearn_Usuarios_Usuario $remetentePadrao = null,
+                                         WeLearn_Usuarios_Usuario $destinatarioPadrao = null)
+
     {
-        $chave=$this->gerarChave($dto);
-        $resultado=$this->_convitePorUsuarioCF->get($chave);
-        return $resultado;
+        if($column['remetente'])
+        $column['remetente'] = ($remetentePadrao instanceof WeLearn_Usuarios_Usuario)
+            ? $remetentePadrao
+            : $this->_usuarioDao->recuperar($column['remetente']);
+
+        if($column['destinatario'])
+            $column['destinatario'] = ($destinatarioPadrao instanceof WeLearn_Usuarios_Usuario)
+                ? $destinatarioPadrao
+                : $this->_usuarioDao->recuperar($column['destinatario']);
+        $column['paraCurso'] = ($column['paraCurso'] instanceof WeLearn_Cursos_Segmento)
+            ? $column['paraCurso']
+            : $this->_cursoDao->criarNovo();
+
+
+
+
+
+        $convite = $this->criarNovo();
+        $convite->fromCassandra($column);
+
+        return $convite;
     }
 
-    private function gerarChave($dto)
+    private function _criarVariosFromCassandra(array $columns,WeLearn_Usuarios_Usuario $remetentePadrao = null,
+                                               WeLearn_Usuarios_Usuario $destinatarioPadrao = null)
     {
-        $Array= array($dto->getDestinatario()->getId(),$dto->getRemetente()->getId());
-        sort($Array);
-        $chave=implode('::',$Array);
-        return $chave;
+        $arrayConvites = array();
+
+        foreach ( $columns as $column ) {
+            $arrayConvites[] = $this->_criarFromCassandra($column, $remetentePadrao, $destinatarioPadrao);
+        }
+
+        return $arrayConvites;
     }
-*/
+
+
 }

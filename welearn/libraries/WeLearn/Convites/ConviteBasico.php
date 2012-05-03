@@ -177,6 +177,7 @@ class WeLearn_Convites_ConviteBasico extends WeLearn_DTO_AbstractDTO
             'msgConvite' => $this->getMsgConvite(),
             'remetente' => $this->getRemetente()->getId(),
             'status' => $this->getStatus()
+
         );
     }
 

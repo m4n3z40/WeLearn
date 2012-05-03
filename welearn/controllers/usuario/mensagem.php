@@ -12,8 +12,8 @@ class Mensagem extends WL_Controller
     {
         parent::__construct();
         $this->template->setTemplate('home')
-                       ->appendJSImport('home.js')
-                       ->appendJSImport('mensagem.js');
+            ->appendJSImport('home.js')
+            ->appendJSImport('mensagem.js');
     }
 
     public function index()
@@ -46,52 +46,51 @@ class Mensagem extends WL_Controller
                 redirect($this->index());
             }else{
 
-            $count=10;
+                $count=10;
 
-            $usuario = $this->autenticacao->getUsuarioAutenticado();
-            $amigo = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idAmigo);
-            $mensagemDao = WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
+                $usuario = $this->autenticacao->getUsuarioAutenticado();
+                $amigo = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idAmigo);
+                $mensagemDao = WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
+                $filtros= array('count' => $count+1,'usuario' => $usuario, 'amigo' => $amigo);
+
+                try {
+                    $listaMensagens = $mensagemDao->recuperarTodos('','',$filtros);
 
 
-            try {
-                $listaMensagens = $mensagemDao->recuperarTodosPorUsuario($usuario,
-                                                                         $amigo,
-                                                                         '', '',
-                                                                         $count + 1);
-            } catch (cassandra_NotFoundException $e) {
-                $listaMensagens = array();
+                } catch (cassandra_NotFoundException $e) {
+                    $listaMensagens = array();
+                }
+
+                $this->load->helper('paginacao_cassandra');
+                $dadosPaginados = create_paginacao_cassandra($listaMensagens, $count);
+                $dadosPaginados= array_reverse($dadosPaginados);
+
+                $partialListaMensagens = $this->template->loadPartial(
+                    'lista',
+                    array(
+                        'mensagens' => $listaMensagens,
+                        'paginacao' => $dadosPaginados,
+                        'idAmigo' => $amigo->getId(),
+                        'nomeAmigo'=>$amigo->getNome(),
+                        'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
+                        'haMensagens' => $dadosPaginados['proxima_pagina']
+                    ),
+                    'usuario/mensagem'
+                );
+
+                $partialEnviarMensagem = $this->template->loadPartial(
+                    'criar',
+                    array( 'idDestinatario' => $idAmigo ),
+                    'usuario/mensagem'
+                );
+
+                $dadosView = array(
+                    'listaMensagens' => $partialListaMensagens,
+                    'enviarMensagem' => $partialEnviarMensagem
+                );
+
+                $this->_renderTemplateHome('usuario/mensagem/listar', $dadosView);
             }
-
-            $this->load->helper('paginacao_cassandra');
-            $dadosPaginados = create_paginacao_cassandra($listaMensagens, $count);
-            $dadosPaginados= array_reverse($dadosPaginados);
-
-            $partialListaMensagens = $this->template->loadPartial(
-                'lista',
-                array(
-                    'mensagens' => $listaMensagens,
-                    'paginacao' => $dadosPaginados,
-                    'idAmigo' => $amigo->getId(),
-                    'nomeAmigo'=>$amigo->getNome(),
-                    'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
-                    'haMensagens' => $dadosPaginados['proxima_pagina']
-                ),
-                'usuario/mensagem'
-            );
-
-            $partialEnviarMensagem = $this->template->loadPartial(
-                'criar',
-                array( 'idDestinatario' => $idAmigo ),
-                'usuario/mensagem'
-            );
-
-            $dadosView = array(
-                'listaMensagens' => $partialListaMensagens,
-                'enviarMensagem' => $partialEnviarMensagem
-            );
-
-            $this->_renderTemplateHome('usuario/mensagem/listar', $dadosView);
-        }
         }catch(Exception $e) {
             log_message('error', 'Erro ao tentar exibir lista de Enquetes: '
                 . create_exception_description($e));
@@ -112,15 +111,11 @@ class Mensagem extends WL_Controller
             $count = 10;
 
             $usuario = $this->autenticacao->getUsuarioAutenticado();
-            $destinatario = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idAmigo);
+            $amigo = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idAmigo);
             $mensagemDao = WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
-
+            $filtros= array('count' => $count+1,'usuario' => $usuario, 'amigo' => $amigo);
             try {
-                $listaMensagens = $mensagemDao->recuperarTodosPorUsuario($usuario,
-                                                                         $destinatario,
-                                                                         $inicio,
-                                                                         '',
-                                                                         $count + 1);
+                $listaMensagens = $mensagemDao->recuperarTodos($inicio,'',$filtros);
             } catch(cassandra_NotFoundException $e) {
                 $listaMensagens= array();
             }
@@ -200,10 +195,10 @@ class Mensagem extends WL_Controller
 
         $response = array(
             'success' => true,
-             'mensagemId'=>$mensagemObj->getId(),
-             'remetenteId'=>$mensagemObj->getRemetente()->getId(),
-             'mensagemTexto'=>$mensagemObj->getMensagem(),
-             'dataEnvio'=>$mensagemObj->getDataEnvio()
+            'mensagemId'=>$mensagemObj->getId(),
+            'remetenteId'=>$mensagemObj->getRemetente()->getId(),
+            'mensagemTexto'=>$mensagemObj->getMensagem(),
+            'dataEnvio'=>$mensagemObj->getDataEnvio()
         );
 
         $json = Zend_Json::encode($response);
@@ -236,7 +231,7 @@ class Mensagem extends WL_Controller
 
         } catch( Exception $e ) {
 
-           $json = create_json_feedback();
+            $json = create_json_feedback();
         }
 
         echo $json;

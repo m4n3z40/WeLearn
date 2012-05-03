@@ -8,12 +8,6 @@
  */
 ?>
 <?php if ($success==true): ?>
-<div>
-    <?php if($haConvites): ?>
-            <a href="#" data-proximo="<?php echo $inicioProxPagina ?>">convites mais antigos</a>
-            <input type='hidden' value='<?=$inicioProxPagina?>' id='id-prox-pagina'/>
-    <?php endif;?>
-</div>
 <?=$partialListaConvites?>
 <?php else: ?>
     <h3>Voce não possui nenhum convite pendente</h3>
