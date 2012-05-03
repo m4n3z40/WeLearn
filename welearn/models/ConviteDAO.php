@@ -9,10 +9,22 @@
  
 class ConviteDAO extends WeLearn_DAO_AbstractDAO
 {
+    protected $_nomeCF = 'convites_convite_basico';
+
+    private $_usuarioDao;
      /**
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
      */
+
+
+    public function __construct()
+    {
+        $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+    }
+
+
+
     public function recuperar($id)
     {
         // TODO: Implementar este metodo
@@ -26,7 +38,9 @@ class ConviteDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperarTodos($de = null, $ate = null, array $filtros = null)
     {
-        // TODO: Implementar este metodo
+        $resultado= $this->_cf->multiget($filtros['convites'],null,$de,$ate,true,$filtros['count']);
+        $cassandra= $this->_criarVariosFromCassandra($resultado);
+        return $cassandra;
     }
 
     /**
@@ -54,7 +68,7 @@ class ConviteDAO extends WeLearn_DAO_AbstractDAO
      */
     public function criarNovo(array $dados = null)
     {
-        // TODO: Implementar este metodo
+        return new WeLearn_Convites_ConviteBasico($dados);
     }
 
     /**
@@ -72,7 +86,10 @@ class ConviteDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        // TODO: Implementar este metodo
+        $UUID = UUID::mint();
+        $dto->setId($UUID->string);
+        $this->_cf->insert($UUID->bytes, $dto->getConviteBasicoToCassandra());
+
     }
 
     /**
@@ -114,4 +131,37 @@ class ConviteDAO extends WeLearn_DAO_AbstractDAO
     {
         // TODO: Implementar este metodo
     }
+
+    private function _criarFromCassandra(array $column,
+                                         WeLearn_Usuarios_Usuario $remetentePadrao = null
+                                         )
+    {
+        if ($remetentePadrao instanceof WeLearn_Usuarios_Usuario) {
+            $column['remetente'] = $remetentePadrao;
+        } else {
+            $column['remetente'] = $this->_usuarioDao->recuperar($column['remetente']);
+        }
+
+
+
+        $convite = $this->criarNovo();
+        $convite->fromCassandra($column);
+
+        return $convite;
+    }
+
+    private function _criarVariosFromCassandra(array $columns,
+                                               WeLearn_Usuarios_Usuario $remetentePadrao = null
+                                               )
+    {
+        $arrayConvites = array();
+
+        foreach ( $columns as $column ) {
+            $arrayConvites[] = $this->_criarFromCassandra($column, $remetentePadrao);
+        }
+
+        return $arrayConvites;
+    }
+
+
 }

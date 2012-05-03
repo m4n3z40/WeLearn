@@ -66,4 +66,17 @@ class WeLearn_Convites_ConviteCadastrado extends WeLearn_Convites_ConviteBasico
 
         return $selfArray;
     }
+
+    public function toCassandra()
+    {
+        return array(
+            'id' => $this->getId(),
+            'msgConvite' => $this->getMsgConvite(),
+            'remetente' => $this->getRemetente()->getId(),
+            'status' => $this->getStatus(),
+            'destinatario' => $this->getDestinatario()->getId(),
+            'dataEnvio' => $this->getDataEnvio(),
+            'paraCurso' => empty($this->_paraCurso) ? '' : $this->getParaCurso()->getId()
+        );
+    }
 }

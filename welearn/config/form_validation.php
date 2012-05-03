@@ -348,6 +348,13 @@ $config = array(
             'rules' => 'required|max_length[50]'
         )
     ),
+    'convite/enviar' => array(
+        array(
+            'field'=>'txt-convite',
+            'label'=>'txt-convite',
+            'rules'=>'required|max_length[125]'
+        )
+    )
 );
 
 

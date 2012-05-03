@@ -42,9 +42,10 @@ class WeLearn_Usuarios_AmizadeUsuario extends WeLearn_DTO_AbstractDTO
      * @param int $comecouEm
      * @param int $status
      */
+
     public function __construct(WeLearn_Usuarios_Usuario $usuario = null,
         WeLearn_Usuarios_Usuario $amigo = null,
-        $comecouEm = 0,
+        $comecouEm = null,
         $status = WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA)
     {
         $dados = array(

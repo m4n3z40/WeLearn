@@ -2,7 +2,7 @@
 <?php
 foreach ($ResultadoBusca as $row):?>
     <div>
-    <a href='#'><?= $row->getNome().' '.$row->getSobrenome()?></a>
+        <?php echo anchor('/perfil/'.$row->getId(), $row->getNome().' '.$row->getSobrenome()) ?>
     </br>
     <?= $row->getEmail()?>
     </div>

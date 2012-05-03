@@ -29,7 +29,7 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
 
     function __construct()
     {
-        parent::__construct();
+
 
         $phpCassa = WL_Phpcassa::getInstance();
 
@@ -232,9 +232,7 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     public function criarNovo(array $dados = null)
     {
-        $novaAmizade = new WeLearn_Usuarios_AmizadeUsuario();
-        $novaAmizade->preencherPropriedades($dados);
-
+        $novaAmizade = new WeLearn_Usuarios_AmizadeUsuario($dados['convite']->getRemetente(),$dados['convite']->getDestinatario(),time(),0);
         return $novaAmizade;
     }
 

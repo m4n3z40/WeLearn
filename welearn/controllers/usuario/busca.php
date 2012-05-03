@@ -35,8 +35,18 @@ class busca extends WL_Controller
                 'usuario/home/busca'
             );
 
+
+            if(!$listaUsuarios)
+            {
+                $success=false;
+            }
+            else
+            {
+                $success=true;
+            }
+
             $dadosView = array(
-                'listaUsuarios' => $partialBuscarUsuario,'paginacao' => $dadosPaginados,'texto' => $texto
+               'listaUsuarios' => $partialBuscarUsuario,'paginacao' => $dadosPaginados,'texto' => $texto,'success'=>$success
             );
             $this->template->setTemplate('home');
             $this->_renderTemplateHome('usuario/home/busca/listar', $dadosView);

@@ -73,13 +73,7 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
 
     public function recuperarTodos($de = '', $ate = '', array $filtros = null)
     {
-
-    }
-
-
-    public function recuperarTodosPorUsuario($remetente, $destinatario, $de = '',$ate = '',$count = 10)
-    {
-        $chave = $this->gerarChave($remetente->getId(), $destinatario->getId());
+        $chave = $this->gerarChave($filtros['usuario']->getId(), $filtros['amigo']->getId());
 
         if ($de != '') {
             $de = CassandraUtil::import($de)->bytes;
@@ -89,11 +83,13 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
             $ate = CassandraUtil::import($ate)->bytes;
         }
 
-        $listaMensagens=array_keys($this->_MPPorAmigosCF->get($chave,null,$de,$ate,true,$count));
-
+        $listaMensagens=array_keys($this->_MPPorAmigosCF->get($chave,null,$de,$ate,true,$filtros['count']));
         $resultado=$this->_cf->multiget($listaMensagens);
-        return $this->_criarVariosFromCassandra($resultado, $remetente, $destinatario);
+        return $this->_criarVariosFromCassandra($resultado,$filtros['usuario'],$filtros['amigo']);
     }
+
+
+
 
     /**
      * @param mixed $id
@@ -123,7 +119,7 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
             $aux[]=$value;
         }
         $resultado=$this->_cf->multiget($aux);
-        $cassandra=$this->_criarVariosFromCassandra($resultado);
+        $cassandra=$this->_criarVariosFromCassandra($resultado,$resultado['remetente'],$resultado['destinatario']);
         return $cassandra;
     }
 
@@ -148,8 +144,8 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
         $validador=$this->verificarSeHaMensagens($mensagem['remetente'],$mensagem['destinatario']);
         if($validador==1)
         {
-         $this->_MPListaAmigosCF->remove($mensagem['remetente'],array($mensagem['destinatario']));
-         $this->_MPListaAmigosCF->remove($mensagem['destinatario'],array($mensagem['remetente']));
+            $this->_MPListaAmigosCF->remove($mensagem['remetente'],array($mensagem['destinatario']));
+            $this->_MPListaAmigosCF->remove($mensagem['destinatario'],array($mensagem['remetente']));
         }
         $array_sort= array($mensagem['remetente'],$mensagem['destinatario']);
         sort($array_sort);
@@ -168,21 +164,18 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
     }
 
     private function _criarFromCassandra(array $column,
-                                         WeLearn_Usuarios_Usuario $remetentePadrao = null,
-                                         WeLearn_Usuarios_Usuario $destinatarioPadrao = null)
+                                         WeLearn_Usuarios_Usuario $usuarioPadrao = null,
+                                         WeLearn_Usuarios_Usuario $amigoPadrao = null)
     {
-        if ($remetentePadrao instanceof WeLearn_Usuarios_Usuario) {
-            $column['remetente'] = $remetentePadrao;
-        } else {
-            $column['remetente'] = $this->_usuarioDao->recuperar($column['remetente']);
-        }
+        if($column['remetente'])
+            $column['remetente'] = ($usuarioPadrao instanceof WeLearn_Usuarios_Usuario)
+                ? $usuarioPadrao
+                : $this->_usuarioDao->recuperar($column['remetente']);
 
-        if ($destinatarioPadrao instanceof WeLearn_Usuarios_Usuario) {
-            $column['destinatario'] = $destinatarioPadrao;
-        } else {
-            $column['destinatario'] = $this->_usuarioDao->recuperar($column['destinatario']);
-        }
-
+        if($column['destinatario'])
+            $column['destinatario'] = ($amigoPadrao instanceof WeLearn_Usuarios_Usuario)
+                ? $amigoPadrao
+                : $this->_usuarioDao->recuperar($column['destinatario']);
         $mensagem = $this->criarNovo();
         $mensagem->fromCassandra($column);
 

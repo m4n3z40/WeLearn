@@ -79,11 +79,12 @@ $route['curso/conteudo/comentario/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{
 $route['curso/conteudo/comentario/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] ='conteudo/comentario/$1/$2';
 $route['curso/conteudo/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/conteudo/index/$1';
 $route['curso/conteudo/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/conteudo/$1/$2';
-$route['usuario/perfil'] = 'usuario/perfil/index';
-$route['usuario/perfil/([a-z_]+)'] = 'usuario/perfil/$1';
+$route['perfil/([a-z0-9_]+)'] = 'usuario/perfil/index/$1';
+$route['perfil/([a-z_]+)/([a-z0-9_]+)'] = 'usuario/perfil/$1/$2';
 $route['usuario/mensagem'] = 'usuario/mensagem/index';
 $route['usuario/mensagem/listar/([a-z_]+)'] = 'usuario/mensagem/listar/$1';
 $route['usuario/([a-z_]+)'] = 'usuario/usuario/$1';
+$route['usuario/amigos']='usuario/amigos/index';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */
