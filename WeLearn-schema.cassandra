@@ -95,6 +95,17 @@ and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'UTF8Type';
 
+create column family usuarios_amizade_requisicoes
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
+create column family usuarios_amizade_requisicoes_por_data
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
 
 create column family usuarios_mensagem_pessoal
 with comparator = 'UTF8Type'
@@ -115,23 +126,24 @@ and default_validation_class = 'UTF8Type'
 and key_validation_class = 'UTF8Type';
 
 
-create column family convites_convite_basico
+create column family convites_convite_cadastrado
 with comparator = 'UTF8Type'
 and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
-create column family convites_convite_por_usuario
-with comparator = 'TimeUUIDType'
-and column_type = 'Standard'
-and default_validation_class = 'UTF8Type'
-and key_validation_class = 'UTF8Type';
-
-create column family convites_convite_cadastrado
+create column family convites_convite_cadastrado_por_remetente
 with comparator = 'UTF8Type'
 and column_type = 'Standard'
-and default_validation_class = 'UTF8Type'
+and default_validation_class = 'TimeUUIDType'
 and key_validation_class = 'UTF8Type';
+
+create column family convites_convite_cadastrado_por_destinatario
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'TimeUUIDType'
+and key_validation_class = 'UTF8Type';
+
 
 
 create column family cursos_area

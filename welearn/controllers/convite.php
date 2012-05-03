@@ -6,14 +6,43 @@
  * Time: 17:33
  * To change this template use File | Settings | File Templates.
  */
-class Convite extends CI_Controller
+class Convite extends WL_Controller
 {
     public function __construct(){
         parent::__construct();
+        $this->template->setTemplate('home')
+            ->appendJSImport('home.js')
+            ->appendJSImport('convite.js');
     }
 
     public function index(){
+        try{
+        $conviteCadastradoDao= WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
+        $filtros=array('idUsuario' => $this->autenticacao->getUsuarioAutenticado()->getId(),'count' => 10);
+        $listaConvites=$conviteCadastradoDao->recuperarTodos('','',$filtros);
+        $this->load->helper('paginacao_cassandra');
+        $dadosPaginados = create_paginacao_cassandra($listaConvites, $filtros['count']);
+        $partialListaConvites = $this->template->loadPartial(
+            'lista',
+            array(
+                'success'=>true,
+                'convites' => $listaConvites,
+                'paginacao' => $dadosPaginados,
+                'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
+                'haConvites' => $dadosPaginados['proxima_pagina']
+            ),
+            'usuario/convite'
+        );
+        $dadosView = array(
+            'partialListaConvites' => $partialListaConvites
 
+        );
+
+        }catch(cassandra_NotFoundException $e)
+        {
+          $dadosView['success'] =false;
+        }
+        $this->_renderTemplateHome('usuario/convite/index', $dadosView);
     }
 
     public function enviar(){
@@ -36,7 +65,11 @@ class Convite extends CI_Controller
                 $conviteCadastrado->setRemetente($remetente);
                 $conviteCadastrado->setDestinatario($destinatario);
                 $conviteCadastrado->setStatus(0);
+                $conviteCadastrado->setDataEnvio(time());
                 $conviteCadastradoDao->salvar($conviteCadastrado);
+                $amizadeUsuarioDao=WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+                $amizadeUsuarioObj=$amizadeUsuarioDao->criarNovo(array('convite'=>$conviteCadastrado));
+                $amizadeUsuarioDao->salvar($amizadeUsuarioObj);
                 $response=array('success'=>true);
                 $json = Zend_Json::encode($response);
             }catch(Exception $e){
@@ -51,12 +84,45 @@ class Convite extends CI_Controller
                 Tente novamente mais tarde.'
                 );
 
-                $json = create_json_feedback(false, $error);
+                $json = create_json_feedback(false, $e);
             }
 
             echo $json;
         }
 
+    }
+
+
+
+    public function remover($id,$idRemetente)
+    {
+        try{
+            $conviteCadastradoDao=WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
+            $destinatario=$this->autenticacao->getUsuarioAutenticado();
+            $conviteCadastradoDao->remover($id);
+
+            $result= array('success'=>true);
+        }catch(cassandra_NotFoundException $e)
+        {
+            $result=array('success'=>false);
+
+        }
+        echo Zend_Json::encode($result);
+    }
+
+    private function _renderTemplateHome($view = '', $dados = array())
+    {
+        $dadosBarraEsquerda = array(
+            'usuario' => $this->autenticacao->getUsuarioAutenticado()
+        );
+
+        $dadosBarraDireita = array(
+
+        );
+
+        $this->template->setDefaultPartialVar('home/barra_lateral_esquerda', $dadosBarraEsquerda)
+            ->setDefaultPartialVar('home/barra_lateral_direita', $dadosBarraDireita)
+            ->render($view, $dados);
     }
 
 

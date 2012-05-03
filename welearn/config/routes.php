@@ -74,5 +74,6 @@ $route['usuario/perfil/([a-z_]+)'] = 'usuario/perfil/$1';
 $route['usuario/mensagem'] = 'usuario/mensagem/index';
 $route['usuario/mensagem/listar/([a-z_]+)'] = 'usuario/mensagem/listar/$1';
 $route['usuario/([a-z_]+)'] = 'usuario/usuario/$1';
+$route['usuario/amigos']='usuario/amigos/index';
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

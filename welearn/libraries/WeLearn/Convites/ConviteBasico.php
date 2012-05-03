@@ -31,6 +31,12 @@ class WeLearn_Convites_ConviteBasico extends WeLearn_DTO_AbstractDTO
     protected $_status;
 
     /**
+     * @var int
+     */
+    protected $_dataEnvio;
+
+
+    /**
      * @param string $id
      */
     public function setId($id)
@@ -92,6 +98,22 @@ class WeLearn_Convites_ConviteBasico extends WeLearn_DTO_AbstractDTO
     public function getStatus()
     {
         return $this->_status;
+    }
+
+    /**
+     * @param int $dataEnvio
+     */
+    public function setDataEnvio($dataEnvio)
+    {
+        $this->_dataEnvio= $dataEnvio;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDataEnvio()
+    {
+        return $this->_dataEnvio;
     }
 
     /**

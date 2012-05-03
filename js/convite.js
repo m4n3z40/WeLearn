@@ -16,7 +16,7 @@
         height: 170
     });
 
-    $( "#enviarConvite" ).click(function(e) {
+    $( "#enviar-convite" ).click(function(e) {
         e.preventDefault();
         $( "#convite-form" ).dialog( "open");
         return false;
@@ -32,7 +32,34 @@
                                     if(res.success)
                                     {
                                        $('#convite-form').dialog("close");
+                                       location.reload();
                                     }
                                 }
         )});
+
+
+    $('.remover-convite').click(
+        function(e)
+        {
+            e.preventDefault();
+            var idConvite=$(this).parent().children('.id-convite').val();
+            var idRemetente=$(this).parent().children('.id-remetente').val();
+            var url=$(this).attr('href');
+            url+='/'+idConvite;
+            url+='/'+idRemetente;
+            $.post(
+                WeLearn.url.siteURL(url),
+                function(result) {
+                    if (result.success) {
+                       alert('teste');
+                       //location.reload();
+                    } else {
+
+                    }
+
+                },
+                'json'
+            );
+        }
+    );
 })();

@@ -30,7 +30,7 @@ class Perfil extends WL_Controller {
         $conviteCadastrado->setRemetente($this->autenticacao->getUsuarioAutenticado());
         $conviteCadastrado->setDestinatario($usuarioObj);
         try{
-            $saoAmigos=$conviteCadastradoDao->recuperar_por_chave($conviteCadastrado);
+            $saoAmigos=null;
         }catch(cassandra_NotFoundException $e){
             $saoAmigos=null;
         }
