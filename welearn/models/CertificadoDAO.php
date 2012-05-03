@@ -9,6 +9,30 @@
  
 class CertificadoDAO extends WeLearn_DAO_AbstractDAO
 {
+    const MAX_CERTIFICADOS = 20;
+
+    protected $_nomeCF = 'cursos_certificado';
+
+    private $_nomeCertificadosPorCursoCF = 'cursos_certificado_por_curso';
+
+    /**
+     * @var ColumnFamily
+     */
+    private $_certificadosPorCursoCF;
+
+    /**
+     * @var CursoDAO
+     */
+    private $_cursoDao;
+
+    function __construct()
+    {
+        $this->_certificadosPorCursoCF = WL_Phpcassa::getInstance()->getColumnFamily(
+            $this->_nomeCertificadosPorCursoCF
+        );
+
+        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+    }
 
     /**
      * @param mixed $id
@@ -16,7 +40,27 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperar($id)
     {
-        // TODO: implementar este metodo.
+        $UUID = UUID::import( $id );
+
+        $column = $this->_cf->get( $UUID->bytes );
+
+        return $this->_criarFromCassandra( $column );
+    }
+
+    public function recuperarAtivoPorCurso(WeLearn_Cursos_Curso $curso)
+    {
+        $cursoUUID = UUID::import( $curso->getId() );
+
+        $idCertificadoAtivo = $this->_cursoDao->getCf()->get(
+            $cursoUUID->bytes,
+            array('certificado')
+        );
+
+        $idCertificadoAtivo = UUID::import( $idCertificadoAtivo['certificado'] )->bytes;
+
+        $column = $this->_cf->get( $idCertificadoAtivo );
+
+        return $this->_criarFromCassandra($column, $curso);
     }
 
 
@@ -26,9 +70,52 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
      * @param array|null $filtros
      * @return array
      */
-    public function recuperarTodos($de = null, $ate = null, array $filtros = null)
+    public function recuperarTodos($de = '', $ate = '', array $filtros = null)
     {
-        // TODO: Implementar este metodo.
+        if ($filtros['count']) {
+            $count = $filtros['count'];
+        } else {
+            $count = CertificadoDAO::MAX_CERTIFICADOS;
+        }
+
+        if (isset($filtros['curso']) && $filtros['curso'] instanceof WeLearn_Cursos_Curso) {
+            return $this->recuperarTodosPorCurso($filtros['curso'], $de, $ate, $count);
+        }
+
+        return array();
+    }
+
+    public function recuperarTodosPorCurso(
+        WeLearn_Cursos_Curso $curso,
+        $de = '',
+        $ate = '',
+        $count = CertificadoDAO::MAX_CERTIFICADOS
+    )
+    {
+        if ($de != '') {
+            $de = UUID::import( $de )->bytes;
+        }
+
+        if ($ate != '') {
+            $ate = UUID::import( $ate )->bytes;
+        }
+
+        $cursoUUID = UUID::import( $curso->getId() );
+
+        $idsCertificados = array_keys(
+            $this->_certificadosPorCursoCF->get(
+                $cursoUUID->bytes,
+                null,
+                $de,
+                $ate,
+                false,
+                $count
+            )
+        );
+
+        $columns = $this->_cf->multiget( $idsCertificados );
+
+        return $this->_criarVariosFromCassandra( $columns, $curso );
     }
 
     /**
@@ -38,7 +125,18 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperarQtdTotal($de = null, $ate = null)
     {
-        // TODO: Implementar este metodo.
+        if ( $de instanceof WeLearn_Cursos_Curso ) {
+            return $this->recuperarQtdTotalPorCurso( $de );
+        }
+
+        return 0;
+    }
+
+    public function recuperarQtdTotalPorCurso(WeLearn_Cursos_Curso $curso)
+    {
+        $cursoUUID = UUID::import( $curso->getId() );
+
+        return $this->_certificadosPorCursoCF->get_count( $cursoUUID->bytes );
     }
 
     /**
@@ -47,7 +145,38 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
      */
     public function remover($id)
     {
-        // TODO: Implementar este metodo.
+        $certificadoRemovido = $this->recuperar( $id );
+
+        $cursoUUID = UUID::import( $certificadoRemovido->getCurso()->getId() );
+        $UUID = UUID::import( $id );
+
+        $this->_cf->remove( $UUID->bytes );
+        $this->_certificadosPorCursoCF->remove(
+            $cursoUUID->bytes,
+            array($UUID->bytes)
+        );
+
+        $certificadoRemovido->setPersistido(false);
+
+        return $certificadoRemovido;
+    }
+
+    public function removerTodosPorCurso(WeLearn_Cursos_Curso $curso)
+    {
+        $cursoUUID = UUID::import( $curso->getId() );
+
+        $listaRemovidos = $this->recuperarTodosPorCurso( $curso );
+
+        foreach ($listaRemovidos as $certificado) {
+            $UUID = UUID::import( $certificado->getId() );
+
+            $this->_cf->remove($UUID->bytes);
+            $certificado->setPersistido( false );
+        }
+
+        $this->_certificadosPorCursoCF->remove( $cursoUUID->bytes );
+
+        return $listaRemovidos;
     }
 
     /**
@@ -56,7 +185,7 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
      */
     public function criarNovo(array $dados = null)
     {
-        // TODO: Implementar este metodo.
+        return new WeLearn_Cursos_Certificado( $dados );
     }
 
     /**
@@ -65,7 +194,11 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _atualizar(WeLearn_DTO_IDTO $dto)
     {
-        // TODO: Implementar este metodo.
+        $UUID = UUID::import( $dto->getId() );
+
+        $this->_cf->insert( $UUID->bytes, $dto->toCassandra() );
+
+        $this->alterarAtivo( $dto );
     }
 
 
@@ -75,16 +208,76 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        // TODO: Implementar este metodo.
+        $UUID = UUID::mint();
+        $cursoUUID = UUID::import( $dto->getCurso()->getId() );
+
+        $dto->setId( $UUID->string );
+
+        $this->_cf->insert( $UUID->bytes, $dto->toCassandra() );
+        $this->_certificadosPorCursoCF->insert(
+            $cursoUUID->bytes,
+            array($UUID->bytes => '')
+        );
+
+        if ( $dto->isAtivo() ) {
+            $this->_cursoDao->getCf()->insert(
+                $cursoUUID->bytes,
+                array( 'certificado' => $UUID->string )
+            );
+        }
+
+        $dto->setPersistido(true);
     }
 
     /**
-     * @param WeLearn_Cursos_Certificados $certificado
+     * @param WeLearn_Cursos_Certificado $certificado
      * @return void
      */
-    public function alterarAtivo(WeLearn_Cursos_Certificados $certificado)
+    public function alterarAtivo(WeLearn_Cursos_Certificado $certificado)
     {
-        // TODO: Implementar este metodo.
+        $cursoUUID = UUID::import( $certificado->getCurso()->getId() );
+
+        $idCertificadoAtivo = $this->_cursoDao->getCf()->get(
+            $cursoUUID->bytes,
+            array('certificado')
+        );
+
+        $idCertificadoAtivo = $idCertificadoAtivo['certificado'];
+
+        if ( $certificado->isAtivo() ) {
+
+            if ( $idCertificadoAtivo != $certificado->getId() ) {
+
+                $this->_cursoDao->getCf()->insert(
+                    $cursoUUID->bytes,
+                    array( 'certificado' => $certificado->getId() )
+                );
+
+            }
+
+        }
     }
-    
+
+    private function _criarFromCassandra (array $column, WeLearn_Cursos_Curso $cursoPadrao = null)
+    {
+        $column['curso'] = ($cursoPadrao instanceof WeLearn_Cursos_Curso)
+                           ? $cursoPadrao
+                           : $this->_cursoDao->recuperar( $column['curso'] );
+
+        $certificado = $this->criarNovo();
+        $certificado->fromCassandra( $column );
+
+        return $certificado;
+    }
+
+    private function _criarVariosFromCassandra (array $columns, WeLearn_Cursos_Curso $cursoPadrao = null)
+    {
+        $listaCertificados = array();
+
+        foreach ($columns as $column) {
+            $listaCertificados[] = $this->_criarFromCassandra($column, $cursoPadrao);
+        }
+
+        return $listaCertificados;
+    }
 }

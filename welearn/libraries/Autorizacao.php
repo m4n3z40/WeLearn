@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
  
-class WL_Autenticacao
+class WL_Autorizacao
 {
 
 }

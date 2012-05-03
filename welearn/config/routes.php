@@ -47,6 +47,14 @@ $route['curso/configurar/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-
 $route['curso/([a-z_]+)'] = 'curso/curso/$1';
 $route['curso/sugestao'] = 'curso/sugestao/index';
 $route['curso/sugestao/([a-z_]+)'] = 'curso/sugestao/$1';
+$route['curso/certificado/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/certificado/$1/$2';
+$route['curso/certificado/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/certificado/index/$1';
+$route['curso/review/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/review/$1/$2';
+$route['curso/review/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/review/index/$1';
+$route['curso/aluno/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/aluno/$1/$2';
+$route['curso/aluno/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/aluno/index/$1';
+$route['curso/gerenciador/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/gerenciador/$1/$2';
+$route['curso/gerenciador/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/gerenciador/index/$1';
 $route['curso/forum/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/forum/index/$1';
 $route['curso/forum/categoria/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/categoria/index/$1';
 $route['curso/forum/categoria/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/categoria/$1/$2';
@@ -76,5 +84,6 @@ $route['usuario/perfil/([a-z_]+)'] = 'usuario/perfil/$1';
 $route['usuario/mensagem'] = 'usuario/mensagem/index';
 $route['usuario/mensagem/listar/([a-z_]+)'] = 'usuario/mensagem/listar/$1';
 $route['usuario/([a-z_]+)'] = 'usuario/usuario/$1';
+
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */
