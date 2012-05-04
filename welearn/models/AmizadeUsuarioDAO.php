@@ -53,6 +53,21 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param WeLearn_Usuarios_Usuario $usuarioAtual
+     * @param WeLearn_Usuarios_Usuario $amigo
+     * @return WeLearn_Usuarios_AmizadeUsuario
+     */
+    public function recuperarDeUsuarioAtual(WeLearn_Usuarios_Usuario $usuarioAtual,
+                                            WeLearn_Usuarios_Usuario $amigo)
+    {
+        $idAmizade = $this->gerarIdAmizade( $usuarioAtual, $amigo );
+
+        $column = $this->_cf->get( $idAmizade );
+
+        return $this->_criarFromCassandra($column, $usuarioAtual, $amigo);
+    }
+
+    /**
      * @param mixed $de
      * @param mixed $ate
      * @param array|null $filtros
@@ -232,7 +247,9 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     public function criarNovo(array $dados = null)
     {
-        $novaAmizade = new WeLearn_Usuarios_AmizadeUsuario($dados['convite']->getRemetente(),$dados['convite']->getDestinatario(),time(),0);
+        $novaAmizade = new WeLearn_Usuarios_AmizadeUsuario();
+        $novaAmizade->preencherPropriedades($dados);
+
         return $novaAmizade;
     }
 
@@ -332,6 +349,21 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
         $dto->setPersistido(true);
     }
 
+    public function saoAmigos(WeLearn_Usuarios_Usuario $usuarioAutenticado,
+                              WeLearn_Usuarios_Usuario $usuarioPerfil)
+    {
+        try {
+            $amizade = $this->recuperarDeUsuarioAtual(
+                $usuarioAutenticado,
+                $usuarioPerfil
+            );
+
+            return $amizade->getStatus();
+
+        } catch (cassandra_NotFoundException $e) {
+            return WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS;
+        }
+    }
 
     public function gerarIdAmizade(WeLearn_Usuarios_Usuario $usuario, WeLearn_Usuarios_Usuario $amigo)
     {
@@ -341,17 +373,29 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
         return implode('::', $arraySort);
     }
 
-    private function _recuperarUsuariosDeIdAmizade($idAmizade, WeLearn_Usuarios_Usuario $usuarioAtual = null) {
+    /**
+     * @param $idAmizade
+     * @param null|WeLearn_Usuarios_Usuario $usuarioAtual
+     * @param WeLearn_Usuarios_Usuario $amigoAtual
+     * @return array
+     */
+    private function _recuperarUsuariosDeIdAmizade($idAmizade,
+                                                   WeLearn_Usuarios_Usuario $usuarioAtual = null,
+                                                   WeLearn_Usuarios_Usuario $amigoAtual = null) {
         $arrayIdUsuarios = explode('::', $idAmizade);
         $arrayRetorno = array();
 
         if ($usuarioAtual instanceof WeLearn_Usuarios_Usuario) {
             $arrayRetorno['usuario'] = $usuarioAtual;
-            if ($arrayIdUsuarios[0] == $usuarioAtual->getId()) {
+            if ($usuarioAtual instanceof WeLearn_Usuarios_Usuario) {
+                $arrayRetorno['amigo'] = $amigoAtual;
+
+                return $arrayRetorno;
+            } elseif($arrayIdUsuarios[0] == $usuarioAtual->getId()) {
                 $arrayRetorno['amigo'] = $this->_usuarioDao->recuperar($arrayIdUsuarios[1]);
 
                 return $arrayRetorno;
-            } elseif($arrayIdUsuarios[1] == $usuarioAtual->getId()) {
+            } elseif($arrayRetorno[1] == $usuarioAtual->getId()) {
                 $arrayRetorno['amigo'] = $this->_usuarioDao->recuperar($arrayIdUsuarios[0]);
 
                 return $arrayRetorno;
@@ -364,11 +408,17 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
         return $arrayRetorno;
     }
 
-    private function _criarFromCassandra(array $column, WeLearn_Usuarios_Usuario $usuarioPadrao = null)
+    private function _criarFromCassandra(array $column,
+                                         WeLearn_Usuarios_Usuario $usuarioPadrao = null,
+                                         WeLearn_Usuarios_Usuario $amigoPadrao = null)
     {
         $column = array_merge(
             $column,
-            $this->_recuperarUsuariosDeIdAmizade($column['id'], $usuarioPadrao)
+            $this->_recuperarUsuariosDeIdAmizade(
+                $column['id'],
+                $usuarioPadrao,
+                $amigoPadrao
+            )
         );
 
         $amizade = new WeLearn_Usuarios_AmizadeUsuario();

@@ -49,11 +49,17 @@ class WeLearn_Usuarios_AmizadeUsuario extends WeLearn_DTO_AbstractDTO
         $status = WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA)
     {
         $dados = array(
-            'usuario' => $usuario,
-            'amigo' => $amigo,
             'comecouEm' => $comecouEm,
             'status' => $status
         );
+
+        if ( $usuario instanceof WeLearn_Usuarios_Usuario) {
+            $dados['usuario'] = $usuario;
+        }
+
+        if ( $amigo instanceof WeLearn_Usuarios_Usuario ) {
+            $dados['amigo'] = $amigo;
+        }
 
         parent::__construct($dados);
 
