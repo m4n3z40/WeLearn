@@ -307,6 +307,8 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
 
         $this->_cf->insert($idAmizade, $amizadeColumns);
 
+        $timeUUID = CassandraUtil::import($amizadeColumns['timeUUID'])->bytes;
+
         $this->_amizadeRequisicoesCF->insert(
             $dto->getUsuario()->getId(),
             array($dto->getAmigo()->getId() => '')
@@ -314,11 +316,22 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
 
         $this->_amizadeRequisicoesPorDataCF->insert(
             $dto->getUsuario()->getId(),
-            array( CassandraUtil::import($amizadeColumns['timeUUID'])->bytes => $dto->getAmigo()->getId() )
+            array($timeUUID => $dto->getAmigo()->getId() )
+        );
+
+        $this->_amizadeAmigosCF->insert(
+            $dto->getUsuario()->getId(),
+            array($dto->getAmigo()->getId() => '')
+        );
+
+        $this->_amizadeAmigosPorDataCF->insert(
+            $dto->getUsuario()->getId(),
+            array($timeUUID => $dto->getAmigo()->getId())
         );
 
         $dto->setPersistido(true);
     }
+
 
     public function gerarIdAmizade(WeLearn_Usuarios_Usuario $usuario, WeLearn_Usuarios_Usuario $amigo)
     {

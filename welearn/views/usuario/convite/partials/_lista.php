@@ -16,7 +16,7 @@
             <input type='hidden' class='id-convite' value='<?=$row->getId();?>'>
             <div class='destinatario'><?=$row->getDestinatario()->getId();?></div>
             <div class='mensagem'><?=$row->getMsgConvite();?></div>
-            <div class='data'><?=$row->getDataEnvio();?></div>
+            <div class='data'><?=date('d/m/Y à\s H:i',$row->getDataEnvio());?></div>
         </li>
     <?php endforeach;?>
     <?php elseif ($tipo == 'recebidos'): ?>
@@ -25,7 +25,7 @@
             <input type='hidden' class='id-convite' value='<?=$row->getId();?>'>
             <div class='destinatario'><?=$row->getRemetente()->getId();?></div>
             <div class='mensagem'><?=$row->getMsgConvite();?></div>
-            <div class='data'><?=$row->getDataEnvio();?></div>
+            <div class='data'><?=date('d/m/Y à\s H:i',$row->getDataEnvio());?></div>
         </li>
         <?php endforeach;?>
     <?php endif;?>

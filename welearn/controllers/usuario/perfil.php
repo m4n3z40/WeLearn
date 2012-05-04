@@ -16,19 +16,14 @@ class Perfil extends WL_Controller {
 
     public function index($id)
     {
-        $usuarioDao= WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-        $conviteCadastradoDao=WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
-        $usuarioObj=$usuarioDao->recuperar($id);
-        $conviteCadastrado=$conviteCadastradoDao->criarNovo();
-        $conviteCadastrado->setRemetente($this->autenticacao->getUsuarioAutenticado());
-        $conviteCadastrado->setDestinatario($usuarioObj);
-        try{
-            $saoAmigos=null;
-        }catch(cassandra_NotFoundException $e){
-            $saoAmigos=null;
-        }
-        $dados=array('id' => $usuarioObj->getId(), 'nome' => $usuarioObj->getNome(),
-                     'sobrenome' => $usuarioObj->getSobrenome(), 'email' => $usuarioObj->getEmail(),
+        $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+        $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+        $usuarioAutenticado=$this->autenticacao->getUsuarioAutenticado();
+        $usuarioPerfil=$usuarioDao->recuperar($id);
+        $saoAmigos=$amizadeUsuarioDao->SaoAmigos($usuarioAutenticado,$usuarioPerfil);
+
+        $dados=array('id' => $usuarioPerfil->getId(), 'nome' => $usuarioPerfil->getNome(),
+                     'sobrenome' => $usuarioPerfil->getSobrenome(), 'email' => $usuarioPerfil->getEmail(),
                      'saoAmigos' => $saoAmigos
                     );
         $this->_renderTemplatePerfil('usuario/perfil/index',$dados);

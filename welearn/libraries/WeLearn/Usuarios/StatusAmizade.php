@@ -26,7 +26,14 @@ abstract class WeLearn_Usuarios_StatusAmizade implements WeLearn_Base_IEnum
      *
      * @constant
      */
-    const ATIVO = 1;
+    const AMIGOS = 1;
+
+    /**
+     * Indicador do Status da Amizade Ativa
+     *
+     * @constant
+     */
+     const NAO_AMIGOS = -1;
 
     /**
      * Retorna a descrição do Enum passado por parametru.
@@ -40,8 +47,10 @@ abstract class WeLearn_Usuarios_StatusAmizade implements WeLearn_Base_IEnum
         switch ($codigo) {
             case self::REQUISICAO_EM_ESPERA:
                 return 'Requisição de Amizade em Espera de Aprovação';
-            case self::ATIVO:
+            case self::AMIGOS:
                 return 'Amizade Ativa';
+            case self::NAO_AMIGOS:
+                return 'Sem Amizade';
             default:
                 throw new WeLearn_Base_CodigoEnumIncorretoException();
         }

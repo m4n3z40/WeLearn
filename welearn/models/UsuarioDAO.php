@@ -150,7 +150,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         $sql->db->or_like('email',$filtros['id']);
         $sql->db->distinct();
         $sql->db->select('id, nome, sobrenome');
-        $sql->db->limit($filtros['qtd'],$de); //recuperar $qtd registros a partir do $de
+        $sql->db->limit($filtros['qtd'],$de);
         $sqlData = $sql->db->get($this->_mysql_tbl_name)->result_array();
         $idArray=array();
         foreach ($sqlData as $row) {

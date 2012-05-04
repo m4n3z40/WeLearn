@@ -78,6 +78,12 @@ class Convite extends WL_Controller
                 $amizadeUsuarioDao->salvar($amizadeUsuarioObj);
                 $response=array('success'=>true);
                 $json = Zend_Json::encode($response);
+                $this->load->helper('notificacao_js');
+                $notificacoesFlash = create_notificacao_json(
+                    'sucesso',
+                    'Convite enviado com sucesso!'
+                );
+                $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
             }catch(Exception $e){
                 log_message(
                     'error',

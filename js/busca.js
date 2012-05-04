@@ -42,8 +42,6 @@ $(document).ready(
         $('enviar').click(
             function(e)
             {
-                /*if($('#txt-search').val()=='')
-                e.preventDefault();*/
                 alert('teste');
             }
         );

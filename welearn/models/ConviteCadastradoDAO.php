@@ -59,7 +59,7 @@ class ConviteCadastradoDAO extends WeLearn_DAO_AbstractDAO
         {
             $convitesEnviados=$this->_convitePorRemetente->get($filtros['usuarioObj']->getId(),null,$de,$ate,true,$filtros['count']);
             $cassandra=$this->_cf->multiget($convitesEnviados);
-            $convites=$this->_criarVariosFromCassandra($cassandra,null,$filtros['usuarioObj']);
+            $convites=$this->_criarVariosFromCassandra($cassandra,$filtros['usuarioObj']);
         }
 
         if($filtros['tipoConvite'] == 'recebidos')
@@ -103,6 +103,17 @@ class ConviteCadastradoDAO extends WeLearn_DAO_AbstractDAO
         return new WeLearn_Convites_ConviteCadastrado($dados);
     }
 
+
+    /**
+     * @param array|null $dados
+     * @return WeLearn_DTO_IDTO
+     */
+    public function recuperarPendentes(array $dados = null)
+    {
+
+    }
+
+
     /**
      * @param WeLearn_DTO_IDTO $dto
      * @return boolean
@@ -139,13 +150,12 @@ class ConviteCadastradoDAO extends WeLearn_DAO_AbstractDAO
             $column['destinatario'] = ($destinatarioPadrao instanceof WeLearn_Usuarios_Usuario)
                 ? $destinatarioPadrao
                 : $this->_usuarioDao->recuperar($column['destinatario']);
-        $column['paraCurso'] = ($column['paraCurso'] instanceof WeLearn_Cursos_Segmento)
-            ? $column['paraCurso']
-            : $this->_cursoDao->criarNovo();
 
-
-
-
+        if($column['paraCurso']) {
+            $column['paraCurso'] = $this->_cursoDao->recuperar($column['paraCurso']);
+        } else {
+            unset($column['paraCurso']);
+        }
 
         $convite = $this->criarNovo();
         $convite->fromCassandra($column);
