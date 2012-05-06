@@ -246,13 +246,17 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
      */
     public function alterarAtivo(WeLearn_Cursos_Certificado $certificado)
     {
-        $cursoUUID = UUID::import( $certificado->getCurso()->getId() );
+        try {
+            $cursoUUID = UUID::import( $certificado->getCurso()->getId() );
 
-        $idCertificadoAtivo = $this->_cursoDao->getCf()->get(
-            $cursoUUID->bytes,
-            array('certificado')
-        );
-        $idCertificadoAtivo = $idCertificadoAtivo['certificado'];
+            $idCertificadoAtivo = $this->_cursoDao->getCf()->get(
+                $cursoUUID->bytes,
+                array('certificado')
+            );
+            $idCertificadoAtivo = $idCertificadoAtivo['certificado'];
+        } catch (cassandra_NotFoundException $e) {
+            $idCertificadoAtivo = '';
+        }
 
         if ( $certificado->isAtivo() ) {
 
