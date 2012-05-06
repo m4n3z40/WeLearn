@@ -14,7 +14,25 @@
     </header>
     <div>
         <?php if ($haCertificados): ?>
-
+        <h4>Exibindo <em id="em-total-certificados"><?php echo $totalCertificados ?></em> Certificado(s).
+            (Max. <?php echo $maxCertificados ?>)</h4>
+        <h4>Certificado Ativo:</h4>
+            <?php if ($certificadoAtivo): ?>
+            <ul>
+                <?php echo $certificadoAtivo ?>
+            </ul>
+            <?php else: ?>
+            <h4>Não há nenhum certificado ativo no momento.</h4>
+            <?php endif; ?>
+        <hr>
+        <h4>Certificado(s) Inativo(s):</h4>
+            <?php if ($certificadosInativos): ?>
+            <ul>
+                <?php echo $certificadosInativos ?>
+            </ul>
+            <?php else: ?>
+            <h4>Não há mais certificados a serem listados.</h4>
+            <?php endif; ?>
         <?php else: ?>
         <h4>Nenhum certificado foi enviado a este curso até o momento.
             <?php echo anchor('/curso/certificado/criar/' . $idCurso,

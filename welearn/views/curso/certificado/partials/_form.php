@@ -7,7 +7,7 @@
                       id="txt-descricao"
                       cols="60"
                       rows="10"><?php echo $descricaoAtual ?></textarea>
-        <dt><span>Tornar ativo ao enviar?</span></dt>
+        <dt><span>Certificado ativo?</span></dt>
         <dd>
             <input type="radio"
                    name="ativo"

@@ -116,7 +116,12 @@ class WeLearn_Cursos_Certificado extends WeLearn_DTO_AbstractDTO
      */
     public function setAtivo($ativo)
     {
-        $this->_ativo = (boolean)$ativo;
+        if ( ! is_bool( $ativo ) ) {
+            $ativo = (int)$ativo;
+            $ativo = ( $ativo > 0 );
+        }
+
+        $this->_ativo = $ativo;
     }
 
     /**
@@ -474,7 +479,7 @@ class WeLearn_Cursos_Certificado extends WeLearn_DTO_AbstractDTO
         return array(
             'id' => $this->getId(),
             'descricao' => $this->getDescricao(),
-            'ativo' => $this->isAtivo(),
+            'ativo' => $this->isAtivo() ? 'true' : 'false',
             'curso' => ($this->_curso instanceof WeLearn_Cursos_Curso)
                        ? $this->getCurso()->getId() : '',
             'urlBig' => $this->getUrlBig(),
@@ -484,7 +489,7 @@ class WeLearn_Cursos_Certificado extends WeLearn_DTO_AbstractDTO
             'assinaturaSmall' => $this->getAssinaturaSmall(),
             'caminho' => $this->getCaminho(),
             'caminhoCompletoBig' => $this->getCaminhoCompletoBig(),
-            'caminhoCompletoSmaill' => $this->getCaminhoCompletoSmall(),
+            'caminhoCompletoSmall' => $this->getCaminhoCompletoSmall(),
             'mimeType' => $this->getMimeType(),
             'tamanhoBig' => $this->getTamanhoBig(),
             'tamanhoSmall' => $this->getTamanhoSmall(),
@@ -494,5 +499,23 @@ class WeLearn_Cursos_Certificado extends WeLearn_DTO_AbstractDTO
             'larguraImagemSmall' => $this->getLarguraImagemSmall(),
             'tipoImagem' => $this->getTipoImagem()
         );
+    }
+
+    function __toString()
+    {
+        $url = $this->getUrlSmall();
+        $alt = 'Certificado do curso "' . $this->getCurso()->getNome() . '"';
+        $descricao = ( strlen($this->getDescricao()) > 100 )
+                     ? substr($this->getDescricao(), 0, 100) . '...'
+                     : $this->getDescricao();
+
+        return
+            "<div>
+                <figure>
+                    <img src=\"{$url}\" alt=\"{$alt}\">
+                    <figcaption>Miniatura do Certificado</figcaption>
+                </figure>
+                <blockquote>{$descricao}</blockquote>
+            </div>";
     }
 }

@@ -108,7 +108,7 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
                 null,
                 $de,
                 $ate,
-                false,
+                true,
                 $count
             )
         );
@@ -156,6 +156,13 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
             array($UUID->bytes)
         );
 
+        if ( $certificadoRemovido->isAtivo() ) {
+            $this->_cursoDao->getCf()->insert(
+                $cursoUUID->bytes,
+                array( 'certificado' => '' )
+            );
+        }
+
         $certificadoRemovido->setPersistido(false);
 
         return $certificadoRemovido;
@@ -173,6 +180,11 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
             $this->_cf->remove($UUID->bytes);
             $certificado->setPersistido( false );
         }
+
+        $this->_cursoDao->getCf()->insert(
+            $cursoUUID->bytes,
+            array( 'certificado' => '' )
+        );
 
         $this->_certificadosPorCursoCF->remove( $cursoUUID->bytes );
 
@@ -223,12 +235,7 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
             array($UUID->bytes => '')
         );
 
-        if ( $dto->isAtivo() ) {
-            $this->_cursoDao->getCf()->insert(
-                $cursoUUID->bytes,
-                array( 'certificado' => $UUID->string )
-            );
-        }
+        $this->alterarAtivo( $dto );
 
         $dto->setPersistido(true);
     }
@@ -256,6 +263,20 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
                     array( 'certificado' => $certificado->getId() )
                 );
 
+                if ( $idCertificadoAtivo ) {
+                    $UUIDInativo = UUID::import($idCertificadoAtivo)->bytes;
+                    $this->_cf->insert( $UUIDInativo, array( 'ativo' => 'false' ) );
+                }
+
+            }
+
+        } else {
+
+            if ( $idCertificadoAtivo == $certificado->getId() ) {
+                $this->_cursoDao->getCf()->insert(
+                    $cursoUUID->bytes,
+                    array( 'certificado' => '' )
+                );
             }
 
         }
@@ -266,6 +287,8 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
         $column['curso'] = ($cursoPadrao instanceof WeLearn_Cursos_Curso)
                            ? $cursoPadrao
                            : $this->_cursoDao->recuperar( $column['curso'] );
+
+        $column['ativo'] = ($column['ativo'] == 'true') ? true : false;
 
         $certificado = $this->criarNovo();
         $certificado->fromCassandra( $column );

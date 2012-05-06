@@ -341,6 +341,23 @@ $config = array(
             'rules' => 'required|max_length[2048]'
         )
     ),
+    'certificado/salvar' => array(
+        array(
+            'field' => 'descricao',
+            'label' => 'Descrição',
+            'rules' => 'required|max_length[2048]'
+        ),
+        array(
+            'field' => 'ativo',
+            'label' => 'Ativo ao enviar',
+            'rules' => 'required'
+        ),
+        array(
+            'field' => 'certificadoId',
+            'label' => 'Upload do Arquivo',
+            'rules' => 'required'
+        )
+    ),
     'usuario/buscar' => array(
         array(
             'field' => 'txt-search',
