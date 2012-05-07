@@ -26,6 +26,7 @@ class Convite extends WL_Controller
                 $listaConvites=$conviteCadastradoDao->recuperarTodos('','',$filtros);
                 $this->load->helper('paginacao_cassandra');
                 $dadosPaginados = create_paginacao_cassandra($listaConvites, $count);
+                $listaConvites= array_reverse($listaConvites);
                 $partialListaConvites = $this->template->loadPartial(
                     'lista',
                     array(
@@ -45,11 +46,67 @@ class Convite extends WL_Controller
             }
         }catch(cassandra_NotFoundException $e)
         {
-          $dadosView['success'] =false;
+            $dadosView['success'] =false;
         }
-        $this->_renderTemplateHome('usuario/convite/index', $dadosView);
+        $this->_renderTemplateHome('usuario/convite/listar', $dadosView);
 
     }
+
+
+
+    public function proxima_pagina($param,$inicio)
+    {
+
+        try{
+            if( $param != 'enviados' && $param != 'recebidos') {
+                redirect(site_url('usuario/amigos'));
+            }else{
+                $count=10;
+                $conviteCadastradoDao= WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
+                $filtros=array('usuarioObj' => $this->autenticacao->getUsuarioAutenticado(),'count' => $count+1,'tipoConvite' => $param);
+                $listaConvites=$conviteCadastradoDao->recuperarTodos($inicio,'',$filtros);
+                $this->load->helper('paginacao_cassandra');
+                $dadosPaginados = create_paginacao_cassandra($listaConvites, $count);
+                $listaConvites = array_reverse($listaConvites);
+                $response=array('success' => true,'paginacao' => $dadosPaginados,'htmlListaConvites' =>
+                $partialListaConvites = $this->template->loadPartial(
+                    'lista',
+                    array(
+                        'success'=>true,
+                        'convites' => $listaConvites,
+                        'paginacao' => $dadosPaginados,
+                        'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
+                        'haConvites' => $dadosPaginados['proxima_pagina'],
+                        'tipo'=>$param
+                    ),
+                    'usuario/convite'
+                )
+                );
+                $json=Zend_Json::encode($response);
+            }
+        }catch(UUIDException $e)
+        {
+            log_message(
+                'error',
+                'Ocorreu um erro ao tentar recupera uma nova página de convites: '
+                    . create_exception_description($e)
+            );
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro inesperado, já estamos verificando.
+Tente novamente mais tarde.'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+
+    }
+
+
+
+
 
     public function enviar(){
         $this->load->library('form_validation');
@@ -61,28 +118,38 @@ class Convite extends WL_Controller
             exit($json);
         }else{
             try{
-                $mensagem=$this->input->post('txt-convite');
-                $remetente=$this->autenticacao->getUsuarioAutenticado();
-                $destinatario=$this->input->post('destinatario');
-                $conviteCadastradoDao=WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
-                $destinatario=WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($destinatario);
-                $conviteCadastrado=$conviteCadastradoDao->criarNovo();
+                $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
+                $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+                $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+
+                $mensagem = $this->input->post('txt-convite');
+                $remetente = $this->autenticacao->getUsuarioAutenticado();
+                $destinatario = $usuarioDao->recuperar( $this->input->post('destinatario') );
+
+                $conviteCadastrado = $conviteCadastradoDao->criarNovo();
                 $conviteCadastrado->setMsgConvite($mensagem);
                 $conviteCadastrado->setRemetente($remetente);
                 $conviteCadastrado->setDestinatario($destinatario);
-                $conviteCadastrado->setStatus(0);
+                $conviteCadastrado->setStatus(WeLearn_Convites_StatusConvite::EM_ESPERA_NOVO);
                 $conviteCadastrado->setDataEnvio(time());
+
                 $conviteCadastradoDao->salvar($conviteCadastrado);
-                $amizadeUsuarioDao=WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
-                $amizadeUsuarioObj=$amizadeUsuarioDao->criarNovo(array('convite'=>$conviteCadastrado));
+
+                $amizadeUsuarioObj = $amizadeUsuarioDao->criarNovo();
+                $amizadeUsuarioObj->setUsuario( $remetente );
+                $amizadeUsuarioObj->setAmigo( $destinatario );
+                $amizadeUsuarioObj->setStatus( WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA );
+
                 $amizadeUsuarioDao->salvar($amizadeUsuarioObj);
-                $response=array('success'=>true);
-                $json = Zend_Json::encode($response);
+
+                $json = Zend_Json::encode( array( 'success' => true ) );
+
                 $this->load->helper('notificacao_js');
                 $notificacoesFlash = create_notificacao_json(
                     'sucesso',
                     'Convite enviado com sucesso!'
                 );
+
                 $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
             }catch(Exception $e){
                 log_message(
@@ -93,7 +160,7 @@ class Convite extends WL_Controller
 
                 $error = create_json_feedback_error_json(
                     'Ocorreu um erro inesperado, já estamos verificando.
-                Tente novamente mais tarde.'
+Tente novamente mais tarde.'
                 );
 
                 $json = create_json_feedback(false, $e);
@@ -106,17 +173,31 @@ class Convite extends WL_Controller
 
 
 
-    public function remover($id,$idRemetente)
+
+
+    public function remover($idConvite)
     {
+        $this->load->helper('notificacao_js');
         try{
             $conviteCadastradoDao=WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
-            $destinatario=$this->autenticacao->getUsuarioAutenticado();
-            $conviteCadastradoDao->remover($id);
+            $conviteRemovido=$conviteCadastradoDao->remover($idConvite);
 
-            $result= array('success'=>true);
+            $amizadeDao=WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+            $amizadeObj=$amizadeDao->criarNovo();
+            $amizadeObj->setUsuario( $conviteRemovido->getDestinatario() );
+            $amizadeObj->setAmigo( $conviteRemovido->getRemetente());
+            $idAmizade=$amizadeDao->gerarIdAmizade($amizadeObj->getUsuario(),$amizadeObj->getAmigo());
+            $amizadeRemovida=$amizadeDao->remover($idAmizade);
+            $result= array('success'=>true,'notificacao'=> create_notificacao_array(
+                'sucesso',
+                'convite removido'
+            ));
         }catch(cassandra_NotFoundException $e)
         {
-            $result=array('success'=>false);
+            $result=array('success'=>false,'notificacao'=> create_notificacao_array(
+                'erro',
+                'falha ao remover convite'
+            ));
 
         }
         echo Zend_Json::encode($result);

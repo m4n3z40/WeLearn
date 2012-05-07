@@ -10,12 +10,14 @@
     <?php if($haMensagens){ ?>
     <a href="#" data-proximo="<?php echo $inicioProxPagina ?>" data-id-amigo="<?php echo $idAmigo ?>" id="paginacaoMensagem">mensagens mais antigas</a>
     <input type='hidden' value='<?=$inicioProxPagina?>' id='id-prox-pagina'/>
-   <?php }?>
+    <?php }?>
 </div>
-<?php
-echo $listaMensagens;
-?>
-<?php echo $enviarMensagem;  ?>
+<div id="mensagem-lista-mensagens">
+    <?php
+    echo $listaMensagens;
+    ?>
+</div>
+<?php echo $enviarMensagem; ?>
 
 
 

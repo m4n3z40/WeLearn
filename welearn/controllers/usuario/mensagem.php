@@ -92,7 +92,7 @@ class Mensagem extends WL_Controller
                 $this->_renderTemplateHome('usuario/mensagem/listar', $dadosView);
             }
         }catch(Exception $e) {
-            log_message('error', 'Erro ao tentar exibir lista de Enquetes: '
+            log_message('error', 'Erro ao tentar exibir lista de mensagens: '
                 . create_exception_description($e));
 
             show_404();
@@ -145,13 +145,13 @@ class Mensagem extends WL_Controller
 
             log_message(
                 'error',
-                'Ocorreu um erro ao tentar recupera uma nova página de enquetes: '
+                'Ocorreu um erro ao tentar recupera uma nova página de mensagens: '
                     . create_exception_description($e)
             );
 
             $error = create_json_feedback_error_json(
                 'Ocorreu um erro inesperado, já estamos verificando.
-                Tente novamente mais tarde.'
+Tente novamente mais tarde.'
             );
 
             $json = create_json_feedback(false, $error);
@@ -190,15 +190,21 @@ class Mensagem extends WL_Controller
         $mensagemObj->setMensagem($mensagem);
         $mensagemObj->setDestinatario($destinatario);
         $mensagemObj->setRemetente($remetente);
+        $mensagemObj->setStatus(WeLearn_Usuarios_StatusMP::NOVO);
         $mensagemDao->salvar($mensagemObj);
 
+        $this->load->helper('notificacao_js');
 
         $response = array(
             'success' => true,
             'mensagemId'=>$mensagemObj->getId(),
             'remetenteId'=>$mensagemObj->getRemetente()->getId(),
             'mensagemTexto'=>$mensagemObj->getMensagem(),
-            'dataEnvio'=>$mensagemObj->getDataEnvio()
+            'dataEnvio'=>$mensagemObj->getDataEnvio(),
+            'notificacao'=> create_notificacao_array(
+                'sucesso',
+                'Mensagem enviada com sucesso'
+            )
         );
 
         $json = Zend_Json::encode($response);
@@ -219,7 +225,7 @@ class Mensagem extends WL_Controller
             $usuario = $this->autenticacao->getUsuarioAutenticado();
             $amigo = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idAmigo);;
 
-            $mensagemPessoalDao =  WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
+            $mensagemPessoalDao = WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
 
             $mensagemPessoal = $mensagemPessoalDao->criarNovo();
             $mensagemPessoal->setDestinatario($amigo);

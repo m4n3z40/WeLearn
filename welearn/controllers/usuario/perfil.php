@@ -11,21 +11,38 @@ class Perfil extends WL_Controller {
         parent::__construct();
 
         $this->template->setTemplate('perfil')
-        ->appendJSImport('convite.js');
+            ->appendJSImport('convite.js');
     }
 
     public function index($id)
     {
         $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
         $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+        $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
         $usuarioAutenticado=$this->autenticacao->getUsuarioAutenticado();
         $usuarioPerfil=$usuarioDao->recuperar($id);
         $saoAmigos=$amizadeUsuarioDao->SaoAmigos($usuarioAutenticado,$usuarioPerfil);
 
-        $dados=array('id' => $usuarioPerfil->getId(), 'nome' => $usuarioPerfil->getNome(),
-                     'sobrenome' => $usuarioPerfil->getSobrenome(), 'email' => $usuarioPerfil->getEmail(),
-                     'saoAmigos' => $saoAmigos
-                    );
+        $dados=array('usuarioPerfil' => $usuarioPerfil,'usuarioAutenticado' => $usuarioAutenticado,
+            'saoAmigos' => $saoAmigos
+        );
+
+        if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )
+        {
+            try{
+                $convitePendente = $conviteCadastradoDao->recuperarPendentes($usuarioAutenticado,$usuarioPerfil);
+                $partialExibirConvite = $this->template->loadPartial(
+                    'exibicao_convite',
+                    array( 'convite_pendente' => $convitePendente,'usuarioAutenticado' => $usuarioAutenticado),
+                    'usuario/convite'
+                );
+                $dados['partialConvitePendente']=$partialExibirConvite;
+
+            }catch(cassandra_NotFoundException $e){//funçao sempre retorna um convite, mas caso haja uma falha
+                $saoAmigos= WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS;
+            }
+        }
+
         $this->_renderTemplatePerfil('usuario/perfil/index',$dados);
     }
 

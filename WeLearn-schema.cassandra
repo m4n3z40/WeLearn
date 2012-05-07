@@ -143,6 +143,18 @@ and column_type = 'Standard'
 and default_validation_class = 'TimeUUIDType'
 and key_validation_class = 'UTF8Type';
 
+create column family convites_convite_cadastrado_por_remetente_por_data
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'TimeUUIDType'
+and key_validation_class = 'UTF8Type';
+
+create column family convites_convite_cadastrado_por_destinatario_por_data
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'TimeUUIDType'
+and key_validation_class = 'UTF8Type';
+
 create column family cursos_area
 with comparator = 'UTF8Type'
 and column_type = 'Standard'

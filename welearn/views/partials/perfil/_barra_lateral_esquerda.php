@@ -2,13 +2,14 @@
     <nav>
         <h3>perfil</h3>
         <ul>
-
-            <?php if(!$saoAmigos):?>
-                <li><?php echo anchor('','Adicionar Amigo',array('id' => 'enviar-convite')) ?></li>
-            <?php else:?>
-                <lir><?php echo anchor('','Remover Amizade',array('id' => 'remover-amizade'))?></lir>
+            <?php if($saoAmigos == WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS):?>
+            <li><?= anchor('','Adicionar Amigo',array('id' => 'enviar-convite')) ?></li>
+            <?php elseif($saoAmigos == WeLearn_Usuarios_StatusAmizade::AMIGOS):?>
+            <li><?= anchor('','Remover Amizade',array('id' => 'remover-amizade'))?></li>
+            <?php elseif($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA):?>
+                        <li><?= anchor('#','Convite Pendente', array('id' => 'exibir-convite-pendente'))?>
             <?php endif;?>
-            <li><?php echo anchor('','Enviar Mensagem')?></li>
+            <li><?= anchor('usuario/mensagem/criar','Enviar Mensagem',array('id' => 'perfil-enviar-mensagem'))?></li>
         </ul>
     </nav>
 </section>
