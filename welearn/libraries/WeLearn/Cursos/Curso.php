@@ -26,6 +26,16 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
     private $_tempoDuracaoMax;
 
     /**
+     * @var float
+     */
+    private $_mediaQualidade;
+
+    /**
+     * @var float
+     */
+    private $_mediaDificuldade;
+
+    /**
      * @var WeLearn_Usuarios_GerenciadorPrincipal
      */
     private $_criador;
@@ -137,6 +147,38 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
     }
 
     /**
+     * @param float $mediaDificuldade
+     */
+    public function setMediaDificuldade($mediaDificuldade)
+    {
+        $this->_mediaDificuldade = (float)$mediaDificuldade;
+    }
+
+    /**
+     * @return float
+     */
+    public function getMediaDificuldade()
+    {
+        return $this->_mediaDificuldade;
+    }
+
+    /**
+     * @param float $mediaQualidade
+     */
+    public function setMediaQualidade($mediaQualidade)
+    {
+        $this->_mediaQualidade = (float)$mediaQualidade;
+    }
+
+    /**
+     * @return float
+     */
+    public function getMediaQualidade()
+    {
+        return $this->_mediaQualidade;
+    }
+
+    /**
      * @param array $opcoes
      * @return void
      */
@@ -173,6 +215,8 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
                 'objetivos' => $this->getObjetivos(),
                 'conteudoProposto' => $this->getConteudoProposto(),
                 'tempoDuracaoMax' => $this->getTempoDuracaoMax(),
+                'mediaQualidade' => $this->getMediaQualidade(),
+                'mediaDificuldade' => $this->getMediaDificuldade(),
                 'criador' => $this->getCriador()->toArray(),
                 'imagem' => $this->getImagem()->toArray(),
                 'configuracao' => $this->getConfiguracao()->toArray()
@@ -197,5 +241,20 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
         );
 
         return $selfArrayCassandra;
+    }
+
+    public function toMySQL()
+    {
+        return array(
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'tema' => $this->getTema(),
+            'descricao' => $this->getDescricao(),
+            'area_id' => ( $this->_segmento instanceof WeLearn_Cursos_Segmento
+                         && $this->getSegmento()->getArea() instanceof WeLearn_Cursos_Area )
+                         ? $this->getSegmento()->getArea()->getId() : '',
+            'segmento_id' => ( $this->_segmento instanceof WeLearn_Cursos_Segmento )
+                             ? $this->getSegmento()->getId() : ''
+        );
     }
 }

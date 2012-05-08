@@ -20,6 +20,8 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
     private $_cursosPorSegmentoCF;
     private $_cursosPorCriadorCF;
 
+    private $_mysql_tbl_name = 'cursos';
+
     /**
      * @var SegmentoDAO
      */
@@ -144,6 +146,8 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         $this->_cursosPorSegmentoCF->insert($dto->getSegmento()->getId(), array($UUID->bytes => ''));
         $this->_cursosPorCriadorCF->insert($dto->getCriador()->getId(), array($UUID->bytes => ''));
 
+        get_instance()->db->insert( $this->_mysql_tbl_name, $dto->toMySQL() );
+
         $dto->setPersistido(true);
     }
 
@@ -176,6 +180,9 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         if ( ! is_null( $dto->getConfiguracao() ) ) {
             $this->_configuracaoDAO->salvar($dto->getConfiguracao());
         }
+
+        get_instance()->db->where( 'id', $dto->getId() )
+                      ->update( $this->_mysql_tbl_name, $dto->toMySQL() );
     }
 
     /**

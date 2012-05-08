@@ -358,6 +358,30 @@ $config = array(
             'rules' => 'required'
         )
     ),
+    'review/salvar' => array(
+        array(
+            'field' => 'conteudo',
+            'label' => 'Análise do Curso',
+            'rules' => 'required|max_length[2048]'
+        ),
+        array(
+            'field' => 'qualidade',
+            'label' => 'Qualidade do Curso',
+            'rules' => 'required|numeric|greater_than[0]|less_than[11]'
+        ),
+        array(
+            'field' => 'dificuldade',
+            'label' => 'Dificuldade do Curso',
+            'rules' => 'required|numeric|greater_than[0]|less_than[11]'
+        ),
+    ),
+    'review/salvar_resposta' => array(
+        array(
+            'field' => 'conteudo',
+            'label' => 'Análise do Curso',
+            'rules' => 'required|max_length[2048]'
+        )
+    ),
     'usuario/buscar' => array(
         array(
             'field' => 'txt-search',

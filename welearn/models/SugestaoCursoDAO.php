@@ -77,14 +77,7 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
         $this->_sugestaoPorUsuarioCF->insert($dto->getCriador()->getId(), array($uuidObj->bytes => ''));
         $this->_sugestaoPorStatusCF->insert($dto->getStatus(), array($uuidObj->bytes => ''));
 
-        $indexMySqlVotos = array(
-            'id' => $dto->getId(),
-            'votos' => 0,
-            'area_id' => $dto->getSegmento()->getArea()->getId(),
-            'segmento_id' => $dto->getSegmento()->getId()
-        );
-
-        get_instance()->db->insert($this->_mysql_tbl_name, $indexMySqlVotos);
+        get_instance()->db->insert( $this->_mysql_tbl_name, $dto->toMySQL() );
 
         $dto->setPersistido(true);
     }

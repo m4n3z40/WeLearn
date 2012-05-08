@@ -11,9 +11,9 @@
 class WeLearn_Cursos_Reviews_RespostaResenha extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var int
+     * @var string
      */
-    private $_id;
+    private $_resenhaId;
 
     /**
      * @var string
@@ -21,19 +21,30 @@ class WeLearn_Cursos_Reviews_RespostaResenha extends WeLearn_DTO_AbstractDTO
     private $_conteudo;
 
     /**
-     * @var string
+     * @var int
      */
     private $_dataEnvio;
 
     /**
-     * @var WeLearn_Cursos_Reviews_Resenha
-     */
-    private $_resenha;
-
-    /**
-     * @var WeLearn_Usuarios_GerenciadorAuxiliar
+     * @var WeLearn_Usuarios_Usuario
      */
     private $_criador;
+
+    /**
+     * @param string $resenhaId
+     */
+    public function setResenhaId($resenhaId)
+    {
+        $this->_resenhaId = (string)$resenhaId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResenhaId()
+    {
+        return $this->_resenhaId;
+    }
 
     /**
      * @param string $conteudo
@@ -52,15 +63,15 @@ class WeLearn_Cursos_Reviews_RespostaResenha extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param \WeLearn_Usuarios_GerenciadorAuxiliar $criador
+     * @param \WeLearn_Usuarios_Usuario $criador
      */
-    public function setCriador(WeLearn_Usuarios_GerenciadorAuxiliar $criador)
+    public function setCriador(WeLearn_Usuarios_Usuario $criador)
     {
         $this->_criador = $criador;
     }
 
     /**
-     * @return \WeLearn_Usuarios_GerenciadorAuxiliar
+     * @return \WeLearn_Usuarios_Usuario
      */
     public function getCriador()
     {
@@ -68,51 +79,19 @@ class WeLearn_Cursos_Reviews_RespostaResenha extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param string $dataEnvio
+     * @param int $dataEnvio
      */
     public function setDataEnvio($dataEnvio)
     {
-        $this->_dataEnvio = (string)$dataEnvio;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDataEnvio()
-    {
-        return $this->_dataEnvio;
-    }
-
-    /**
-     * @param int $id
-     */
-    public function setId($id)
-    {
-        $this->_id = (int)$id;
+        $this->_dataEnvio = (int)$dataEnvio;
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getDataEnvio()
     {
-        return $this->_id;
-    }
-
-    /**
-     * @param \WeLearn_Cursos_Reviews_Resenha $resenha
-     */
-    public function setResenha(WeLearn_Cursos_Reviews_Resenha $resenha)
-    {
-        $this->_resenha = $resenha;
-    }
-
-    /**
-     * @return \WeLearn_Cursos_Reviews_Resenha
-     */
-    public function getResenha()
-    {
-        return $this->_resenha;
+        return $this->_dataEnvio;
     }
 
     /**
@@ -124,12 +103,28 @@ class WeLearn_Cursos_Reviews_RespostaResenha extends WeLearn_DTO_AbstractDTO
     public function toArray()
     {
         return array(
-            'id' => $this->getId(),
+            'resenhaId' => $this->getResenhaId(),
             'conteudo' => $this->getConteudo(),
             'dataEnvio' => $this->getDataEnvio(),
-            'resenha' => $this->getResenha()->toArray(),
-            'criador' => $this->getCriador()->toArray(),
+            'criador' => ( $this->_criador instanceof WeLearn_Usuarios_Usuario )
+                         ? $this->getCriador()->toArray() : '',
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'resenhaId' => $this->getResenhaId(),
+            'conteudo' => $this->getConteudo(),
+            'dataEnvio' => $this->getDataEnvio(),
+            'criador' => ( $this->_criador instanceof WeLearn_Usuarios_Usuario )
+                         ? $this->getCriador()->getId() : ''
         );
     }
 }

@@ -114,4 +114,17 @@ class WeLearn_Cursos_SugestaoCurso extends WeLearn_Cursos_CursoBasico
 
         return $selfArray;
     }
+
+    public function toMySQL()
+    {
+        return array(
+            'id' => $this->getId(),
+            'votos' => is_null($this->_votos) ? 0 : $this->getVotos(),
+            'area_id' => ( $this->_segmento instanceof WeLearn_Cursos_Segmento
+                         && $this->getSegmento()->getArea() instanceof WeLearn_Cursos_Area )
+                         ? $this->getSegmento()->getArea()->getId() : '',
+            'segmento_id' => ( $this->_segmento instanceof WeLearn_Cursos_Segmento )
+                             ? $this->getSegmento()->getId() : ''
+        );
+    }
 }

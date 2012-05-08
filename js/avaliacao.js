@@ -125,14 +125,14 @@
         '<div/>',
         {id : 'div-dialogo-form-questao'}
     ).dialog({
-            autoOpen: false,
-            resizable: false,
-            width: 610,
-            height: 600,
-            beforeClose: function(){
-                $(this).empty();
-            }
-        });
+        autoOpen: false,
+        resizable: false,
+        width: 610,
+        height: 600,
+        beforeClose: function(){
+            $(this).empty();
+        }
+    });
 
     $('a.a-adicionar-questao').click(function(e){
         e.preventDefault();
