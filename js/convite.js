@@ -93,6 +93,25 @@
         }
     );
 
+    $('.aceitar-convite').live('click',function(e){
+        e.preventDefault();
+        var idConvite = $(this).parent().children('.id-convite').val();
+        var url = $(this).attr('href');
+        url+='/'+idConvite;
+        var convite=$('#'+idConvite);
+        $.post(
+            WeLearn.url.siteURL(url),
+            function(result){
+                if(result.success){
+                    convite.remove();
+                    WeLearn.notificar(result.notificacao);
+                } else {
+                    WeLearn.notificar(result.notificacao);
+                }
+            },'json'
+        );
+    });
+
     $('#exibir-convite-pendente').click(
         function(e)
         {
@@ -108,7 +127,12 @@
             autoOpen: false,
             show: "blind",
             width: 400,
-            height: 170
+            height: 170,
+            buttons: {
+                "cancelar requisicao": function() {
+                    $( this ).dialog( "close" );
+                }
+            }
         }
     );
 

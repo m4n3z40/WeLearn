@@ -14,13 +14,10 @@
     <?php $remetente=$convite_pendente->getRemetente();?>
     <div>Voce possui uma solicitaçao de amizade pendente enviada por <?=$remetente->getNome().' '.$remetente->getSobreNome()?></div>
     <div><?= $convite_pendente->getMsgConvite();?></div>
-    <?=form_button('#','Aceitar',array('id' => 'aceitar-convite'))?>
-    <?=form_button('#','Recusar',array('id' => 'recusar-convite' ))?>
     <?php else:?>
     <?php $destinatario=$convite_pendente->getDestinatario();?>
     <div>Voce já enviou uma solicitacao de amizade para <?=$destinatario->getNome().' '.$destinatario->getSobreNome()?></div>
     <div><?= $convite_pendente->getMsgConvite();?></div>
-    <?= form_button('#','Remover',array('id' => 'remover-convite'))?>
     <?php endif;?>
     <?php echo form_close()?>
 </div>

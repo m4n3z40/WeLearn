@@ -203,6 +203,31 @@ Tente novamente mais tarde.'
         echo Zend_Json::encode($result);
     }
 
+    public function aceitar($idConvite){
+       $this->load->helper('notificacao_js');
+       try{
+           $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
+           $conviteRemovido = $conviteCadastradoDao->remover($idConvite);
+           $amizadeDao=WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+           $idAmizade=$amizadeDao->gerarIdAmizade($conviteRemovido->getDestinatario(),$conviteRemovido->getRemetente());
+           $amizadeObj=$amizadeDao->recuperar($idAmizade);
+           $amizadeObj->setPersistido(true);
+           $amizadeObj->setStatus(WeLearn_Usuarios_StatusAmizade::AMIGOS);
+           $amizadeDao->salvar($amizadeObj);
+           $result= array('success'=>true,'notificacao'=> create_notificacao_array(
+               'sucesso',
+               'convite aceito'
+           ));
+
+       }catch(cassandra_NotFoundException $e){
+           $result=array('success'=>false,'notificacao'=> create_notificacao_array(
+               'erro',
+               'falha ao aceitar convite'
+           ));
+       }
+        echo Zend_Json::encode($result);
+    }
+
     private function _renderTemplateHome($view = '', $dados = array())
     {
         $dadosBarraEsquerda = array(

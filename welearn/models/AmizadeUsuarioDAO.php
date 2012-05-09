@@ -46,7 +46,6 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
     public function recuperar($id)
     {
         $column = $this->_cf->get($id);
-
         return $this->_criarFromCassandra($column);
     }
 
@@ -209,7 +208,6 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
         $column = $this->_cf->get($id);
         $timeUUID = CassandraUtil::import($column['timeUUID'])->bytes;
         $amizadeRemovida = $this->_criarFromCassandra($column);
-
         $this->_cf->remove($id);
 
         if ($amizadeRemovida->getStatus() === WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA) {
@@ -267,6 +265,9 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _atualizar(WeLearn_DTO_IDTO $dto)
     {
+        //echo $dto->getStatus();
+        //echo    'atualizando';
+
         $idAmizade = $this->gerarIdAmizade($dto->getUsuario(), $dto->getAmigo());
 
         $statusArray = $this->_cf->get($idAmizade, array('status','timeUUID'));
@@ -318,6 +319,7 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
                 );
             }
         }
+
     }
 
     /**

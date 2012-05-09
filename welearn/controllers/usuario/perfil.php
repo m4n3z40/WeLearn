@@ -29,7 +29,6 @@ class Perfil extends WL_Controller {
 
         if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )
         {
-            try{
                 $convitePendente = $conviteCadastradoDao->recuperarPendentes($usuarioAutenticado,$usuarioPerfil);
                 $partialExibirConvite = $this->template->loadPartial(
                     'exibicao_convite',
@@ -37,10 +36,6 @@ class Perfil extends WL_Controller {
                     'usuario/convite'
                 );
                 $dados['partialConvitePendente']=$partialExibirConvite;
-
-            }catch(cassandra_NotFoundException $e){//funçao sempre retorna um convite, mas caso haja uma falha
-                $saoAmigos= WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS;
-            }
         }
 
         $this->_renderTemplatePerfil('usuario/perfil/index',$dados);
