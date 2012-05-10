@@ -21,36 +21,40 @@ class busca extends WL_Controller
 
     public function buscar()
     {
-        $count=10;
-        $texto= $this->input->post('txt-search');
+        $count = 10;
+        $texto = $this->input->post('txt-search');
 
-            $usuarioDao= WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-            $filtros=array('id'=>$texto,'qtd'=>$count+1);
-            $listaUsuarios=$usuarioDao->recuperarTodos(0,null,$filtros);
-            $this->load->helper('paginacao_mysql');
-            $dadosPaginados = create_paginacao_mysql($listaUsuarios,0, $count);
-            $partialBuscarUsuario = $this->template->loadPartial(
-                'lista_busca',
-                array( 'ResultadoBusca' => $listaUsuarios),
-                'usuario/home/busca'
-            );
+        $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
 
+        $filtros = array( 'busca' => $texto, 'count' => $count + 1 );
 
-            if(!$listaUsuarios)
-            {
-                $success=false;
-            }
-            else
-            {
-                $success=true;
-            }
+        $listaUsuarios = $usuarioDao->recuperarTodos( 0, null, $filtros );
 
-            $dadosView = array(
-               'listaUsuarios' => $partialBuscarUsuario,'paginacao' => $dadosPaginados,'texto' => $texto,'success'=>$success
-            );
-            $this->template->setTemplate('home');
-            $this->_renderTemplateHome('usuario/home/busca/listar', $dadosView);
+        $this->load->helper('paginacao_mysql');
+        $dadosPaginados = create_paginacao_mysql($listaUsuarios,0, $count);
+
+        $partialBuscarUsuario = $this->template->loadPartial(
+            'lista_busca',
+            array( 'ResultadoBusca' => $listaUsuarios),
+            'usuario/home/busca'
+        );
+
+        if( ! $listaUsuarios ) {
+            $success = false;
+        } else {
+            $success = true;
         }
+
+        $dadosView = array(
+           'listaUsuarios' => $partialBuscarUsuario,
+            'paginacao' => $dadosPaginados,
+            'texto' => $texto,
+            'success' => $success
+        );
+
+        $this->template->setTemplate('home');
+        $this->_renderTemplateHome('usuario/home/busca/listar', $dadosView);
+    }
 
 
 

@@ -1,6 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Categoria extends WL_Controller {
+class Categoria extends WL_Controller
+{
+    /**
+     * @var CursoDAO
+     */
+    private $_cursoDao;
 
     public function __construct()
     {
@@ -8,6 +13,8 @@ class Categoria extends WL_Controller {
 
         $this->template->setTemplate('curso')
                        ->appendJSImport('categoria_forum.js');
+
+        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
     }
 
     public function index($idCurso)
@@ -20,8 +27,7 @@ class Categoria extends WL_Controller {
         try {
             $count = 20;
 
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar($idCurso);
+            $curso = $this->_cursoDao->recuperar($idCurso);
 
             $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
 
@@ -66,8 +72,7 @@ class Categoria extends WL_Controller {
         try {
             $count = 10;
 
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar($cursoId);
+            $curso = $this->_cursoDao->recuperar($cursoId);
 
             $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
             $listaCategorias = $categoriaDao->recuperarTodosPorCurso($curso, $inicio, '', $count + 1);
@@ -101,8 +106,7 @@ class Categoria extends WL_Controller {
     public function criar($idCurso)
     {
         try {
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar($idCurso);
+            $curso = $this->_cursoDao->recuperar($idCurso);
 
             $dadosFormCriar = array(
                 'nomeAtual' => '',
@@ -209,9 +213,8 @@ class Categoria extends WL_Controller {
                 $this->load->helper('notificacao_js');
 
                 if (isset($dadosCategoria['acao']) && $dadosCategoria['acao'] == 'criar') {
-                    $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
 
-                    $dadosCategoria['curso'] = $cursoDao->recuperar($dadosCategoria['cursoId']);
+                    $dadosCategoria['curso'] = $this->_cursoDao->recuperar($dadosCategoria['cursoId']);
                     $dadosCategoria['criador'] = $this->autenticacao->getUsuarioAutenticado();
 
                     $novaCategoria = $categoriaDao->criarNovo($dadosCategoria);
@@ -254,6 +257,11 @@ class Categoria extends WL_Controller {
 
     private function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null, $view = '', array $dados = null)
     {
+        $vinculo = $this->_cursoDao->recuperarTipoDeVinculo(
+            $this->autenticacao->getUsuarioAutenticado(),
+            $curso
+        );
+
         $dadosBarraEsquerda = array(
             'idCurso' => $curso->getId()
         );
@@ -264,6 +272,10 @@ class Categoria extends WL_Controller {
                           ? $curso->getImagem()->getUrl()
                           : site_url($this->config->item('default_curso_img_uri')),
             'descricao' => $curso->getDescricao(),
+            'usuarioNaoVinculado' => $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO,
+            'usuarioPendente' => ($vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE
+                              || $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE),
+            'idCurso' => $curso->getId(),
             'menuContexto' => $this->template->loadPartial('menu', array('idCurso' => $curso->getId()), 'curso/forum')
         );
 

@@ -13,6 +13,8 @@ class Certificado extends WL_Controller
         $this->template->setTemplate('curso')
                        ->appendJSImport('certificado.js');
 
+        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+
         $this->_tempCertificadosDir = TEMP_UPLOAD_DIR . 'certificados/';
         $this->_certificadosArquivosDir = CURSOS_FILES_DIR . 'certificados/';
     }
@@ -25,8 +27,7 @@ class Certificado extends WL_Controller
     public function listar ($idCurso)
     {
         try {
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar( $idCurso );
+            $curso = $this->_cursoDao->recuperar( $idCurso );
 
             $certificadoDao = WeLearn_DAO_DAOFactory::create('CertificadoDAO');
 
@@ -76,10 +77,9 @@ class Certificado extends WL_Controller
     public function criar ($idCurso)
     {
         try {
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
             $certificadoDao = WeLearn_DAO_DAOFactory::create('CertificadoDAO');
 
-            $curso = $cursoDao->recuperar( $idCurso );
+            $curso = $this->_cursoDao->recuperar( $idCurso );
 
             $dadosForm = array(
                 'formAction' => '/curso/certificado/salvar',
@@ -388,8 +388,7 @@ class Certificado extends WL_Controller
 
     public function _criar (array $post)
     {
-        $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-        $curso = $cursoDao->recuperar( $post['cursoId'] );
+        $curso = $this->_cursoDao->recuperar( $post['cursoId'] );
 
         $this->load->library('encrypt');
 
@@ -485,6 +484,11 @@ class Certificado extends WL_Controller
                                           $view = '',
                                           array $dados = null)
     {
+        $vinculo = $this->_cursoDao->recuperarTipoDeVinculo(
+            $this->autenticacao->getUsuarioAutenticado(),
+            $curso
+        );
+
         $dadosBarraEsquerda = array(
             'idCurso' => $curso->getId()
         );
@@ -494,7 +498,11 @@ class Certificado extends WL_Controller
             'imagemUrl' => ($curso->getImagem() instanceof WeLearn_Cursos_ImagemCurso)
                           ? $curso->getImagem()->getUrl()
                           : site_url($this->config->item('default_curso_img_uri')),
-            'descricao' => $curso->getDescricao()
+            'descricao' => $curso->getDescricao(),
+            'usuarioNaoVinculado' => $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO,
+            'usuarioPendente' => ($vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE
+                              || $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE),
+            'idCurso' => $curso->getId(),
         );
 
         $this->template->setDefaultPartialVar('curso/barra_lateral_esquerda', $dadosBarraEsquerda)

@@ -2,12 +2,19 @@
 
 class Enquete extends WL_Controller {
 
+    /**
+     * @var CursoDAO
+     */
+    private $_cursoDao;
+
     public function __construct()
     {
         parent::__construct();
 
         $this->template->setTemplate('curso')
                        ->appendJSImport('enquete.js');
+
+        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
     }
 
     public function index ($idCurso)
@@ -20,8 +27,7 @@ class Enquete extends WL_Controller {
         try {
             $count = 10;
 
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar($idCurso);
+            $curso = $this->_cursoDao->recuperar($idCurso);
 
             $filtro = $this->input->get('f');
 
@@ -72,8 +78,7 @@ class Enquete extends WL_Controller {
 
             $count = 10;
 
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar($idCurso);
+            $curso = $this->_cursoDao->recuperar($idCurso);
 
             $filtro = $this->input->get('f');
 
@@ -167,8 +172,7 @@ class Enquete extends WL_Controller {
     public function criar ($idCurso)
     {
         try {
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar($idCurso);
+            $curso = $this->_cursoDao->recuperar($idCurso);
 
             $dadosPartialForm = array(
                 'formAction' => 'enquete/enquete/salvar',
@@ -458,8 +462,7 @@ class Enquete extends WL_Controller {
 
     private function _criarEnquete ($post)
     {
-        $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-        $curso = $cursoDao->recuperar( $post['cursoId'] );
+        $curso = $this->_cursoDao->recuperar( $post['cursoId'] );
 
         $enqueteDao = WeLearn_DAO_DAOFactory::create('EnqueteDAO');
         $novaEnquete = $enqueteDao->criarNovo();
@@ -527,6 +530,11 @@ class Enquete extends WL_Controller {
 
     private function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null, $view = '', array $dados = null)
     {
+        $vinculo = $this->_cursoDao->recuperarTipoDeVinculo(
+            $this->autenticacao->getUsuarioAutenticado(),
+            $curso
+        );
+
         $dadosBarraEsquerda = array(
             'idCurso' => $curso->getId()
         );
@@ -537,6 +545,10 @@ class Enquete extends WL_Controller {
                           ? $curso->getImagem()->getUrl()
                           : site_url($this->config->item('default_curso_img_uri')),
             'descricao' => $curso->getDescricao(),
+            'usuarioNaoVinculado' => $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO,
+            'usuarioPendente' => ($vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE
+                              || $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE),
+            'idCurso' => $curso->getId(),
             'menuContexto' => ''
         );
 

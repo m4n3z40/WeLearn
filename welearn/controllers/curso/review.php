@@ -8,13 +8,14 @@ class Review extends WL_Controller
 
         $this->template->setTemplate('curso')
                        ->appendJSImport('review.js');
+
+        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
     }
 
     public function index ($idCurso)
     {
         try {
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar( $idCurso );
+            $curso = $this->_cursoDao->recuperar( $idCurso );
 
             $resenhaDao = WeLearn_DAO_DAOFactory::create('ResenhaDAO');
 
@@ -65,10 +66,9 @@ class Review extends WL_Controller
         try {
             $count = 30;
 
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
             $resenhaDao = WeLearn_DAO_DAOFactory::create('ResenhaDAO');
 
-            $curso = $cursoDao->recuperar( $idCurso );
+            $curso = $this->_cursoDao->recuperar( $idCurso );
 
             $totalReviews = $resenhaDao->recuperarQtdTotalPorCurso( $curso );
 
@@ -129,10 +129,9 @@ class Review extends WL_Controller
         try {
             $count = 30;
 
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
             $resenhaDao = WeLearn_DAO_DAOFactory::create('ResenhaDAO');
 
-            $curso = $cursoDao->recuperar( $idCurso );
+            $curso = $this->_cursoDao->recuperar( $idCurso );
 
             try {
                 $listaReviews = $resenhaDao->recuperarTodosPorCurso(
@@ -182,8 +181,7 @@ class Review extends WL_Controller
     public function enviar ($idCurso)
     {
         try {
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar( $idCurso );
+            $curso = $this->_cursoDao->recuperar( $idCurso );
 
             $resenhaDao = WeLearn_DAO_DAOFactory::create('ResenhaDAO');
 
@@ -543,10 +541,9 @@ class Review extends WL_Controller
 
     private function _adicionar($post)
     {
-        $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
         $resenhaDao = WeLearn_DAO_DAOFactory::create('ResenhaDAO');
 
-        $curso = $cursoDao->recuperar( $post['cursoId'] );
+        $curso = $this->_cursoDao->recuperar( $post['cursoId'] );
 
         $novaResenha = $resenhaDao->criarNovo( $post );
         $novaResenha->setCurso( $curso );
@@ -644,6 +641,11 @@ class Review extends WL_Controller
 
     private function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null, $view = '', array $dados = null)
     {
+        $vinculo = $this->_cursoDao->recuperarTipoDeVinculo(
+            $this->autenticacao->getUsuarioAutenticado(),
+            $curso
+        );
+
         $dadosBarraEsquerda = array(
             'idCurso' => $curso->getId()
         );
@@ -653,7 +655,11 @@ class Review extends WL_Controller
             'imagemUrl' => ($curso->getImagem() instanceof WeLearn_Cursos_ImagemCurso)
                           ? $curso->getImagem()->getUrl()
                           : site_url($this->config->item('default_curso_img_uri')),
-            'descricao' => $curso->getDescricao()
+            'descricao' => $curso->getDescricao(),
+            'usuarioNaoVinculado' => $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO,
+            'usuarioPendente' => ($vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE
+                              || $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE),
+            'idCurso' => $curso->getId(),
         );
 
         $this->template->setDefaultPartialVar('curso/barra_lateral_esquerda', $dadosBarraEsquerda)

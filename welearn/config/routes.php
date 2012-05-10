@@ -41,50 +41,60 @@
 $route['default_controller'] = 'Bem_vindo';
 $route['404_override'] = '';
 
-$route['curso'] = 'curso/curso/index';
-$route['curso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/curso/exibir/$1';
-$route['curso/configurar/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/curso/configurar/$1';
-$route['curso/([a-z_]+)'] = 'curso/curso/$1';
-$route['curso/sugestao'] = 'curso/sugestao/index';
-$route['curso/sugestao/([a-z_]+)'] = 'curso/sugestao/$1';
-$route['curso/certificado/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/certificado/$1/$2';
-$route['curso/certificado/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/certificado/index/$1';
-$route['curso/review/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/review/$1/$2';
-$route['curso/review/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/review/index/$1';
-$route['curso/aluno/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/aluno/$1/$2';
-$route['curso/aluno/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/aluno/index/$1';
-$route['curso/gerenciador/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/gerenciador/$1/$2';
-$route['curso/gerenciador/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'curso/gerenciador/index/$1';
-$route['curso/forum/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/forum/index/$1';
-$route['curso/forum/categoria/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/categoria/index/$1';
-$route['curso/forum/categoria/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/categoria/$1/$2';
-$route['curso/forum/post/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/post/index/$1';
-$route['curso/forum/post/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/post/$1/$2';
-$route['curso/forum/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'forum/forum/$1/$2';
-$route['curso/forum/([a-z_]+)'] = 'forum/forum/$1';
-$route['curso/enquete/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'enquete/enquete/index/$1';
-$route['curso/enquete/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'enquete/enquete/$1/$2';
-$route['curso/enquete/([a-z_]+)'] = 'enquete/enquete/$1';
-$route['curso/conteudo/modulo/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/modulo/index/$1';
-$route['curso/conteudo/modulo/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] ='conteudo/modulo/$1/$2';
-$route['curso/conteudo/aula/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/aula/index/$1';
-$route['curso/conteudo/aula/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] ='conteudo/aula/$1/$2';
-$route['curso/conteudo/pagina/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/pagina/index/$1';
-$route['curso/conteudo/pagina/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] ='conteudo/pagina/$1/$2';
-$route['curso/conteudo/avaliacao/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/avaliacao/index/$1';
-$route['curso/conteudo/avaliacao/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] ='conteudo/avaliacao/$1/$2';
-$route['curso/conteudo/recurso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/recurso/index/$1';
-$route['curso/conteudo/recurso/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] ='conteudo/recurso/$1/$2';
-$route['curso/conteudo/comentario/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/comentario/index/$1';
-$route['curso/conteudo/comentario/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] ='conteudo/comentario/$1/$2';
-$route['curso/conteudo/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/conteudo/index/$1';
-$route['curso/conteudo/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/conteudo/$1/$2';
-$route['perfil/([a-z0-9_]+)'] = 'usuario/perfil/index/$1';
-$route['perfil/([a-z_]+)/([a-z0-9_]+)'] = 'usuario/perfil/$1/$2';
-$route['usuario/mensagem'] = 'usuario/mensagem/index';
-$route['usuario/mensagem/listar/([a-z_]+)'] = 'usuario/mensagem/listar/$1';
-$route['usuario/([a-z_]+)'] = 'usuario/usuario/$1';
-$route['usuario/amigos']='usuario/amigos/index';
+$route['curso/sugestao']                                                                                     = 'curso/sugestao/index';
+$route['curso/sugestao/([a-z_]+)']                                                                           = 'curso/sugestao/$1';
+
+$route['curso/certificado/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']         = 'curso/certificado/$1/$2';
+$route['curso/certificado/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']                   = 'curso/certificado/index/$1';
+
+$route['curso/review/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']              = 'curso/review/$1/$2';
+$route['curso/review/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']                        = 'curso/review/index/$1';
+
+$route['curso/aluno/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']               = 'curso/aluno/$1/$2';
+$route['curso/aluno/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']                         = 'curso/aluno/index/$1';
+
+$route['curso/gerenciador/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']         = 'curso/gerenciador/$1/$2';
+$route['curso/gerenciador/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']                   = 'curso/gerenciador/index/$1';
+
+$route['curso/forum/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']                         = 'forum/forum/index/$1';
+$route['curso/forum/categoria/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']               = 'forum/categoria/index/$1';
+$route['curso/forum/categoria/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']     = 'forum/categoria/$1/$2';
+$route['curso/forum/post/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']                    = 'forum/post/index/$1';
+$route['curso/forum/post/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']          = 'forum/post/$1/$2';
+$route['curso/forum/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']               = 'forum/forum/$1/$2';
+$route['curso/forum/([a-z_]+)']                                                                              = 'forum/forum/$1';
+
+$route['curso/enquete/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']                       = 'enquete/enquete/index/$1';
+$route['curso/enquete/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']             = 'enquete/enquete/$1/$2';
+$route['curso/enquete/([a-z_]+)']                                                                            = 'enquete/enquete/$1';
+
+$route['curso/conteudo/modulo/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']               = 'conteudo/modulo/index/$1';
+$route['curso/conteudo/modulo/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']     = 'conteudo/modulo/$1/$2';
+$route['curso/conteudo/aula/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']                 = 'conteudo/aula/index/$1';
+$route['curso/conteudo/aula/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']       = 'conteudo/aula/$1/$2';
+$route['curso/conteudo/pagina/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']               = 'conteudo/pagina/index/$1';
+$route['curso/conteudo/pagina/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']     = 'conteudo/pagina/$1/$2';
+$route['curso/conteudo/avaliacao/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']            = 'conteudo/avaliacao/index/$1';
+$route['curso/conteudo/avaliacao/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']  = 'conteudo/avaliacao/$1/$2';
+$route['curso/conteudo/recurso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']              = 'conteudo/recurso/index/$1';
+$route['curso/conteudo/recurso/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']    = 'conteudo/recurso/$1/$2';
+$route['curso/conteudo/comentario/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']           = 'conteudo/comentario/index/$1';
+$route['curso/conteudo/comentario/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})'] = 'conteudo/comentario/$1/$2';
+$route['curso/conteudo/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']                      = 'conteudo/conteudo/index/$1';
+$route['curso/conteudo/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']            = 'conteudo/conteudo/$1/$2';
+
+$route['curso']                                                                                              = 'curso/curso/index';
+$route['curso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']                               = 'curso/curso/exibir/$1';
+$route['curso/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']                     = 'curso/curso/$1/$2';
+$route['curso/([a-z_]+)']                                                                                    = 'curso/curso/$1';
+
+$route['perfil/([a-z0-9_]+)']                                                                                = 'usuario/perfil/index/$1';
+$route['perfil/([a-z_]+)/([a-z0-9_]+)']                                                                      = 'usuario/perfil/$1/$2';
+
+$route['usuario/mensagem']                                                                                   = 'usuario/mensagem/index';
+$route['usuario/mensagem/listar/([a-z_]+)']                                                                  = 'usuario/mensagem/listar/$1';
+$route['usuario/([a-z_]+)']                                                                                  = 'usuario/usuario/$1';
+$route['usuario/amigos']                                                                                     = 'usuario/amigos/index';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

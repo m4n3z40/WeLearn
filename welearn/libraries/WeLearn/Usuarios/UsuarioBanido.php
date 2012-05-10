@@ -3,7 +3,7 @@
 /**
  * Create by Victor
  */
-class WeLearn_Administracao_UsuarioBanido extends WeLearn_DTO_AbstractDTO
+class WeLearn_Usuarios_UsuarioBanido extends WeLearn_DTO_AbstractDTO
 {
     /**
      * @var string

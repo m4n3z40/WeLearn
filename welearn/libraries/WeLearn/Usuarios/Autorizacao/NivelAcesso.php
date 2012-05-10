@@ -8,33 +8,42 @@
  *
  */
 
-abstract class WeLearn_Usuarios_NivelAcesso implements WeLearn_Base_IEnum
+abstract class WeLearn_Usuarios_Autorizacao_NivelAcesso implements WeLearn_Base_IEnum
 {
+    /**
+     * @constant
+     */
+    const USUARIO = 0;
 
     /**
      * @constant
      */
-    const ALUNO = 0;
+    const ALUNO = 1;
 
     /**
      * @constant
      */
-    const MODERADOR = 1;
+    const ALUNO_INSCRICAO_PENDENTE = 11;
 
     /**
      * @constant
      */
-    const INSTRUTOR = 2;
+    const GERENCIADOR_AUXILIAR = 2;
 
     /**
      * @constant
      */
-    const GERENCIADOR_AUXILIAR = 3;
+    const GERENCIADOR_CONVITE_PENDENTE = 22;
 
     /**
      * @constant
      */
-    const GERENCIADOR_PRINCIPAL = 4;
+    const GERENCIADOR_PRINCIPAL = 3;
+
+    /**
+     * @constant
+     */
+    const ADMINISTRADOR_DO_SERVICO = 999;
 
     /**
      * Retorna a descrição do Enum passado por parametru.
@@ -46,16 +55,20 @@ abstract class WeLearn_Usuarios_NivelAcesso implements WeLearn_Base_IEnum
     public static function getDescricao($codigo)
     {
         switch ($codigo) {
+            case self::USUARIO:
+                return 'Usuário';
             case self::ALUNO:
                 return 'Aluno';
-            case self::MODERADOR:
-                return 'Moderador';
-            case self::INSTRUTOR:
-                return 'Instrutor';
+            case self::ALUNO_INSCRICAO_PENDENTE:
+                return 'Inscrição Pendente';
             case self::GERENCIADOR_AUXILIAR:
                 return 'Gerenciador Auxiliar';
+            case self::GERENCIADOR_CONVITE_PENDENTE:
+                return 'Convite Pendente';
             case self::GERENCIADOR_PRINCIPAL:
                 return 'Gerenciador Principal';
+            case self::ADMINISTRADOR_DO_SERVICO:
+                return 'Administrador do Serviço';
             default:
                 throw new WeLearn_Base_CodigoEnumIncorretoException();
         }

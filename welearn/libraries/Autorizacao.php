@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
  
-class WL_Autorizacao
+class WL_Autorizacao extends WeLearn_Usuarios_Autorizacao_ControleAcesso
 {
 
 }

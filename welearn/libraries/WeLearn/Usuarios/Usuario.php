@@ -11,67 +11,73 @@
 /**
  *
  */
-class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO implements Serializable
+class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
+                               implements Serializable, WeLearn_Usuarios_Autorizacao_Papel
 {
     /**
      * @var string
      */
-    private $_id;
+    protected $_id;
 
     /**
      * @var string
      */
-    private $_nome;
+    protected $_nome;
 
     /**
      * @var string
      */
-    private $_sobrenome;
+    protected $_sobrenome;
 
     /**
      * @var string
      */
-    private $_email;
+    protected $_email;
 
     /**
      * @var string
      */
-    private $_nomeUsuario;
+    protected $_nomeUsuario;
 
     /**
      * @var string
      */
-    private $_senha;
+    protected $_senha;
 
     /**
      * @var string
      */
-    private $_dataCadastro;
+    protected $_dataCadastro;
+
+    /**
+     * @var int
+     */
+    protected $_nivelAcesso = WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO;
 
     /**
      * @var WeLearn_Usuarios_ImagemUsuario
      */
-    private $_imagem;
+    protected $_imagem;
 
     /**
      * @var WeLearn_Usuarios_DadosPessoaisUsuario
      */
-    private $_dadosPessoais;
+    protected $_dadosPessoais;
 
     /**
      * @var WeLearn_Usuarios_DadosProfissionaisUsuario
      */
-    private $_dadosProfissionais;
+    protected $_dadosProfissionais;
 
     /**
      * @var WeLearn_Cursos_Segmento
      */
-    private $_segmentoInteresse;
+    protected $_segmentoInteresse;
 
     /**
      * @var WeLearn_Usuarios_ConfiguracaoUsuario
      */
-    private $_configuracao;
+    protected $_configuracao;
 
     /**
      * @param \WeLearn_Usuarios_ConfiguracaoUsuario $configuracao
@@ -266,6 +272,14 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO implements Serial
     }
 
     /**
+     * @return int
+     */
+    public function getNivelAcesso()
+    {
+        return $this->_nivelAcesso;
+    }
+
+    /**
      * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
      * em um array.
      *
@@ -281,6 +295,7 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO implements Serial
             'nomeUsuario' => $this->getNomeUsuario(),
             'senha' => $this-> getSenha(),
             'dataCadastro' => $this->getDataCadastro(),
+            'nivelAcesso' => $this->getNivelAcesso(),
             'imagem' => empty($this->_imagem) ? '' : $this->getImagem()->toArray(),
             'dadosPessoais' => empty($this->_dadosPessoais) ? '' : $this->getDadosPessoais()->toArray(),
             'dadosProfissionais' => empty($this->_dadosProfissionais) ? '' : $this->getDadosProfissionais()->toArray(),
@@ -325,6 +340,7 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO implements Serial
             'nomeUsuario' => $this->getNomeUsuario(),
             'senha' => $this->getSenha(),
             'dataCadastro' => $this->getDataCadastro(),
+            'nivelAcesso' => $this->getNivelAcesso(),
             'configuracao' => empty($this->_configuracao) ? '' : $this->getConfiguracao()->toArray(),
             'segmentoInteresse' => empty($this->_segmentoInteresse) ? '' : $this->getSegmentoInteresse()->toArray(),
             'persistido' => $this->isPersistido(),
@@ -358,6 +374,8 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO implements Serial
         $arrayUsuario['configuracao'] = $configuracao;
 
         $this->__construct($arrayUsuario);
+
+        $this->_nivelAcesso = $arrayUsuario['nivelAcesso'];
     }
 
     /**

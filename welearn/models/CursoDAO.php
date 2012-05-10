@@ -14,11 +14,21 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
     private $_nomeCUrsosPorAreaCF = 'cursos_curso_por_area';
     private $_nomeCursosPorSegmentoCF = 'cursos_curso_por_segmento';
     private $_nomeCursosPorCriador = 'cursos_curso_por_criador';
+    private $_nomeCursosPorAlunoCF = 'cursos_curso_por_aluno';
+    private $_nomeCursosPorInscricoesCF = 'cursos_curso_por_inscricao';
+    private $_nomeCursosPorGerenciadoresCF = 'cursos_curso_por_gerenciador';
+
+    private $_nomeUsuariosPorCursoCF = 'cursos_usuario_por_curso';
 
     private $_cursosPorNomeCF;
     private $_cursosPorAreaCF;
     private $_cursosPorSegmentoCF;
     private $_cursosPorCriadorCF;
+    private $_cursosPorAlunoCF;
+    private $_cursosPorInscricoesCF;
+    private $_cursosPorGerenciadoresCF;
+
+    private $_usuariosPorCursoCF;
 
     private $_mysql_tbl_name = 'cursos';
 
@@ -50,6 +60,11 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         $this->_cursosPorAreaCF = $phpCassa->getColumnFamily($this->_nomeCUrsosPorAreaCF);
         $this->_cursosPorSegmentoCF = $phpCassa->getColumnFamily($this->_nomeCursosPorSegmentoCF);
         $this->_cursosPorCriadorCF = $phpCassa->getColumnFamily($this->_nomeCursosPorCriador);
+        $this->_cursosPorAlunoCF = $phpCassa->getColumnFamily($this->_nomeCursosPorAlunoCF);
+        $this->_cursosPorInscricoesCF = $phpCassa->getColumnFamily($this->_nomeCursosPorInscricoesCF);
+        $this->_cursosPorGerenciadoresCF = $phpCassa->getColumnFamily($this->_nomeCursosPorGerenciadoresCF);
+
+        $this->_usuariosPorCursoCF = $phpCassa->getColumnFamily($this->_nomeUsuariosPorCursoCF);
 
         $this->_segmentoDAO = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
         $this->_usuarioDAO = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
@@ -73,6 +88,27 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     * @param WeLearn_Cursos_Curso $noCurso
+     * @return int
+     */
+    public function recuperarTipoDeVinculo(WeLearn_Usuarios_Usuario $usuario, WeLearn_Cursos_Curso $noCurso)
+    {
+        try {
+            $cursoUUID = UUID::import( $noCurso->getId() );
+
+            $column = $this->_usuariosPorCursoCF->get(
+                $cursoUUID->bytes,
+                array( $usuario->getId() )
+            );
+
+            return (int)$column[ $usuario->getId() ];
+        } catch ( cassandra_NotFoundException $e ) {
+            return WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO;
+        }
+    }
+
+    /**
      * @param mixed $de
      * @param mixed $ate
      * @param array|null $filtros
@@ -84,13 +120,381 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param WeLearn_Cursos_Area $area
+     * @param string $de
+     * @param string $ate
+     * @param int $count
+     * @return array
+     */
+    public function recuperarTodosPorArea(WeLearn_Cursos_Area $area,
+                                          $de = '',
+                                          $ate = '',
+                                          $count = 20)
+    {
+        if ( ! $de != '' ) {
+            $de = UUID::import( $de )->bytes;
+        }
+
+        if ( ! $ate != '' ) {
+            $ate = UUID::import( $ate )->bytes;
+        }
+
+        $ids = array_keys(
+            $this->_cursosPorAreaCF->get(
+                $area->getId(),
+                null,
+                $de,
+                $ate,
+                true,
+                $count
+            )
+        );
+
+        $columns = $this->_cf->multiget( $ids );
+
+        return $this->_criarVariosFromCassandra( $columns );
+    }
+
+    /**
+     * @param WeLearn_Cursos_Segmento $segmento
+     * @param string $de
+     * @param string $ate
+     * @param int $count
+     * @return array
+     */
+    public function recuperarTodosPorSegmento(WeLearn_Cursos_Segmento $segmento,
+                                              $de = '',
+                                              $ate = '',
+                                              $count = 20)
+    {
+        if ( ! $de != '' ) {
+            $de = UUID::import( $de )->bytes;
+        }
+
+        if ( ! $ate != '' ) {
+            $ate = UUID::import( $ate )->bytes;
+        }
+
+        $ids = array_keys(
+            $this->_cursosPorSegmentoCF->get(
+                $segmento->getId(),
+                null,
+                $de,
+                $ate,
+                true,
+                $count
+            )
+        );
+
+        $columns = $this->_cf->multiget( $ids );
+
+        return $this->_criarVariosFromCassandra( $columns, $segmento );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_GerenciadorPrincipal $criador
+     * @param string $de
+     * @param string $ate
+     * @param int $count
+     * @return array
+     */
+    public function recuperarTodosPorCriador(WeLearn_Usuarios_GerenciadorPrincipal $criador,
+                                             $de = '',
+                                             $ate = '',
+                                             $count = 20)
+    {
+        if ( ! $de != '' ) {
+            $de = UUID::import( $de )->bytes;
+        }
+
+        if ( ! $ate != '' ) {
+            $ate = UUID::import( $ate )->bytes;
+        }
+
+        $ids = array_keys(
+            $this->_cursosPorCriadorCF->get(
+                $criador->getId(),
+                null,
+                $de,
+                $ate,
+                true,
+                $count
+            )
+        );
+
+        $columns = $this->_cf->multiget( $ids );
+
+        return $this->_criarVariosFromCassandra( $columns, null, $criador );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Aluno $aluno
+     * @param string $de
+     * @param string $ate
+     * @param int $count
+     * @return array
+     */
+    public function recuperarTodosPorAluno(WeLearn_Usuarios_Aluno $aluno,
+                                           $de = '',
+                                           $ate = '',
+                                           $count = 20)
+    {
+        if ( ! $de != '' ) {
+            $de = UUID::import( $de )->bytes;
+        }
+
+        if ( ! $ate != '' ) {
+            $ate = UUID::import( $ate )->bytes;
+        }
+
+        $ids = array_keys(
+            $this->_cursosPorAlunoCF->get(
+                $aluno->getId(),
+                null,
+                $de,
+                $ate,
+                true,
+                $count
+            )
+        );
+
+        $columns = $this->_cf->multiget( $ids );
+
+        return $this->_criarVariosFromCassandra( $columns );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     * @param string $de
+     * @param string $ate
+     * @param int $count
+     * @return array
+     */
+    public function recuperarTodosPorInscricao(WeLearn_Usuarios_Usuario $usuario,
+                                               $de = '',
+                                               $ate = '',
+                                               $count = 20)
+    {
+        if ( ! $de != '' ) {
+            $de = UUID::import( $de )->bytes;
+        }
+
+        if ( ! $ate != '' ) {
+            $ate = UUID::import( $ate )->bytes;
+        }
+
+        $ids = array_keys(
+            $this->_cursosPorInscricoesCF->get(
+                $usuario->getId(),
+                null,
+                $de,
+                $ate,
+                true,
+                $count
+            )
+        );
+
+        $columns = $this->_cf->multiget( $ids );
+
+        return $this->_criarVariosFromCassandra( $columns );
+    }
+
+    public function recuperarTodosPorGerenciador(WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador, $de = '', $ate = '', $count = 20)
+    {
+        // TODO: Implementar este metodo.
+    }
+
+    /**
      * @param mixed $de
      * @param mixed $ate
      * @return int
      */
     public function recuperarQtdTotal($de = null, $ate = null)
     {
-       // TODO: Implementar este metodo.
+       return $this->_cursosPorAreaCF->get_count('__todos__');
+    }
+
+    /**
+     * @param WeLearn_Cursos_Area $area
+     * @return int
+     */
+    public function recuperarQtdTotalPorArea(WeLearn_Cursos_Area $area)
+    {
+        return $this->_cursosPorAreaCF->get_count( $area->getId() );
+    }
+
+    /**
+     * @param WeLearn_Cursos_Segmento $segmento
+     * @return int
+     */
+    public function recuperarQtdTotalPorSegmento(WeLearn_Cursos_Segmento $segmento)
+    {
+        return $this->_cursosPorSegmentoCF->get_count( $segmento->getId() );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_GerenciadorPrincipal $criador
+     * @return int
+     */
+    public function recuperarQtdTotalPorCriador(WeLearn_Usuarios_GerenciadorPrincipal $criador)
+    {
+        return $this->_cursosPorCriadorCF->get_count( $criador->getId() );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Aluno $aluno
+     * @return int
+     */
+    public function recuperarQtdTotalPorAluno(WeLearn_Usuarios_Aluno $aluno)
+    {
+        return $this->_cursosPorAlunoCF->get_count( $aluno->getId() );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     * @return int
+     */
+    public function recuperarQtdTotalPorInscricao(WeLearn_Usuarios_Usuario $usuario)
+    {
+        return $this->_cursosPorInscricoesCF->get_count( $usuario->getId() );
+    }
+
+    public function recuperarQtdTotalPorGerenciador(WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador)
+    {
+        // TODO: Implementar este metodo.
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Aluno $aluno
+     * @param WeLearn_Cursos_Curso $noCurso
+     */
+    public function salvarAluno(WeLearn_Usuarios_Aluno $aluno, WeLearn_Cursos_Curso $noCurso)
+    {
+        $cursoUUID = UUID::import( $noCurso->getId() );
+
+        $this->_usuariosPorCursoCF->insert(
+            $cursoUUID->bytes,
+            array( $aluno->getId() => $aluno->getNivelAcesso() )
+        );
+
+        $this->_cursosPorAlunoCF->insert(
+            $aluno->getId(),
+            array( $cursoUUID->bytes => '' )
+        );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     * @param WeLearn_Cursos_Curso $noCurso
+     */
+    public function salvarInscricao(WeLearn_Usuarios_Usuario $usuario, WeLearn_Cursos_Curso $noCurso)
+    {
+        $cursoUUID = UUID::import( $noCurso->getId() );
+
+        $this->_usuariosPorCursoCF->insert(
+            $cursoUUID->bytes,
+            array( $usuario->getId() => WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE )
+        );
+
+        $this->_cursosPorInscricoesCF->insert(
+            $usuario->getId(),
+            array( $cursoUUID->bytes => '' )
+        );
+    }
+
+    public function salvarGerenciador(WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador, WeLearn_Cursos_Curso $noCurso)
+    {
+        // TODO: Implementar este metodo.
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Aluno $aluno
+     * @param WeLearn_Cursos_Curso $doCurso
+     */
+    public function removerAluno(WeLearn_Usuarios_Aluno $aluno, WeLearn_Cursos_Curso $doCurso)
+    {
+        $cursoUUID = UUID::import( $doCurso->getId() );
+
+        $this->_usuariosPorCursoCF->remove(
+            $cursoUUID->bytes,
+            array( $aluno->getId() )
+        );
+
+        $this->_cursosPorAlunoCF->remove(
+            $aluno->getId(),
+            array( $cursoUUID->bytes )
+        );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     * @param WeLearn_Cursos_Curso $doCurso
+     */
+    public function removerInscricao(WeLearn_Usuarios_Usuario $usuario, WeLearn_Cursos_Curso $doCurso)
+    {
+        $cursoUUID = UUID::import( $doCurso->getId() );
+
+        $this->_usuariosPorCursoCF->remove(
+            $cursoUUID->bytes,
+            array( $usuario->getId() )
+        );
+
+        $this->_cursosPorInscricoesCF->remove(
+            $usuario->getId(),
+            array( $cursoUUID->bytes )
+        );
+    }
+
+    public function removerGerenciador(WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador, WeLearn_Cursos_Curso $doCurso)
+    {
+        // TODO: Implementar este metodo.
+    }
+
+    /**
+     * @param array $idsAlunos
+     * @param WeLearn_Cursos_Curso $doCurso
+     */
+    public function removerTodosAlunos(array $idsAlunos, WeLearn_Cursos_Curso $doCurso)
+    {
+        $cursoUUID = UUID::mint( $doCurso->getId() );
+
+        foreach ($idsAlunos as $id) {
+            $this->_usuariosPorCursoCF->remove(
+                $cursoUUID->bytes,
+                array( $id )
+            );
+
+            $this->_cursosPorAlunoCF->remove(
+                $id,
+                array( $cursoUUID->bytes )
+            );
+        }
+    }
+
+    /**
+     * @param array $idsUsuarios
+     * @param WeLearn_Cursos_Curso $doCurso
+     */
+    public function removerTodasInscricoes(array $idsUsuarios, WeLearn_Cursos_Curso $doCurso)
+    {
+        $cursoUUID = UUID::mint( $doCurso->getId() );
+
+        foreach ( $idsUsuarios as $id ) {
+            $this->_usuariosPorCursoCF->remove(
+                $cursoUUID->bytes,
+                array( $id )
+            );
+
+            $this->_cursosPorInscricoesCF->remove(
+                $id,
+                array( $cursoUUID->bytes )
+            );
+        }
+    }
+
+    public function removerTodosGerenciadores(WeLearn_Cursos_Curso $doCurso)
+    {
+        // TODO: Implementar este metodo.
     }
 
     /**
@@ -140,11 +544,35 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         $nomeSimplificado = url_title(convert_accented_characters(strtolower($dto->getNome())));
         $primeiraLetra = $nomeSimplificado[0];
 
-        $this->_cursosPorNomeCF->insert($primeiraLetra, array($nomeSimplificado => $UUID->bytes));
-        $this->_cursosPorAreaCF->insert('__todos__', array($UUID->bytes => ''));
-        $this->_cursosPorAreaCF->insert($dto->getSegmento()->getArea()->getId(), array($UUID->bytes => ''));
-        $this->_cursosPorSegmentoCF->insert($dto->getSegmento()->getId(), array($UUID->bytes => ''));
-        $this->_cursosPorCriadorCF->insert($dto->getCriador()->getId(), array($UUID->bytes => ''));
+        $this->_cursosPorNomeCF->insert(
+            $primeiraLetra,
+            array( $nomeSimplificado => $UUID->bytes )
+        );
+
+        $this->_cursosPorAreaCF->insert(
+            '__todos__',
+            array( $UUID->bytes => '' )
+        );
+
+        $this->_cursosPorAreaCF->insert(
+            $dto->getSegmento()->getArea()->getId(),
+            array( $UUID->bytes => '' )
+        );
+
+        $this->_cursosPorSegmentoCF->insert(
+            $dto->getSegmento()->getId(),
+            array( $UUID->bytes => '' )
+        );
+
+        $this->_cursosPorCriadorCF->insert(
+            $dto->getCriador()->getId(),
+            array( $UUID->bytes => '' )
+        );
+
+        $this->_usuariosPorCursoCF->insert(
+            $UUID->bytes,
+            array( $dto->getCriador()->getId() => $dto->getCriador()->getNivelAcesso() )
+        );
 
         get_instance()->db->insert( $this->_mysql_tbl_name, $dto->toMySQL() );
 
@@ -162,13 +590,30 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         //Verifica se houve alteração no segmento e reconstroi os indexes.
         $segmentoAtual = $this->_cf->get($UUID->bytes, array('segmento'));
 
-        if ($segmentoAtual['segmento'] != $dto->getSegmento()->getId()) {
-            $segmentoAtual = $this->_segmentoDAO->recuperar($segmentoAtual['segmento']);
-            $this->_cursosPorAreaCF->remove($segmentoAtual->getArea()->getId(), array($UUID->bytes));
-            $this->_cursosPorSegmentoCF->remove($segmentoAtual->getId(), array($UUID->bytes));
+        if ( $segmentoAtual['segmento'] != $dto->getSegmento()->getId() ) {
 
-            $this->_cursosPorAreaCF->insert($dto->getSegmento()->getArea()->getId(), array($UUID->bytes => ''));
-            $this->_cursosPorSegmentoCF->insert($dto->getSegmento()->getId(), array($UUID->bytes => ''));
+            $segmentoAtual = $this->_segmentoDAO->recuperar($segmentoAtual['segmento']);
+
+            $this->_cursosPorAreaCF->remove(
+                $segmentoAtual->getArea()->getId(),
+                array( $UUID->bytes )
+            );
+
+            $this->_cursosPorSegmentoCF->remove(
+                $segmentoAtual->getId(),
+                array( $UUID->bytes )
+            );
+
+            $this->_cursosPorAreaCF->insert(
+                $dto->getSegmento()->getArea()->getId(),
+                array( $UUID->bytes => '' )
+            );
+
+            $this->_cursosPorSegmentoCF->insert(
+                $dto->getSegmento()->getId(),
+                array( $UUID->bytes => '' )
+            );
+
         }
 
         $this->_cf->insert($UUID->bytes, $dto->toCassandra());
@@ -191,19 +636,33 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
      */
     public function descontinuar(WeLearn_Cursos_Curso $curso)
     {
-         // TODO: Implementar este metodo.
+         $this->remover( $curso->getId() );
     }
 
+    /**
+     * @param array|null $dados
+     * @return WeLearn_DTO_IDTO
+     */
     public function criarConfiguracao(array $dados = null)
     {
         return $this->_configuracaoDAO->criarNovo($dados);
     }
 
+    /**
+     * @param array|null $dados
+     * @return WeLearn_DTO_IDTO
+     */
     public function criarImagem(array $dados = null)
     {
         return $this->_imagemDAO->criarNovo($dados);
     }
 
+    /**
+     * @param array $column
+     * @param null|WeLearn_Cursos_Segmento $segmentoPadrao
+     * @param null|WeLearn_Usuarios_GerenciadorPrincipal $criadorPadrao
+     * @return WeLearn_Cursos_Curso
+     */
     private function _criarFromCassandra(array $column,
                                          WeLearn_Cursos_Segmento $segmentoPadrao = null,
                                          WeLearn_Usuarios_GerenciadorPrincipal $criadorPadrao = null)
@@ -232,6 +691,12 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         return $curso;
     }
 
+    /**
+     * @param array $columns
+     * @param null|WeLearn_Cursos_Segmento $segmentoPadrao
+     * @param null|WeLearn_Usuarios_GerenciadorPrincipal $criadorPadrao
+     * @return array
+     */
     private function _criarVariosFromCassandra(array $columns,
                                                WeLearn_Cursos_Segmento $segmentoPadrao = null,
                                                WeLearn_Usuarios_GerenciadorPrincipal $criadorPadrao = null)

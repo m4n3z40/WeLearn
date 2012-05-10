@@ -2,12 +2,19 @@
 
 class Curso extends WL_Controller {
 
+    /**
+     * @var CursoDAO
+     */
+    private $_cursoDao;
+
     public function __construct()
     {
         parent::__construct();
 
         $this->template->setTemplate('curso')
                        ->appendJSImport('curso.js');
+
+        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
     }
 
     public function index()
@@ -18,8 +25,7 @@ class Curso extends WL_Controller {
     public function exibir($id)
     {
         try {
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar(CassandraUtil::import($id)->bytes);
+            $curso = $this->_cursoDao->recuperar( $id );
 
             $dadosViewExibir = array (
                 'curso' => $curso
@@ -27,16 +33,101 @@ class Curso extends WL_Controller {
 
             $this->_renderTemplateCurso($curso, 'curso/curso/exibir', $dadosViewExibir);
         } catch (Exception $e) {
-            log_message('error', 'Erro ao exibir o curso: ' . create_exception_description($e));
+            log_message('error', 'Erro ao exibir o curso: '
+                . create_exception_description($e));
             show_404();
         }
+    }
+
+    public function inscrever($idCurso)
+    {
+        set_json_header();
+
+        try {
+            $alunoDao = WeLearn_DAO_DAOFactory::create('AlunoDAO');
+
+            $curso = $this->_cursoDao->recuperar( $idCurso );
+
+            $vinculo = $this->_cursoDao->recuperarTipoDeVinculo(
+                $this->autenticacao->getUsuarioAutenticado(),
+                $curso
+            );
+
+            if ( $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO ) {
+
+                $this->load->helper('notificacao_js');
+
+                if ( $curso->getConfiguracao()->getPrivacidadeInscricao() === WeLearn_Cursos_PermissaoCurso::RESTRITO ) {
+
+                    $alunoDao->enviarRequisicaoInscricao(
+                        $this->autenticacao->getUsuarioAutenticado(),
+                        $curso
+                    );
+
+                    $response = Zend_Json::encode(array(
+                        'atualizarPagina' => false,
+                        'notificacao' => create_notificacao_array(
+                            'sucesso',
+                            'Sua requisição para se inscrever neste curso foi enviada com sucesso aos gerenciadores!<br>
+                            Aguarde, você será notificado quando sua requisição for aceita ou recusada.'
+                        )
+                    ));
+
+                } else {
+
+                    $alunoDao->inscrever(
+                        $this->autenticacao->getUsuarioAutenticado(),
+                        $curso
+                    );
+
+                    $response = Zend_Json::encode(array(
+                        'atualizarPagina' => true,
+                        'notificacao' => false
+                    ));
+
+                    $this->session->set_flashdata(
+                        'notificacoesFlash',
+                        create_notificacao_json(
+                            'sucesso',
+                            'Sua inscrição neste curso foi efetuada com sucesso!<br>
+                            Você já pode acessar o conteúdo restrido aos alunos.'
+                        )
+                    );
+
+                }
+
+                $json = create_json_feedback(true, '', $response);
+            } else {
+                $error = create_json_feedback_error_json(
+                    'Não é possível inscrevê-lo. Você já tem um vínculo com este curso!'
+                );
+
+                $json = create_json_feedback(false, $error);
+            }
+
+        } catch (Exception $e) {
+            log_message('error', 'Ocorreu um erro ao tentar inscrever usuario no curso: '
+                . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro desconhecido, já estamos verificando. Tente novamente mais tarde.'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    public function sair($idCurso)
+    {
+
     }
 
     public function configurar($id)
     {
         try {
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar(CassandraUtil::import($id)->bytes);
+            $curso = $this->_cursoDao->recuperar( $id );
 
             $this->load->helper('area');
             $listaAreas = lista_areas_para_dados_dropdown();
@@ -272,6 +363,11 @@ class Curso extends WL_Controller {
 
     private function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null, $view = '', array $dados = null)
     {
+        $vinculo = $this->_cursoDao->recuperarTipoDeVinculo(
+            $this->autenticacao->getUsuarioAutenticado(),
+            $curso
+        );
+
         $dadosBarraEsquerda = array(
             'idCurso' => $curso->getId()
         );
@@ -281,7 +377,11 @@ class Curso extends WL_Controller {
             'imagemUrl' => ($curso->getImagem() instanceof WeLearn_Cursos_ImagemCurso)
                           ? $curso->getImagem()->getUrl()
                           : site_url($this->config->item('default_curso_img_uri')),
-            'descricao' => $curso->getDescricao()
+            'descricao' => $curso->getDescricao(),
+            'usuarioNaoVinculado' => $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO,
+            'usuarioPendente' => ($vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE
+                              || $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE),
+            'idCurso' => $curso->getId(),
         );
 
         $this->template->setDefaultPartialVar('curso/barra_lateral_esquerda', $dadosBarraEsquerda)
@@ -313,7 +413,6 @@ class Curso extends WL_Controller {
             try {
                 $segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
                 $usuarioDao  = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-                $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
 
                 $dadosNovoCurso = $this->input->post();
 
@@ -322,15 +421,15 @@ class Curso extends WL_Controller {
                 $dadosNovoCurso['criador'] = $usuarioDao->criarGerenciadorPrincipal(
                     $this->autenticacao->getUsuarioAutenticado()
                 );
-                $dadosNovoCurso['configuracao'] = $cursoDao->criarConfiguracao($dadosNovoCurso);
+                $dadosNovoCurso['configuracao'] = $this->_cursoDao->criarConfiguracao($dadosNovoCurso);
 
                 //Gerando e salvando imagem, caso houver.
                 if (isset($dadosNovoCurso['imagem']) && is_array($dadosNovoCurso['imagem'])) {
-                    $dadosNovoCurso['imagem'] = $this->_salvarImagem($dadosNovoCurso['imagem'], $cursoDao);
+                    $dadosNovoCurso['imagem'] = $this->_salvarImagem( $dadosNovoCurso['imagem'] );
                 }
 
-                $novoCurso = $cursoDao->criarNovo($dadosNovoCurso);
-                $cursoDao->salvar($novoCurso);
+                $novoCurso = $this->_cursoDao->criarNovo($dadosNovoCurso);
+                $this->_cursoDao->salvar($novoCurso);
 
                 if ($dadosNovoCurso['acao'] == 'criarFromSugestao') {
                     $sugestaoDao = WeLearn_DAO_DAOFactory::create('SugestaoCursoDAO');
@@ -369,11 +468,9 @@ class Curso extends WL_Controller {
             $json = create_json_feedback(false, validation_errors_json());
         } else {
             try {
-                $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-
                 $dadosConfig = $this->input->post();
 
-                $curso = $cursoDao->recuperar($dadosConfig['id']);
+                $curso = $this->_cursoDao->recuperar($dadosConfig['id']);
 
                 if( $curso->getSegmento()->getId() != $dadosConfig['segmento'] ) {
                     $segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
@@ -388,7 +485,7 @@ class Curso extends WL_Controller {
                         unlink($curso->getImagem()->getDiretorioCompleto());
                     }
 
-                    $dadosConfig['imagem'] = $this->_salvarImagem($dadosConfig['imagem'], $cursoDao);
+                    $dadosConfig['imagem'] = $this->_salvarImagem( $dadosConfig['imagem'] );
 
                     if ( $dadosConfig['imagem'] != null ) {
                         $dadosConfig['imagem']->setCursoId( $curso->getId() );
@@ -397,7 +494,7 @@ class Curso extends WL_Controller {
 
                 $curso->getConfiguracao()->preencherPropriedades($dadosConfig);
                 $curso->preencherPropriedades($dadosConfig);
-                $cursoDao->salvar($curso);
+                $this->_cursoDao->salvar($curso);
 
                 $notificacoesFlash = create_notificacao_json(
                     'sucesso',
@@ -419,7 +516,7 @@ class Curso extends WL_Controller {
         return $json;
     }
 
-    private function _salvarImagem($dadosImagemTemp, CursoDAO $cursoDao)
+    private function _salvarImagem($dadosImagemTemp)
     {
         $arquivoImagem = $dadosImagemTemp['id'] . $dadosImagemTemp['ext'];
         $caminhoImagemTemp = TEMP_UPLOAD_DIR . 'img/' . $arquivoImagem;
@@ -437,7 +534,7 @@ class Curso extends WL_Controller {
                 'diretorioCompleto' => $caminhoImagemCurso . $arquivoImagem
             );
 
-            return $cursoDao->criarImagem($dadosImagem);
+            return $this->_cursoDao->criarImagem($dadosImagem);
         } else {
             return null;
         }

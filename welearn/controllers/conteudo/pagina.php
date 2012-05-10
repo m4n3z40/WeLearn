@@ -8,6 +8,11 @@
  */
 class Pagina extends WL_Controller
 {
+    /**
+     * @var CursoDAO
+     */
+    var $_cursoDao;
+
     public function __construct()
     {
         parent::__construct();
@@ -15,6 +20,8 @@ class Pagina extends WL_Controller
         $this->template->setTemplate('curso')
                        ->appendJSImport('libs/tiny_mce/tiny_mce.js')
                        ->appendJSImport('pagina.js');
+
+        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
     }
 
     public function recuperar_lista( $idAula )
@@ -509,6 +516,11 @@ class Pagina extends WL_Controller
 
     private function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null, $view = '', array $dados = null)
     {
+        $vinculo = $this->_cursoDao->recuperarTipoDeVinculo(
+            $this->autenticacao->getUsuarioAutenticado(),
+            $curso
+        );
+
         $dadosBarraEsquerda = array(
             'idCurso' => $curso->getId()
         );
@@ -519,6 +531,10 @@ class Pagina extends WL_Controller
                           ? $curso->getImagem()->getUrl()
                           : site_url($this->config->item('default_curso_img_uri')),
             'descricao' => $curso->getDescricao(),
+            'usuarioNaoVinculado' => $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO,
+            'usuarioPendente' => ($vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE
+                              || $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE),
+            'idCurso' => $curso->getId(),
             'menuContexto' => $this->template->loadPartial('menu', array('idCurso'=> $curso->getId()), 'curso/conteudo')
         );
 

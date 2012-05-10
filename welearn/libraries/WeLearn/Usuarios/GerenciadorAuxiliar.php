@@ -8,7 +8,7 @@
  *
  */
 
-class WeLearn_Usuarios_GerenciadorAuxiliar extends WeLearn_Usuarios_Instrutor
+class WeLearn_Usuarios_GerenciadorAuxiliar extends WeLearn_Usuarios_Aluno
 {
-
+    protected $_nivelAcesso = WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_AUXILIAR;
 }

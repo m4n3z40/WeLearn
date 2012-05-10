@@ -47,7 +47,9 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
 
     public function __construct()
     {
-        $this->_emailUsuarioCF = WL_Phpcassa::getInstance()->getColumnFamily('usuarios_email_usuario');
+        $phpCassa = WL_Phpcassa::getInstance();
+        $this->_emailUsuarioCF = $phpCassa->getColumnFamily('usuarios_email_usuario');
+
         $this->_imagemDao = WeLearn_DAO_DAOFactory::create('ImagemUsuarioDAO');
         $this->_dadosPessoaisDao = WeLearn_DAO_DAOFactory::create('DadosPessoaisUsuarioDAO');
         $this->_dadosProfissionaisDao = WeLearn_DAO_DAOFactory::create('DadosProfissionaisUsuarioDAO');
@@ -143,26 +145,35 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperarTodos($de = null, $ate = null, array $filtros = null)
     {
-        $sql=get_instance();
-        $sql->db->like('id',$filtros['id']);
-        $sql->db->or_like('nome', $filtros['id']);
-        $sql->db->or_like('sobrenome',$filtros['id']);
-        $sql->db->or_like('email',$filtros['id']);
-        $sql->db->distinct();
-        $sql->db->select('id, nome, sobrenome');
-        $sql->db->limit($filtros['qtd'],$de);
-        $sqlData = $sql->db->get($this->_mysql_tbl_name)->result_array();
-        $idArray=array();
-        foreach ($sqlData as $row) {
-            $idArray[]=$row['id'];
+        $db = get_instance()->db;
+
+        $termo = '';
+        if ( isset( $filtros['busca'] ) ) {
+            $termo = $filtros['busca'];
         }
 
-        $arrayUsuarios= array();
-        foreach($idArray as $row)
-        {
-            $arrayUsuarios[$row]=$this->recuperar($row);
+        $count = 10;
+        if ( isset( $filtros['count'] ) ) {
+            $count = $filtros['count'];
         }
-        return $arrayUsuarios;
+
+        $db->like( 'id', $termo )
+           ->or_like( 'nome', $termo )
+           ->or_like( 'sobrenome',$termo )
+           ->or_like( 'email',$termo )
+           ->select( 'id' )
+           ->limit( $count, $de );
+
+        $sqlData = $db->get( $this->_mysql_tbl_name )->result();
+
+        $idArray = array();
+        foreach ($sqlData as $row) {
+            $idArray[] = $row->id;
+        }
+
+        $columns = $this->_cf->multiget( $idArray );
+
+        return $this->_criarVariosFromCassandra( $columns );
     }
 
     /**
@@ -171,15 +182,12 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperar($id)
     {
-        $dados_usuario = $this->_cf->get($id);
-        $dados_usuario['segmentoInteresse'] = $this->_segmentoDao->recuperar($dados_usuario['segmentoInteresse']);
+        $column = $this->_cf->get($id);
 
-        $usuario = $this->criarNovo();
-        $usuario->fromCassandra($dados_usuario);
+        $usuario = $this->_criarFromCassandra( $column );
 
-        $this->recuperarConfiguracao($usuario);
+        $this->recuperarConfiguracao( $usuario );
 
-        $usuario->setPersistido(true);
         return $usuario;
     }
 
@@ -224,7 +232,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperarQtdTotal($de = null, $ate = null)
     {
-        // TODO: Implement recuperarQtdTotal() method.
+        return get_instance()->db->count_all( $this->_mysql_tbl_name );
     }
 
     /**
@@ -281,34 +289,6 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         }
 
         return new WeLearn_Usuarios_GerenciadorAuxiliar($dados);
-    }
-
-    /**
-     * @param $dados
-     * @return WeLearn_Usuarios_Moderador
-     */
-    public function criarModerador($dados)
-    {
-        if ($dados instanceof WeLearn_Usuarios_Usuario) {
-            $dados = $this->_extrairDadosUsuarioParaArray($dados);
-            return new WeLearn_Usuarios_Moderador($dados);
-        }
-
-        return new WeLearn_Usuarios_Moderador($dados);
-    }
-
-    /**
-     * @param $dados
-     * @return WeLearn_Usuarios_Instrutor
-     */
-    public function criarInstrutor($dados)
-    {
-        if ($dados instanceof WeLearn_Usuarios_Usuario) {
-            $dados = $this->_extrairDadosUsuarioParaArray($dados);
-            return new WeLearn_Usuarios_Instrutor($dados);
-        }
-
-        return new WeLearn_Usuarios_Instrutor($dados);
     }
 
     /**
@@ -424,6 +404,38 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     public function getSegmentoDao()
     {
         return $this->_segmentoDao;
+    }
+
+    /**
+     * @param $column
+     * @return WeLearn_DTO_IDTO
+     */
+    protected function _criarFromCassandra( $column )
+    {
+        $column['segmentoInteresse'] = $this->_segmentoDao->recuperar(
+            $column['segmentoInteresse']
+        );
+
+        $usuario = $this->criarNovo();
+
+        $usuario->fromCassandra( $column );
+
+        return $usuario;
+    }
+
+    /**
+     * @param $columns
+     * @return array
+     */
+    protected function _criarVariosFromCassandra( $columns )
+    {
+        $listaUsuarios = array();
+
+        foreach ($columns as $column) {
+            $listaUsuarios[] = $this->_criarFromCassandra( $column );
+        }
+
+        return $listaUsuarios;
     }
 
     /**

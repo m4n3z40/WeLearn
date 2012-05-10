@@ -5,12 +5,19 @@ class Recurso extends WL_Controller
     private $_tempRecursoDir;
     private $_recursoArquivosDir;
 
+    /**
+     * @var CursoDAO
+     */
+    var $_cursoDao;
+
     public function __construct()
     {
         parent::__construct();
 
         $this->template->appendJSImport('recurso.js')
                        ->setTemplate('curso');
+
+        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
 
         $this->_tempRecursoDir = TEMP_UPLOAD_DIR . 'recursos/';
         $this->_recursoArquivosDir = CURSOS_FILES_DIR . 'recursos/';
@@ -19,8 +26,7 @@ class Recurso extends WL_Controller
     public function index ($idCurso)
     {
         try {
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar($idCurso);
+            $curso = $this->_cursoDao->recuperar($idCurso);
 
             $dadosView = array(
                 'idCurso' => $curso->getId()
@@ -40,8 +46,7 @@ class Recurso extends WL_Controller
         try {
             $count = 20;
 
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar($idCurso);
+            $curso = $this->_cursoDao->recuperar($idCurso);
 
             $recursoDao = WeLearn_DAO_DAOFactory::create('RecursoDAO');
 
@@ -90,8 +95,7 @@ class Recurso extends WL_Controller
     public function restrito ($idCurso)
     {
         try {
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar($idCurso);
+            $curso = $this->_cursoDao->recuperar($idCurso);
 
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             try {
@@ -270,8 +274,7 @@ class Recurso extends WL_Controller
 
                 } else {
 
-                    $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-                    $curso = $cursoDao->recuperar( $idParent );
+                    $curso = $this->_cursoDao->recuperar( $idParent );
 
                     $listaRecursos = $recursoDao->recuperarTodosGerais($curso,
                                                                        $idInicio,
@@ -317,8 +320,7 @@ class Recurso extends WL_Controller
     public function criar ($idCurso)
     {
         try {
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar( $idCurso );
+            $curso = $this->_cursoDao->recuperar( $idCurso );
 
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             try {
@@ -639,8 +641,7 @@ class Recurso extends WL_Controller
 
         } else {
 
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-            $curso = $cursoDao->recuperar( $post['cursoId'] );
+            $curso = $this->_cursoDao->recuperar( $post['cursoId'] );
 
             $recurso = $recursoDao->criarNovoGeral();
             $recurso->setCurso( $curso );
@@ -722,6 +723,11 @@ class Recurso extends WL_Controller
 
     private function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null, $view = '', array $dados = null)
     {
+        $vinculo = $this->_cursoDao->recuperarTipoDeVinculo(
+            $this->autenticacao->getUsuarioAutenticado(),
+            $curso
+        );
+
         $dadosBarraEsquerda = array(
             'idCurso' => $curso->getId()
         );
@@ -732,6 +738,9 @@ class Recurso extends WL_Controller
                           ? $curso->getImagem()->getUrl()
                           : site_url($this->config->item('default_curso_img_uri')),
             'descricao' => $curso->getDescricao(),
+            'usuarioNaoVinculado' => $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO,
+            'usuarioPendente' => ($vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE
+                              || $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE),
             'menuContexto' => $this->template->loadPartial('menu', array('idCurso'=> $curso->getId()), 'curso/conteudo')
         );
 

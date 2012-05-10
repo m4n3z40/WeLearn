@@ -497,6 +497,48 @@ and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
+create column family cursos_usuario_por_curso
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'IntegerType'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_aluno_por_curso
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_gerenciador_por_curso
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_inscricao_por_curso
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family cursos_curso_por_aluno
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
+create column family cursos_curso_por_gerenciador
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
+create column family cursos_curso_por_inscricao
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
 create column family contadores_timeuuid
 with comparator = 'TimeUUIDType'
 and column_type = 'Standard'
