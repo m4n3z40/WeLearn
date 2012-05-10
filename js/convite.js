@@ -67,49 +67,48 @@
     );
 
 
+    function removerConvite(url)
+    {
+        $.post(
+            WeLearn.url.siteURL(url),
+            function(result) {
+                location.reload();
+            },
+            'json'
+        );
+    }
+
+    function aceitarConvite(url)
+    {
+        $.post(
+            WeLearn.url.siteURL(url),
+            function(result){
+                location.reload();
+            },'json'
+        );
+    }
 
     $('.remover-convite').live('click',
         function(e)
         {
             var idConvite = $(this).parent().children('.id-convite').val();
+            var idRemetente =$(this).parent().children('.id-remetente').val();
+            var idDestinatario=$(this).parent().children('.id-destinatario').val();
             var url = $(this).attr('href');
-            url+='/'+idConvite;
-            var convite=$('#'+idConvite);
+            url+='/'+idConvite+'/'+idRemetente+'/'+idDestinatario;
             e.preventDefault();
-            $.post(
-                WeLearn.url.siteURL(url),
-                function(result) {
-                    if (result.success) {
-                        convite.remove();
-                        WeLearn.notificar(result.notificacao);
-                    } else {
-                        WeLearn.notificar(result.notificacao);
-                    }
-                },
-                'json'
-            );
-
-
+            removerConvite(url);
         }
     );
 
     $('.aceitar-convite').live('click',function(e){
         e.preventDefault();
         var idConvite = $(this).parent().children('.id-convite').val();
+        var idRemetente =$(this).parent().children('.id-remetente').val();
+        var idDestinatario=$(this).parent().children('.id-destinatario').val();;
         var url = $(this).attr('href');
-        url+='/'+idConvite;
-        var convite=$('#'+idConvite);
-        $.post(
-            WeLearn.url.siteURL(url),
-            function(result){
-                if(result.success){
-                    convite.remove();
-                    WeLearn.notificar(result.notificacao);
-                } else {
-                    WeLearn.notificar(result.notificacao);
-                }
-            },'json'
-        );
+        url+='/'+idConvite+'/'+idRemetente+'/'+idDestinatario;
+        aceitarConvite(url);
     });
 
     $('#exibir-convite-pendente').click(
@@ -122,6 +121,17 @@
     );
 
 
+
+
+
+var param = $('.param-tipo-convite').val();
+var idConvite = $('#id-convite').val();
+var idRemetente=$('#id-remetente').val();
+var idDestinatario=$('#id-destinatario').val();
+
+
+
+if(param=='enviado'){
     $('#container-convite-pendente').dialog(
         {
             autoOpen: false,
@@ -129,11 +139,38 @@
             width: 400,
             height: 170,
             buttons: {
-                "cancelar requisicao": function() {
+                "Cancelar Requisicao": function() {
+                    var url='/convite/remover/'+idConvite+'/'+idRemetente+'/'+idDestinatario;
+                    removerConvite(url);
                     $( this ).dialog( "close" );
                 }
             }
         }
     );
+
+
+}else{
+    $('#container-convite-pendente').dialog(
+        {
+            autoOpen: false,
+            show: "blind",
+            width: 400,
+            height: 170,
+            buttons: {
+                "Cancelar Requisicao": function() {
+                    var url='/convite/remover/'+idConvite+'/'+idRemetente+'/'+idDestinatario;
+                    removerConvite(url);
+                    $( this ).dialog( "close" );
+                },
+                "Aceitar Requisicao": function(){
+                    var url='/convite/aceitar/'+idConvite+'/'+idRemetente+'/'+idDestinatario;
+                    aceitarConvite(url);
+                    $( this ).dialog( "close" );
+                }
+            }
+        }
+    );
+}
+
 
 })();

@@ -3,8 +3,8 @@
 <?php foreach ($convites as $row):?>
     <li id='<?=$row->getId();?>'>
         <input type='hidden' class='id-convite' value='<?=$row->getId();?>'>
-        <input type='hidden' class= 'remetente' value='<?=$row->getRemetente()->getId();?>'>
-        <input type='hidden' class= 'destinatario' value='<?=$row->getDestinatario()->getId();?>'><?=$row->getDestinatario()->getId();?>
+        <input type='hidden' class= 'id-remetente' value='<?=$row->getRemetente()->getId();?>'>
+        <input type='hidden' class= 'id-destinatario' value='<?=$row->getDestinatario()->getId();?>'><?=$row->getDestinatario()->getId();?>
         <div class='mensagem'><?=$row->getMsgConvite();?></div>
         <div class='data'><?=date('d/m/Y à\s H:i',$row->getDataEnvio());?></div>
         <?=anchor('/convite/remover','cancelar',array('class'=>'remover-convite'))?>
@@ -15,8 +15,8 @@
 <?php foreach ($convites as $row):?>
     <li id='<?=$row->getId();?>'>
         <input type='hidden' class='id-convite' value='<?=$row->getId();?>'>
-        <input type='hidden' class= 'remetente' value='<?=$row->getRemetente()->getId();?>'><?=$row->getRemetente()->getId();?>
-        <input type='hidden' class= 'destinatario' value='<?=$row->getDestinatario()->getId();?>'>
+        <input type='hidden' class= 'id-remetente' value='<?=$row->getRemetente()->getId();?>'><?=$row->getRemetente()->getId();?>
+        <input type='hidden' class= 'id-destinatario' value='<?=$row->getDestinatario()->getId();?>'>
         <div class='mensagem'><?=$row->getMsgConvite();?></div>
         <div class='data'><?=date('d/m/Y à\s H:i',$row->getDataEnvio());?></div>
         <?=anchor('/convite/aceitar','aceitar',array('class'=>'aceitar-convite'))?>

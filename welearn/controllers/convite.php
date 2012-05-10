@@ -175,35 +175,58 @@ Tente novamente mais tarde.'
 
 
 
-    public function remover($idConvite)
+    public function remover($idConvite,$idRemetente,$idDestinatario)
     {
         $this->load->helper('notificacao_js');
         try{
             $conviteCadastradoDao=WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
             $conviteRemovido=$conviteCadastradoDao->remover($idConvite);
-
             $amizadeDao=WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
             $amizadeObj=$amizadeDao->criarNovo();
             $amizadeObj->setUsuario( $conviteRemovido->getDestinatario() );
             $amizadeObj->setAmigo( $conviteRemovido->getRemetente());
             $idAmizade=$amizadeDao->gerarIdAmizade($amizadeObj->getUsuario(),$amizadeObj->getAmigo());
             $amizadeRemovida=$amizadeDao->remover($idAmizade);
-            $result= array('success'=>true,'notificacao'=> create_notificacao_array(
+            $result= array('success'=>true);
+
+            $notificacoesFlash = create_notificacao_json(
                 'sucesso',
-                'convite removido'
-            ));
+                'Convite Removido com sucesso!'
+            );
+
+
         }catch(cassandra_NotFoundException $e)
         {
-            $result=array('success'=>false,'notificacao'=> create_notificacao_array(
-                'erro',
-                'falha ao remover convite'
-            ));
+            $amizadeDao=WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+            $usuarioDao=WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+            $Remetente=$usuarioDao->recuperar($idRemetente);
+            $Destinatario=$usuarioDao->recuperar($idDestinatario);
+            $amizadeObj=$amizadeDao->criarNovo();
+            $amizadeObj->setUsuario( $Destinatario);
+            $amizadeObj->setAmigo( $Remetente);
+            $saoAmigos=$amizadeDao->saoAmigos($amizadeObj->getUsuario(),$amizadeObj->getAmigo());
+
+            if($saoAmigos== WeLearn_Usuarios_StatusAmizade::AMIGOS)
+            {
+                $result= array('success'=>false,'amigos'=>true);
+                $notificacoesFlash = create_notificacao_json(
+                    'erro',
+                    'O Convite Já foi Aceito Pelo Outro Usuario'
+                );
+            }else{
+                $result= array('success'=>false,'amigos'=>false);
+                $notificacoesFlash = create_notificacao_json(
+                    'erro',
+                    'O Convite Já Foi Removido Pelo Outro Usuario'
+                );
+            }
 
         }
+        $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
         echo Zend_Json::encode($result);
     }
 
-    public function aceitar($idConvite){
+    public function aceitar($idConvite,$idRemetente,$idDestinatario){
        $this->load->helper('notificacao_js');
        try{
            $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
@@ -214,17 +237,38 @@ Tente novamente mais tarde.'
            $amizadeObj->setPersistido(true);
            $amizadeObj->setStatus(WeLearn_Usuarios_StatusAmizade::AMIGOS);
            $amizadeDao->salvar($amizadeObj);
-           $result= array('success'=>true,'notificacao'=> create_notificacao_array(
+           $result= array('success'=>true);
+           $notificacoesFlash = create_notificacao_json(
                'sucesso',
-               'convite aceito'
-           ));
+               'Convite Aceito!'
+           );
 
        }catch(cassandra_NotFoundException $e){
-           $result=array('success'=>false,'notificacao'=> create_notificacao_array(
-               'erro',
-               'falha ao aceitar convite'
-           ));
+           $amizadeDao=WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+           $usuarioDao=WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+           $Remetente=$usuarioDao->recuperar($idRemetente);
+           $Destinatario=$usuarioDao->recuperar($idDestinatario);
+           $amizadeObj=$amizadeDao->criarNovo();
+           $amizadeObj->setUsuario( $Destinatario);
+           $amizadeObj->setAmigo( $Remetente);
+           $saoAmigos=$amizadeDao->saoAmigos($amizadeObj->getUsuario(),$amizadeObj->getAmigo());
+
+           if($saoAmigos== WeLearn_Usuarios_StatusAmizade::AMIGOS)
+           {
+               $result= array('success'=>false,'amigos'=>true);
+               $notificacoesFlash = create_notificacao_json(
+                   'erro',
+                   'O Convite Já foi Aceito Pelo Outro Usuario'
+               );
+           }else{
+               $result= array('success'=>false,'amigos'=>false);
+               $notificacoesFlash = create_notificacao_json(
+                   'erro',
+                   'O Convite Foi Removido Pelo Outro Usuario'
+               );
+           }
        }
+        $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
         echo Zend_Json::encode($result);
     }
 
