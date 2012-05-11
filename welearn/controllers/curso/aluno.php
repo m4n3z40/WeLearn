@@ -21,6 +21,12 @@ class Aluno extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar( $idCurso );
 
+            try {
+
+            } catch (cassandra_NotFoundException $e) {
+                
+            }
+
             $dadosView = array(
 
             );
