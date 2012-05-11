@@ -399,7 +399,7 @@ class WeLearn_Cursos_Recursos_Recurso extends WeLearn_DTO_AbstractDTO
             'dataInclusao' => $this->getDataInclusao(),
             'url' => $this->getUrl(),
             'criador' => ($this->_criador instanceof WeLearn_Usuarios_Usuario)
-                             ? $this->getCriador()->getId() : '',
+                             ? $this->getCriador()->toArray() : '',
             'tipo' => $this->getTipo(),
             'extensao' => $this->getExtensao(),
             'assinatura' => $this->getAssinatura(),
@@ -417,11 +417,26 @@ class WeLearn_Cursos_Recursos_Recurso extends WeLearn_DTO_AbstractDTO
 
     public function toCassandra()
     {
-        $selfArray = $this->toArray();
-
-        unset( $selfArray['persistido'] );
-
-        return $selfArray;
+        return array(
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'descricao' => $this->getDescricao(),
+            'dataInclusao' => $this->getDataInclusao(),
+            'url' => $this->getUrl(),
+            'criador' => ($this->_criador instanceof WeLearn_Usuarios_Usuario)
+                             ? $this->getCriador()->getId() : '',
+            'tipo' => $this->getTipo(),
+            'extensao' => $this->getExtensao(),
+            'assinatura' => $this->getAssinatura(),
+            'caminho' => $this->getCaminho(),
+            'caminhoCompleto' => $this->getCaminhoCompleto(),
+            'mimeType' => $this->getMimeType(),
+            'tamanho' => $this->getTamanho(),
+            'isImagem' => $this->isImagem(),
+            'alturaImagem' => $this->getAlturaImagem(),
+            'larguraImagem' => $this->getLarguraImagem(),
+            'tipoImagem' => $this->getTipoImagem()
+        );
     }
 
     public function preencherPropriedades(array $dados = null)

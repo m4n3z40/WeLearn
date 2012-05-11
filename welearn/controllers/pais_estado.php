@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Pais_estado extends CI_Controller {
+class Pais_estado extends WL_Controller {
     /**
      * Construtor carrega configurações da classes base CI_Controller
      * (Resolve bug ao utilizar this->load)
@@ -12,13 +12,7 @@ class Pais_estado extends CI_Controller {
 
     public function index()
     {
-        echo '<pre>';
-        $this->load->model('PaisEstadoDAO');
-
-        $estados = $this->PaisEstadoDAO->recuperarEstadosDeUmPaisSimplificado('BR');
-
-        var_dump($estados);
-        echo '</pre>';
+        $this->_renderTemplate();
     }
 
     public function recuperar_lista_estados($pais = '')

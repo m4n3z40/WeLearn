@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Certificado extends WL_Controller
+class Certificado extends Curso_Controller
 {
     private $_tempCertificadosDir;
     private $_certificadosArquivosDir;
@@ -10,10 +10,7 @@ class Certificado extends WL_Controller
     {
         parent::__construct();
 
-        $this->template->setTemplate('curso')
-                       ->appendJSImport('certificado.js');
-
-        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+        $this->template->appendJSImport('certificado.js');
 
         $this->_tempCertificadosDir = TEMP_UPLOAD_DIR . 'certificados/';
         $this->_certificadosArquivosDir = CURSOS_FILES_DIR . 'certificados/';
@@ -478,35 +475,5 @@ class Certificado extends WL_Controller
         ));
 
         return create_json_feedback(true, '', $response);
-    }
-
-    private function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null,
-                                          $view = '',
-                                          array $dados = null)
-    {
-        $vinculo = $this->_cursoDao->recuperarTipoDeVinculo(
-            $this->autenticacao->getUsuarioAutenticado(),
-            $curso
-        );
-
-        $dadosBarraEsquerda = array(
-            'idCurso' => $curso->getId()
-        );
-
-        $dadosBarraDireita = array(
-            'nome' => $curso->getNome(),
-            'imagemUrl' => ($curso->getImagem() instanceof WeLearn_Cursos_ImagemCurso)
-                          ? $curso->getImagem()->getUrl()
-                          : site_url($this->config->item('default_curso_img_uri')),
-            'descricao' => $curso->getDescricao(),
-            'usuarioNaoVinculado' => $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO,
-            'usuarioPendente' => ($vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE
-                              || $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE),
-            'idCurso' => $curso->getId(),
-        );
-
-        $this->template->setDefaultPartialVar('curso/barra_lateral_esquerda', $dadosBarraEsquerda)
-                       ->setDefaultPartialVar('curso/barra_lateral_direita', $dadosBarraDireita)
-                       ->render($view, $dados);
     }
 }

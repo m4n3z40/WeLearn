@@ -6,7 +6,7 @@
  * Time: 09:51
  * To change this template use File | Settings | File Templates.
  */
-class Teste extends CI_Controller
+class Teste extends WL_Controller
 {
 
     function __construct()

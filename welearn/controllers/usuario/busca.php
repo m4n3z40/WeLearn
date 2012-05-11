@@ -6,7 +6,7 @@
  * Time: 18:30
  * To change this template use File | Settings | File Templates.
  */
-class busca extends WL_Controller
+class busca extends Home_Controller
 {
     function __construct()
     {
@@ -52,7 +52,6 @@ class busca extends WL_Controller
             'success' => $success
         );
 
-        $this->template->setTemplate('home');
         $this->_renderTemplateHome('usuario/home/busca/listar', $dadosView);
     }
 
@@ -98,28 +97,4 @@ class busca extends WL_Controller
         echo $json;
 
     }
-
-    private function _renderTemplateHome($view = '', $dados = array())
-    {
-        $dadosBarraEsquerda = array(
-            'usuario' => $this->autenticacao->getUsuarioAutenticado()
-        );
-
-        $dadosBarraDireita = array(
-
-        );
-
-        $this->template
-            ->setDefaultPartialVar(
-            'perfil/barra_usuario',
-            array(
-                'nomeUsuario' =>  $this->autenticacao->getUsuarioAutenticado()->getNomeUsuario()
-            )
-        )
-            ->setDefaultPartialVar('home/barra_lateral_esquerda', $dadosBarraEsquerda)
-            ->setDefaultPartialVar('home/barra_lateral_direita', $dadosBarraDireita)
-            ->render($view, $dados);
-    }
-
-
 }

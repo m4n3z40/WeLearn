@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Segmento extends CI_Controller {
+class Segmento extends WL_Controller {
 
     /**
      * Construtor carrega configurações da classes base CI_Controller
@@ -13,7 +13,7 @@ class Segmento extends CI_Controller {
 
 	public function index()
 	{
-		$this->template->render();
+		$this->_renderTemplate();
     }
 
     public function adicionar()
