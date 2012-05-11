@@ -10,7 +10,7 @@ class Perfil extends Perfil_Controller {
     {
         parent::__construct();
 
-        $this->template->appendJSImport('convite.js');
+        $this->template->appendJSImport('perfil.js');
     }
 
     public function index($id)

@@ -25,3 +25,12 @@
     <?php endforeach;?>
 <?php endif;?>
 
+
+<div id="remover-convite" title="Remover Convite" style="display: none;">
+    Você Tem Certeza Que Deseja Remover Este Convite?
+</div>
+
+<div id="confirmar-amizade" title="Aceitar Convite" style="display: none;">
+    Você Tem Certeza Que Deseja Aceitar Este Convite?
+</div>
+
