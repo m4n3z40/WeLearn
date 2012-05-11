@@ -18,7 +18,7 @@
                     if(res.paginacao.proxima_pagina) {
                         $('#id-prox-pagina').val(res.paginacao.inicio_proxima_pagina);
                     } else {
-                        $('#paginacaoMensagem').parent().html('<h4>Não há mais mensagens a serem exibida.</h4>');
+                        $('#paginacaoMensagem').parent().html('<h4>Não há mais mensagens à serem exibida.</h4>');
                         $('#paginacaoMensagem').remove();
                     }
                 }else {
@@ -43,19 +43,20 @@
                 if(res.success==true)
                 {
                     $('#mensagem-lista-mensagens').append(
-                                                            '<li class="item-lista-mensagem">'+
-                                                            '<input type="hidden" id="id-mensagem" value="'
-                                                             +res.mensagemId+'">'+
-                                                            '<div class="imagem-remetente">imagem remetente</div>'+
-                                                            '<div class="id-remetente">'+res.remetenteId+'</div>'+
-                                                            '<div class="mensagem-texto">'+res.mensagemTexto+'</div>'+
-                                                            '<div class="data-envio">'+res.dataEnvio+'</div>'+
-                                                            '<a href="usuario/mensagem/remover" class="remover-mensagem">'
-                                                             +'remover</a>'+
-                                                            '</li>'+
-                                                            '</div>'
+                        '<li class="item-lista-mensagem">'+
+                            '<input type="hidden" id="id-mensagem" value="'
+                            +res.mensagemId+'">'+
+                            '<div class="imagem-remetente">imagem remetente</div>'+
+                            '<div class="id-remetente">'+res.remetenteId+'</div>'+
+                            '<div class="mensagem-texto">'+res.mensagemTexto+'</div>'+
+                            '<div class="data-envio">'+res.dataEnvio+'</div>'+
+                            '<a href="usuario/mensagem/remover" class="remover-mensagem">'
+                            +'remover</a>'+
+                            '</li>'+
+                            '</div>'
                     );
                     $('#txt-mensagem').val('');
+                    WeLearn.notificar(res.notificacao);
                 }
             }
         );
@@ -63,19 +64,19 @@
     });
 
     $('.remover-mensagem').live('click', function(e) {
-        e.preventDefault();
 
+        e.preventDefault();
         var url=$(this).attr('href');
         var mensagem=$(this).parent();// elemento item-lista-mensagem a ser removido
         var idMensagem=$(this).parent().children('#id-mensagem').val();
         var idAmigo=$('#id-amigo-mensagens').val();
         url+='/'+idMensagem;
-        url+='/'+idAmigo;
+        alert(url);
         $.post(
             WeLearn.url.siteURL(url),
             function(result) {
                 if (result.success) {
-                   mensagem.remove();
+                    mensagem.remove();
                 } else {
                     alert('erro ao executar operação');
                 }
@@ -84,5 +85,7 @@
         );
 
     });
+
+
 
 })();

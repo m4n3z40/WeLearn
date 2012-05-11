@@ -17,14 +17,26 @@ class Perfil extends Perfil_Controller {
     {
         $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
         $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+        $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
         $usuarioAutenticado=$this->autenticacao->getUsuarioAutenticado();
         $usuarioPerfil=$usuarioDao->recuperar($id);
         $saoAmigos=$amizadeUsuarioDao->SaoAmigos($usuarioAutenticado,$usuarioPerfil);
 
-        $dados=array('id' => $usuarioPerfil->getId(), 'nome' => $usuarioPerfil->getNome(),
-                     'sobrenome' => $usuarioPerfil->getSobrenome(), 'email' => $usuarioPerfil->getEmail(),
-                     'saoAmigos' => $saoAmigos
-                    );
+        $dados=array('usuarioPerfil' => $usuarioPerfil,'usuarioAutenticado' => $usuarioAutenticado,
+            'saoAmigos' => $saoAmigos
+        );
+
+        if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
+        {
+                $convitePendente = $conviteCadastradoDao->recuperarPendentes($usuarioAutenticado,$usuarioPerfil);
+                $partialExibirConvite = $this->template->loadPartial(
+                    'exibicao_convite',
+                    array( 'convite_pendente' => $convitePendente,'usuarioAutenticado' => $usuarioAutenticado),
+                    'usuario/convite'
+                );
+                $dados['partialConvitePendente']=$partialExibirConvite;
+        }
+
         $this->_renderTemplatePerfil('usuario/perfil/index',$dados);
     }
 }

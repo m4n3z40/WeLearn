@@ -164,18 +164,18 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
     }
 
     private function _criarFromCassandra(array $column,
-                                         WeLearn_Usuarios_Usuario $usuarioPadrao = null,
-                                         WeLearn_Usuarios_Usuario $amigoPadrao = null)
+                                         WeLearn_Usuarios_Usuario $remetentePadrao = null,
+                                         WeLearn_Usuarios_Usuario $destinatariooPadrao = null)
     {
-        if($column['remetente'])
-            $column['remetente'] = ($usuarioPadrao instanceof WeLearn_Usuarios_Usuario)
-                ? $usuarioPadrao
-                : $this->_usuarioDao->recuperar($column['remetente']);
+        // verifica qual usuario é o remetente
+        if($column['remetente']==$remetentePadrao->getId()){
+            $column['remetente']=$remetentePadrao;
+            $column['destinatario']=$destinatariooPadrao;
+        }else{
+            $column['remetente']=$destinatariooPadrao;
+            $column['destinatario']=$remetentePadrao;
+        }
 
-        if($column['destinatario'])
-            $column['destinatario'] = ($amigoPadrao instanceof WeLearn_Usuarios_Usuario)
-                ? $amigoPadrao
-                : $this->_usuarioDao->recuperar($column['destinatario']);
         $mensagem = $this->criarNovo();
         $mensagem->fromCassandra($column);
 

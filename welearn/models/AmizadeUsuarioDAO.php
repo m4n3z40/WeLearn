@@ -6,7 +6,7 @@
  * Time: 09:22
  * To change this template use File | Settings | File Templates.
  */
- 
+
 class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
 {
     protected $_nomeCF = 'usuarios_amizade';
@@ -29,8 +29,6 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
 
     function __construct()
     {
-
-
         $phpCassa = WL_Phpcassa::getInstance();
 
         $this->_amizadeAmigosCF = $phpCassa->getColumnFamily($this->_nomeAmizadeAmigos);
@@ -48,7 +46,6 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
     public function recuperar($id)
     {
         $column = $this->_cf->get($id);
-
         return $this->_criarFromCassandra($column);
     }
 
@@ -109,11 +106,11 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
 
         $idsAmigos = array_keys(
             $this->_amizadeAmigosCF->get($usuario->getId(),
-                                         null,
-                                         $de,
-                                         $ate,
-                                         false,
-                                         $count)
+                null,
+                $de,
+                $ate,
+                false,
+                $count)
         );
 
         return $this->_recuperarUsuariosPorIds($idsAmigos);
@@ -130,11 +127,11 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
 
         $idsAmigos = array_values(
             $this->_amizadeAmigosPorDataCF->get($usuario->getId(),
-                                                null,
-                                                $de,
-                                                $ate,
-                                                true,
-                                                $count)
+                null,
+                $de,
+                $ate,
+                true,
+                $count)
         );
 
         return $this->_recuperarUsuariosPorIds($idsAmigos);
@@ -151,11 +148,11 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
 
         $idsAmigos = array_keys(
             $this->_amizadeRequisicoesCF->get($usuario->getId(),
-                                              null,
-                                              $de,
-                                              $ate,
-                                              false,
-                                              $count)
+                null,
+                $de,
+                $ate,
+                false,
+                $count)
         );
 
         return $this->_recuperarUsuariosPorIds($idsAmigos);
@@ -172,11 +169,11 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
 
         $idsAmigos = array_values(
             $this->_amizadeRequisicoesPorDataCF->get($usuario->getId(),
-                                                     null,
-                                                     $de,
-                                                     $ate,
-                                                     true,
-                                                     $count)
+                null,
+                $de,
+                $ate,
+                true,
+                $count)
         );
 
         return $this->_recuperarUsuariosPorIds($idsAmigos);
@@ -211,7 +208,6 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
         $column = $this->_cf->get($id);
         $timeUUID = CassandraUtil::import($column['timeUUID'])->bytes;
         $amizadeRemovida = $this->_criarFromCassandra($column);
-
         $this->_cf->remove($id);
 
         if ($amizadeRemovida->getStatus() === WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA) {
@@ -220,10 +216,20 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
                 array($amizadeRemovida->getAmigo()->getId())
             );
 
+            $this->_amizadeRequisicoesCF->remove($amizadeRemovida->getAmigo()->getId(),
+                array($amizadeRemovida->getUsuario()->getId())
+            );
+
             $this->_amizadeRequisicoesPorDataCF->remove(
                 $amizadeRemovida->getUsuario()->getId(),
                 array($timeUUID)
             );
+
+            $this->_amizadeRequisicoesPorDataCF->remove(
+                $amizadeRemovida->getAmigo()->getId(),
+                array($timeUUID)
+            );
+
         } else {
             $this->_amizadeAmigosCF->remove(
                 $amizadeRemovida->getUsuario()->getId(),
@@ -259,6 +265,9 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _atualizar(WeLearn_DTO_IDTO $dto)
     {
+        //echo $dto->getStatus();
+        //echo    'atualizando';
+
         $idAmizade = $this->gerarIdAmizade($dto->getUsuario(), $dto->getAmigo());
 
         $statusArray = $this->_cf->get($idAmizade, array('status','timeUUID'));
@@ -310,6 +319,7 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
                 );
             }
         }
+
     }
 
     /**
@@ -318,11 +328,9 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
-        $idAmizade = $this->gerarIdAmizade($dto->getUsuario(), $dto->getAmigo());
-
         $amizadeColumns = $dto->toCassandra();
 
-        $this->_cf->insert($idAmizade, $amizadeColumns);
+        $this->_cf->insert($amizadeColumns['id'], $amizadeColumns);
 
         $timeUUID = CassandraUtil::import($amizadeColumns['timeUUID'])->bytes;
 
@@ -334,16 +342,6 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
         $this->_amizadeRequisicoesPorDataCF->insert(
             $dto->getUsuario()->getId(),
             array($timeUUID => $dto->getAmigo()->getId() )
-        );
-
-        $this->_amizadeAmigosCF->insert(
-            $dto->getUsuario()->getId(),
-            array($dto->getAmigo()->getId() => '')
-        );
-
-        $this->_amizadeAmigosPorDataCF->insert(
-            $dto->getUsuario()->getId(),
-            array($timeUUID => $dto->getAmigo()->getId())
         );
 
         $dto->setPersistido(true);
