@@ -7,134 +7,74 @@
  */
 (function(){
 
-//////////////////////////////////////////////acoes de convite perfil////////////////////////////
 
-    $( "#convite-form" ).dialog({
-        autoOpen: false,
-        show: "blind",
-        width: 400,
-        height: 170
-    });
+    var idConvite;
+    var idRemetente;
+    var idDestinatario;
+    var convite;
+    var tipoView;
+    var url;
 
-
-    // exibir formulario de convite
-    $( "#enviar-convite" ).click(function(e) {
-        e.preventDefault();
-        $( "#convite-form" ).dialog( "open");
-        return false;
-    });
-
-    // enviar convite
-    var formpost=document.getElementById('form-enviar-convite');
-    $('#btn-form-convite').click(function(e){
-        e.preventDefault();
-        WeLearn.validarForm(formpost,
-            $(formpost).attr('action'),
-            function(res)
-            {
-                if(res.success)
-                {
-                    if(res.amigos)
-                    {
-                        $('#convite-form').dialog("close");
-                        window.location = WeLearn.url.siteURL('convite/index/recebidos');
-                    }else{
-                        $('#convite-form').dialog("close");
-                        location.reload();
-                    }
-
-                }
-
-            }
-        )});
-
-    $('#exibir-convite-pendente').click(
-        function(e)
+    $('#remover-convite').dialog(
         {
-            e.preventDefault();
-            $( "#container-convite-pendente" ).dialog( "open");
-            return false;
+            autoOpen: false,
+            show: "blind",
+            modal:true,
+            width: 400,
+            height: 170,
+            buttons: {
+                "Confirmar": function() {
+                        $.post(
+                            WeLearn.url.siteURL(url),
+                            function(result) {
+                                if (result.success) {
+                                    convite.remove();
+                                    WeLearn.notificar(result.notificacao);
+                                } else {
+                                    WeLearn.notificar(result.notificacao);
+                                }
+                            },
+                            'json'
+                        );
+                        $(this).dialog("close");
+                },
+                "Cancelar": function(){
+                    $(this).dialog("close");
+                }
+            }
         }
     );
 
 
 
-
-
-    var param = $('.param-tipo-convite').val();
-    var idConvite = $('#id-convite').val();
-    var idRemetente=$('#id-remetente').val();
-    var idDestinatario=$('#id-destinatario').val();
-
-
-
-    if(param=='enviado'){
-        $('#container-convite-pendente').dialog(
-            {
-                autoOpen: false,
-                show: "blind",
-                width: 400,
-                height: 170,
-                buttons: {
-                    "Cancelar Requisicao": function() {
-                        var tipoView='perfil';
-                        var url='/convite/remover/'+idConvite+'/'+idRemetente+'/'+idDestinatario+'/'+tipoView;
-                        $.post(
-                            WeLearn.url.siteURL(url),
-                            function(result) {
-                                location.reload();
-                            },
-                            'json'
-                        );
-                        $( this ).dialog( "close" );
-                    }
+    $('#confirmar-amizade').dialog(
+        {
+            autoOpen: false,
+            show: "blind",
+            modal:true,
+            width: 400,
+            height: 170,
+            buttons: {
+                "Confirmar": function() {
+                    $.post(
+                        WeLearn.url.siteURL(url),
+                        function(result){
+                            if(result.success){
+                                convite.remove();
+                                WeLearn.notificar(result.notificacao);
+                            } else {
+                                WeLearn.notificar(result.notificacao);
+                            }
+                        },'json'
+                    );
+                    $(this).dialog("close");
+                },
+                "Cancelar": function(){
+                    $(this).dialog("close");
                 }
             }
-        );
-
-
-    }else{
-        $('#container-convite-pendente').dialog(
-            {
-                autoOpen: false,
-                show: "blind",
-                width: 400,
-                height: 170,
-                buttons: {
-                    "Cancelar Requisicao": function() {
-                        var tipoView='perfil';
-                        var url='/convite/remover/'+idConvite+'/'+idRemetente+'/'+idDestinatario+'/'+tipoView;
-                        $.post(
-                            WeLearn.url.siteURL(url),
-                            function(result) {
-                                location.reload();
-                            },
-                            'json'
-                        );
-                        $( this ).dialog( "close" );
-                    },
-                    "Aceitar Requisicao": function(){
-                        var tipoView='perfil';
-                        var url='/convite/aceitar/'+idConvite+'/'+idRemetente+'/'+idDestinatario+'/'+tipoView;
-                        $.post(
-                            WeLearn.url.siteURL(url),
-                            function(result){
-                                location.reload();
-                            },'json'
-                        );
-                        $( this ).dialog( "close" );
-                    }
-                }
-            }
-        );
-    }
-///////////////////////////////////////////acoes de convite perfil////////////////////////////////////////////////
-
-
-
-
-
-   ///////////////////////acoes da pagina listar convites///////////////////////////////
+        }
+    );
 
 
 
@@ -166,56 +106,34 @@
         }
     );
 
+
+
     $('.remover-convite').live('click',
         function(e)
         {
-            var idConvite = $(this).parent().children('.id-convite').val();
-            var idRemetente =$(this).parent().children('.id-remetente').val();
-            var idDestinatario=$(this).parent().children('.id-destinatario').val();
-            var convite=$('#'+idConvite);
-            var tipoView='lista';
-            var url = $(this).attr('href');
-            url+='/'+idConvite+'/'+idRemetente+'/'+idDestinatario+'/'+tipoView;
             e.preventDefault();
-            $.post(
-                WeLearn.url.siteURL(url),
-                function(result) {
-                    if (result.success) {
-                        convite.remove();
-                        WeLearn.notificar(result.notificacao);
-                    } else {
-                        WeLearn.notificar(result.notificacao);
-                    }
-                },
-                'json'
-            );
+             idConvite = $(this).parent().children('.id-convite').val();
+             idRemetente =$(this).parent().children('.id-remetente').val();
+             idDestinatario=$(this).parent().children('.id-destinatario').val();
+             convite=$('#'+idConvite);
+             tipoView='lista';
+             url = $(this).attr('href');
+             url+='/'+idConvite+'/'+idRemetente+'/'+idDestinatario+'/'+tipoView;
+            $('#remover-convite').dialog( "open");
         }
     );
 
     $('.aceitar-convite').live('click',function(e){
         e.preventDefault();
-        var idConvite = $(this).parent().children('.id-convite').val();
-        var idRemetente =$(this).parent().children('.id-remetente').val();
-        var idDestinatario=$(this).parent().children('.id-destinatario').val();
-        var convite=$('#'+idConvite);
-        var tipoView='lista';
-        var url = $(this).attr('href');
+        idConvite = $(this).parent().children('.id-convite').val();
+        idRemetente =$(this).parent().children('.id-remetente').val();
+        idDestinatario=$(this).parent().children('.id-destinatario').val();
+        convite=$('#'+idConvite);
+        tipoView='lista';
+        url = $(this).attr('href');
         url+='/'+idConvite+'/'+idRemetente+'/'+idDestinatario+'/'+tipoView;
-        var convite=$('#'+idConvite);
-        $.post(
-            WeLearn.url.siteURL(url),
-            function(result){
-                if(result.success){
-                    convite.remove();
-                    WeLearn.notificar(result.notificacao);
-                } else {
-                    WeLearn.notificar(result.notificacao);
-                }
-            },'json'
-        );
+        $('#confirmar-amizade').dialog("open");
     });
-    ///////////////////////acoes da pagina listar convites///////////////////////////////
-
 
 
 })();
