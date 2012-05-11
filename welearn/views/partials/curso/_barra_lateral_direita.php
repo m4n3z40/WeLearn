@@ -7,20 +7,30 @@
             ) ?>
         </figure>
         <div>
-        <?php if ( $usuarioNaoVinculado ): ?>
+        <?php if ( $tipoVinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO ): ?>
             <?php echo anchor(
                 '/curso/inscrever/' . $idCurso,
                 'Inscrever-se no Curso',
-                'title="Inscrever-se no Curso" id="a-curso-inscreverse" class="button"'
+                'title="Inscrever-se no Curso" id="a-curso-inscrever" class="button"'
             ) ?>
-        <?php elseif( $usuarioPendente ): ?>
-            <span data-id-curso="<?php echo $idCurso ?>" title="Vínculo Pendente...">Vínculo com o curso pendente</span>
-        <?php else: ?>
+        <?php elseif( $tipoVinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE ): ?>
+            <span>Sua inscrição está sendo avaliada pelos gerenciadores.</span>
+        <?php elseif( $tipoVinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE ): ?>
+            <span>">Você foi convidado à gerenciar este curso. Verifique a seção "Convites para Gerenciamento" na área "Meus Cursos". </span>
+        <?php elseif( $tipoVinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO ): ?>
             <?php echo anchor(
                 '/curso/sair/' . $idCurso,
                 'Sair do Curso',
-                'title="Sair do Curso" id="a-curso-desvincularse" class="button"'
+                'title="Sair do Curso" id="a-curso-desvincular" class="button"'
             ) ?>
+        <?php elseif( $tipoVinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_AUXILIAR ): ?>
+            <?php echo anchor(
+                '/curso/sair/' . $idCurso,
+                'Abandonar Gerência do Curso',
+                'title="Sair do Curso" id="a-curso-desvincular" class="button"'
+            ) ?>
+        <?php elseif( $tipoVinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_PRINCIPAL ): ?>
+            <span>Você é o criador deste curso! Longa vida à <?php echo $nomeCriador ?>!</span>
         <?php endif; ?>
         </div>
     </header>

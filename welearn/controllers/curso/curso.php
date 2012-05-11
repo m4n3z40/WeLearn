@@ -6,8 +6,6 @@ class Curso extends Curso_Controller
     public function __construct()
     {
         parent::__construct();
-
-        $this->template->appendJSImport('curso.js');
     }
 
     public function index($id)
@@ -34,6 +32,10 @@ class Curso extends Curso_Controller
 
     public function inscrever($idCurso)
     {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
         set_json_header();
 
         try {
@@ -61,9 +63,10 @@ class Curso extends Curso_Controller
                         'atualizarPagina' => false,
                         'notificacao' => create_notificacao_array(
                             'sucesso',
-                            'Sua requisição para se inscrever neste curso foi enviada com sucesso aos gerenciadores!<br>
-                            Aguarde, você será notificado quando sua requisição for aceita ou recusada.'
-                        )
+                            'Sua requisição para se inscrever neste curso foi enviada com sucesso!<br>
+                            Você será notificado quando ela for aceita ou recusada.'
+                        ),
+                        'elementoSubstituto' => '<span>Sua inscrição está sendo avaliada pelos gerenciadores.</span>'
                     ));
 
                 } else {
@@ -74,8 +77,7 @@ class Curso extends Curso_Controller
                     );
 
                     $response = Zend_Json::encode(array(
-                        'atualizarPagina' => true,
-                        'notificacao' => false
+                        'atualizarPagina' => true
                     ));
 
                     $this->session->set_flashdata(
@@ -114,7 +116,70 @@ class Curso extends Curso_Controller
 
     public function sair($idCurso)
     {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
 
+        set_json_header();
+
+        try {
+            $curso = $this->_cursoDao->recuperar( $idCurso );
+
+            $vinculo = $this->_cursoDao->recuperarTipoDeVinculo(
+                $this->autenticacao->getUsuarioAutenticado(),
+                $curso
+            );
+
+            $this->load->helper('notificacao_js');
+
+            if ( $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO ) {
+                $alunoDao = WeLearn_DAO_DAOFactory::create('AlunoDAO');
+
+                $aluno = $alunoDao->criarAluno(
+                    $this->autenticacao->getUsuarioAutenticado()
+                );
+
+                $alunoDao->desvincular(
+                    $aluno,
+                    $curso
+                );
+
+                $this->session->set_flashdata(
+                    'notificacoesFlash',
+                    create_notificacao_json(
+                        'sucesso',
+                        'Sua inscrição neste curso foi efetuada com sucesso!<br>
+                        Você já pode acessar o conteúdo restrido aos alunos.'
+                    )
+                );
+
+                $json = create_json_feedback(true);
+
+            } elseif( $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_AUXILIAR ) {
+
+                //TODO: Fazer desvinculo de gerenciador
+
+                $json = create_json_feedback(true);
+            } else {
+                $error = create_json_feedback_error_json(
+                    'Não é possível sair deste curso!'
+                );
+
+                $json = create_json_feedback(false, $error);
+            }
+
+        } catch (Exception $e) {
+            log_message('error', 'Ocorreu um erro ao tentar inscrever usuario no curso: '
+                . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro desconhecido, já estamos verificando. Tente novamente mais tarde.'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
     }
 
     public function configurar($id)
@@ -356,18 +421,17 @@ class Curso extends Curso_Controller
 
     private function _renderTemplateHome($view = '', $dados = array())
     {
-        $dadosBarraEsquerda = array(
-            'usuario' => $this->autenticacao->getUsuarioAutenticado()
-        );
+        $this->_setTemplate( 'home' )
+             ->_setBarraUsuarioPath( 'perfil/barra_usuario' )
+             ->_setBarraEsquerdaPath( 'home/barra_lateral_esquerda' )
+             ->_setBarraDireitaPath( 'home/barra_lateral_direita' )
 
-        $dadosBarraDireita = array(
+             ->_barraEsquerdaSetVar(
+                 'usuario',
+                 $this->autenticacao->getUsuarioAutenticado()
+             )
 
-        );
-
-        $this->template->setTemplate('home')
-                       ->setDefaultPartialVar('home/barra_lateral_esquerda', $dadosBarraEsquerda)
-                       ->setDefaultPartialVar('home/barra_lateral_direita', $dadosBarraDireita)
-                       ->render($view, $dados);
+             ->_renderTemplate( $view, $dados );
     }
 
     private function _salvarNovoCurso()
@@ -406,7 +470,7 @@ class Curso extends Curso_Controller
                     'sucesso',
                     'O novo curso foi criado com sucesso e você é o Gerenciador Principal!'.
                     '<br /> Comece a Alterar as configurações, editar o conteúdo e convidar alunos em potencial.',
-                    10000
+                    5000
                 );
 
                 $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
@@ -464,7 +528,7 @@ class Curso extends Curso_Controller
                 $notificacoesFlash = create_notificacao_json(
                     'sucesso',
                     'As alterações nas configurações do curso foram salvas com sucesso!',
-                    10000
+                    5000
                 );
 
                 $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);

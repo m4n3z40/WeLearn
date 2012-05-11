@@ -302,6 +302,8 @@ class Curso_Controller extends WL_Controller
         }
 
         $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+
+        $this->template->appendJSImport('curso.js');
     }
 
     /**
@@ -335,11 +337,6 @@ class Curso_Controller extends WL_Controller
     {
         $vinculo = $this->_getNivelAcesso( $curso );
 
-        $usuarioNaoVinculado = ( $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO );
-
-        $usuarioPendente = ($vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE
-                         || $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE);
-
         $urlImagem =   ($curso->getImagem() instanceof WeLearn_Cursos_ImagemCurso)
                       ? $curso->getImagem()->getUrl()
                       : site_url( $this->config->item('default_curso_img_uri') );
@@ -354,8 +351,8 @@ class Curso_Controller extends WL_Controller
              ->_barraDireitaSetVar( 'nome' , $curso->getNome() )
              ->_barraDireitaSetVar( 'imagemUrl', $urlImagem )
              ->_barraDireitaSetVar( 'descricao', $curso->getDescricao() )
-             ->_barraDireitaSetVar( 'usuarioNaoVinculado', $usuarioNaoVinculado )
-             ->_barraDireitaSetVar( 'usuarioPendente', $usuarioPendente )
+             ->_barraDireitaSetVar( 'tipoVinculo', $vinculo )
+             ->_barraDireitaSetVar( 'nomeCriador', $curso->getCriador()->getNomeUsuario() )
              ->_barraDireitaSetVar( 'idCurso', $curso->getId() )
 
              ->_renderTemplate( $view, $dados );

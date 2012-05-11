@@ -159,4 +159,63 @@
             });
         });
     }
+
+    $('#a-curso-inscrever').click(function(e){
+        e.preventDefault();
+
+        var $this = $(this);
+
+        $.get(
+            $this.attr('href'),
+            {},
+            function(res) {
+                if (res.success) {
+
+                    if ( res.atualizarPagina ) {
+
+                        window.location.reload();
+
+                    } else {
+
+                        WeLearn.notificar( res.notificacao );
+
+                        $this.replaceWith( res.elementoSubstituto )
+
+                    }
+
+                } else {
+                    WeLearn.notificar({
+                        nivel: 'error',
+                        msg: res.errors[0].error_msg,
+                        tempo: 5000
+                    });
+                }
+            }
+        );
+    });
+
+    $('#a-curso-desvincular').click(function(e){
+        e.preventDefault();
+
+        var $this = $(this);
+
+        $.get(
+            $this.attr('href'),
+            {},
+            function(res) {
+                if (res.success) {
+
+                    window.location.reload();
+
+                } else {
+                    WeLearn.notificar({
+                        nivel: 'error',
+                        msg: res.errors[0].error_msg,
+                        tempo: 5000
+                    });
+                }
+            }
+        );
+    });
+
 })();
