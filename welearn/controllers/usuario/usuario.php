@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Usuario extends CI_Controller
+class Usuario extends WL_Controller
 {
 
     /**
@@ -10,34 +10,6 @@ class Usuario extends CI_Controller
     function __construct()
     {
         parent::__construct();
-    }
-
-    public function cadastrar()
-    {
-        
-        if ( $this->autenticacao->isAutenticado() ) {
-            redirect('/home');
-        }
-
-        $this->load->helper('area');
-        $listaAreas = lista_areas_para_dados_dropdown();
-
-        $dadosPartial = array(
-            'listaAreas' => $listaAreas
-        );
-
-        $partial_cadastro = array(
-            'form_cadastro' => $this->template
-                                    ->loadPartial(
-                                            'form_cadastro', 
-                                            $dadosPartial, 
-                                            'usuario'
-                                    )
-        );
-
-        $this->template->setTemplate('default')
-                       ->appendJSImport('cadastro_usuario.js')
-                       ->render('usuario/cadastrar', $partial_cadastro);
     }
 
     public function validar_cadastro()
@@ -189,7 +161,7 @@ class Usuario extends CI_Controller
 
     public function index()
     {
-        $this->template->render();
+        $this->_renderTemplate();
     }
 }
 

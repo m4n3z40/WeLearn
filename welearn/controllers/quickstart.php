@@ -13,8 +13,8 @@ class Quickstart extends WL_Controller {
 
     public function index()
     {
-        $this->template->appendJSImport('quickstart.js')
-                       ->render('quickstart/quickstart');
+        $this->template->appendJSImport( 'quickstart.js' );
+        $this->_renderTemplate( 'quickstart/quickstart' );
     }
 
     public function carregar_etapa($etapa)

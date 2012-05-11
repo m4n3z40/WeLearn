@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Perfil extends WL_Controller {
+class Perfil extends Perfil_Controller {
 
     /**
      * Construtor carrega configurações da classes base CI_Controller
@@ -10,8 +10,7 @@ class Perfil extends WL_Controller {
     {
         parent::__construct();
 
-        $this->template->setTemplate('perfil')
-        ->appendJSImport('convite.js');
+        $this->template->appendJSImport('convite.js');
     }
 
     public function index($id)
@@ -28,24 +27,6 @@ class Perfil extends WL_Controller {
                     );
         $this->_renderTemplatePerfil('usuario/perfil/index',$dados);
     }
-
-    private function _renderTemplatePerfil($view = '', $dados=array() )
-    {
-        $dadosBarraEsquerda = array(
-            'usuario' => $dados
-        );
-
-        $dadosBarraDireita = array(
-            'imagem'=>'implementar imagem',
-            'amigos'=>'implementar amigos',
-            'cursos'=>'implementar cursos'
-        );
-
-        $this->template->setDefaultPartialVar('perfil/barra_lateral_esquerda', $dadosBarraEsquerda)
-            ->setDefaultPartialVar('perfil/barra_lateral_direita', $dadosBarraDireita)
-            ->render($view, $dados);
-    }
-
 }
 
 /* End of file perfil.php */

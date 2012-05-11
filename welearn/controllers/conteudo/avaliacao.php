@@ -6,21 +6,14 @@
  * Time: 21:20
  * To change this template use File | Settings | File Templates.
  */
-class Avaliacao extends WL_Controller
+class Avaliacao extends Curso_Controller
 {
-    /**
-     * @var CursoDAO
-     */
-    var $_cursoDao;
 
     function __construct()
     {
         parent::__construct();
 
-        $this->template->setTemplate('curso')
-                       ->appendJSImport('avaliacao.js');
-
-        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+        $this->template->appendJSImport('avaliacao.js');
     }
 
     public function index ($idCurso)
@@ -768,33 +761,20 @@ class Avaliacao extends WL_Controller
         return create_json_feedback(true, '', $response);
     }
 
-    private function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null, $view = '', array $dados = null)
+    protected function _renderTemplateCurso(WeLearn_Cursos_Curso $curso,
+                                            $view = '',
+                                            array $dados = null)
     {
-        $vinculo = $this->_cursoDao->recuperarTipoDeVinculo(
-            $this->autenticacao->getUsuarioAutenticado(),
-            $curso
+        $this->_barraDireitaSetVar(
+            'menuContexto',
+            $this->template->loadPartial(
+                'menu',
+                array( 'idCurso' => $curso->getId() ),
+                'curso/conteudo'
+            )
         );
 
-        $dadosBarraEsquerda = array(
-            'idCurso' => $curso->getId()
-        );
-
-        $dadosBarraDireita = array(
-            'nome' => $curso->getNome(),
-            'imagemUrl' => ($curso->getImagem() instanceof WeLearn_Cursos_ImagemCurso)
-                          ? $curso->getImagem()->getUrl()
-                          : site_url($this->config->item('default_curso_img_uri')),
-            'descricao' => $curso->getDescricao(),
-            'usuarioNaoVinculado' => $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO,
-            'usuarioPendente' => ($vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE
-                              || $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE),
-            'idCurso' => $curso->getId(),
-            'menuContexto' => $this->template->loadPartial('menu', array('idCurso'=> $curso->getId()), 'curso/conteudo')
-        );
-
-        $this->template->setDefaultPartialVar('curso/barra_lateral_esquerda', $dadosBarraEsquerda)
-                       ->setDefaultPartialVar('curso/barra_lateral_direita', $dadosBarraDireita)
-                       ->render($view, $dados);
+        parent::_renderTemplateCurso($curso, $view, $dados);
     }
 
     public function _validarQtdAlternativasIncorretas($alternativas)

@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Area extends CI_Controller {
+class Area extends WL_Controller {
 
     /**
      * Construtor carrega configurações da classes base CI_Controller
@@ -13,8 +13,7 @@ class Area extends CI_Controller {
 
 	public function index()
 	{
-		$this->template->setTitle('Welcome to CodeIgniter')
-                       ->render('welcome_message');
+        $this->_renderTemplate();
     }
 
     public function adicionar()

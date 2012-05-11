@@ -6,14 +6,14 @@
  * Time: 19:13
  * To change this template use File | Settings | File Templates.
  */
-class Mensagem extends WL_Controller
+class Mensagem extends Home_Controller
 {
     function __construct()
     {
         parent::__construct();
-        $this->template->setTemplate('home')
-            ->appendJSImport('home.js')
-            ->appendJSImport('mensagem.js');
+
+        $this->template->appendJSImport('home.js')
+                       ->appendJSImport('mensagem.js');
     }
 
     public function index()
@@ -235,20 +235,5 @@ class Mensagem extends WL_Controller
         }
 
         echo $json;
-    }
-
-    private function _renderTemplateHome($view = '', $dados = array())
-    {
-        $dadosBarraEsquerda = array(
-            'usuario' => $this->autenticacao->getUsuarioAutenticado()
-        );
-
-        $dadosBarraDireita = array(
-
-        );
-
-        $this->template->setDefaultPartialVar('home/barra_lateral_esquerda', $dadosBarraEsquerda)
-            ->setDefaultPartialVar('home/barra_lateral_direita', $dadosBarraDireita)
-            ->render($view, $dados);
     }
 }

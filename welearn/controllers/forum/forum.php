@@ -1,20 +1,13 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Forum extends WL_Controller
+class Forum extends Curso_Controller
 {
-    /**
-     * @var CursoDAO
-     */
-    private $_cursoDao;
 
     public function __construct()
     {
         parent::__construct();
 
-        $this->template->setTemplate('curso')
-                       ->appendJSImport('forum.js');
-
-        $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+        $this->template->appendJSImport('forum.js');
     }
 
     public function index($idCurso)
@@ -442,33 +435,20 @@ class Forum extends WL_Controller
         return create_json_feedback(true, '', Zend_Json::encode(array('idForum' => $forum->getId())));
     }
 
-    private function _renderTemplateCurso(WeLearn_Cursos_Curso $curso = null, $view = '', array $dados = null)
+    protected function _renderTemplateCurso(WeLearn_Cursos_Curso $curso,
+                                            $view = '',
+                                            array $dados = null)
     {
-        $vinculo = $this->_cursoDao->recuperarTipoDeVinculo(
-            $this->autenticacao->getUsuarioAutenticado(),
-            $curso
+        $this->_barraDireitaSetVar(
+            'menuContexto',
+            $this->template->loadPartial(
+                'menu',
+                array( 'idCurso' => $curso->getId() ),
+                'curso/forum'
+            )
         );
 
-        $dadosBarraEsquerda = array(
-            'idCurso' => $curso->getId()
-        );
-
-        $dadosBarraDireita = array(
-            'nome' => $curso->getNome(),
-            'imagemUrl' => ($curso->getImagem() instanceof WeLearn_Cursos_ImagemCurso)
-                          ? $curso->getImagem()->getUrl()
-                          : site_url($this->config->item('default_curso_img_uri')),
-            'descricao' => $curso->getDescricao(),
-            'usuarioNaoVinculado' => $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO,
-            'usuarioPendente' => ($vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE
-                              || $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE),
-            'idCurso' => $curso->getId(),
-            'menuContexto' => $this->template->loadPartial('menu', array('idCurso' => $curso->getId()), 'curso/forum')
-        );
-
-        $this->template->setDefaultPartialVar('curso/barra_lateral_esquerda', $dadosBarraEsquerda)
-                       ->setDefaultPartialVar('curso/barra_lateral_direita', $dadosBarraDireita)
-                       ->render($view, $dados);
+        parent::_renderTemplateCurso($curso, $view, $dados);
     }
 
     private function _tituloLista($filtro)
