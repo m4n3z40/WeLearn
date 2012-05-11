@@ -27,7 +27,7 @@ class Perfil extends WL_Controller {
             'saoAmigos' => $saoAmigos
         );
 
-        if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )
+        if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
         {
                 $convitePendente = $conviteCadastradoDao->recuperarPendentes($usuarioAutenticado,$usuarioPerfil);
                 $partialExibirConvite = $this->template->loadPartial(

@@ -16,12 +16,15 @@
         height: 170
     });
 
+
+    // exibir formulario de convite
     $( "#enviar-convite" ).click(function(e) {
         e.preventDefault();
         $( "#convite-form" ).dialog( "open");
         return false;
     });
 
+    // enviar convite
     var formpost=document.getElementById('form-enviar-convite');
     $('#btn-form-convite').click(function(e){
         e.preventDefault();
@@ -31,9 +34,17 @@
             {
                 if(res.success)
                 {
-                    $('#convite-form').dialog("close");
-                    location.reload();
+                    if(res.amigos)
+                    {
+                        $('#convite-form').dialog("close");
+                        window.location = WeLearn.url.siteURL('convite/index/recebidos');
+                    }else{
+                        $('#convite-form').dialog("close");
+                        location.reload();
+                    }
+
                 }
+
             }
         )});
 
