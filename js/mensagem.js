@@ -64,7 +64,6 @@
     });
 
     $('.remover-mensagem').live('click', function(e) {
-
         e.preventDefault();
         var url=$(this).attr('href');
         var mensagem=$(this).parent();// elemento item-lista-mensagem a ser removido
@@ -85,7 +84,5 @@
         );
 
     });
-
-
 
 })();

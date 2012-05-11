@@ -10,7 +10,7 @@
                 <?php elseif($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA):?>
                     <li><?= anchor('#','Convite Pendente', array('id' => 'exibir-convite-pendente'))?>
                 <?php endif;?>
-                    <li><?= anchor('usuario/mensagem/criar','Enviar Mensagem',array('id' => 'perfil-enviar-mensagem'))?></li>
+                    <li><?= anchor('usuario/mensagem/criar','Enviar Mensagem',array('id' => 'enviar-mensagem'))?></li>
             <?php endif; ?>
         </ul>
     </nav>
