@@ -8,6 +8,7 @@
  */
 class Convite extends Home_Controller
 {
+    private static $_count=30;
     public function __construct(){
         parent::__construct();
         $this->template->appendJSImport('home.js')
@@ -19,12 +20,12 @@ class Convite extends Home_Controller
             if( $param != 'enviados' && $param != 'recebidos') {
                 redirect(site_url('usuario/amigos'));
             }else{
-                $count=10;
+
                 $conviteCadastradoDao= WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
-                $filtros=array('usuarioObj' => $this->autenticacao->getUsuarioAutenticado(),'count' => $count+1,'tipoConvite' => $param);
+                $filtros=array('usuarioObj' => $this->autenticacao->getUsuarioAutenticado(),'count' => self::$_count+1,'tipoConvite' => $param);
                 $listaConvites=$conviteCadastradoDao->recuperarTodos('','',$filtros);
                 $this->load->helper('paginacao_cassandra');
-                $dadosPaginados = create_paginacao_cassandra($listaConvites, $count);
+                $dadosPaginados = create_paginacao_cassandra($listaConvites, self::$_count);
                 $listaConvites= array_reverse($listaConvites);
                 $partialListaConvites = $this->template->loadPartial(
                     'lista',
@@ -57,12 +58,11 @@ class Convite extends Home_Controller
             if( $param != 'enviados' && $param != 'recebidos') {
                 redirect(site_url('usuario/amigos'));
             }else{
-                $count=10;
                 $conviteCadastradoDao= WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
-                $filtros=array('usuarioObj' => $this->autenticacao->getUsuarioAutenticado(),'count' => $count+1,'tipoConvite' => $param);
+                $filtros=array('usuarioObj' => $this->autenticacao->getUsuarioAutenticado(),'count' => self::$_count+1,'tipoConvite' => $param);
                 $listaConvites=$conviteCadastradoDao->recuperarTodos($inicio,'',$filtros);
                 $this->load->helper('paginacao_cassandra');
-                $dadosPaginados = create_paginacao_cassandra($listaConvites, $count);
+                $dadosPaginados = create_paginacao_cassandra($listaConvites, self::$_count);
                 $listaConvites = array_reverse($listaConvites);
                 $response=array('success' => true,'paginacao' => $dadosPaginados,'htmlListaConvites' =>
                 $partialListaConvites = $this->template->loadPartial(
@@ -104,6 +104,8 @@ class Convite extends Home_Controller
 
 
     public function enviar(){
+
+
         $this->load->library('form_validation');
 
         if ($this->form_validation->run() === FALSE) {
@@ -171,6 +173,7 @@ class Convite extends Home_Controller
             }
             echo $json;
         }
+
 
     }
 

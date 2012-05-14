@@ -69,16 +69,14 @@
         var mensagem=$(this).parent();// elemento item-lista-mensagem a ser removido
         var idMensagem=$(this).parent().children('#id-mensagem').val();
         var idAmigo=$('#id-amigo-mensagens').val();
-        url+='/'+idMensagem;
-        alert(url);
+        url+='/'+idMensagem+'/'+idAmigo;
         $.post(
             WeLearn.url.siteURL(url),
             function(result) {
-                if (result.success) {
+                if (result.success == true) {
                     mensagem.remove();
-                } else {
-                    alert('erro ao executar operação');
                 }
+                WeLearn.notificar(result.notificacao);
             },
             'json'
         );

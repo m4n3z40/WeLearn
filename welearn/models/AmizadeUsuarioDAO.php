@@ -97,12 +97,6 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
 
     public function recuperarTodosAmigos(WeLearn_Usuarios_Usuario $usuario, $de = '', $ate = '', $count = 10)
     {
-        if ($de != '') {
-            $de = CassandraUtil::import($de)->bytes;
-        }
-        if ($ate != '') {
-            $ate = CassandraUtil::import($ate)->bytes;
-        }
 
         $idsAmigos = array_keys(
             $this->_amizadeAmigosCF->get($usuario->getId(),
@@ -293,9 +287,19 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
                     array($dto->getAmigo()->getId() => '')
                 );
 
+                $this->_amizadeAmigosCF->insert(
+                    $dto->getAmigo()->getId(),
+                    array($dto->getUsuario()->getId() => '')
+                );
+
                 $this->_amizadeAmigosPorDataCF->insert(
                     $dto->getUsuario()->getId(),
                     array($timeUUID => $dto->getAmigo()->getId())
+                );
+
+                $this->_amizadeAmigosPorDataCF->insert(
+                    $dto->getAmigo()->getId(),
+                    array($timeUUID => $dto->getUsuario()->getId())
                 );
             } else {
                 $this->_amizadeAmigosCF->remove(

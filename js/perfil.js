@@ -9,6 +9,7 @@
 
 (function(){
 
+
     $( "#convite-form" ).dialog({
         autoOpen: false,
         width: 400,
@@ -25,11 +26,11 @@
     });
 
     // enviar convite
-    var formpost=document.getElementById('form-enviar-convite');
+    var formConvite=document.getElementById('form-enviar-convite');
     $('#btn-form-convite').click(function(e){
         e.preventDefault();
-        WeLearn.validarForm(formpost,
-            $(formpost).attr('action'),
+        WeLearn.validarForm(formConvite,
+            $(formConvite).attr('action'),
             function(res)
             {
                 if(res.success)
@@ -72,7 +73,6 @@
         $('#container-convite-pendente').dialog(
             {
                 autoOpen: false,
-                show: "blind",
                 width: 400,
                 height: 170,
                 buttons: {
@@ -97,7 +97,6 @@
         $('#container-convite-pendente').dialog(
             {
                 autoOpen: false,
-                show: "blind",
                 width: 400,
                 height: 170,
                 buttons: {
@@ -131,11 +130,44 @@
 
 
 
-    $('#enviar-mensagem').live('click',
-        function(e){
-            e.preventDefault();
-            alert('teste');
+
+    var formMensagem=document.getElementById('form-criar-mensagem');
+    $( "#form-criar-mensagem" ).dialog({
+        autoOpen: false,
+        modal:true,
+        title:'Enviar Mensagem',
+        width: 400,
+        height: 170,
+        buttons: {
+            "Confirmar": function() {
+
+                WeLearn.validarForm(formMensagem,
+                    $(formMensagem).attr('action'),
+                    function(res)
+                    {
+                        if(res.success){
+                            WeLearn.notificar(res.notificacao);
+                        }
+                    }
+                )
+                $(this).dialog("close");
+            },
+            "Cancelar": function(){
+                $(this).dialog("close");
+            }
         }
-    );
+    });
+
+
+
+    $( "#enviar-mensagem" ).click(function(e) {
+        e.preventDefault();
+        $( "#form-criar-mensagem" ).dialog( "open");
+    });
+
+
+
+
+
 
 })();
