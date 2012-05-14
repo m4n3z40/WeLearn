@@ -188,7 +188,7 @@ class AlunoDAO extends UsuarioDAO
             )
         );
 
-        $columns = $this->_cf->get( $ids );
+        $columns = $this->_cf->multiget( $ids );
 
         return $this->_criarVariosFromCassandra( $columns );
     }

@@ -289,6 +289,10 @@ class Curso_Controller extends WL_Controller
      * @var string
      */
     private $_nivelAcessoCursoId;
+    /**
+     * @var WeLearn_Usuarios_Autorizacao_Papel
+     */
+    private $_papel;
 
     /**
      *
@@ -312,7 +316,7 @@ class Curso_Controller extends WL_Controller
      */
     protected function _getNivelAcesso(WeLearn_Cursos_Curso $curso)
     {
-        if ( null === $this->_nivelAcesso || $this->_nivelAcessoCursoId === $curso->getId() ) {
+        if ( null === $this->_nivelAcesso || $this->_nivelAcessoCursoId != $curso->getId() ) {
 
             $this->_nivelAcessoCursoId = $curso->getId();
 
@@ -324,6 +328,40 @@ class Curso_Controller extends WL_Controller
         }
 
         return $this->_nivelAcesso;
+    }
+
+    /**
+     * @param WeLearn_Cursos_Curso $curso
+     * @return WeLearn_Usuarios_Autorizacao_Papel
+     */
+    protected function _getPapel(WeLearn_Cursos_Curso $curso)
+    {
+        if ( null === $this->_papel || $this->_nivelAcessoCursoId != $curso->getId() ) {
+
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+            $nivelAcesso = $this->_getNivelAcesso( $curso );
+            $usuario = $this->autenticacao->getUsuarioAutenticado();
+
+            switch ( $nivelAcesso ) {
+                case WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_PRINCIPAL:
+                    $this->_papel = $usuarioDao->criarGerenciadorPrincipal( $usuario );
+                    break;
+                case WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_AUXILIAR:
+                    $this->_papel = $usuarioDao->criarGerenciadorAuxiliar( $usuario );
+                    break;
+                case WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO:
+                    $this->_papel = $usuarioDao->criarAluno( $usuario );
+                    break;
+                case WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE:
+                case WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE:
+                case WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO:
+                default:
+                    $this->_papel = $usuario;
+            }
+
+        }
+
+        return $this->_papel;
     }
 
     /**

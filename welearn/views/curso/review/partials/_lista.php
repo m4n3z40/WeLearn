@@ -2,8 +2,7 @@
 <li>
     <article>
         <header>
-            <h4>Avaliação do aluno <?php echo anchor('/perfil/' . $resenha->criador->id,
-                                                      $resenha->criador->nome) ?></h4>
+            <h4>Avaliação do aluno <?php echo $resenha->criador->toHTML('somente_link') ?></h4>
             <ul>
                 <li>Enviado em: <em><?php echo date('d/m/Y à\s H:i:s', $resenha->dataEnvio) ?></em></li>
                 <li>Nota para a qualidade deste curso:

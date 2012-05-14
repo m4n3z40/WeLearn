@@ -11,7 +11,7 @@
             'Clique aqui para voltar à lista de enquetes.') ?>
         </p>
         <ul>
-            <li>Criada por: <?php echo anchor('usuario/' . $enquete->criador->id, $enquete->criador->nome) ?></li>
+            <li>Criada por: <?php echo $enquete->criador->toHTML('imagem_pequena') ?></li>
             <li>Criada em: <?php echo date('d/m/Y H:i:s', $enquete->dataCriacao) ?></li>
             <li>Fecha as votações em: <?php echo ($enquete->situacao == WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA) ?
                                                  date('d/m/Y H:i:s', $enquete->dataExpiracao) :

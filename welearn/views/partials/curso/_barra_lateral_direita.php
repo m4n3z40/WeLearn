@@ -3,7 +3,8 @@
         <figure>
             <?php echo anchor(
                 '/curso/' . $idCurso,
-                "<img src=\"{$imagemUrl}\" alt=\"{$descricao}\" /><figcaption>{$nome}</figcaption>"
+                "<img src=\"{$imagemUrl}\" alt=\"{$descricao}\" /><figcaption>{$nome}</figcaption>",
+                "title=\"{$descricao}\""
             ) ?>
         </figure>
         <div>

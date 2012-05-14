@@ -4,7 +4,7 @@
     <td><?php echo $categoria->descricao ?></td>
     <td><?php echo date('d/m/Y H:i:s', $categoria->dataCriacao) ?></td>
     <?php if ($categoria->criador): ?>
-        <td><?php echo anchor('usuario/' . $categoria->criador->id, $categoria->criador->nome) ?></td>
+        <td><?php echo $categoria->criador->toHTML('somente_link') ?></td>
     <?php else: ?>
         <td>O usuário criador deste curso não está mais no WeLearn :(</td>
     <?php endif; ?>

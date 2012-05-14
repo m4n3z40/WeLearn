@@ -39,6 +39,7 @@ $config['template_data'] = array(
 );
 
 $config['default_curso_img_uri'] = '/img/defaults/curso/header.jpg';
+$config['default_userpic_img_uri'] = '/img/defaults/user/default_userpic.png';
 
 /* End of file template.php */
 /* Location: ./application/config/template.php */

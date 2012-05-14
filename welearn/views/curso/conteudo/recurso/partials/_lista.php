@@ -9,8 +9,7 @@
     <td>
         <dl>
             <dt>Por:</dt>
-            <dd><?php echo anchor('/usuario/' . $recurso->criador->id,
-                                  $recurso->criador->nome) ?></dd>
+            <dd><?php echo $recurso->criador->toHTML('somente_link') ?></dd>
             <dt>Em:</dt>
             <dd><?php echo date('d/m/Y H:i:s', $recurso->dataInclusao) ?></dd>
         </dl>

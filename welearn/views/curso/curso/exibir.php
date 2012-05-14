@@ -44,7 +44,7 @@
     <hr class="curso-info-content-separator" />
     <div>
         <h4>Criador do Curso</h4>
-        <div><?php echo anchor('usuario/' . $curso->criador->id, $curso->criador->nome) ?></div>
+        <div><?php echo $curso->criador->toHTML('imagem_pequena') ?></div>
     </div>
     <hr class="curso-info-content-separator" />
 </section>

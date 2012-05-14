@@ -6,7 +6,7 @@
         </hgroup>
         <p><?php echo nl2br($forum->descricao) ?></p>
         <ul>
-            <li>Criador: <span><?php echo $forum->criador->nome ?></span></li>
+            <li>Criado por: <span><?php echo $forum->criador->toHTML('imagem_pequena') ?></span></li>
             <li>Criado em: <span><?php echo date('d/m/Y, à\s H:i:s', $forum->dataCriacao) ?></span></li>
             <li>Nº de posts: <span><?php echo $forum->qtdPosts ?></span></li>
         </ul>

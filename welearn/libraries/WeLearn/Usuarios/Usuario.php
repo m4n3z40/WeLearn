@@ -425,4 +425,73 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
 
         WeLearn_DAO_DAOFactory::create('UsuarioDAO')->salvarConfiguracao( $this->getConfiguracao() );
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->toHTML('imagem_grande');
+    }
+
+    /**
+     * @param bool $pequena
+     * @return string
+     */
+    private function _htmlImagem($pequena = false)
+    {
+        $imagemUrl = ( $this->_imagem instanceof WeLearn_Usuarios_ImagemUsuario )
+                     ? $this->getImagem()->getUrl()
+                     : site_url( get_instance()->config->item('default_userpic_img_uri') );
+
+        $alt = $this->getNome() . ' ' . $this->getSobrenome();
+
+        if ( $pequena ) {
+
+            return "<img src=\"{$imagemUrl}\" alt=\"{$alt}\" title=\"{$alt}\" width=\"80\" height=\"80\">";
+
+        }
+
+        return "<img src=\"{$imagemUrl}\" alt=\"{$alt}\" title='{$alt}'>";
+    }
+
+    /**
+     * @param bool $pequeno
+     * @return string
+     */
+    private function _htmlUsuario($pequeno = false)
+    {
+        $htmlImagem = $this->_htmlImagem( $pequeno );
+        $nomeCompleto = $this->getNome() . ' ' . $this->getSobrenome();
+        $id = $this->getId();
+        $urlPerfil = site_url( '/perfil/' . $id );
+
+        return "<figure><a href=\"{$urlPerfil}\" title=\"{$nomeCompleto}\">{$htmlImagem}<figcaption><span>{$nomeCompleto}</span></figcaption></a></figure>";
+    }
+
+    private function _htmlLinkUsuario()
+    {
+        $nomeCompleto = $this->getNome() . ' ' . $this->getSobrenome();
+        $id = $this->getId();
+        $urlPerfil = site_url( '/perfil/' . $id );
+
+        return "<a href=\"{$urlPerfil}\" title=\"{$nomeCompleto}\"><span>{$nomeCompleto}</span></a>";
+    }
+
+    /**
+     * @param string $tipo
+     * @return string
+     */
+    public function toHTML($tipo = 'imagem_grande')
+    {
+        switch ( $tipo ) {
+            case 'imagem_pequena':
+                return $this->_htmlUsuario( true );
+            case 'somente_link':
+                return $this->_htmlLinkUsuario();
+            case 'imagem_grande':
+            default:
+                return $this->_htmlUsuario( false );
+        }
+    }
 }

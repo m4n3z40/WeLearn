@@ -3,13 +3,10 @@
     <article>
         <aside>
             <header>
-            <?php if ($comentario->criador->imagem): ?>
-                <?php echo $comentario->criador->imagem ?>
-            <?php endif; ?>
+                <?php echo $comentario->criador->toHTML('imagem_pequena') ?>
             </header>
             <div>
                 <p>
-                    Autor: <span><?php echo anchor('/usuario/' . $comentario->criador->id, $comentario->criador->nome) ?></span><br>
                     Criado em: <span><?php echo date('d/m/Y, à\s H:i:s', $comentario->dataEnvio) ?></span><br>
                     <?php if ($comentario->dataAlteracao): ?>
                     Alterado em: <span><?php echo date('d/m/Y, à\s H:i:s', $comentario->dataAlteracao) ?></span>

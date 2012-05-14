@@ -21,7 +21,7 @@
             ) ?></li>
             <li><?php echo anchor(
                 '/curso/conteudo/comentario/' . $pagina->aula->modulo->curso->id . '?p=' . $pagina->id,
-                'Gerenciar Comentários'
+                'Comentários'
             ) . ' <span>(' . $pagina->qtdTotalComentarios . ')</span>' ?></li>
         </ul>
     </nav>

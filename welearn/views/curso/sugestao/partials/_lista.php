@@ -28,7 +28,7 @@
         </tr>
         <tr>
             <td>Criador da Sugestão</td>
-            <td><?php echo anchor('usuario/' . $sugestao->criador->id, $sugestao->criador->nome) ?></td>
+            <td><?php echo $sugestao->criador->toHTML('imagem_pequena') ?></td>
         </tr>
     </table>
     <footer>

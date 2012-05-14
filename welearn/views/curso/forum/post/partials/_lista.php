@@ -3,13 +3,10 @@
     <article>
         <aside>
             <header>
-            <?php if ($post->criador->imagem): ?>
-                <?php echo $post->criador->imagem ?>
-            <?php endif; ?>
+                <?php echo $post->criador->toHTML('imagem_pequena') ?>
             </header>
             <div>
                 <p>
-                    Autor: <span><?php echo anchor('/usuario/' . $post->criador->id, $post->criador->nome) ?></span><br>
                     Criado em: <span><?php echo date('d/m/Y, à\s H:i:s', $post->dataCriacao) ?></span><br>
                     <?php if ($post->dataAlteracao): ?>
                     Alterado em: <span><?php echo date('d/m/Y, à\s H:i:s', $post->dataAlteracao) ?></span>
