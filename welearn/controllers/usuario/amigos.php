@@ -8,7 +8,7 @@
  */
 class Amigos extends Home_Controller
 {
-
+    private static $_count=30;
     function __construct()
     {
         parent::__construct();
@@ -18,8 +18,72 @@ class Amigos extends Home_Controller
 
     public function index()
     {
-        $this->_renderTemplateHome('usuario/amigos/index', $dadosView=null);
+        $usuarioAutenticado=$this->autenticacao->getUsuarioAutenticado();
+        $amigosDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+        $filtros= array('count' => self::$_count+1 , 'opcao' => 'amigos' , 'usuario' => $usuarioAutenticado);
+        try{
+            $totalAmigos = $amigosDao->recuperarQtdTotalAmigos($usuarioAutenticado);
+            $listaAmigos= $amigosDao->recuperarTodos('','',$filtros);
+            $this->load->helper('paginacao_cassandra');
+            $dadosPaginados=create_paginacao_cassandra($listaAmigos,self::$_count);
+            $partialListaAmigos=$this->template->loadPartial('lista',
+                array('listaAmigos' => $listaAmigos,
+                      'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
+                      'haAmigos' => $dadosPaginados['proxima_pagina']),
+                'usuario/amigos'
+            );
+            $dadosView= array('success' => true,'partialListaAmigos' => $partialListaAmigos, 'totalAmigos' => $totalAmigos);
+        }catch(cassandra_NotFoundException $e){
+            $dadosView= array('success' => false, 'totalAmigos' => 0);
+        }
+        $this->_renderTemplateHome('usuario/amigos/index', $dadosView);
     }
+
+
+
+
+    public function proxima_pagina($inicio)
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+
+            $count = 10;
+            $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+            $amigosDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+            $filtros= array('count' => $count+1,'usuario' => $usuarioAutenticado, 'opcao'=>'amigos');
+            try {
+                $listaAmigos = $amigosDao->recuperarTodos($inicio,'',$filtros);
+                //print_r($listaAmigos);
+                $this->load->helper('paginacao_cassandra');
+                $dadosPaginados = create_paginacao_cassandra($listaAmigos, $count);
+                $response = array(
+                    'success' => true,
+                    'htmlListaAmigos' => $this->template->loadPartial(
+                        'lista',
+                        array(
+                            'haAmigos'=> $dadosPaginados['proxima_pagina'],
+                            'listaAmigos' => $listaAmigos,
+                            'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina']
+                        ),
+                        'usuario/amigos'
+                    ),
+                    'paginacao' => $dadosPaginados
+                );
+
+
+            } catch(cassandra_NotFoundException $e) {
+                $response = array('success' => false);
+            }
+
+        $json = Zend_Json::encode($response);
+        echo $json;
+    }
+
+
+
+
 
     protected function _renderTemplateHome($view = '', $dados = array())
     {
@@ -27,7 +91,7 @@ class Amigos extends Home_Controller
             'menuContexto',
             $this->template->loadPartial(
                 'menu',
-                array(),
+                $dados,
                 'usuario/convite'
             )
         );

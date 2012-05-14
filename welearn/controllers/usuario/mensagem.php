@@ -8,6 +8,7 @@
  */
 class Mensagem extends Home_Controller
 {
+    private static $_count=30;
     function __construct()
     {
         parent::__construct();
@@ -45,13 +46,10 @@ class Mensagem extends Home_Controller
             if( $idAmigo=='' ) {
                 redirect($this->index());
             }else{
-
-                $count=10;
-
                 $usuario = $this->autenticacao->getUsuarioAutenticado();
                 $amigo = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idAmigo);
                 $mensagemDao = WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
-                $filtros= array('count' => $count+1,'usuario' => $usuario, 'amigo' => $amigo);
+                $filtros= array('count' => self::$_count+1,'usuario' => $usuario, 'amigo' => $amigo);
 
                 try {
                     $listaMensagens = $mensagemDao->recuperarTodos('','',$filtros);
@@ -62,7 +60,7 @@ class Mensagem extends Home_Controller
                 }
 
                 $this->load->helper('paginacao_cassandra');
-                $dadosPaginados = create_paginacao_cassandra($listaMensagens, $count);
+                $dadosPaginados = create_paginacao_cassandra($listaMensagens, self::$_count);
                 $dadosPaginados= array_reverse($dadosPaginados);
 
                 $partialListaMensagens = $this->template->loadPartial(
@@ -108,12 +106,10 @@ class Mensagem extends Home_Controller
         }
 
         try{
-            $count = 10;
-
             $usuario = $this->autenticacao->getUsuarioAutenticado();
             $amigo = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idAmigo);
             $mensagemDao = WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
-            $filtros= array('count' => $count+1,'usuario' => $usuario, 'amigo' => $amigo);
+            $filtros= array('count' => self::$_count+1,'usuario' => $usuario, 'amigo' => $amigo);
             try {
                 $listaMensagens = $mensagemDao->recuperarTodos($inicio,'',$filtros);
             } catch(cassandra_NotFoundException $e) {
@@ -121,7 +117,7 @@ class Mensagem extends Home_Controller
             }
 
             $this->load->helper('paginacao_cassandra');
-            $dadosPaginados = create_paginacao_cassandra($listaMensagens, $count);
+            $dadosPaginados = create_paginacao_cassandra($listaMensagens,self::$_count);
             $dadosPaginados= array_reverse($dadosPaginados);
 
             $response = array(
@@ -200,7 +196,7 @@ Tente novamente mais tarde.'
             'mensagemId'=>$mensagemObj->getId(),
             'remetenteId'=>$mensagemObj->getRemetente()->getId(),
             'mensagemTexto'=>$mensagemObj->getMensagem(),
-            'dataEnvio'=>$mensagemObj->getDataEnvio(),
+            'dataEnvio'=>date('d/m/Y à\s H:i',$mensagemObj->getDataEnvio()),
             'notificacao'=> create_notificacao_array(
                 'sucesso',
                 'Mensagem enviada com sucesso'
@@ -220,7 +216,7 @@ Tente novamente mais tarde.'
         }
 
         set_json_header();
-
+        $this->load->helper('notificacao_js');
         try{
             $usuario = $this->autenticacao->getUsuarioAutenticado();
             $amigo = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idAmigo);;
@@ -232,12 +228,19 @@ Tente novamente mais tarde.'
             $mensagemPessoal->setRemetente($usuario);
 
             $mensagemPessoalDao->remover($idMensagem);
-
-            $json=Zend_Json::encode(array( 'success' => true ));
+            $json=Zend_Json::encode(array( 'success' => true , 'notificacao'=> create_notificacao_array(
+                'sucesso',
+                'Mensagem Removida Com Sucesso!'
+            )
+            ));
 
         } catch( Exception $e ) {
 
-            $json = create_json_feedback();
+            $json=Zend_Json::encode(array( 'success' => false , 'notificacao'=> create_notificacao_array(
+                'erro',
+                'A Mensagem Selecionada Não Existe, ou Já Foi Removida!'
+            )
+            ));
         }
 
         echo $json;

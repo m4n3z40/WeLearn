@@ -18,8 +18,8 @@
     $('#remover-convite').dialog(
         {
             autoOpen: false,
-            show: "blind",
             modal:true,
+            title:'Remover Convite',
             width: 400,
             height: 170,
             buttons: {
@@ -50,8 +50,8 @@
     $('#confirmar-amizade').dialog(
         {
             autoOpen: false,
-            show: "blind",
             modal:true,
+            title:'Aceitar Convite',
             width: 400,
             height: 170,
             buttons: {

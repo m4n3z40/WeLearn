@@ -20,14 +20,24 @@ class Perfil extends Perfil_Controller {
         $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
         $usuarioAutenticado=$this->autenticacao->getUsuarioAutenticado();
         $usuarioPerfil=$usuarioDao->recuperar($id);
-        $saoAmigos=$amizadeUsuarioDao->SaoAmigos($usuarioAutenticado,$usuarioPerfil);
+        $dados=array('usuarioPerfil' => $usuarioPerfil,'usuarioAutenticado' => $usuarioAutenticado);
 
-        $dados=array('usuarioPerfil' => $usuarioPerfil,'usuarioAutenticado' => $usuarioAutenticado,
-            'saoAmigos' => $saoAmigos
-        );
 
-        if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
+        if($usuarioPerfil->getId() != $usuarioAutenticado->getId() )
         {
+            $saoAmigos=$amizadeUsuarioDao->SaoAmigos($usuarioAutenticado,$usuarioPerfil);
+            $dados['saoAmigos']=$saoAmigos;
+
+            if($saoAmigos == WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS ){
+                $partialEnviarConvite = $this->template->loadPartial('enviar_convite',
+                    array('usuarioPerfil' => $usuarioPerfil->getId()),
+                    'usuario/convite'
+                );
+                $dados['partialEnviarConvite']=$partialEnviarConvite;
+            }
+
+            if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
+            {
                 $convitePendente = $conviteCadastradoDao->recuperarPendentes($usuarioAutenticado,$usuarioPerfil);
                 $partialExibirConvite = $this->template->loadPartial(
                     'exibicao_convite',
@@ -35,8 +45,16 @@ class Perfil extends Perfil_Controller {
                     'usuario/convite'
                 );
                 $dados['partialConvitePendente']=$partialExibirConvite;
-        }
+            }
 
+            $partialEnviarMensagem = $this->template->loadPartial(
+                'mensagem_perfil',
+                array('idDestinatario' => $usuarioPerfil->getId()),
+                'usuario/mensagem'
+            );
+
+            $dados['partialEnviarMensagem']=$partialEnviarMensagem;
+        }
         $this->_renderTemplatePerfil('usuario/perfil/index',$dados);
     }
 }
