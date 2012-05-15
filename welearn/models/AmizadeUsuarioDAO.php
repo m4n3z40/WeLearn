@@ -97,7 +97,6 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
 
     public function recuperarTodosAmigos(WeLearn_Usuarios_Usuario $usuario, $de = '', $ate = '', $count = 10)
     {
-
         $idsAmigos = array_keys(
             $this->_amizadeAmigosCF->get($usuario->getId(),
                 null,
@@ -204,37 +203,27 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
         $amizadeRemovida = $this->_criarFromCassandra($column);
         $this->_cf->remove($id);
 
-        if ($amizadeRemovida->getStatus() === WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA) {
-            $this->_amizadeRequisicoesCF->remove(
-                $amizadeRemovida->getUsuario()->getId(),
-                array($amizadeRemovida->getAmigo()->getId())
-            );
+        $this->_amizadeAmigosCF->remove(
+            $amizadeRemovida->getUsuario()->getId(),
+            array($amizadeRemovida->getAmigo()->getId())
+        );
 
-            $this->_amizadeRequisicoesCF->remove($amizadeRemovida->getAmigo()->getId(),
-                array($amizadeRemovida->getUsuario()->getId())
-            );
+        $this->_amizadeAmigosCF->remove(
+            $amizadeRemovida->getAmigo()->getId(),
+            array($amizadeRemovida->getUsuario()->getId())
+        );
 
-            $this->_amizadeRequisicoesPorDataCF->remove(
-                $amizadeRemovida->getUsuario()->getId(),
-                array($timeUUID)
-            );
+        $this->_amizadeAmigosPorDataCF->remove(
+            $amizadeRemovida->getUsuario()->getId(),
+            array($timeUUID)
+        );
 
-            $this->_amizadeRequisicoesPorDataCF->remove(
-                $amizadeRemovida->getAmigo()->getId(),
-                array($timeUUID)
-            );
+        $this->_amizadeAmigosPorDataCF->remove(
+            $amizadeRemovida->getAmigo()->getId(),
+            array($timeUUID)
+        );
 
-        } else {
-            $this->_amizadeAmigosCF->remove(
-                $amizadeRemovida->getUsuario()->getId(),
-                array($amizadeRemovida->getAmigo()->getId())
-            );
 
-            $this->_amizadeAmigosPorDataCF->remove(
-                $amizadeRemovida->getUsuario()->getId(),
-                array($timeUUID)
-            );
-        }
 
         $amizadeRemovida->setPersistido(false);
 
@@ -259,9 +248,6 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     protected function _atualizar(WeLearn_DTO_IDTO $dto)
     {
-        //echo $dto->getStatus();
-        //echo    'atualizando';
-
         $idAmizade = $this->gerarIdAmizade($dto->getUsuario(), $dto->getAmigo());
 
         $statusArray = $this->_cf->get($idAmizade, array('status','timeUUID'));
