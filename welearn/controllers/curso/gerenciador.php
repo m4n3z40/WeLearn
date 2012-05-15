@@ -2,11 +2,18 @@
 
 class Gerenciador extends Curso_Controller
 {
+    /**
+     * @var GerenciadorAuxiliarDAO
+     */
+    private $_gerenciadorDao;
+
     public function __construct()
     {
         parent::__construct();
 
         $this->template->appendJSImport('gerenciador.js');
+
+        $this->_gerenciadorDao = WeLearn_DAO_DAOFactory::create('GerenciadorAuxiliarDAO');
     }
 
     public function index ($idCurso)
@@ -21,5 +28,25 @@ class Gerenciador extends Curso_Controller
 
             show_404();
         }
+    }
+
+    protected function _renderTemplateCurso(WeLearn_Cursos_Curso $curso,
+                                            $view = '',
+                                            array $dados = null)
+    {
+        $this->_barraDireitaSetVar(
+            'menuContexto',
+            $this->template->loadPartial(
+                'menu',
+                array(
+                    'idCurso' => $curso->getId(),
+                    'totalGerenciadores' => $this->_gerenciadorDao->recuperarQtdTotalPorCurso( $curso ),
+                    'totalConvites' => $this->_gerenciadorDao->recuperarQtdTotalConvitesPorCurso( $curso )
+                ),
+                'curso/gerenciador'
+            )
+        );
+
+        parent::_renderTemplateCurso($curso, $view, $dados);
     }
 }

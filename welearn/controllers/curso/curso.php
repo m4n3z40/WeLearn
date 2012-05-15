@@ -148,8 +148,8 @@ class Curso extends Curso_Controller
                     'notificacoesFlash',
                     create_notificacao_json(
                         'sucesso',
-                        'Sua inscrição neste curso foi efetuada com sucesso!<br>
-                        Você já pode acessar o conteúdo restrido aos alunos.'
+                        'Sua saída do curso foi efetuada com sucesso!<br>
+                        Você pode voltar quando quiser, te esperamos :)'
                     )
                 );
 

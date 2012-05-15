@@ -1,4 +1,4 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Aluno extends Curso_Controller
 {
@@ -16,19 +16,19 @@ class Aluno extends Curso_Controller
         $this->_alunoDao = WeLearn_DAO_DAOFactory::create('AlunoDAO');
     }
 
-    public function index ($idCurso)
+    public function index($idCurso)
     {
         try {
-            $curso = $this->_cursoDao->recuperar( $idCurso );
+            $curso = $this->_cursoDao->recuperar($idCurso);
 
             try {
-                $ultimasRequisicoes = $this->_alunoDao->recuperarTodasInscricoesPorCurso( $curso, '', '', 5 );
+                $ultimasRequisicoes = $this->_alunoDao->recuperarTodasInscricoesPorCurso($curso, '', '', 5);
             } catch (cassandra_NotFoundException $e) {
                 $ultimasRequisicoes = array();
             }
 
             $dadosView = array(
-                'haInscricoes' => count( $ultimasRequisicoes ) > 0,
+                'haInscricoes' => count($ultimasRequisicoes) > 0,
                 'idCurso' => $curso->getId(),
                 'ultimasRequisicoes' => $this->template->loadPartial(
                     'lista_requisicoes',
@@ -40,7 +40,7 @@ class Aluno extends Curso_Controller
                 )
             );
 
-            $this->_renderTemplateCurso($curso, 'curso/aluno/index', $dadosView );
+            $this->_renderTemplateCurso($curso, 'curso/aluno/index', $dadosView);
         } catch (Exception $e) {
             log_message('error', 'Ocorreu um erro ao tentar exibir index do gerenciamento de alunos'
                 . create_exception_description($e));
@@ -49,18 +49,41 @@ class Aluno extends Curso_Controller
         }
     }
 
-    public function listar ($idCurso)
+    public function listar($idCurso)
     {
         try {
             $count = 20;
 
-            $curso = $this->_cursoDao->recuperar( $idCurso );
+            $curso = $this->_cursoDao->recuperar($idCurso);
+
+            try {
+                $listaAlunos = $this->_alunoDao->recuperarTodosPorCurso($curso, '', '', $count + 1);
+                $totalAlunos = $this->_alunoDao->recuperarQtdTotalPorCurso($curso);
+            } catch (cassandra_NotFoundException $e) {
+                $listaAlunos = array();
+                $totalAlunos = 0;
+            }
+
+            $this->load->helper('paginacao_cassandra');
+            $paginacao = create_paginacao_cassandra($listaAlunos, $count);
 
             $dadosView = array(
-
+                'haAlunos' => $totalAlunos > 0,
+                'qtdAlunos' => count($listaAlunos),
+                'totalAlunos' => $totalAlunos,
+                'listaAlunos' => $this->template->loadPartial(
+                    'lista',
+                    array(
+                        'listaAlunos' => $listaAlunos,
+                        'idCurso' => $curso->getId()
+                    ),
+                    'curso/aluno'
+                ),
+                'haMaisPaginas' => $paginacao['proxima_pagina'],
+                'idProximo' => $paginacao['inicio_proxima_pagina']
             );
 
-            $this->_renderTemplateCurso($curso, 'curso/aluno/listar', $dadosView );
+            $this->_renderTemplateCurso($curso, 'curso/aluno/listar', $dadosView);
         } catch (Exception $e) {
             log_message('error', 'Ocorreu um erro ao tentar exibir lista de alunos do curso: '
                 . create_exception_description($e));
@@ -69,27 +92,124 @@ class Aluno extends Curso_Controller
         }
     }
 
-    public function requisicoes ($idCurso)
+    public function mais_alunos($idCurso)
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $count = 20;
+
+            $idProximo = $this->input->get('proximo');
+
+            $curso = $this->_cursoDao->recuperar($idCurso);
+
+            try {
+                $listaAlunos = $this->_alunoDao->recuperarTodosPorCurso($curso, $idProximo, '', $count + 1);
+            } catch (cassandra_NotFoundException $e) {
+                $listaAlunos = array();
+            }
+
+            $this->load->helper('paginacao_cassandra');
+            $paginacao = create_paginacao_cassandra($listaAlunos, $count);
+
+            $response = Zend_Json::encode(array(
+                'qtdAlunos' => count($listaAlunos),
+                'htmlListaAlunos' => $this->template->loadPartial(
+                    'lista',
+                    array(
+                        'listaAlunos' => $listaAlunos,
+                        'idCurso' => $curso->getId()
+                    ),
+                    'curso/aluno'
+                ),
+                'paginacao' => $paginacao
+            ));
+
+            $json = create_json_feedback(true, '', $response);
+        } catch (cassandra_NotFoundException $e) {
+            log_message('error', 'Erro ao tentar recuparar proxima página da lista de alunos: '
+                . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro inesperado, já estamos tentando resolver.
+                   Tente novamente mais tarde!'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    public function desvincular($idCurso)
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+
+            $idAluno = $this->input->get('id-aluno');
+
+            $curso = $this->_cursoDao->recuperar($idCurso);
+
+            $aluno = $this->_alunoDao->recuperar( $idAluno );
+            $aluno = $this->_alunoDao->criarAluno( $aluno );
+
+            $this->_alunoDao->desvincular( $aluno, $curso );
+
+            $this->load->helper('notificacao_js');
+
+            $response = Zend_Json::encode(array(
+                'notificacao' => create_notificacao_array(
+                    'sucesso',
+                    'O aluno foi desvinculado com sucesso! <br> Ele será notificado desta má notícia :('
+                )
+            ));
+
+            $json = create_json_feedback(true, '', $response);
+        } catch (cassandra_NotFoundException $e) {
+            log_message('error', 'Erro ao tentar recuparar proxima página da lista de alunos: '
+                . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro inesperado, já estamos tentando resolver.
+                   Tente novamente mais tarde!'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    public function requisicoes($idCurso)
     {
         try {
             $count = 20;
 
-            $curso = $this->_cursoDao->recuperar( $idCurso );
+            $curso = $this->_cursoDao->recuperar($idCurso);
 
             try {
-                $listaRequisicoes = $this->_alunoDao->recuperarTodasInscricoesPorCurso( $curso, '', '', $count + 1 );
-                $totalRequisicoes = $this->_alunoDao->recuperarQtdTotalInscricoesPorCurso( $curso );
+                $listaRequisicoes = $this->_alunoDao->recuperarTodasInscricoesPorCurso($curso, '', '', $count + 1);
+                $totalRequisicoes = $this->_alunoDao->recuperarQtdTotalInscricoesPorCurso($curso);
             } catch (cassandra_NotFoundException $e) {
                 $listaRequisicoes = array();
                 $totalRequisicoes = 0;
             }
 
-            $this->load->helper( 'paginacao_cassandra' );
-            $paginacao = create_paginacao_cassandra( $listaRequisicoes, $count );
+            $this->load->helper('paginacao_cassandra');
+            $paginacao = create_paginacao_cassandra($listaRequisicoes, $count);
 
             $dadosView = array(
                 'haRequisicoes' => $totalRequisicoes > 0,
-                'qtdRequisicoes' => count( $listaRequisicoes ),
+                'qtdRequisicoes' => count($listaRequisicoes),
                 'totalRequisicoes' => $totalRequisicoes,
                 'listaRequisicoes' => $this->template->loadPartial(
                     'lista_requisicoes',
@@ -104,7 +224,7 @@ class Aluno extends Curso_Controller
                 'idCurso' => $curso->getId()
             );
 
-            $this->_renderTemplateCurso($curso, 'curso/aluno/requisicoes', $dadosView );
+            $this->_renderTemplateCurso($curso, 'curso/aluno/requisicoes', $dadosView);
         } catch (Exception $e) {
             log_message('error', 'Ocorreu um erro ao tentar exibir lista de requisições de inscrição: '
                 . create_exception_description($e));
@@ -113,9 +233,9 @@ class Aluno extends Curso_Controller
         }
     }
 
-    public function mais_requisicoes ( $idCurso )
+    public function mais_requisicoes($idCurso)
     {
-        if ( ! $this->input->is_ajax_request() ) {
+        if (!$this->input->is_ajax_request()) {
             show_404();
         }
 
@@ -124,18 +244,18 @@ class Aluno extends Curso_Controller
         try {
             $count = 20;
 
-            $idProximo = $this->input->get( 'proximo' );
+            $idProximo = $this->input->get('proximo');
 
-            $curso = $this->_cursoDao->recuperar( $idCurso );
+            $curso = $this->_cursoDao->recuperar($idCurso);
 
             try {
-                $listaRequisicoes = $this->_alunoDao->recuperarTodasInscricoesPorCurso( $curso, $idProximo, '', $count + 1 );
+                $listaRequisicoes = $this->_alunoDao->recuperarTodasInscricoesPorCurso($curso, $idProximo, '', $count + 1);
             } catch (cassandra_NotFoundException $e) {
                 $listaRequisicoes = array();
             }
 
-            $this->load->helper( 'paginacao_cassandra' );
-            $paginacao = create_paginacao_cassandra( $listaRequisicoes, $count );
+            $this->load->helper('paginacao_cassandra');
+            $paginacao = create_paginacao_cassandra($listaRequisicoes, $count);
 
             $response = Zend_Json::encode(array(
                 'htmlListaRequisicoes' => $this->template->loadPartial(
@@ -146,7 +266,7 @@ class Aluno extends Curso_Controller
                     ),
                     'curso/aluno'
                 ),
-                'qtdRequisicoes' => count( $listaRequisicoes ),
+                'qtdRequisicoes' => count($listaRequisicoes),
                 'paginacao' => $paginacao
             ));
 
@@ -166,22 +286,22 @@ class Aluno extends Curso_Controller
         echo $json;
     }
 
-    public function aceitar_requisicao ($idCurso)
+    public function aceitar_requisicao($idCurso)
     {
-        if ( ! $this->input->is_ajax_request() ) {
+        if (!$this->input->is_ajax_request()) {
             show_404();
         }
 
         set_json_header();
 
         try {
-            $idUsuario = $this->input->get( 'id-usuario' );
+            $idUsuario = $this->input->get('id-usuario');
 
-            $curso = $this->_cursoDao->recuperar( $idCurso );
+            $curso = $this->_cursoDao->recuperar($idCurso);
 
-            $usuario = $this->_alunoDao->recuperar( $idUsuario );
+            $usuario = $this->_alunoDao->recuperar($idUsuario);
 
-            $this->_alunoDao->aceitarRequisicaoInscricao( $usuario, $curso );
+            $this->_alunoDao->aceitarRequisicaoInscricao($usuario, $curso);
 
             $this->load->helper('notificacao_js');
 
@@ -209,22 +329,22 @@ class Aluno extends Curso_Controller
         echo $json;
     }
 
-    public function recusar_requisicao ($idCurso)
+    public function recusar_requisicao($idCurso)
     {
-        if ( ! $this->input->is_ajax_request() ) {
+        if (!$this->input->is_ajax_request()) {
             show_404();
         }
 
         set_json_header();
 
         try {
-            $idUsuario = $this->input->get( 'id-usuario' );
+            $idUsuario = $this->input->get('id-usuario');
 
-            $curso = $this->_cursoDao->recuperar( $idCurso );
+            $curso = $this->_cursoDao->recuperar($idCurso);
 
-            $usuario = $this->_alunoDao->recuperar( $idUsuario );
+            $usuario = $this->_alunoDao->recuperar($idUsuario);
 
-            $this->_alunoDao->recusarRequisicaoInscricao( $usuario, $curso );
+            $this->_alunoDao->recusarRequisicaoInscricao($usuario, $curso);
 
             $this->load->helper('notificacao_js');
 
@@ -261,8 +381,8 @@ class Aluno extends Curso_Controller
                 'menu',
                 array(
                     'idCurso' => $curso->getId(),
-                    'totalAlunos' => $this->_alunoDao->recuperarQtdTotalPorCurso( $curso ),
-                    'totalRequisicoes' => $this->_alunoDao->recuperarQtdTotalInscricoesPorCurso( $curso )
+                    'totalAlunos' => $this->_alunoDao->recuperarQtdTotalPorCurso($curso),
+                    'totalRequisicoes' => $this->_alunoDao->recuperarQtdTotalInscricoesPorCurso($curso)
                 ),
                 'curso/aluno'
             )

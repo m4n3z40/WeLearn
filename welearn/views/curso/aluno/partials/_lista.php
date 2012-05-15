@@ -1,8 +1,14 @@
-<?php
-/**
- * Created by JetBrains PhpStorm.
- * User: allan
- * Date: 11/05/12
- * Time: 22:09
- * To change this template use File | Settings | File Templates.
- */
+<?php foreach ($listaAlunos as $aluno): ?>
+<li>
+    <div>
+        <?php echo $aluno->toHTML('imagem_pequena') ?>
+        <ul>
+            <li><?php echo anchor(
+                '/curso/aluno/desvincular/' . $idCurso,
+                'Desvincular aluno',
+                'class="a-desvincular-aluno" data-id-aluno="'. $aluno->id .'"'
+            ) ?></li>
+        </ul>
+    </div>
+</li>
+<?php endforeach; ?>
