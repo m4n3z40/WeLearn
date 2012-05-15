@@ -2,7 +2,7 @@
 
 <?php foreach ($listaAmigos as $row):?>
     <li id='item-amigo'>
-        <a href="#"><?=$row->getNome()?> <?=$row->getSobrenome()?></a>
+        <?= $row->toHTML('imagem_pequena')?>
     </li>
 <?php endforeach;?>
 

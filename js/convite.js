@@ -18,7 +18,9 @@
     $('#remover-convite').dialog(
         {
             autoOpen: false,
-            modal:true,
+            modal: true,
+            draggable: false,
+            resizable: false,
             title:'Remover Convite',
             width: 400,
             height: 170,
@@ -51,6 +53,8 @@
         {
             autoOpen: false,
             modal:true,
+            draggable: false,
+            resizable : false,
             title:'Aceitar Convite',
             width: 400,
             height: 170,

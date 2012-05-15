@@ -194,7 +194,7 @@ Tente novamente mais tarde.'
         $response = array(
             'success' => true,
             'mensagemId'=>$mensagemObj->getId(),
-            'remetenteId'=>$mensagemObj->getRemetente()->getId(),
+            'remetente'=>$mensagemObj->getRemetente()->toHTML('imagem_pequena'),
             'mensagemTexto'=>$mensagemObj->getMensagem(),
             'dataEnvio'=>date('d/m/Y à\s H:i',$mensagemObj->getDataEnvio()),
             'notificacao'=> create_notificacao_array(
