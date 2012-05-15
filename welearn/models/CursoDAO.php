@@ -17,6 +17,7 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
     private $_nomeCursosPorAlunoCF = 'cursos_curso_por_aluno';
     private $_nomeCursosPorInscricoesCF = 'cursos_curso_por_inscricao';
     private $_nomeCursosPorGerenciadoresCF = 'cursos_curso_por_gerenciador';
+    private $_nomeCursosPorConviteGerenciadorCF = 'cursos_curso_por_convite_gerenciador';
 
     private $_nomeUsuariosPorCursoCF = 'cursos_usuario_por_curso';
 
@@ -27,6 +28,7 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
     private $_cursosPorAlunoCF;
     private $_cursosPorInscricoesCF;
     private $_cursosPorGerenciadoresCF;
+    private $_cursosPorConviteGerenciadorCF;
 
     private $_usuariosPorCursoCF;
 
@@ -63,6 +65,7 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         $this->_cursosPorAlunoCF = $phpCassa->getColumnFamily($this->_nomeCursosPorAlunoCF);
         $this->_cursosPorInscricoesCF = $phpCassa->getColumnFamily($this->_nomeCursosPorInscricoesCF);
         $this->_cursosPorGerenciadoresCF = $phpCassa->getColumnFamily($this->_nomeCursosPorGerenciadoresCF);
+        $this->_cursosPorConviteGerenciadorCF = $phpCassa->getColumnFamily($this->_nomeCursosPorConviteGerenciadorCF);
 
         $this->_usuariosPorCursoCF = $phpCassa->getColumnFamily($this->_nomeUsuariosPorCursoCF);
 
@@ -299,9 +302,76 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         return $this->_criarVariosFromCassandra( $columns );
     }
 
-    public function recuperarTodosPorGerenciador(WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador, $de = '', $ate = '', $count = 20)
+    /**
+     * @param WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador
+     * @param string $de
+     * @param string $ate
+     * @param int $count
+     * @return array
+     */
+    public function recuperarTodosPorGerenciador(WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador,
+                                                 $de = '',
+                                                 $ate = '',
+                                                 $count = 20)
     {
-        // TODO: Implementar este metodo.
+        if ( ! $de != '' ) {
+            $de = UUID::import( $de )->bytes;
+        }
+
+        if ( ! $ate != '' ) {
+            $ate = UUID::import( $ate )->bytes;
+        }
+
+        $ids = array_keys(
+            $this->_cursosPorGerenciadoresCF->get(
+                $gerenciador->getId(),
+                null,
+                $de,
+                $ate,
+                true,
+                $count
+            )
+        );
+
+        $columns = $this->_cf->multiget( $ids );
+
+        return $this->_criarVariosFromCassandra( $columns );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     * @param string $de
+     * @param string $ate
+     * @param int $count
+     * @return array
+     */
+    public function recuperarTodosPorConviteGerenciador(WeLearn_Usuarios_Usuario $usuario,
+                                                        $de = '',
+                                                        $ate = '',
+                                                        $count = 20)
+    {
+        if ( ! $de != '' ) {
+            $de = UUID::import( $de )->bytes;
+        }
+
+        if ( ! $ate != '' ) {
+            $ate = UUID::import( $ate )->bytes;
+        }
+
+        $ids = array_keys(
+            $this->_cursosPorConviteGerenciadorCF->get(
+                $usuario->getId(),
+                null,
+                $de,
+                $ate,
+                true,
+                $count
+            )
+        );
+
+        $columns = $this->_cf->multiget( $ids );
+
+        return $this->_criarVariosFromCassandra( $columns );
     }
 
     /**
@@ -359,9 +429,22 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         return $this->_cursosPorInscricoesCF->get_count( $usuario->getId() );
     }
 
+    /**
+     * @param WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador
+     * @return int
+     */
     public function recuperarQtdTotalPorGerenciador(WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador)
     {
-        // TODO: Implementar este metodo.
+        return $this->_cursosPorGerenciadoresCF->get_count( $gerenciador->getId() );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     * @return int
+     */
+    public function recuperarQtdTotalPorConviteGerenciador(WeLearn_Usuarios_Usuario $usuario)
+    {
+        return $this->_cursosPorConviteGerenciadorCF->get_count( $usuario->getId() );
     }
 
     /**
@@ -402,9 +485,44 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         );
     }
 
-    public function salvarGerenciador(WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador, WeLearn_Cursos_Curso $noCurso)
+    /**
+     * @param WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador
+     * @param WeLearn_Cursos_Curso $noCurso
+     */
+    public function salvarGerenciador(WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador,
+                                      WeLearn_Cursos_Curso $noCurso)
     {
-        // TODO: Implementar este metodo.
+        $cursoUUID = UUID::import( $noCurso->getId() );
+
+        $this->_usuariosPorCursoCF->insert(
+            $cursoUUID->bytes,
+            array( $gerenciador->getId() => $gerenciador->getNivelAcesso() )
+        );
+
+        $this->_cursosPorGerenciadoresCF->insert(
+            $gerenciador->getId(),
+            array( $cursoUUID->bytes => '' )
+        );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     * @param WeLearn_Cursos_Curso $noCurso
+     */
+    public function salvarConviteGerenciador(WeLearn_Usuarios_Usuario $usuario,
+                                             WeLearn_Cursos_Curso $noCurso)
+    {
+        $cursoUUID = UUID::import( $noCurso->getId() );
+
+        $this->_usuariosPorCursoCF->insert(
+            $cursoUUID->bytes,
+            array( $usuario->getId() => WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE )
+        );
+
+        $this->_cursosPorConviteGerenciadorCF->insert(
+            $usuario->getId(),
+            array( $cursoUUID->bytes => '' )
+        );
     }
 
     /**
@@ -445,9 +563,44 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         );
     }
 
-    public function removerGerenciador(WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador, WeLearn_Cursos_Curso $doCurso)
+    /**
+     * @param WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador
+     * @param WeLearn_Cursos_Curso $doCurso
+     */
+    public function removerGerenciador(WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador,
+                                       WeLearn_Cursos_Curso $doCurso)
     {
-        // TODO: Implementar este metodo.
+        $cursoUUID = UUID::import( $doCurso->bytes );
+
+        $this->_usuariosPorCursoCF->remove(
+            $cursoUUID->bytes,
+            array( $gerenciador->getId() )
+        );
+
+        $this->_cursosPorGerenciadoresCF->remove(
+            $gerenciador->getId(),
+            array( $cursoUUID->bytes )
+        );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     * @param WeLearn_Cursos_Curso $doCurso
+     */
+    public function removerConviteGerenciador(WeLearn_Usuarios_Usuario $usuario,
+                                              WeLearn_Cursos_Curso $doCurso)
+    {
+        $cursoUUID = UUID::import( $doCurso->bytes );
+
+        $this->_usuariosPorCursoCF->remove(
+            $cursoUUID->bytes,
+            array( $usuario->getId() )
+        );
+
+        $this->_cursosPorConviteGerenciadorCF->remove(
+            $usuario->getId(),
+            array( $cursoUUID->bytes )
+        );
     }
 
     /**
@@ -458,16 +611,18 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
     {
         $cursoUUID = UUID::mint( $doCurso->getId() );
 
+        $this->_usuariosPorCursoCF->remove(
+            $cursoUUID->bytes,
+            array( $idsAlunos )
+        );
+
         foreach ($idsAlunos as $id) {
-            $this->_usuariosPorCursoCF->remove(
-                $cursoUUID->bytes,
-                array( $id )
-            );
 
             $this->_cursosPorAlunoCF->remove(
                 $id,
                 array( $cursoUUID->bytes )
             );
+
         }
     }
 
@@ -479,22 +634,65 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
     {
         $cursoUUID = UUID::mint( $doCurso->getId() );
 
+        $this->_usuariosPorCursoCF->remove(
+            $cursoUUID->bytes,
+            array( $idsUsuarios )
+        );
+
         foreach ( $idsUsuarios as $id ) {
-            $this->_usuariosPorCursoCF->remove(
-                $cursoUUID->bytes,
-                array( $id )
-            );
 
             $this->_cursosPorInscricoesCF->remove(
                 $id,
                 array( $cursoUUID->bytes )
             );
+
         }
     }
 
-    public function removerTodosGerenciadores(WeLearn_Cursos_Curso $doCurso)
+    /**
+     * @param array $idsGerenciadores
+     * @param WeLearn_Cursos_Curso $doCurso
+     */
+    public function removerTodosGerenciadores(array $idsGerenciadores, WeLearn_Cursos_Curso $doCurso)
     {
-        // TODO: Implementar este metodo.
+        $cursoUUID = UUID::import( $doCurso->getId() );
+
+        $this->_usuariosPorCursoCF->remove(
+            $cursoUUID->bytes,
+            array( $idsGerenciadores )
+        );
+
+        foreach ($idsGerenciadores as $id) {
+
+            $this->_cursosPorGerenciadoresCF->remove(
+                $id,
+                array( $cursoUUID->bytes )
+            );
+
+        }
+    }
+
+    /**
+     * @param array $idsUsuarios
+     * @param WeLearn_Cursos_Curso $curso
+     */
+    public function removerTodosConvitesGerenciador(array $idsUsuarios, WeLearn_Cursos_Curso $curso)
+    {
+        $cursoUUID = UUID::import( $curso );
+
+        $this->_usuariosPorCursoCF->remove(
+            $cursoUUID->bytes,
+            array( $idsUsuarios )
+        );
+
+        foreach ($idsUsuarios as $id) {
+
+            $this->_cursosPorConviteGerenciadorCF->remove(
+                $id,
+                array( $cursoUUID->bytes )
+            );
+
+        }
     }
 
     /**
