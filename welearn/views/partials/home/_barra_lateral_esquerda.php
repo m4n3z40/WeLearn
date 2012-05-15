@@ -1,11 +1,8 @@
 <section id="home-left-bar" class="inner-sidebar-container inner-sidebar-container-left">
     <header>
         <figure>
-            <?php if ($usuario->imagem): ?>
-            <img src="<?php echo $usuario->imagem->url ?>" alt="Perfil de <?php echo $usuario->nome ?>">
-            <?php endif; ?>
             <figcaption>
-                <?php echo anchor('/usuario/' . $usuario->id, $usuario->nome) ?>
+                <?php echo anchor('/usuario/' . $usuario->id, $usuario->toHTML('imagem_grande')) ?>
             </figcaption>
         </figure>
     </header>

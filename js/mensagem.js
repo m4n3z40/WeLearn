@@ -46,8 +46,7 @@
                         '<li class="item-lista-mensagem">'+
                             '<input type="hidden" id="id-mensagem" value="'
                             +res.mensagemId+'">'+
-                            '<div class="imagem-remetente">imagem remetente</div>'+
-                            '<div class="id-remetente">'+res.remetenteId+'</div>'+
+                            '<div class="remetente">'+res.remetente+'</div>'+
                             '<div class="mensagem-texto">'+res.mensagemTexto+'</div>'+
                             '<div class="data-envio">'+res.dataEnvio+'</div>'+
                             '<a href="usuario/mensagem/remover" class="remover-mensagem">'
@@ -73,9 +72,7 @@
         $.post(
             WeLearn.url.siteURL(url),
             function(result) {
-                if (result.success == true) {
-                    mensagem.remove();
-                }
+                mensagem.remove();
                 WeLearn.notificar(result.notificacao);
             },
             'json'

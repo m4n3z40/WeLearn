@@ -81,6 +81,35 @@ class Amigos extends Home_Controller
         echo $json;
     }
 
+    public function remover($idAmigo)
+    {
+        try{
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+            $amizadeDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+            $usuarioAutenticado=$this->autenticacao->getUsuarioAutenticado();
+            $amigo = $usuarioDao->recuperar($idAmigo);
+            $idAmizade=$amizadeDao->gerarIdAmizade($usuarioAutenticado,$amigo);
+            $amizadeRemovida=$amizadeDao->remover($idAmizade);
+            print_r($amizadeRemovida->toArray());
+            $this->load->helper('notificacao_js');
+            $resposta=array('success' => true);
+            $notificacoesFlash = create_notificacao_json(
+                'sucesso',
+                'Amizade Removida com Sucesso!'
+            );
+            $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+        }catch(cassandra_NotFoundException $e){
+            $resposta=array('success' => false);
+            $notificacoesFlash = create_notificacao_json(
+                'erro',
+                'Falha Ao Remover Amizade!'
+            );
+            $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+        }
+        echo $resposta;
+
+    }
+
 
 
 

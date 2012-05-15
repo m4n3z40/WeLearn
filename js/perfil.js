@@ -9,45 +9,46 @@
 
 (function(){
 
-
-    $( "#convite-form" ).dialog({
-        autoOpen: false,
-        width: 400,
-        height: 170
-    });
-
-
-
-    // exibir formulario de convite
     $( "#enviar-convite" ).click(function(e) {
         e.preventDefault();
         $( "#convite-form" ).dialog( "open");
         return false;
     });
 
-    // enviar convite
-    var formConvite=document.getElementById('form-enviar-convite');
-    $('#btn-form-convite').click(function(e){
-        e.preventDefault();
-        WeLearn.validarForm(formConvite,
-            $(formConvite).attr('action'),
-            function(res)
-            {
-                if(res.success)
-                {
-                    if(res.amigos)
+
+    $( "#convite-form" ).dialog({
+        autoOpen: false,
+        modal: true,
+        resizable: false,
+        draggable: false,
+        width: 400,
+        height: 200,
+        buttons:{
+            "Enviar Convite": function(){
+               var formConvite=document.getElementById('form-enviar-convite');
+                WeLearn.validarForm(formConvite,
+                    $(formConvite).attr('action'),
+                    function(res)
                     {
-                        $('#convite-form').dialog("close");
-                        window.location = WeLearn.url.siteURL('convite/index/recebidos');
-                    }else{
-                        $('#convite-form').dialog("close");
-                        location.reload();
-                    }
+                        if(res.success)
+                        {
+                            if(res.amigos)
+                            {
+                                $('#convite-form').dialog("close");
+                                window.location = WeLearn.url.siteURL('convite/index/recebidos');
+                            }else{
+                                $('#convite-form').dialog("close");
+                                location.reload();
+                            }
 
-                }
+                        }
 
+                    });
             }
-        )});
+
+        }
+    });
+
 
     $('#exibir-convite-pendente').click(
         function(e)
@@ -59,20 +60,19 @@
     );
 
 
-
-
-
     var param = $('.param-tipo-convite').val();
     var idConvite = $('#id-convite').val();
     var idRemetente=$('#id-remetente').val();
     var idDestinatario=$('#id-destinatario').val();
 
 
-
     if(param=='enviado'){
         $('#container-convite-pendente').dialog(
             {
                 autoOpen: false,
+                modal: true,
+                draggable: false,
+                resizable: false,
                 width: 400,
                 height: 170,
                 buttons: {
@@ -97,6 +97,9 @@
         $('#container-convite-pendente').dialog(
             {
                 autoOpen: false,
+                modal: true,
+                draggable: false,
+                resizable: false,
                 width: 400,
                 height: 170,
                 buttons: {
@@ -134,10 +137,12 @@
     var formMensagem=document.getElementById('form-criar-mensagem');
     $( "#form-criar-mensagem" ).dialog({
         autoOpen: false,
-        modal:true,
+        modal: true,
+        draggable: false,
+        resizable: false,
         title:'Enviar Mensagem',
         width: 400,
-        height: 170,
+        height: 200,
         buttons: {
             "Confirmar": function() {
 
@@ -165,7 +170,38 @@
         $( "#form-criar-mensagem" ).dialog( "open");
     });
 
+    var divRemoverAmizade= $('<div>Tem certeza que deseja remover a amizade?</div>');
 
+
+
+
+    $('#remover-amizade').click(
+        function(e){
+            e.preventDefault();
+            var url=$(this).attr('href');
+            divRemoverAmizade.dialog({
+                autoOpen: false,
+                modal: true,
+                draggable: false,
+                resizable: false,
+                title:'Enviar Mensagem',
+                width: 400,
+                height: 200,
+                buttons: {
+                    "Confirmar": function() {
+                        $(this).dialog('close');
+                        $.post(url,function(){
+                            location.reload();
+                        });
+                    },
+                    "Cancelar": function(){
+                        $(this).dialog('close');
+                    }
+                }
+            });
+            divRemoverAmizade.dialog('open');
+        }
+    );
 
 
 
