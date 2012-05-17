@@ -80,14 +80,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
             $this->salvarConfiguracao( $dto->getConfiguracao() );
         }
 
-        $indexMySqlUsuario = array(
-            'id' => $dto->getId(),
-            'nome' => $dto->getNome(),
-            'sobrenome' => $dto->getSobrenome(),
-            'email' => $dto->getEmail()
-        );
-
-        get_instance()->db->insert( $this->_mysql_tbl_name, $indexMySqlUsuario );
+        get_instance()->db->insert( $this->_mysql_tbl_name, $dto->toMySQL() );
 
         $dto->setPersistido(true);
     }
@@ -103,6 +96,9 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         }
 
         $this->_cf->insert($dto->getId(), $dto->toCassandra());
+
+        get_instance()->db->where( 'id', $dto->getId() )
+                          ->update( $this->_mysql_tbl_name, $dto->toMySQL() );
     }
 
     /**
@@ -159,10 +155,22 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
 
         $db->like( 'id', $termo )
            ->or_like( 'nome', $termo )
-           ->or_like( 'sobrenome',$termo )
-           ->or_like( 'email',$termo )
+           ->or_like( 'sobrenome', $termo )
+           ->or_like( 'email', $termo )
            ->select( 'id' )
+           ->order_by( 'nome', 'desc' )
+           ->order_by( 'data_cadastro', 'desc' )
            ->limit( $count, $de );
+
+        if ( isset( $filtros['segmento'] ) ) {
+            $db->where( 'segmento_id', $filtros['segmento']->getId() )
+               ->group_by( 'segmento_id' );
+        }
+
+        if ( isset( $filtros['area'] ) ) {
+            $db->where( 'area_id', $filtros['area']->getId() )
+               ->group_by( 'area_id' );
+        }
 
         $sqlData = $db->get( $this->_mysql_tbl_name )->result();
 
@@ -267,7 +275,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
      * @param $dados
      * @return WeLearn_Usuarios_GerenciadorPrincipal
      */
-    public function criarGerenciadorPrincipal($dados)
+    public function criarGerenciadorPrincipal($dados = null)
     {
         if ($dados instanceof WeLearn_Usuarios_Usuario) {
             $dados = $this->_extrairDadosUsuarioParaArray($dados);
@@ -281,7 +289,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
      * @param $dados
      * @return WeLearn_Usuarios_GerenciadorAuxiliar
      */
-    public function criarGerenciadorAuxiliar($dados)
+    public function criarGerenciadorAuxiliar($dados = null)
     {
         if ($dados instanceof WeLearn_Usuarios_Usuario) {
             $dados = $this->_extrairDadosUsuarioParaArray($dados);
@@ -295,7 +303,7 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
      * @param $dados
      * @return WeLearn_Usuarios_Aluno
      */
-    public function criarAluno($dados)
+    public function criarAluno($dados = null)
     {
         if ($dados instanceof WeLearn_Usuarios_Usuario) {
             $dados = $this->_extrairDadosUsuarioParaArray($dados);

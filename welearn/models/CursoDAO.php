@@ -590,7 +590,7 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
     public function removerConviteGerenciador(WeLearn_Usuarios_Usuario $usuario,
                                               WeLearn_Cursos_Curso $doCurso)
     {
-        $cursoUUID = UUID::import( $doCurso->bytes );
+        $cursoUUID = UUID::import( $doCurso->getId() );
 
         $this->_usuariosPorCursoCF->remove(
             $cursoUUID->bytes,

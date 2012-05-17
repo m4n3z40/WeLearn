@@ -261,7 +261,7 @@ class AlunoDAO extends UsuarioDAO
             $column['segmentoInteresse']
         );
 
-        $aluno = $this->criarAluno( $column );
+        $aluno = $this->criarAluno();
 
         $aluno->fromCassandra( $column );
 

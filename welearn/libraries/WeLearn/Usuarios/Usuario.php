@@ -320,7 +320,8 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
             'nomeUsuario' => $this->getNomeUsuario(),
             'senha' => $this->getSenha(),
             'dataCadastro' => $this->getDataCadastro(),
-            'segmentoInteresse' => empty($this->_segmentoInteresse) ? '' : $this->getSegmentoInteresse()->getId()
+            'segmentoInteresse' => ($this->_segmentoInteresse instanceof WeLearn_Cursos_Segmento)
+                                   ? $this->getSegmentoInteresse()->getId() : ''
         );
     }
 
@@ -341,8 +342,12 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
             'senha' => $this->getSenha(),
             'dataCadastro' => $this->getDataCadastro(),
             'nivelAcesso' => $this->getNivelAcesso(),
-            'configuracao' => empty($this->_configuracao) ? '' : $this->getConfiguracao()->toArray(),
-            'segmentoInteresse' => empty($this->_segmentoInteresse) ? '' : $this->getSegmentoInteresse()->toArray(),
+            'configuracao' => ($this->_configuracao instanceof WeLearn_Usuarios_ConfiguracaoUsuario)
+                              ? $this->getConfiguracao()->toArray() : '',
+            'segmentoInteresse' => ($this->_segmentoInteresse instanceof WeLearn_Cursos_Segmento)
+                                   ? $this->getSegmentoInteresse()->toArray() : '',
+            'imagem' => ($this->_imagem instanceof WeLearn_Usuarios_ImagemUsuario)
+                        ? $this->getImagem()->toArray() : '',
             'persistido' => $this->isPersistido(),
         );
 
@@ -372,6 +377,17 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
 
         $configuracao = new WeLearn_Usuarios_ConfiguracaoUsuario($arrayUsuario['configuracao']);
         $arrayUsuario['configuracao'] = $configuracao;
+
+        if ( isset( $arrayUsuario['imagem'] ) && is_array( $arrayUsuario['imagem'] ) ) {
+
+            $imagem = new WeLearn_Usuarios_ImagemUsuario($arrayUsuario['imagem']);
+            $arrayUsuario['imagem'] = $imagem;
+
+        } else {
+
+            unset( $arrayUsuario['imagem'] );
+
+        }
 
         $this->__construct($arrayUsuario);
 
@@ -457,18 +473,26 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
 
     /**
      * @param bool $pequeno
+     * @param bool $semLink
      * @return string
      */
-    private function _htmlUsuario($pequeno = false)
+    private function _htmlUsuario($pequeno = false, $semLink = false)
     {
         $htmlImagem = $this->_htmlImagem( $pequeno );
         $nomeCompleto = $this->getNome() . ' ' . $this->getSobrenome();
         $id = $this->getId();
         $urlPerfil = site_url( '/perfil/' . $id );
 
-        return "<figure><a href=\"{$urlPerfil}\" title=\"{$nomeCompleto}\">{$htmlImagem}<figcaption><span>{$nomeCompleto}</span></figcaption></a></figure>";
+        if ( $semLink ) {
+            return "<figure>{$htmlImagem}<figcaption><span>{$nomeCompleto}</span></figcaption></figure>";
+        } else {
+            return "<figure><a href=\"{$urlPerfil}\" title=\"{$nomeCompleto}\">{$htmlImagem}<figcaption><span>{$nomeCompleto}</span></figcaption></a></figure>";
+        }
     }
 
+    /**
+     * @return string
+     */
     private function _htmlLinkUsuario()
     {
         $nomeCompleto = $this->getNome() . ' ' . $this->getSobrenome();
@@ -485,6 +509,10 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
     public function toHTML($tipo = 'imagem_grande')
     {
         switch ( $tipo ) {
+            case 'imagem_pequena_sem_link':
+                return $this->_htmlUsuario(true, true);
+            case 'imagem_grande_sem_link':
+                return $this->_htmlUsuario(false, true);
             case 'imagem_pequena':
                 return $this->_htmlUsuario( true );
             case 'somente_link':
@@ -493,5 +521,23 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
             default:
                 return $this->_htmlUsuario( false );
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function toMySQL()
+    {
+        return array(
+            'id' => $this->getId(),
+            'nome' => $this->getNome(),
+            'sobrenome' => $this->getSobrenome(),
+            'email' => $this->getEmail(),
+            'segmento_id' => ($this->_segmentoInteresse instanceof WeLearn_Cursos_Segmento)
+                             ? $this->getSegmentoInteresse()->getId() : '',
+            'area_id' => ($this->_segmentoInteresse instanceof WeLearn_Cursos_Segmento)
+                         && ($this->_segmentoInteresse->getArea() instanceof WeLearn_Cursos_Area)
+                         ? $this->getSegmentoInteresse()->getArea()->getId() : ''
+        );
     }
 }

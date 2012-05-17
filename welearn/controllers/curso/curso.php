@@ -8,9 +8,16 @@ class Curso extends Curso_Controller
         parent::__construct();
     }
 
-    public function index($id)
+    public function index()
     {
-        $this->exibir($id);
+        try {
+
+            $this->_renderTemplateHome();
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao exibir index de cursos: '
+                . create_exception_description($e));
+            show_404();
+        }
     }
 
     public function exibir($id)
@@ -25,6 +32,111 @@ class Curso extends Curso_Controller
             $this->_renderTemplateCurso($curso, 'curso/curso/exibir', $dadosViewExibir);
         } catch (Exception $e) {
             log_message('error', 'Erro ao exibir o curso: '
+                . create_exception_description($e));
+            show_404();
+        }
+    }
+
+    public function buscar()
+    {
+        try {
+            $dadosView = array(
+
+            );
+
+            $this->_renderTemplateHome('curso/buscar', $dadosView);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao exibir o página de busca de cursos do serviço: '
+                . create_exception_description($e));
+            show_404();
+        }
+    }
+
+    public function meus_cursos_criador()
+    {
+        try {
+            $dadosView = array(
+
+            );
+
+            $this->_renderTemplateHome('curso/meus_cursos_criador', $dadosView);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao exibir lista de cursos que o usuário criou: '
+                . create_exception_description($e));
+            show_404();
+        }
+    }
+
+    public function meus_cursos_gerenciador()
+    {
+        try {
+            $dadosView = array(
+
+            );
+
+            $this->_renderTemplateHome('curso/meus_cursos_gerenciador', $dadosView);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao exibir lista de cursos em que o usuário é gerenciador auxiliar: '
+                . create_exception_description($e));
+            show_404();
+        }
+    }
+
+    public function meus_cursos_aluno()
+    {
+        try {
+            $dadosView = array(
+
+            );
+
+            $this->_renderTemplateHome('curso/meus_cursos_aluno', $dadosView);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao exibir lista de cursos em que o usuário é aluno: '
+                . create_exception_description($e));
+            show_404();
+        }
+    }
+
+    public function meus_cursos_em_espera()
+    {
+        try {
+            $dadosView = array(
+
+            );
+
+            $this->_renderTemplateHome('curso/meus_cursos_em_espera', $dadosView);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao exibir lista de cursos em que o usuário se inscreveu: '
+                . create_exception_description($e));
+            show_404();
+        }
+    }
+
+    public function meus_convites()
+    {
+        try {
+            $dadosView = array(
+
+            );
+
+            $this->_renderTemplateHome('curso/meus_convites', $dadosView);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao exibir lista de convites de curso do usuário: '
+                . create_exception_description($e));
+            show_404();
+        }
+    }
+
+    public function meus_certificados()
+    {
+        try {
+            $dadosView = array(
+
+            );
+
+            $this->_renderTemplateHome('curso/meus_certificados', $dadosView);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao exibir lista de certificados do usuário: '
                 . create_exception_description($e));
             show_404();
         }
@@ -429,6 +541,11 @@ class Curso extends Curso_Controller
              ->_barraEsquerdaSetVar(
                  'usuario',
                  $this->autenticacao->getUsuarioAutenticado()
+             )
+
+             ->_barraDireitaSetVar(
+                'menuContexto',
+                $this->template->loadPartial('menu', array(), 'curso')
              )
 
              ->_renderTemplate( $view, $dados );

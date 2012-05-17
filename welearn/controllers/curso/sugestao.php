@@ -416,6 +416,16 @@ class Sugestao extends Home_Controller {
 
         echo $json;
     }
+
+    protected function _renderTemplateHome($view = '', $dados = null)
+    {
+        $this->_barraDireitaSetVar(
+            'menuContexto',
+            $this->template->loadPartial('menu', array(), 'curso')
+        );
+
+        parent::_renderTemplateHome($view, $dados);
+    }
 }
 
 /* End of file sugestao.php */
