@@ -15,7 +15,18 @@ class Home extends Home_Controller {
 
     public function index()
     {
-        $this->_renderTemplateHome('usuario/home/index');
+        $partialCriarFeed= $this->template->loadPartial(
+            'form',
+             array(),
+            'usuario/feed'
+        );
+        $partialListarFeed= $this->template->loadPartial(
+            'lista',
+            array(),
+            'usuario/feed'
+        );
+        $dados= array('criarFeed' => $partialCriarFeed , 'listarFeed' => $partialListarFeed);
+        $this->_renderTemplateHome('usuario/feed/index',$dados);
     }
 }
 

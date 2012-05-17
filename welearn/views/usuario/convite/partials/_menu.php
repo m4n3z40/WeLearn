@@ -1,5 +1,6 @@
-<h3>Ações em Convites</h3>
+<h3>Ações em Amigos</h3>
 <ul>
-    <li><?=anchor('/convite/index/enviados','convites enviados');?></li>
-    <li><?=anchor('/convite/index/recebidos','convites recebidos');?></li>
+    <li><?=anchor('/convite/index/enviados','Convites Enviados');?></li>
+    <li><?=anchor('/convite/index/recebidos','Convites Recebidos');?></li>
+    <li><?=anchor(site_url('/usuario/amigos'),'Amigos')?></li>
 </ul>
