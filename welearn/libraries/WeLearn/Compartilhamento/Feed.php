@@ -154,4 +154,15 @@ class WeLearn_Compartilhamento_Feed extends WeLearn_DTO_AbstractDTO
             'persistido' => $this->isPersistido()
         );
     }
+
+    public function toCassandra()
+    {
+        return array(
+            'id' => $this->getId(),
+            'conteudo' => $this->getConteudo(),
+            'criador' => $this->getCriador()->getId(),
+            'tipo' => $this->getTipo(),
+            'descricao' => empty($this->_descricao) ? '' : $this->getDescricao()
+        );
+    }
 }

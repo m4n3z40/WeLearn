@@ -22,6 +22,8 @@
                 <?php endif;?>
                     <li><?= anchor('usuario/mensagem/criar','Enviar Mensagem',array('id' => 'enviar-mensagem'))?></li>
                     <?php echo $partialEnviarMensagem; ?>
+            <?php else: ?>
+                   <?= anchor('/home','home')?>
             <?php endif; ?>
         </ul>
     </nav>
