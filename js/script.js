@@ -167,17 +167,17 @@ window.WeLearn = {
     },
     initAjax : function () {
         var loaderHTML = '<div id="ajax-loading">' +
-                         '<img src="http://welearn.com/img/ajax_loading.gif" alt="Carregando..." />' +
+                         '<img src="' + this.url.siteURL('/img/ajax_loading.gif') + '" alt="Carregando..." />' +
                          '</div>';
 
         var $loader = $(loaderHTML);
 
         $loader.bind({
             ajaxStart: function(){
-                $(this).show('slide', {direction: 'up'}, 250);
+                $(this).show();
             },
             ajaxStop: function(){
-                $(this).hide('slide', {direction: 'up'}, 250);
+                $(this).hide();
             }
         });
 
