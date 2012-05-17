@@ -9,6 +9,8 @@
  
 class FeedDAO extends WeLearn_DAO_AbstractDAO
 {
+    protected $_nomeCF = 'compartilhamento_feed';
+
     /**
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
@@ -54,7 +56,7 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
      */
     public function criarNovo(array $dados = null)
     {
-        // TODO: Implementar este metodo
+        return new WeLearn_Compartilhamento_Feed();
     }
 
     /**
