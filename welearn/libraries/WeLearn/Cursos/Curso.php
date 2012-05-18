@@ -51,6 +51,11 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
     private $_configuracao;
 
     /**
+     * @var int
+     */
+    private $_totalAlunos;
+
+    /**
      * @param \WeLearn_Cursos_ConfiguracaoCurso $configuracao
      */
     public function setConfiguracao(WeLearn_Cursos_ConfiguracaoCurso $configuracao)
@@ -205,6 +210,18 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
         //@TODO: Implementar este método!!
     }
 
+    /**
+     * @return int
+     */
+    public function getTotalAlunos()
+    {
+        if ($this->_totalAlunos === null) {
+            $this->_totalAlunos = WeLearn_DAO_DAOFactory::create('AlunoDAO')->recuperarQtdTotalPorCurso( $this );
+        }
+
+        return $this->_totalAlunos;
+    }
+
     public function toArray()
     {
         $selfArray = parent::toArray();
@@ -256,5 +273,37 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
             'segmento_id' => ( $this->_segmento instanceof WeLearn_Cursos_Segmento )
                              ? $this->getSegmento()->getId() : ''
         );
+    }
+
+    public function toHTML($pequeno=false)
+    {
+        $tam = '';
+
+        if ( $pequeno ) {
+            $tam = 'width="80" height="65"';
+        }
+
+        $url = site_url( '/curso/' . $this->getId() );
+        $urlImagem = ( $this->_imagem instanceof WeLearn_Cursos_ImagemCurso )
+                     ? $this->getImagem()->getUrl()
+                     : site_url( get_instance()->config->item('default_curso_img_uri') );
+        $nome = $this->getNome();
+        $descricao = $this->getDescricao();
+        $segmento = $this->getSegmento()->getDescricao();
+        $area = $this->getSegmento()->getArea()->getDescricao();
+        $tema = $this->getTema();
+        $totalAlunos = $this->getTotalAlunos();
+
+        return "<figure><a href=\"{$url}\" title=\"{$descricao}\">
+                <img src=\"{$urlImagem}\" alt=\"{$nome}\" {$tam}>
+                <figcaption>{$nome}</figcaption></a></figure><ul>
+                <li>Há <strong>{$totalAlunos}</strong> alunos neste curso.</li>
+                <li><strong>Segmento:</strong> {$segmento}</li>
+                <li><strong>Área:</strong> {$area}</li>
+                <li><strong>Tema:</strong> <pre>{$tema}</pre></li></ul>";
+    }
+
+    function __toString() {
+        return $this->toHTML();
     }
 }

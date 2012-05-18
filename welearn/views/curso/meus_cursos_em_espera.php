@@ -7,6 +7,17 @@
         <p></p>
     </header>
     <div>
-        
+        <?php if ($haCursos): ?>
+        <h4>Exibindo <em><?php echo $totalCursos ?></em> Cursos em que sua inscrição se encontra pendente.</h4>
+        <ul>
+            <?php foreach ($listaCursos as $curso): ?>
+            <li>
+                <?php echo $curso->toHTML(true) ?>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+        <?php else: ?>
+        <h4>Não há inscrições em cursos pendentes no momento.</h4>
+        <?php endif; ?>
     </div>
 </div>

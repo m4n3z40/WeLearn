@@ -18,26 +18,104 @@ class Gerenciador extends Curso_Controller
 
     public function index ($idCurso)
     {
+        $this->listar($idCurso);
+    }
+
+    public function listar ($idCurso)
+    {
         try {
+            $count = 20;
+
             $curso = $this->_cursoDao->recuperar( $idCurso );
 
-            $this->_renderTemplateCurso($curso);
+            try {
+                $listaGerenciadores = $this->_gerenciadorDao->recuperarTodosPorCurso($curso, '', '', $count + 1);
+                $totalGerenciadores = $this->_gerenciadorDao->recuperarQtdTotalPorCurso($curso);
+            } catch(cassandra_NotFoundException $e) {
+                $listaGerenciadores = array();
+                $totalGerenciadores = 0;
+            }
+
+            $this->load->helper('paginacao_cassandra');
+            $paginacao = create_paginacao_cassandra($listaGerenciadores, $count);
+
+            $dadosView = array(
+                'idCurso' => $curso->getId(),
+                'haGerenciadores' => $totalGerenciadores > 0,
+                'qtdGerenciadores' => count( $listaGerenciadores ),
+                'totalGerenciadores' => $totalGerenciadores,
+                'listaGerenciadores' => $this->template->loadPartial(
+                    'lista_gerenciadores',
+                    array(
+                        'idCurso' => $curso->getId(),
+                        'listaGerenciadores' => $listaGerenciadores
+                    ),
+                    'curso/gerenciador'
+                ),
+                'haMaisPaginas' => $paginacao['proxima_pagina'],
+                'idProximo' => $paginacao['inicio_proxima_pagina']
+            );
+
+            $this->_renderTemplateCurso($curso, '/curso/gerenciador/listar', $dadosView);
         } catch (Exception $e) {
-            log_message('error', 'Ocorreu um erro ao tentar exibir index do gerenciamento de gerenciadores'
+            log_message('error', 'Ocorreu um erro ao tentar exibir lista de gerenciadores do curso.'
                 . create_exception_description($e));
 
             show_404();
         }
     }
 
-    public function listar ($idCurso)
-    {
-
-    }
-
     public function mais_gerenciadores ($idCurso)
     {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
 
+        set_json_header();
+
+        try {
+            $count = 20;
+
+            $curso = $this->_cursoDao->recuperar( $idCurso );
+
+            $inicio = $this->input->get('proximo');
+
+            try {
+                $listaGerenciadores = $this->_gerenciadorDao->recuperarTodosPorCurso($curso, $inicio, '', $count + 1);
+            } catch(cassandra_NotFoundException $e) {
+                $listaGerenciadores = array();
+            }
+
+            $this->load->helper('paginacao_cassandra');
+            $paginacao = create_paginacao_cassandra($listaGerenciadores, $count);
+
+            $response = Zend_Json::encode(array(
+                'htmlGerenciadores' => $this->template->loadPartial(
+                    'lista_gerenciadores',
+                    array(
+                        'listaGerenciadores' => $listaGerenciadores,
+                        'idCurso' => $curso->getId()
+                    ),
+                    'curso/gerenciador'
+                ),
+                'qtdGerenciadores' => count( $listaGerenciadores ),
+                'paginacao' => $paginacao
+            ));
+
+            $json = create_json_feedback(true, '', $response);
+        } catch (cassandra_NotFoundException $e) {
+            log_message('error', 'Erro ao tentar recuperar outra página da lista de gerenciadores do curso :'
+                . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro inesperado, já estamos tentando resolver.
+                   Tente novamente mais tarde!'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
     }
 
     public function convites ($idCurso)
@@ -167,6 +245,136 @@ class Gerenciador extends Curso_Controller
             $json = create_json_feedback(true, '', $response);
         } catch (cassandra_NotFoundException $e) {
             log_message('error', 'Erro ao tentar cancelar convite para gerenciamento :'
+                . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro inesperado, já estamos tentando resolver.
+                   Tente novamente mais tarde!'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    public function aceitar_convite($idCurso)
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $curso = $this->_cursoDao->recuperar( $idCurso );
+
+            $usuario = $this->autenticacao->getUsuarioAutenticado();
+
+            $this->_gerenciadorDao->aceitarConvite( $usuario, $curso );
+
+            $this->load->helper('notificacao_js');
+
+            $this->session->set_flashdata('notificacoesFlash', create_notificacao_json(
+                'sucesso',
+                'Parabéns! Vocẽ acaba de se tornar o mais novo gerenciador deste curso, dê uma olhada nas ações dísponíveis!<br>
+                Mas cuidado! Grandes poderes acompanham grandes responsabilidades ;)',
+                10000
+            ));
+
+            $response = Zend_Json::encode(array(
+                'urlCurso' => site_url('/curso/' . $curso->getId())
+            ));
+
+            $json = create_json_feedback(true, '', $response);
+        } catch (cassandra_NotFoundException $e) {
+            log_message('error', 'Erro ao tentar aceitar convite para gerenciamento :'
+                . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro inesperado, já estamos tentando resolver.
+                   Tente novamente mais tarde!'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    public function recusar_convite($idCurso)
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $curso = $this->_cursoDao->recuperar( $idCurso );
+
+            $usuario = $this->autenticacao->getUsuarioAutenticado();
+
+            $this->_gerenciadorDao->recusarConvite( $usuario, $curso );
+
+            $this->load->helper('notificacao_js');
+
+            $response = Zend_Json::encode(array(
+                'notificacao' => create_notificacao_array(
+                    'sucesso',
+                    'O Convite para gerenciamento do curso <em>"'
+                        . $curso->getNome() . '"</em> foi recusado com sucesso!'
+                )
+            ));
+
+            $json = create_json_feedback(true, '', $response);
+        } catch (cassandra_NotFoundException $e) {
+            log_message('error', 'Erro ao tentar recusar convite para gerenciamento :'
+                . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro inesperado, já estamos tentando resolver.
+                   Tente novamente mais tarde!'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    public function desvincular($idCurso)
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $curso = $this->_cursoDao->recuperar( $idCurso );
+
+            $idGerenciador = $this->input->get('gerenciadorId');
+
+            $gerenciador = $this->_gerenciadorDao->criarGerenciadorAuxiliar(
+                $this->_gerenciadorDao->recuperar( $idGerenciador )
+            );
+
+            $this->_gerenciadorDao->desvincular( $gerenciador, $curso );
+
+            $this->load->helper('notificacao_js');
+
+            $response = Zend_Json::encode(array(
+                'notificacao' => create_notificacao_array(
+                    'sucesso',
+                    'O usuário <em>"'
+                        . $gerenciador->getNome() . '"</em> não faz mais parte do gerenciamento deste curso!'
+                )
+            ));
+
+            $json = create_json_feedback(true, '', $response);
+        } catch (cassandra_NotFoundException $e) {
+            log_message('error', 'Erro ao tentar desvincular gerenciador :'
                 . create_exception_description($e));
 
             $error = create_json_feedback_error_json(
@@ -324,7 +532,7 @@ class Gerenciador extends Curso_Controller
                 }
 
                 $notificacoesFlash = create_notificacao_json(
-                    'aviso',
+                    'erro',
                     "<div><span>Alguns convites não foram enviados devido à erros, mais informações abaixo:</span><ul>{$errorsHtml}</ul></div>",
                     0
                 );

@@ -134,11 +134,11 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
                                           $ate = '',
                                           $count = 20)
     {
-        if ( ! $de != '' ) {
+        if ( $de != '' ) {
             $de = UUID::import( $de )->bytes;
         }
 
-        if ( ! $ate != '' ) {
+        if ( $ate != '' ) {
             $ate = UUID::import( $ate )->bytes;
         }
 
@@ -170,11 +170,11 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
                                               $ate = '',
                                               $count = 20)
     {
-        if ( ! $de != '' ) {
+        if ( $de != '' ) {
             $de = UUID::import( $de )->bytes;
         }
 
-        if ( ! $ate != '' ) {
+        if ( $ate != '' ) {
             $ate = UUID::import( $ate )->bytes;
         }
 
@@ -206,11 +206,11 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
                                              $ate = '',
                                              $count = 20)
     {
-        if ( ! $de != '' ) {
+        if ( $de != '' ) {
             $de = UUID::import( $de )->bytes;
         }
 
-        if ( ! $ate != '' ) {
+        if ( $ate != '' ) {
             $ate = UUID::import( $ate )->bytes;
         }
 
@@ -242,11 +242,11 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
                                            $ate = '',
                                            $count = 20)
     {
-        if ( ! $de != '' ) {
+        if ( $de != '' ) {
             $de = UUID::import( $de )->bytes;
         }
 
-        if ( ! $ate != '' ) {
+        if ( $ate != '' ) {
             $ate = UUID::import( $ate )->bytes;
         }
 
@@ -278,11 +278,11 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
                                                $ate = '',
                                                $count = 20)
     {
-        if ( ! $de != '' ) {
+        if ( $de != '' ) {
             $de = UUID::import( $de )->bytes;
         }
 
-        if ( ! $ate != '' ) {
+        if ( $ate != '' ) {
             $ate = UUID::import( $ate )->bytes;
         }
 
@@ -314,11 +314,11 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
                                                  $ate = '',
                                                  $count = 20)
     {
-        if ( ! $de != '' ) {
+        if ( $de != '' ) {
             $de = UUID::import( $de )->bytes;
         }
 
-        if ( ! $ate != '' ) {
+        if ( $ate != '' ) {
             $ate = UUID::import( $ate )->bytes;
         }
 
@@ -350,11 +350,11 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
                                                         $ate = '',
                                                         $count = 20)
     {
-        if ( ! $de != '' ) {
+        if ( $de != '' ) {
             $de = UUID::import( $de )->bytes;
         }
 
-        if ( ! $ate != '' ) {
+        if ( $ate != '' ) {
             $ate = UUID::import( $ate )->bytes;
         }
 
@@ -570,7 +570,7 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
     public function removerGerenciador(WeLearn_Usuarios_GerenciadorAuxiliar $gerenciador,
                                        WeLearn_Cursos_Curso $doCurso)
     {
-        $cursoUUID = UUID::import( $doCurso->bytes );
+        $cursoUUID = UUID::import( $doCurso->getId() );
 
         $this->_usuariosPorCursoCF->remove(
             $cursoUUID->bytes,
@@ -902,7 +902,11 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         $listaCursosObjs = array();
 
         foreach ($columns as $column) {
-            $this->_criarFromCassandra($column, $segmentoPadrao, $criadorPadrao);
+            $listaCursosObjs[] = $this->_criarFromCassandra(
+                $column,
+                $segmentoPadrao,
+                $criadorPadrao
+            );
         }
 
         return $listaCursosObjs;

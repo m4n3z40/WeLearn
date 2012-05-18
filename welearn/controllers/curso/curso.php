@@ -10,14 +10,8 @@ class Curso extends Curso_Controller
 
     public function index()
     {
-        try {
-
-            $this->_renderTemplateHome();
-        } catch (Exception $e) {
-            log_message('error', 'Erro ao exibir index de cursos: '
-                . create_exception_description($e));
-            show_404();
-        }
+        //TODO: Desenvolver index de curso mais dinamica.
+        $this->meus_cursos_criador();
     }
 
     public function exibir($id)
@@ -40,6 +34,8 @@ class Curso extends Curso_Controller
     public function buscar()
     {
         try {
+            //TODO: Desenvolver busca de cursos.
+
             $dadosView = array(
 
             );
@@ -55,8 +51,22 @@ class Curso extends Curso_Controller
     public function meus_cursos_criador()
     {
         try {
-            $dadosView = array(
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
 
+            $criador = $usuarioDao->criarGerenciadorPrincipal(
+                $this->autenticacao->getUsuarioAutenticado()
+            );
+
+            try {
+                $listaCursos = $this->_cursoDao->recuperarTodosPorCriador($criador, '', '', 1000000);
+            } catch (cassandra_NotFoundException $e) {
+                $listaCursos = array();
+            }
+
+            $dadosView = array(
+                'haCursos' =>  !empty($listaCursos),
+                'totalCursos' => count( $listaCursos ),
+                'listaCursos' => $listaCursos
             );
 
             $this->_renderTemplateHome('curso/meus_cursos_criador', $dadosView);
@@ -70,8 +80,27 @@ class Curso extends Curso_Controller
     public function meus_cursos_gerenciador()
     {
         try {
-            $dadosView = array(
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
 
+            $gerenciador = $usuarioDao->criarGerenciadorAuxiliar(
+                $this->autenticacao->getUsuarioAutenticado()
+            );
+
+            try {
+                $listaCursos = $this->_cursoDao->recuperarTodosPorGerenciador(
+                    $gerenciador,
+                    '',
+                    '',
+                    1000000
+                );
+            } catch (cassandra_NotFoundException $e) {
+                $listaCursos = array();
+            }
+
+            $dadosView = array(
+                'haCursos' =>  !empty($listaCursos),
+                'totalCursos' => count( $listaCursos ),
+                'listaCursos' => $listaCursos
             );
 
             $this->_renderTemplateHome('curso/meus_cursos_gerenciador', $dadosView);
@@ -85,8 +114,22 @@ class Curso extends Curso_Controller
     public function meus_cursos_aluno()
     {
         try {
-            $dadosView = array(
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
 
+            $aluno = $usuarioDao->criarAluno(
+                $this->autenticacao->getUsuarioAutenticado()
+            );
+
+            try {
+                $listaCursos = $this->_cursoDao->recuperarTodosPorAluno($aluno, '', '', 1000000);
+            } catch (cassandra_NotFoundException $e) {
+                $listaCursos = array();
+            }
+
+            $dadosView = array(
+                'haCursos' =>  !empty($listaCursos),
+                'totalCursos' => count( $listaCursos ),
+                'listaCursos' => $listaCursos
             );
 
             $this->_renderTemplateHome('curso/meus_cursos_aluno', $dadosView);
@@ -100,8 +143,23 @@ class Curso extends Curso_Controller
     public function meus_cursos_em_espera()
     {
         try {
-            $dadosView = array(
+            $usuario = $this->autenticacao->getUsuarioAutenticado();
 
+            try {
+                $listaCursos = $this->_cursoDao->recuperarTodosPorInscricao(
+                    $usuario,
+                    '',
+                    '',
+                    1000000
+                );
+            } catch (cassandra_NotFoundException $e) {
+                $listaCursos = array();
+            }
+
+            $dadosView = array(
+                'haCursos' =>  !empty($listaCursos),
+                'totalCursos' => count( $listaCursos ),
+                'listaCursos' => $listaCursos
             );
 
             $this->_renderTemplateHome('curso/meus_cursos_em_espera', $dadosView);
@@ -115,8 +173,23 @@ class Curso extends Curso_Controller
     public function meus_convites()
     {
         try {
-            $dadosView = array(
+            $usuario = $this->autenticacao->getUsuarioAutenticado();
 
+            try {
+                $listaCursos = $this->_cursoDao->recuperarTodosPorConviteGerenciador(
+                    $usuario,
+                    '',
+                    '',
+                    1000000
+                );
+            } catch (cassandra_NotFoundException $e) {
+                $listaCursos = array();
+            }
+
+            $dadosView = array(
+                'haCursos' =>  !empty($listaCursos),
+                'totalCursos' => count( $listaCursos ),
+                'listaCursos' => $listaCursos
             );
 
             $this->_renderTemplateHome('curso/meus_convites', $dadosView);
@@ -130,6 +203,8 @@ class Curso extends Curso_Controller
     public function meus_certificados()
     {
         try {
+            //TODO: Desenvolver lista de certificados do usuário.
+
             $dadosView = array(
 
             );
@@ -269,7 +344,21 @@ class Curso extends Curso_Controller
 
             } elseif( $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_AUXILIAR ) {
 
-                //TODO: Fazer desvinculo de gerenciador
+                $gerenciadorDao = WeLearn_DAO_DAOFactory::create('GerenciadorAuxiliarDAO');
+
+                $gerenciador = $gerenciadorDao->criarGerenciadorAuxiliar(
+                    $this->autenticacao->getUsuarioAutenticado()
+                );
+
+                $gerenciadorDao->desvincular( $gerenciador, $curso );
+
+                $this->session->set_flashdata(
+                    'notificacoesFlash',
+                    create_notificacao_json(
+                        'sucesso',
+                        'Seu abandono da gerência deste curso foi efetuado com sucesso :('
+                    )
+                );
 
                 $json = create_json_feedback(true);
             } else {

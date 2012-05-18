@@ -40,7 +40,7 @@
 
     var formCurso = document.getElementById('form-curso');
     if (formCurso != null) {
-        $('#fil-imagem').live('change', function(e){
+        $('#fil-imagem').live('change', function(   ){
             var url = WeLearn.url.siteURL('curso/curso/salvar_imagem_temporaria/');
 
             $.ajaxFileUpload({
@@ -49,7 +49,7 @@
                 fileElementId: $(this).attr('id'),
                 dataType: 'json',
                 timeout: 60 * 1000,
-                success: function (res, status) {
+                success: function (res) {
                     if (res.success) {
                         WeLearn.notificar({
                             nivel: 'success',
@@ -85,7 +85,7 @@
                         });
                     }
                 },
-                error: function (res, status) {
+                error: function () {
                     WeLearn.notificar({
                         nivel: 'error',
                         msg: 'Ocorreu um erro inesperado! Já estamos verificando, tente novamente mais tarde.',
@@ -104,7 +104,7 @@
                 $formElems = $divConfigCursoContainer.find('input, textarea, select'),
                 $fdsAtivo = null;
 
-            $formElems.change(function(e) {
+            $formElems.change(function() {
                 $btnConfigCurso.show();
             });
 
@@ -194,7 +194,49 @@
         );
     });
 
+    var $divConfirmacaoDesvincular = $('<div id="dialogo-confirmacao-dexvincular-curso">' +
+                                       '<p>Tem certeza que deseja abandonar este curso?<br/>' +
+                                       'Talvez você queira pensar mais um pouco sobre isso...</p></div>');
     $('#a-curso-desvincular').click(function(e){
+        e.preventDefault();
+
+        var $this = $(this);
+
+        $divConfirmacaoDesvincular.dialog({
+            title: 'Tem certeza?',
+            width: '450px',
+            resizable: false,
+            modal: true,
+            buttons: {
+                'Confirmar' : function() {
+                    $.get(
+                        $this.attr('href'),
+                        {},
+                        function(res) {
+                            if (res.success) {
+
+                                $divConfirmacaoDesvincular.dialog('close');
+
+                                window.location.reload();
+
+                            } else {
+                                WeLearn.notificar({
+                                    nivel: 'error',
+                                    msg: res.errors[0].error_msg,
+                                    tempo: 5000
+                                });
+                            }
+                        }
+                    );
+                },
+                'Cancelar' : function() {
+                    $( this ).dialog('close');
+                }
+            }
+        });
+    });
+
+    $('a.a-aceitar-convite-gerenciamento').click(function(e){
         e.preventDefault();
 
         var $this = $(this);
@@ -202,10 +244,10 @@
         $.get(
             $this.attr('href'),
             {},
-            function(res) {
+            function(res){
                 if (res.success) {
 
-                    window.location.reload();
+                    window.location = res.urlCurso;
 
                 } else {
                     WeLearn.notificar({
@@ -216,6 +258,55 @@
                 }
             }
         );
+    });
+
+    var $emTotalConvites = $('#em-total-convite-gerenciamento'),
+        $divConfirmacaoRecusar = $('<div id="dialogo-confirmacao-recusar-convite-gerenciamento">' +
+                                   '<p>Tem certeza que deseja recusar este convite?<br/>' +
+                                   'Talvez você queira pensar mais um pouco sobre isso...</p></div>');
+    $('a.a-recusar-convite-gerenciamento').click(function(e){
+        e.preventDefault();
+
+        var $this = $(this);
+
+        $divConfirmacaoRecusar.dialog({
+            title: 'Tem certeza?',
+            width: '450px',
+            resizable: false,
+            modal: true,
+            buttons: {
+                'Confirmar' : function() {
+                    $.get(
+                        $this.attr('href'),
+                        {},
+                        function(res){
+                            if (res.success) {
+
+                                $this.parent().parent().parent().fadeOut(function(){
+                                    $(this).remove();
+                                });
+
+                                WeLearn.notificar(res.notificacao);
+
+                                $emTotalConvites.text( parseInt( $emTotalConvites.text() - 1 ) );
+
+                                $divConfirmacaoRecusar.dialog('close');
+
+                            } else {
+                                WeLearn.notificar({
+                                    nivel: 'error',
+                                    msg: res.errors[0].error_msg,
+                                    tempo: 5000
+                                });
+                            }
+                        }
+                    );
+                },
+                'Cancelar' : function() {
+                    $( this ).dialog('close');
+                }
+            }
+        });
     });
 
 })();

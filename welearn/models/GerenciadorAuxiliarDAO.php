@@ -123,11 +123,11 @@ class GerenciadorAuxiliarDAO extends UsuarioDAO
     }
 
     /**
-     * @param WeLearn_Cursos_Curso $usuario
+     * @param WeLearn_Usuarios_Usuario $usuario
      * @param WeLearn_Cursos_Curso $doCurso
      * @return WeLearn_Usuarios_GerenciadorAuxiliar
      */
-    public function aceitarConvite(WeLearn_Cursos_Curso $usuario,
+    public function aceitarConvite(WeLearn_Usuarios_Usuario $usuario,
                                    WeLearn_Cursos_Curso $doCurso)
     {
         $this->cancelarConvite( $usuario, $doCurso );
