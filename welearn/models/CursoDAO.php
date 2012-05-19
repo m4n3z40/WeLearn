@@ -153,7 +153,7 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
         if ( isset( $filtros['area'] ) && $filtros['area'] instanceof WeLearn_Cursos_Area ) {
 
             $areaStr = $db->escape( $filtros['area']->getId() );
-            $queryArea = 'c.segmento_id = ' . $areaStr;
+            $queryArea = 'c.area_id = ' . $areaStr;
 
         }
 

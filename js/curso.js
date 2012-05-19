@@ -309,4 +309,90 @@
         });
     });
 
+    var $emTotalRequisicoesInscricao = $('.em-total-requisicao-inscricao');
+    $('a.a-cancelar-requisicao-inscricao').click(function(e){
+        e.preventDefault();
+
+        var $this = $(this);
+
+        $.get(
+            $this.attr('href'),
+            {},
+            function(res){
+                if (res.success) {
+
+                    $this.parent().parent().parent().fadeOut(function(){
+                        $(this).remove();
+                    });
+
+                    WeLearn.notificar(res.notificacao);
+
+                    $emTotalRequisicoesInscricao.text( parseInt( $emTotalRequisicoesInscricao.text() - 1 ) );
+
+                } else {
+                    WeLearn.notificar({
+                        nivel: 'error',
+                        msg: res.errors[0].error_msg,
+                        tempo: 5000
+                    });
+                }
+            }
+        );
+    });
+
+    var $ulOpcoesBuscaRefinada = $('#ul-opcoes-busca-cursos-refinada'),
+        $ulResultadosBuscaCursos = $('#ul-lista-resultados-busca-cursos');
+    $('input.rdo-tipo-busca-curso').change(function(){
+        if ( $(this).val() == 'refinada' ) {
+            $ulOpcoesBuscaRefinada.fadeIn();
+        } else {
+            $ulOpcoesBuscaRefinada.fadeOut();
+        }
+    });
+
+    $('#a-exibir-area-busca,#a-exibir-segmento-busca').click(function(e){
+        e.preventDefault();
+
+        var $this = $(this);
+
+        $this.parent().hide().next().fadeIn();
+    });
+
+    $('#a-paginacao-busca-cursos').click(function(e){
+        e.preventDefault();
+
+        var $this = $(this),
+            dadosGet = WeLearn.url.params;
+
+        dadosGet.proximo = $this.data('proximo');
+
+        $.get(
+            WeLearn.url.siteURL('/curso/mais_resultados'),
+            dadosGet,
+            function(res) {
+                if (res.success) {
+
+                    $ulResultadosBuscaCursos.append(res.htmlResultadosBusca);
+
+                    if ( res.paginacao.proxima_pagina ) {
+
+                        $this.data( 'proximo', res.paginacao.inicio_proxima_pagina );
+
+                    } else {
+
+                        $this.replaceWith('<h4>Não há mais resultados há serem exibidos.</h4>');
+
+                    }
+
+                } else {
+                    WeLearn.notificar({
+                        nivel: 'error',
+                        msg: res.errors[0].error_msg,
+                        tempo: 5000
+                    });
+                }
+            }
+        );
+    });
+
 })();

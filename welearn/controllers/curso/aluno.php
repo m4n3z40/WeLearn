@@ -371,6 +371,46 @@ class Aluno extends Curso_Controller
         echo $json;
     }
 
+    public function cancelar_requisicao($idCurso)
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $curso = $this->_cursoDao->recuperar($idCurso);
+
+            $usuario = $this->autenticacao->getUsuarioAutenticado();
+
+            $this->_alunoDao->recusarRequisicaoInscricao( $usuario, $curso );
+
+            $this->load->helper('notificacao_js');
+
+            $response = Zend_Json::encode(array(
+                'notificacao' => create_notificacao_array(
+                    'sucesso',
+                    'Sua inscrição no curso "' . $curso->getNome() . '" foi cancelada com sucesso. :('
+                )
+            ));
+
+            $json = create_json_feedback(true, '', $response);
+        } catch (cassandra_NotFoundException $e) {
+            log_message('error', 'Erro ao tentar cancelar requisição de inscricao: '
+                . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro inesperado, já estamos tentando resolver.
+                Tente novamente mais tarde!'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
     protected function _renderTemplateCurso(WeLearn_Cursos_Curso $curso,
                                             $view = '',
                                             array $dados = null)

@@ -60,10 +60,84 @@ class Curso extends Curso_Controller
     public function buscar()
     {
         try {
-            //TODO: Desenvolver busca de cursos.
+            $this->load->helper( array('area', 'segmento', 'paginacao_mysql') );
+
+            $count = 20;
+            $buscaAtual = $this->input->get('busca');
+            $tipoBuscaAtual = $this->input->get('tipo-busca');
+            $areaAtual = $this->input->get('area');
+            $segmentoAtual = $this->input->get('segmento');
+
+            $areaDao = WeLearn_DAO_DAOFactory::create('AreaDAO');
+            $segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
+
+            if ( $buscaAtual && ( $areaAtual != '0' && $segmentoAtual != '0' ) ) {
+
+                try {
+                    $segmento = $segmentoDao->recuperar( $segmentoAtual );
+                    $area = $segmento->getArea();
+                } catch ( cassandra_NotFoundException $e ) {
+                    $segmento = null;
+                    $area = null;
+                }
+
+            } elseif ( $buscaAtual && $areaAtual != '0' ) {
+
+                try {
+                    $area = $areaDao->recuperar( $areaAtual );
+                } catch( cassandra_NotFoundException $e ) {
+                    $area = null;
+                }
+
+                $segmento = null;
+            } else {
+                $area = null;
+                $segmento = null;
+            }
+
+            $listaSegmentos = array();
+            if ( $buscaAtual && $area != null ) {
+                $opcoes = array('areaId' => $area->getId());
+
+                try {
+                    $listaSegmentos = $segmentoDao->recuperarTodos('', '', $opcoes);
+                } catch (cassandra_NotFoundException $e) { }
+            }
+
+            $listaResultados = array();
+            if ( $buscaAtual ) {
+                try {
+                    $listaResultados = $this->_recuperarResultadosBuscaCursos(
+                        $buscaAtual,
+                        $tipoBuscaAtual,
+                        $area,
+                        $segmento,
+                        0,
+                        $count + 1
+                    );
+                } catch (cassandra_NotFoundException $e) {
+                    $listaResultados = array();
+                }
+            }
+
+            $paginacao = create_paginacao_mysql($listaResultados, 0, $count);
 
             $dadosView = array(
-
+                'formAction' => '/curso/buscar',
+                'tipoBuscaAtual' => $tipoBuscaAtual,
+                'areaAtual' => $area === null ? '0' : $area->getId(),
+                'segmentoAtual' => $segmento === null ? '0' : $segmento->getId(),
+                'dadosDropdownArea' => lista_areas_para_dados_dropdown(),
+                'dadosDropdownSegmento' => lista_segmentos_para_dados_dropdown( $listaSegmentos ),
+                'haResultados' => ! empty($listaResultados),
+                'txtBusca' => $buscaAtual,
+                'resultadosBusca' => $this->template->loadPartial(
+                    'lista_busca',
+                    array('listaResultados' => $listaResultados),
+                    'curso'
+                ),
+                'haMaisPaginas' => $paginacao['proxima_pagina'],
+                'inicioProxPagina' => $paginacao['inicio_proxima_pagina']
             );
 
             $this->_renderTemplateHome('curso/buscar', $dadosView);
@@ -72,6 +146,126 @@ class Curso extends Curso_Controller
                 . create_exception_description($e));
             show_404();
         }
+    }
+
+    public function mais_resultados()
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $this->load->helper('paginacao_mysql');
+
+            $count = 20;
+            $buscaAtual = $this->input->get('busca');
+            $tipoBuscaAtual = $this->input->get('tipo-busca');
+            $areaAtual = $this->input->get('area');
+            $segmentoAtual = $this->input->get('segmento');
+            $inicio = (int)$this->input->get('proximo');
+
+            $areaDao = WeLearn_DAO_DAOFactory::create('AreaDAO');
+            $segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
+
+            if ( $buscaAtual && ( $areaAtual != '0' && $segmentoAtual != '0' ) ) {
+
+                try {
+                    $segmento = $segmentoDao->recuperar( $segmentoAtual );
+                    $area = $segmento->getArea();
+                } catch ( cassandra_NotFoundException $e ) {
+                    $segmento = null;
+                    $area = null;
+                }
+
+            } elseif ( $buscaAtual && $areaAtual != '0' ) {
+
+                try {
+                    $area = $areaDao->recuperar( $areaAtual );
+                } catch( cassandra_NotFoundException $e ) {
+                    $area = null;
+                }
+
+                $segmento = null;
+            } else {
+                $area = null;
+                $segmento = null;
+            }
+
+            $listaResultados = array();
+            if ( $buscaAtual ) {
+                try {
+                    $listaResultados = $this->_recuperarResultadosBuscaCursos(
+                        $buscaAtual,
+                        $tipoBuscaAtual,
+                        $area,
+                        $segmento,
+                        $inicio,
+                        $count + 1
+                    );
+                } catch (cassandra_NotFoundException $e) {
+                    $listaResultados = array();
+                }
+            }
+
+            $paginacao = create_paginacao_mysql($listaResultados, $inicio, $count);
+
+            $response = Zend_Json::encode(array(
+                'htmlResultadosBusca' => $this->template->loadPartial(
+                    'lista_busca',
+                    array('listaResultados' => $listaResultados),
+                    'curso'
+                ),
+                'paginacao' => $paginacao
+            ));
+
+            $json = create_json_feedback(true, '', $response);
+        } catch (Exception $e) {
+            log_message('error', 'Ocorreu um erro ao tentar recuperar proxima página de resultados da busca: '
+                . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro desconhecido, já estamos verificando. Tente novamente mais tarde.'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    private function _recuperarResultadosBuscaCursos($busca,
+                                                     $tipoBusca,
+                                                     $area = null,
+                                                     $segmento = null,
+                                                     $inicio = 0,
+                                                     $count = 20)
+    {
+        $opcoes = array();
+
+        switch ( $tipoBusca ) {
+            case 'recomendados':
+                $opcoes['segmento'] = $this->autenticacao
+                                           ->getUsuarioAutenticado()
+                                           ->getSegmentoInteresse();
+                break;
+            case 'refinada':
+                if ( $segmento instanceof WeLearn_Cursos_Segmento ) {
+                    $opcoes['segmento'] = $segmento;
+                    break;
+                } elseif ( $area instanceof WeLearn_Cursos_Area ) {
+                    $opcoes['area'] = $area;
+                    break;
+                }
+            case 'tudo':
+            default:
+        }
+
+        $opcoes['busca'] = $busca;
+        $opcoes['count'] = $count;
+
+        return $this->_cursoDao->recuperarTodos( $inicio, null, $opcoes );
     }
 
     public function meus_cursos_criador()
