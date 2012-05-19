@@ -119,7 +119,116 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperarTodos($de = null, $ate = null, array $filtros = null)
     {
-        // TODO: Implementar este metodo.
+        $db = get_instance()->db;
+
+        $query =
+       'SELECT
+            c.id,
+            AVG(r.qualidade) as mediaQualidade,
+            AVG(r.dificuldade) as mediaDificuldade,
+            COUNT(r.id) AS totalReviews
+        FROM wl_cursos AS c
+        LEFT JOIN wl_reviews AS r
+        ON c.id = r.curso_id';
+
+        $queryBusca = '';
+        if ( isset( $filtros['busca'] ) && $filtros['busca'] ) {
+
+            $buscaStr = $db->escape( '%'.$filtros['busca'].'%' );
+            $queryBusca = '(c.nome LIKE ' . $buscaStr
+                        . ' OR c.tema LIKE ' . $buscaStr
+                        . ' OR c.descricao LIKE ' . $buscaStr . ')';
+
+        }
+
+        $querySegmento = '';
+        if ( isset( $filtros['segmento'] ) && $filtros['segmento'] instanceof WeLearn_Cursos_Segmento ) {
+
+            $segmentoStr = $db->escape( $filtros['segmento']->getId() );
+            $querySegmento = 'c.segmento_id = ' . $segmentoStr;
+
+        }
+
+        $queryArea = '';
+        if ( isset( $filtros['area'] ) && $filtros['area'] instanceof WeLearn_Cursos_Area ) {
+
+            $areaStr = $db->escape( $filtros['area']->getId() );
+            $queryArea = 'c.segmento_id = ' . $areaStr;
+
+        }
+
+        $inicio = is_int( $de ) ? $de : 0;
+
+        $count = isset( $filtros['count'] ) && is_int( $filtros['count'] ) ? $filtros['count'] : 20;
+
+        $queryGroupBy = ' GROUP BY c.id';
+        $queryOrderBy = ' ORDER BY totalReviews DESC, mediaQualidade DESC, mediaDificuldade ASC';
+        $queryLimit = ' LIMIT ' . $inicio . ', ' . $count;
+
+        if ( $queryBusca != '' || $queryArea != '' || $querySegmento != '' ) {
+
+            $query .= ' WHERE ';
+
+            if ( $queryBusca != '' ) {
+
+                $query .= $queryBusca;
+
+            }
+
+            if ( $querySegmento != '' ) {
+
+                if ( $queryBusca != '' ) {
+
+                    $query .= 'AND ' . $querySegmento;
+
+                } else {
+
+                    $query .= $querySegmento;
+
+                }
+
+            }
+
+            if ( $queryArea != '' ) {
+
+                if ( $queryBusca != '' || $querySegmento != '' ) {
+
+                    $query .= 'AND ' . $queryArea;
+
+                } else {
+
+                    $query .= $queryArea;
+
+                }
+
+            }
+
+        }
+
+        $query .= $queryGroupBy;
+        $query .= $queryOrderBy;
+        $query .= $queryLimit;
+
+        $res = $db->query( $query )->result_array();
+
+        $ids = array();
+        for ($i = 0; $i < count( $res ); $i++) {
+            $ids[$i] = UUID::import( $res[$i]['id'] )->bytes;
+            unset( $res[$i]['id'] );
+        }
+
+        $columns = $this->_cf->multiget( $ids );
+        $columns = array_values($columns);
+
+        for ($i = 0; $i < count( $columns ); $i++) {
+            $columns[$i] = array_merge( $columns[$i], $res[$i] );
+        }
+
+        if ( $querySegmento != '' ) {
+            return $this->_criarVariosFromCassandra( $columns, $filtros['segmento'] );
+        }
+
+        return $this->_criarVariosFromCassandra( $columns );
     }
 
     /**

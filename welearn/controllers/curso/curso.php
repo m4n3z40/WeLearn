@@ -10,8 +10,34 @@ class Curso extends Curso_Controller
 
     public function index()
     {
-        //TODO: Desenvolver index de curso mais dinamica.
-        $this->meus_cursos_criador();
+        try {
+            $segmento = $this->autenticacao->getUsuarioAutenticado()
+                                           ->getSegmentoInteresse();
+
+            try {
+                $listaCursos = $this->_cursoDao->recuperarTodos(
+                    0,
+                    null,
+                    array(
+                        'count' => 10,
+                        'segmento' => $segmento
+                    )
+                );
+            } catch (cassandra_NotFoundException $e) {
+                $listaCursos = array();
+            }
+
+            $dadosView = array(
+                'haRecomendados' =>  !empty($listaCursos),
+                'listaRecomendados' => $listaCursos
+            );
+
+            $this->_renderTemplateHome('curso/index', $dadosView);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao exibir index de curso: '
+                . create_exception_description($e));
+            show_404();
+        }
     }
 
     public function exibir($id)
