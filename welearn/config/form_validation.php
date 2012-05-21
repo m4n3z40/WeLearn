@@ -389,6 +389,63 @@ $config = array(
             'rules' => 'required|max_length[50]'
         )
     ),
+    'usuario/salvar_dados_pessoais' => array(
+        array(
+            'field'=>'dataNascimento',
+            'label'=>'Data de Nascimento',
+            'rules'=>'exact_length[10]'
+        ),
+        array(
+            'field' => 'descricaoPessoal',
+            'label' => 'Sobre Mim',
+            'rules' => 'max_length[2048]'
+        ),
+        array(
+            'field' => 'tel',
+            'label' => 'Telefone',
+            'rules' => 'max_length[20]'
+        ),
+        array(
+            'field' => 'telAlternativo',
+            'label' => 'Telefone Alternativo',
+            'rules' => 'max_length[20]'
+        )
+    ),
+    'usuario/salvar_dados_profissionais' => array(
+        array(
+            'field'=>'ano',
+            'label'=>'Ano',
+            'rules'=>'is_natural|exact_length[4]'
+        )
+    ),
+    'usuario/salvar_configuracao' => array(
+        array(
+            'field'=>'privacidadePerfil',
+            'label'=>'Privacidade do Perfil',
+            'rules'=>'required'
+        ),
+        array(
+            'field'=>'privacidadeMP',
+            'label'=>'Privacidade de Mensagens Pessoais',
+            'rules'=>'required'
+        ),
+        array(
+            'field'=>'privacidadeConvites',
+            'label'=>'Privacidade de Convites de Cursos',
+            'rules'=>'required'
+        ),
+        array(
+            'field'=>'privacidadeCompartilhamento',
+            'label'=>'Feed de Compartilhamento',
+            'rules'=>'required'
+        ),
+        array(
+            'field'=>'privacidadeNotificacoes',
+            'label'=>'Notificações de Eventos',
+            'rules'=>'required'
+        ),
+
+    ),
     'convite/enviar' => array(
         array(
             'field'=>'txt-convite',

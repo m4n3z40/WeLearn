@@ -1,140 +1,141 @@
-/**
- * Created by JetBrains PhpStorm.
- * User: Allan Marques
- * Date: 26/08/11
- * Time: 14:38
- */
-
 (function(){
     var $barraProgresso = $('#progressbar'),
-        $etapasContainer = $('#quickstart-form-container');
+        $h3EtapaProgresso = $('#quickstart-progress > h3'),
+        $etapaDadosPessoais = $('#etapa-dados-pessoais'),
+        $etapaDadosProfissionais = $('#etapa-dados-profissionais'),
+        $etapaUploadImagem = $('#etapa-upload-imagem'),
+        $etapaConfigPrivacidade = $('#etapa-configuracao-privacidade'),
+        $aSalvarEtapa = $('.quickstart-salvar'),
+        $aPularEtapa = $('.quickstart-pular'),
+        $aPularTodasEtapas = $('.quickstart-pular-todos'),
+        etapasQuickstart = [
+            $etapaDadosPessoais,
+            $etapaDadosProfissionais,
+            $etapaUploadImagem,
+            $etapaConfigPrivacidade
+        ],
+        $etapaAnterior = null,
+        $etapaAtual = null,
+        totalEtapas = etapasQuickstart.length,
+        numEtapaAtual = 0;
 
     $barraProgresso.progressbar({value: 0});
 
-    function carregarEtapa (etapa) {
-        $.get(
-            WeLearn.url.siteURL('quickstart/carregar_etapa/' + etapa),
-            null,
+    function salvarEtapaAtual() {
+        var $formEtapaAtual = $etapaAtual.find('form');
+
+        WeLearn.validarForm(
+            $formEtapaAtual,
+            $formEtapaAtual.attr('action'),
             function(res) {
-                exibirEtapa(etapa, res);
-                anexarJSEtapa(etapa);
+                if (res.notificacao) {
+                    WeLearn.notificar( res.notificacao );
+                }
+
+                exibirProximaEtapa();
             }
         );
     }
 
-    function salvarEtapa (etapa, dados) {
-        $.post(
-            WeLearn.url.siteURL('quickstart/salvar_etapa/' + etapa),
-            dados,
-            function(res) {
-                if(res.success) {
-                    exibirProximaEtapa(etapa);
-                } else {
-                    alert('Erro no salvamento!');
+    function exibirEtapaAtual() {
+        $('html, body').animate({ scrollTop: 0 }, 'fast');
+
+        if ( $etapaAnterior ) {
+
+            $etapaAnterior.hide(
+                'slide',
+                { direction: 'left' },
+                function(){
+
+                    $etapaAtual.show(
+                        'slide',
+                        {direction: 'right'},
+                        function(){
+                            $barraProgresso.progressbar( {value: (100 / totalEtapas) * numEtapaAtual } );
+                            $h3EtapaProgresso.text('Etapa ' + numEtapaAtual + ' de ' + totalEtapas);
+                        }
+                    );
+
                 }
-            },
-            'json'
-        );
+            );
+
+        } else {
+
+            $etapaAtual.show(
+                'slide',
+                {direction: 'right'},
+                function(){
+                    $barraProgresso.progressbar( {value: (100 / totalEtapas) * numEtapaAtual } );
+                    $h3EtapaProgresso.text('Etapa ' + numEtapaAtual + ' de ' + totalEtapas);
+                }
+            );
+
+        }
+
+        if ( etapasQuickstart.length == 0 ) {
+            $aPularEtapa.remove();
+            $aPularTodasEtapas.remove();
+            $aSalvarEtapa.text('Salvar e Finalizar')
+        }
     }
 
-    function pularEtapaAtual() {
-        var $etapasContainer = $('.container-etapa'),
-            etapaAtual = parseInt($etapasContainer.attr('id').split('-')[1]);
+    function exibirProximaEtapa() {
+        if ( numEtapaAtual < totalEtapas ) {
 
-        exibirProximaEtapa(etapaAtual);
+            $etapaAnterior = $etapaAtual;
+            $etapaAtual = etapasQuickstart.shift();
+            numEtapaAtual++;
+
+            exibirEtapaAtual();
+
+        } else {
+
+            finalizarQuickstart();
+
+        }
     }
 
     function finalizarQuickstart() {
-        alert('Quickstart Finalizado!');
-        window.location = WeLearn.url.siteURL('home');
-    }
+        $.get(
+            WeLearn.url.siteURL('quickstart/finalizar'),
+            {},
+            function(res) {
+                if (res.success) {
+                    window.location = WeLearn.url.siteURL('/home');
+                } else {
+                    WeLearn.notificar({
+                        msg: res.errors[0].error_msg,
+                        nivel: 'error',
+                        tempo: 5000
+                    })
+                }
+            }
+        );
 
-    function exibirEtapa (etapa, conteudoEtapa) {
-        var $containerEtapa = $( document.createElement('div') ),
-            $tituloProgresso = $('#quickstart-progress > h3'),
-            numeroEtapas = 5,
-            progressoAtual = (100 / numeroEtapas) * etapa;
-
-        $tituloProgresso.html('Etapa ' + etapa + ' de ' + numeroEtapas);
-        $barraProgresso.progressbar('option', 'value', progressoAtual);
-
-        $containerEtapa.addClass('container-etapa');
-        $containerEtapa.attr('id', 'etapa-' + etapa);
-        $containerEtapa.append(conteudoEtapa);
-        $etapasContainer.prepend($containerEtapa);
-        $containerEtapa.show('slide', { direction: 'right' }, 500);
-    }
-
-    function exibirProximaEtapa (etapaAtual) {
-        var $containerEtapa = $('#etapa-' + etapaAtual),
-            $jsEtapa = $('#js-etapa-' + etapaAtual),
-            proximaEtapa = ++etapaAtual;
-
-        if (proximaEtapa > 5) {
-            finalizarQuickstart();
-            return;
-        }
-
-        if($jsEtapa.length > 0) {
-            $jsEtapa.remove();
-        }
-
-        if( $containerEtapa.length > 0 ) {
-            $containerEtapa.hide('slide', {}, 500, function(){
-                setTimeout(function(){
-                    $(this).remove()
-                }, 1000);
-            });
-        }
-
-        carregarEtapa(proximaEtapa);
-    }
-
-    function anexarJSEtapa(etapa) {
-        var js;
-
-        switch(etapa) {
-            case 1:
-                js = 'dados_pessoais.js'; break;
-            case 2:
-                js = 'dados_profissionais.js'; break;
-            default:
-                js = false;
-        }
-
-        if(js !== false) {
-            var baseURL = WeLearn.url.baseURL;
-            $('body').append('<script src="' + baseURL + '/js/' + js + '" id="js-etapa-' + etapa + '"></script> ');
-        }
     }
 
     function init() {
-        var etapaAtual = 0;
-        exibirProximaEtapa(etapaAtual);
-
-        var $btnSalvar = $('.salvar'),
-            $btnPular = $('.pular'),
-            $btnPularTodos = $('.pular-todos');
-
-        $btnSalvar.click(function(e){
+        $aSalvarEtapa.click(function(e){
             e.preventDefault();
 
-            var frmEtapaAtual = $('.quickstart-form'),
-                etapa = parseInt(frmEtapaAtual.attr('id').split('-')[2]);
-
-            salvarEtapa(etapa, frmEtapaAtual.serialize());
+            salvarEtapaAtual();
         });
 
-        $btnPular.click(function(e){
+        $aPularEtapa.click(function(e){
             e.preventDefault();
-            pularEtapaAtual();
+
+            exibirProximaEtapa();
         });
 
-        $btnPularTodos.click(function(e){
+        $aPularTodasEtapas.click(function(e){
             e.preventDefault();
+
             finalizarQuickstart();
         });
+
+        exibirProximaEtapa();
     }
 
     init();
+
 })();

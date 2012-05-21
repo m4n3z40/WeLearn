@@ -38,11 +38,6 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO
     /**
      * @var int
      */
-    private $_statusCompartilhamento = WeLearn_Usuarios_PrivacidadeCompartilhamento::HABILITADO;
-
-    /**
-     * @var int
-     */
     private $_privacidadeNotificacoes = WeLearn_Usuarios_PrivacidadeNotificacoes::HABILITADO;
 
     /**
@@ -131,22 +126,6 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param int $statusCompartilhamento
-     */
-    public function setStatusCompartilhamento($statusCompartilhamento)
-    {
-        $this->_statusCompartilhamento = (int)$statusCompartilhamento;
-    }
-
-    /**
-     * @return int
-     */
-    public function getStatusCompartilhamento()
-    {
-        return $this->_statusCompartilhamento;
-    }
-
-    /**
      * @param array $notificacoesHabilitadas
      */
     public function setNotificacoesHabilitadas(array $notificacoesHabilitadas)
@@ -186,7 +165,6 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO
             'privacidadeMP' => $this->getPrivacidadeMP(),
             'privacidadeConvites' => $this->getPrivacidadeConvites(),
             'privacidadeCompartilhamento' => $this->getPrivacidadeCompartilhamento(),
-            'statusCompartilhamento' => $this->getStatusCompartilhamento(),
             'privacidadeNotificacoes' => $this->getPrivacidadeConvites(),
             'notificacoesHabilitadas' => $this->getNotificacoesHabilitadas(),
             'persistido' => $this->isPersistido()
@@ -206,7 +184,6 @@ class WeLearn_Usuarios_ConfiguracaoUsuario extends WeLearn_DTO_AbstractDTO
             'privacidadeMP' => $this->getPrivacidadeMP(),
             'privacidadeConvites' => $this->getPrivacidadeConvites(),
             'privacidadeCompartilhamento' => $this->getPrivacidadeCompartilhamento(),
-            'statusCompartilhamento' => $this->getStatusCompartilhamento(),
             'privacidadeNotificacoes' => $this->getPrivacidadeConvites()
         );
         $arrayConfiguracao['notificacoesHabilitadas'] = !empty($this->_notificacoesHabilitadas)

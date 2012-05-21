@@ -1,5 +1,5 @@
 <h3>Imagem do Perfil</h3>
-<?php echo form_open_multipart('', $extraOpenForm) ?>
+<?php echo form_open_multipart($formAction, $extraOpenForm) ?>
     <fieldset>
         <legend>Imagem do Usuário</legend>
         <dl>
@@ -8,4 +8,3 @@
         </dl>
     </fieldset>
 <?php echo form_close() ?>
- 

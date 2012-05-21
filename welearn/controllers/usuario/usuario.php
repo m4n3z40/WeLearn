@@ -2,14 +2,140 @@
 
 class Usuario extends WL_Controller
 {
-
-    /**
-     * Construtor carrega configurações da classes base CI_Controller
-     * (Resolve bug ao utilizar this->load)
-     */
     function __construct()
     {
         parent::__construct();
+    }
+
+    public function salvar_dados_pessoais()
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        $this->load->library('form_validation');
+
+        if ( ! $this->form_validation->run() ) {
+            $json = create_json_feedback(false, validation_errors_json());
+        } else {
+            try {
+                $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
+                $dados_post = $this->input->post();
+
+                $dadosPessoaisDao = WeLearn_DAO_DAOFactory::create('DadosPessoaisUsuarioDAO');
+                $dadosPessoais = $dadosPessoaisDao->criarNovo($dados_post);
+
+                for ($i = 0; $i < count($dados_post['rsId']); $i++) {
+                    if ( $dados_post['rsId'][$i] ) {
+                        $dadosRS = array(
+                            'usuarioId' => $usuarioAtual->getId(),
+                            'descricaoRS' => $dados_post['rsId'][$i],
+                            'urlUsuarioRS' => $dados_post['rsUsuario'][$i]
+                        );
+
+                        $dadosPessoais->adicionarRS( $dadosPessoaisDao->criarNovoRS($dadosRS) );
+                    }
+                }
+
+                for ($i = 0; $i < count($dados_post['imId']); $i++) {
+                    if ( $dados_post['imId'][$i] ) {
+                        $dadosIM = array(
+                            'usuarioId' => $usuarioAtual->getId(),
+                            'descricaoIM' => $dados_post['imId'][$i],
+                            'descricaoUsuarioIM' => $dados_post['imUsuario'][$i]
+                        );
+
+                        $dadosPessoais->adicionarIM( $dadosPessoaisDao->criarNovoIM($dadosIM) );
+                    }
+                }
+
+                $usuarioAtual->setDadosPessoais( $dadosPessoais );
+
+                $usuarioAtual->salvarDadosPessoais();
+
+                $json = create_json_feedback(true);
+            } catch (Exception $e) {
+                log_message('error', 'Erro ao tentar salvar dados pessoais de usuário. '
+                    . create_exception_description($e));
+
+                $errors =  create_json_feedback_error_json(
+                    'Ops! Ocorreu um erro no servidor, desculpe pelo incidente.<br/>'
+                   .'Já estamos verificando, tente novamente em breve.'
+                );
+
+                $json = create_json_feedback(false, $errors);
+            }
+        }
+
+        echo $json;
+    }
+
+    public function salvar_dados_profissionais()
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        $this->load->library('form_validation');
+
+        if ( ! $this->form_validation->run() ) {
+            $json = create_json_feedback(false, validation_errors_json());
+        } else {
+            try {
+                $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
+                $dados_post = $this->input->post();
+
+                $dadosProfissionaisDao = WeLearn_DAO_DAOFactory::create('DadosProfissionaisUsuarioDAO');
+                $segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
+
+                $dadosProfissionais = $dadosProfissionaisDao->criarNovo( $dados_post );
+
+                if ( $dados_post['segmento'] != '0' ) {
+
+                    $dadosProfissionais->setSegmentoTrabalho(
+                        $segmentoDao->recuperar( $dados_post['segmento'] )
+                    );
+
+                }
+
+                $usuarioAtual->setDadosProfissionais( $dadosProfissionais );
+
+                $usuarioAtual->salvarDadosProfissionais();
+
+                $json = create_json_feedback(true);
+            } catch (Exception $e) {
+                log_message('error', 'Erro ao tentar salvar dados profissionais de usuário. '
+                    . create_exception_description($e));
+
+                $errors =  create_json_feedback_error_json(
+                    'Ops! Ocorreu um erro no servidor, desculpe pelo incidente.<br/>'
+                   .'Já estamos verificando, tente novamente em breve.'
+                );
+
+                $json = create_json_feedback(false, $errors);
+            }
+        }
+
+        echo $json;
+    }
+
+    public function salvar_imagem()
+    {
+
+    }
+
+    public function upload_imagem()
+    {
+
+    }
+
+    public function salvar_configuracao()
+    {
+
     }
 
     public function validar_cadastro()
@@ -154,14 +280,7 @@ class Usuario extends WL_Controller
 
         $this->autenticacao->limparSessao();
 
-        $json = create_json_feedback(true);
-
-        echo $json;
-    }
-
-    public function index()
-    {
-        $this->_renderTemplate();
+        echo create_json_feedback(true);
     }
 }
 

@@ -71,7 +71,7 @@
                    id="a-paginacao-busca-cursos"
                    data-proximo="<?php echo $inicioProxPagina ?>">Exibir mais resultados para <em>"<?php echo $txtBusca ?>"...</em></a>
             <?php else: ?>
-                <h4>Não há mais resultados há serem exibidos.</h4>
+                <h4>Não há mais resultados a serem exibidos.</h4>
             <?php endif; ?>
         <?php else: ?>
             <h3>Nenhuma busca foi realizada ou nenhum resultado foi encontrado :(</h3>
