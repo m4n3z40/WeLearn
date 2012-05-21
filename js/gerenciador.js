@@ -8,7 +8,11 @@
         $ulListaConvites = $('#ul-lista-convites'),
         $aPaginacaoConvites = $('#a-paginacao-convites'),
         $emQtdConvites = $('.em-qtd-convites'),
-        $emTotalConvites = $('.em-total-convites');
+        $emTotalConvites = $('.em-total-convites'),
+        $emQtdGerenciadores = $('.em-qtd-gerenciadores'),
+        $emTotalGerenciadores = $('.em-total-gerenciadores'),
+        $ulListaGerenciadores = $('#ul-lista-gerenciadores'),
+        $aPaginacaoGerenciadores = $('#a-paginacao-gerenciadores');
 
     $('#txt-termo').keyup(function(){
         $hiddenInicioProxPagBusca.val( 0 );
@@ -261,6 +265,91 @@
                 }
             }
         );
+    });
+
+    $aPaginacaoGerenciadores.click(function(e){
+        e.preventDefault();
+
+        var $this = $(this),
+            idCurso = $this.data('id-curso'),
+            idProximo = $this.data('proximo');
+
+        $.get(
+            WeLearn.url.siteURL('/curso/gerenciador/mais_gerenciadores/' + idCurso),
+            { 'proximo': idProximo },
+            function(res) {
+                if (res.success) {
+
+                    $ulListaGerenciadores.append(res.htmlGerenciadores);
+
+                    $emQtdGerenciadores.text( parseInt( $emQtdGerenciadores.text() ) + res.qtdGerenciadores );
+
+                    if ( res.paginacao.proxima_pagina ) {
+                        $this.data( 'proximo', res.paginacao.inicio_proxima_pagina )
+                    } else {
+                        $this.replaceWith('<h4>Não há mais gerenciadores auxiliares a serem exibidos.</h4>');
+                    }
+
+                } else {
+                    WeLearn.notificar({
+                        nivel: 'error',
+                        msg: res.errors[0].error_msg,
+                        tempo: 5000
+                    });
+                }
+            }
+        );
+    });
+
+    var $divConfirmacaoDesvincular = $('<div id="dialogo-confirmacao-desvincular-gerenciador">' +
+                                       '<p>Tem certeza que deseja revogar o cargo de Gerenciador deste usuário?<br/>' +
+                                       'Talvez você queira notificá-lo sobre a idéia antes...</p></div>');
+    $('a.a-desvincular-gerenciador').live('click', function(e){
+        e.preventDefault();
+
+        var $this = $(this),
+            $liRemover = $this.parent().parent().parent(),
+            idGerenciador = $liRemover.data('id-gerenciador');
+
+        $divConfirmacaoDesvincular.dialog({
+            title: 'Tem certeza?',
+            width: '450px',
+            resizable: false,
+            modal: true,
+            buttons: {
+                'Confirmar' : function() {
+                    $.get(
+                        $this.attr('href'),
+                        { 'gerenciadorId': idGerenciador },
+                        function(res){
+                            if (res.success) {
+
+                                $liRemover.fadeOut(function(){
+                                    $(this).remove();
+                                });
+
+                                WeLearn.notificar(res.notificacao);
+
+                                $emQtdGerenciadores.text( parseInt( $emQtdGerenciadores.text() ) - 1 );
+                                $emTotalGerenciadores.text( parseInt( $emTotalGerenciadores.text() - 1 ) );
+
+                                $divConfirmacaoDesvincular.dialog('close');
+
+                            } else {
+                                WeLearn.notificar({
+                                    nivel: 'error',
+                                    msg: res.errors[0].error_msg,
+                                    tempo: 5000
+                                });
+                            }
+                        }
+                    );
+                },
+                'Cancelar' : function() {
+                    $( this ).dialog('close');
+                }
+            }
+        });
     });
 
 })();

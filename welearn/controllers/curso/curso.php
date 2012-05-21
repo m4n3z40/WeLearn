@@ -11,10 +11,30 @@ class Curso extends Curso_Controller
     public function index()
     {
         try {
+            $segmento = $this->autenticacao->getUsuarioAutenticado()
+                                           ->getSegmentoInteresse();
 
-            $this->_renderTemplateHome();
+            try {
+                $listaCursos = $this->_cursoDao->recuperarTodos(
+                    0,
+                    null,
+                    array(
+                        'count' => 10,
+                        'segmento' => $segmento
+                    )
+                );
+            } catch (cassandra_NotFoundException $e) {
+                $listaCursos = array();
+            }
+
+            $dadosView = array(
+                'haRecomendados' =>  !empty($listaCursos),
+                'listaRecomendados' => $listaCursos
+            );
+
+            $this->_renderTemplateHome('curso/index', $dadosView);
         } catch (Exception $e) {
-            log_message('error', 'Erro ao exibir index de cursos: '
+            log_message('error', 'Erro ao exibir index de curso: '
                 . create_exception_description($e));
             show_404();
         }
@@ -40,8 +60,84 @@ class Curso extends Curso_Controller
     public function buscar()
     {
         try {
-            $dadosView = array(
+            $this->load->helper( array('area', 'segmento', 'paginacao_mysql') );
 
+            $count = 20;
+            $buscaAtual = $this->input->get('busca');
+            $tipoBuscaAtual = $this->input->get('tipo-busca');
+            $areaAtual = $this->input->get('area');
+            $segmentoAtual = $this->input->get('segmento');
+
+            $areaDao = WeLearn_DAO_DAOFactory::create('AreaDAO');
+            $segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
+
+            if ( $buscaAtual && ( $areaAtual != '0' && $segmentoAtual != '0' ) ) {
+
+                try {
+                    $segmento = $segmentoDao->recuperar( $segmentoAtual );
+                    $area = $segmento->getArea();
+                } catch ( cassandra_NotFoundException $e ) {
+                    $segmento = null;
+                    $area = null;
+                }
+
+            } elseif ( $buscaAtual && $areaAtual != '0' ) {
+
+                try {
+                    $area = $areaDao->recuperar( $areaAtual );
+                } catch( cassandra_NotFoundException $e ) {
+                    $area = null;
+                }
+
+                $segmento = null;
+            } else {
+                $area = null;
+                $segmento = null;
+            }
+
+            $listaSegmentos = array();
+            if ( $buscaAtual && $area != null ) {
+                $opcoes = array('areaId' => $area->getId());
+
+                try {
+                    $listaSegmentos = $segmentoDao->recuperarTodos('', '', $opcoes);
+                } catch (cassandra_NotFoundException $e) { }
+            }
+
+            $listaResultados = array();
+            if ( $buscaAtual ) {
+                try {
+                    $listaResultados = $this->_recuperarResultadosBuscaCursos(
+                        $buscaAtual,
+                        $tipoBuscaAtual,
+                        $area,
+                        $segmento,
+                        0,
+                        $count + 1
+                    );
+                } catch (cassandra_NotFoundException $e) {
+                    $listaResultados = array();
+                }
+            }
+
+            $paginacao = create_paginacao_mysql($listaResultados, 0, $count);
+
+            $dadosView = array(
+                'formAction' => '/curso/buscar',
+                'tipoBuscaAtual' => $tipoBuscaAtual,
+                'areaAtual' => $area === null ? '0' : $area->getId(),
+                'segmentoAtual' => $segmento === null ? '0' : $segmento->getId(),
+                'dadosDropdownArea' => lista_areas_para_dados_dropdown(),
+                'dadosDropdownSegmento' => lista_segmentos_para_dados_dropdown( $listaSegmentos ),
+                'haResultados' => ! empty($listaResultados),
+                'txtBusca' => $buscaAtual,
+                'resultadosBusca' => $this->template->loadPartial(
+                    'lista_busca',
+                    array('listaResultados' => $listaResultados),
+                    'curso'
+                ),
+                'haMaisPaginas' => $paginacao['proxima_pagina'],
+                'inicioProxPagina' => $paginacao['inicio_proxima_pagina']
             );
 
             $this->_renderTemplateHome('curso/buscar', $dadosView);
@@ -52,11 +148,145 @@ class Curso extends Curso_Controller
         }
     }
 
+    public function mais_resultados()
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $this->load->helper('paginacao_mysql');
+
+            $count = 20;
+            $buscaAtual = $this->input->get('busca');
+            $tipoBuscaAtual = $this->input->get('tipo-busca');
+            $areaAtual = $this->input->get('area');
+            $segmentoAtual = $this->input->get('segmento');
+            $inicio = (int)$this->input->get('proximo');
+
+            $areaDao = WeLearn_DAO_DAOFactory::create('AreaDAO');
+            $segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
+
+            if ( $buscaAtual && ( $areaAtual != '0' && $segmentoAtual != '0' ) ) {
+
+                try {
+                    $segmento = $segmentoDao->recuperar( $segmentoAtual );
+                    $area = $segmento->getArea();
+                } catch ( cassandra_NotFoundException $e ) {
+                    $segmento = null;
+                    $area = null;
+                }
+
+            } elseif ( $buscaAtual && $areaAtual != '0' ) {
+
+                try {
+                    $area = $areaDao->recuperar( $areaAtual );
+                } catch( cassandra_NotFoundException $e ) {
+                    $area = null;
+                }
+
+                $segmento = null;
+            } else {
+                $area = null;
+                $segmento = null;
+            }
+
+            $listaResultados = array();
+            if ( $buscaAtual ) {
+                try {
+                    $listaResultados = $this->_recuperarResultadosBuscaCursos(
+                        $buscaAtual,
+                        $tipoBuscaAtual,
+                        $area,
+                        $segmento,
+                        $inicio,
+                        $count + 1
+                    );
+                } catch (cassandra_NotFoundException $e) {
+                    $listaResultados = array();
+                }
+            }
+
+            $paginacao = create_paginacao_mysql($listaResultados, $inicio, $count);
+
+            $response = Zend_Json::encode(array(
+                'htmlResultadosBusca' => $this->template->loadPartial(
+                    'lista_busca',
+                    array('listaResultados' => $listaResultados),
+                    'curso'
+                ),
+                'paginacao' => $paginacao
+            ));
+
+            $json = create_json_feedback(true, '', $response);
+        } catch (Exception $e) {
+            log_message('error', 'Ocorreu um erro ao tentar recuperar proxima página de resultados da busca: '
+                . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro desconhecido, já estamos verificando. Tente novamente mais tarde.'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    private function _recuperarResultadosBuscaCursos($busca,
+                                                     $tipoBusca,
+                                                     $area = null,
+                                                     $segmento = null,
+                                                     $inicio = 0,
+                                                     $count = 20)
+    {
+        $opcoes = array();
+
+        switch ( $tipoBusca ) {
+            case 'recomendados':
+                $opcoes['segmento'] = $this->autenticacao
+                                           ->getUsuarioAutenticado()
+                                           ->getSegmentoInteresse();
+                break;
+            case 'refinada':
+                if ( $segmento instanceof WeLearn_Cursos_Segmento ) {
+                    $opcoes['segmento'] = $segmento;
+                    break;
+                } elseif ( $area instanceof WeLearn_Cursos_Area ) {
+                    $opcoes['area'] = $area;
+                    break;
+                }
+            case 'tudo':
+            default:
+        }
+
+        $opcoes['busca'] = $busca;
+        $opcoes['count'] = $count;
+
+        return $this->_cursoDao->recuperarTodos( $inicio, null, $opcoes );
+    }
+
     public function meus_cursos_criador()
     {
         try {
-            $dadosView = array(
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
 
+            $criador = $usuarioDao->criarGerenciadorPrincipal(
+                $this->autenticacao->getUsuarioAutenticado()
+            );
+
+            try {
+                $listaCursos = $this->_cursoDao->recuperarTodosPorCriador($criador, '', '', 1000000);
+            } catch (cassandra_NotFoundException $e) {
+                $listaCursos = array();
+            }
+
+            $dadosView = array(
+                'haCursos' =>  !empty($listaCursos),
+                'totalCursos' => count( $listaCursos ),
+                'listaCursos' => $listaCursos
             );
 
             $this->_renderTemplateHome('curso/meus_cursos_criador', $dadosView);
@@ -70,8 +300,27 @@ class Curso extends Curso_Controller
     public function meus_cursos_gerenciador()
     {
         try {
-            $dadosView = array(
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
 
+            $gerenciador = $usuarioDao->criarGerenciadorAuxiliar(
+                $this->autenticacao->getUsuarioAutenticado()
+            );
+
+            try {
+                $listaCursos = $this->_cursoDao->recuperarTodosPorGerenciador(
+                    $gerenciador,
+                    '',
+                    '',
+                    1000000
+                );
+            } catch (cassandra_NotFoundException $e) {
+                $listaCursos = array();
+            }
+
+            $dadosView = array(
+                'haCursos' =>  !empty($listaCursos),
+                'totalCursos' => count( $listaCursos ),
+                'listaCursos' => $listaCursos
             );
 
             $this->_renderTemplateHome('curso/meus_cursos_gerenciador', $dadosView);
@@ -85,8 +334,22 @@ class Curso extends Curso_Controller
     public function meus_cursos_aluno()
     {
         try {
-            $dadosView = array(
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
 
+            $aluno = $usuarioDao->criarAluno(
+                $this->autenticacao->getUsuarioAutenticado()
+            );
+
+            try {
+                $listaCursos = $this->_cursoDao->recuperarTodosPorAluno($aluno, '', '', 1000000);
+            } catch (cassandra_NotFoundException $e) {
+                $listaCursos = array();
+            }
+
+            $dadosView = array(
+                'haCursos' =>  !empty($listaCursos),
+                'totalCursos' => count( $listaCursos ),
+                'listaCursos' => $listaCursos
             );
 
             $this->_renderTemplateHome('curso/meus_cursos_aluno', $dadosView);
@@ -100,8 +363,23 @@ class Curso extends Curso_Controller
     public function meus_cursos_em_espera()
     {
         try {
-            $dadosView = array(
+            $usuario = $this->autenticacao->getUsuarioAutenticado();
 
+            try {
+                $listaCursos = $this->_cursoDao->recuperarTodosPorInscricao(
+                    $usuario,
+                    '',
+                    '',
+                    1000000
+                );
+            } catch (cassandra_NotFoundException $e) {
+                $listaCursos = array();
+            }
+
+            $dadosView = array(
+                'haCursos' =>  !empty($listaCursos),
+                'totalCursos' => count( $listaCursos ),
+                'listaCursos' => $listaCursos
             );
 
             $this->_renderTemplateHome('curso/meus_cursos_em_espera', $dadosView);
@@ -115,8 +393,23 @@ class Curso extends Curso_Controller
     public function meus_convites()
     {
         try {
-            $dadosView = array(
+            $usuario = $this->autenticacao->getUsuarioAutenticado();
 
+            try {
+                $listaCursos = $this->_cursoDao->recuperarTodosPorConviteGerenciador(
+                    $usuario,
+                    '',
+                    '',
+                    1000000
+                );
+            } catch (cassandra_NotFoundException $e) {
+                $listaCursos = array();
+            }
+
+            $dadosView = array(
+                'haCursos' =>  !empty($listaCursos),
+                'totalCursos' => count( $listaCursos ),
+                'listaCursos' => $listaCursos
             );
 
             $this->_renderTemplateHome('curso/meus_convites', $dadosView);
@@ -130,6 +423,8 @@ class Curso extends Curso_Controller
     public function meus_certificados()
     {
         try {
+            //TODO: Desenvolver lista de certificados do usuário.
+
             $dadosView = array(
 
             );
@@ -269,7 +564,21 @@ class Curso extends Curso_Controller
 
             } elseif( $vinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_AUXILIAR ) {
 
-                //TODO: Fazer desvinculo de gerenciador
+                $gerenciadorDao = WeLearn_DAO_DAOFactory::create('GerenciadorAuxiliarDAO');
+
+                $gerenciador = $gerenciadorDao->criarGerenciadorAuxiliar(
+                    $this->autenticacao->getUsuarioAutenticado()
+                );
+
+                $gerenciadorDao->desvincular( $gerenciador, $curso );
+
+                $this->session->set_flashdata(
+                    'notificacoesFlash',
+                    create_notificacao_json(
+                        'sucesso',
+                        'Seu abandono da gerência deste curso foi efetuado com sucesso :('
+                    )
+                );
 
                 $json = create_json_feedback(true);
             } else {
