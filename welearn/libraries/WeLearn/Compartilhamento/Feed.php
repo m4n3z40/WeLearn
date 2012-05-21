@@ -109,7 +109,7 @@ class WeLearn_Compartilhamento_Feed extends WeLearn_DTO_AbstractDTO
      */
     public function setId($id)
     {
-        $this->_id = (int)$id;
+        $this->_id = (string)$id;
     }
 
     /**
@@ -161,6 +161,7 @@ class WeLearn_Compartilhamento_Feed extends WeLearn_DTO_AbstractDTO
             'id' => $this->getId(),
             'conteudo' => $this->getConteudo(),
             'criador' => $this->getCriador()->getId(),
+            'dataEnvio' => $this->getDataEnvio(),
             'tipo' => $this->getTipo(),
             'descricao' => empty($this->_descricao) ? '' : $this->getDescricao()
         );

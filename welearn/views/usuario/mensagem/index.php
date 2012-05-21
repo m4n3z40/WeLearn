@@ -8,9 +8,9 @@
     <div>
         <?php if($success==true){ ?>
         <?php foreach ( $mensagens as $row):?>
-            <?php echo anchor('usuario/mensagem/listar/'.$row,$row,array('class'=>'id-usuario')) ?>
+            <?=anchor('/usuario/mensagem/listar/'.$row->id, $row->toHTML('imagem_pequena_sem_link'))?>
             </br>
-            <?php endforeach;?>
+        <?php endforeach;?>
         <?php }else{?>
         <h3>voce nao possui conversas com nenhum amigo</h3>
         <?php } ?>

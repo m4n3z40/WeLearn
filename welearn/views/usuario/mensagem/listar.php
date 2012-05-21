@@ -8,8 +8,10 @@
 </div>
 <div>
     <?php if($haMensagens){ ?>
-    <a href="#" data-proximo="<?php echo $inicioProxPagina ?>" data-id-amigo="<?php echo $idAmigo ?>" id="paginacaoMensagem">mensagens mais antigas</a>
-    <input type='hidden' value='<?=$inicioProxPagina?>' id='id-prox-pagina'/>
+            <nav id="paginacao-feeds">
+            <a href="#" data-proximo="<?php echo $inicioProxPagina ?>" data-id-amigo="<?php echo $idAmigo ?>" id="paginacaoMensagem">mensagens mais antigas</a>
+            <input type='hidden' value='<?=$inicioProxPagina?>' id='id-prox-pagina'/>
+            </nav>
     <?php }?>
 </div>
 <div id="mensagem-lista-mensagens">

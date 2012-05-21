@@ -40,4 +40,41 @@ $(document).ready(function() {
     );
 
 
+
+    $("#paginacao-feed").click(
+        function(e){
+            e.preventDefault();
+            var url= $(this).attr('href');
+            var proximaPagina= $('#id-prox-pagina').val();
+            url+='/'+proximaPagina;
+            alert(url);
+            $.get(
+                WeLearn.url.siteURL(url),
+                (WeLearn.url.queryString != '') ? WeLearn.url.queryString : null,
+                function(res) {
+                    if (res.success) {
+                        $('#feed-lista-feeds').prepend(res.htmlListaFeeds);
+
+                        if(res.paginacao.proxima_pagina) {
+                            $('#id-prox-pagina').val(res.paginacao.inicio_proxima_pagina);
+                        } else {
+                            $('#paginacao-feed').parent().html('<h4>Não existem novos feeds.</h4>');
+                            $('#paginacao-feed').remove();
+                        }
+                        //alert(res.paginacao.proxima_pagina);
+
+
+                    }else {
+                        WeLearn.notificar({
+                            msg: res.errors[0].error_msg,
+                            nivel: 'error',
+                            tempo: 10000
+                        });
+                    }
+                },'json'
+            )
+        }
+    );
+
+
 } );

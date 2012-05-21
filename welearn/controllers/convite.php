@@ -20,21 +20,25 @@ class Convite extends Home_Controller
             if( $param != 'enviados' && $param != 'recebidos') {
                 redirect(site_url('usuario/amigos'));
             }else{
-
+             try{
                 $conviteCadastradoDao= WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
                 $filtros=array('usuarioObj' => $this->autenticacao->getUsuarioAutenticado(),'count' => self::$_count+1,'tipoConvite' => $param);
                 $listaConvites=$conviteCadastradoDao->recuperarTodos('','',$filtros);
+             }catch(cassandra_NotFoundException $e)
+             {
+                 $listaConvites=array();
+             }
                 $this->load->helper('paginacao_cassandra');
                 $dadosPaginados = create_paginacao_cassandra($listaConvites, self::$_count);
                 $listaConvites= array_reverse($listaConvites);
                 $partialListaConvites = $this->template->loadPartial(
                     'lista',
                     array(
-                        'success'=>true,
-                        'convites' => $listaConvites,
+                        'listaConvites' => $listaConvites,
                         'paginacao' => $dadosPaginados,
                         'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
-                        'haConvites' => $dadosPaginados['proxima_pagina'],
+                        'haConvites' => !empty($listaConvites),
+                        'haMaisPaginas' => $dadosPaginados['proxima_pagina'],
                         'tipo'=>$param
                     ),
                     'usuario/convite'
@@ -58,9 +62,14 @@ class Convite extends Home_Controller
             if( $param != 'enviados' && $param != 'recebidos') {
                 redirect(site_url('usuario/amigos'));
             }else{
+                try{
                 $conviteCadastradoDao= WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
                 $filtros=array('usuarioObj' => $this->autenticacao->getUsuarioAutenticado(),'count' => self::$_count+1,'tipoConvite' => $param);
                 $listaConvites=$conviteCadastradoDao->recuperarTodos($inicio,'',$filtros);
+                }catch(cassandra_NotFoundException $e)
+                {
+                    $listaConvites=array();
+                }
                 $this->load->helper('paginacao_cassandra');
                 $dadosPaginados = create_paginacao_cassandra($listaConvites, self::$_count);
                 $listaConvites = array_reverse($listaConvites);
@@ -68,11 +77,11 @@ class Convite extends Home_Controller
                 $partialListaConvites = $this->template->loadPartial(
                     'lista',
                     array(
-                        'success'=>true,
-                        'convites' => $listaConvites,
+                        'listaConvites' => $listaConvites,
                         'paginacao' => $dadosPaginados,
                         'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
-                        'haConvites' => $dadosPaginados['proxima_pagina'],
+                        'haConvites' => !empty($listaConvites),
+                        'haMaisPaginas' => $dadosPaginados['proxima_pagina'],
                         'tipo'=>$param
                     ),
                     'usuario/convite'
