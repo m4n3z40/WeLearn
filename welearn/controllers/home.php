@@ -29,7 +29,9 @@ class Home extends Home_Controller {
             'lista',
             array('feeds_usuario' => $feeds_usuario,
                   'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
-                  'haFeeds' => !empty($feeds_usuario)),
+                  'haFeeds' => !empty($feeds_usuario),
+                  'haMaisPaginas' => $dadosPaginados['proxima_pagina']
+            ),
             'usuario/feed'
         );
         $dados= array('criarFeed' => $partialCriarFeed , 'listarFeed' => $partialListarFeed,'paginacao' =>$dadosPaginados);

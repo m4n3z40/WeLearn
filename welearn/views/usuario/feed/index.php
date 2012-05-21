@@ -7,7 +7,7 @@
         <ul id='feed-lista-feeds'>
             <?=$listarFeed?>
         </ul>
-        <?php if($haFeeds):?>
+        <?php if($haMaisPaginas):?>
             <footer>
             <nav id="paginacao-feeds">
                 <a href="/home/proxima_pagina" data-proximo="<?php echo $inicioProxPagina ?>"  id="paginacao-feed">mais feeds</a>
