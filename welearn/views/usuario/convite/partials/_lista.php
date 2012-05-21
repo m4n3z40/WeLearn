@@ -1,6 +1,6 @@
 <?php if($tipo=='enviados'):?>
 <input type='hidden' id='tipo-convite' value='enviados'>
-<?php foreach ($convites as $row):?>
+<?php foreach ($listaConvites as $row):?>
     <li id='<?=$row->getId();?>'>
         <input type='hidden' class='id-convite' value='<?=$row->getId();?>'>
         <input type='hidden' class= 'id-remetente' value='<?=$row->getRemetente()->getId();?>'>
@@ -12,7 +12,7 @@
     <?php endforeach;?>
 <?php elseif ($tipo == 'recebidos'): ?>
 <input type='hidden' id='tipo-convite' value='recebidos'>
-<?php foreach ($convites as $row):?>
+<?php foreach ($listaConvites as $row):?>
     <li id='<?=$row->getId();?>'>
         <input type='hidden' class='id-convite' value='<?=$row->getId();?>'>
         <input type='hidden' class= 'id-remetente' value='<?=$row->getRemetente()->getId();?>'><?=$row->getRemetente()->toHTML('imagem_pequena');?>

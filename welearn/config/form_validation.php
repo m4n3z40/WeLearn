@@ -395,21 +395,8 @@ $config = array(
             'label'=>'txt-convite',
             'rules'=>'required|max_length[125]'
         )
-    ),
-
-    'feed/criar' => array(
-        array(
-            'field' => 'conteudo-feed',
-            'label' => 'conteudo-feed',
-            'rules' => 'required'
-
-        ),
-        array(
-            'field' => 'descricao-feed',
-            'label' => 'descricao-feed',
-            'rules' => 'callback__validarDescricao'
-        )
     )
+
 );
 
 

@@ -2,6 +2,7 @@
 
 class Home extends Home_Controller {
 
+    private  $_count = 10;
     /**
      * Construtor carrega configurações da classes base CI_Controller
      * (Resolve bug ao utilizar this->load)
@@ -15,18 +16,83 @@ class Home extends Home_Controller {
 
     public function index()
     {
-        $partialCriarFeed= $this->template->loadPartial(
+
+        $feeds_usuario = $this->carregarFeeds('','',$this->_count);
+        $this->load->helper('paginacao_cassandra');
+        $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
+        $partialCriarFeed = $this->template->loadPartial(
             'form',
              array(),
             'usuario/feed'
         );
         $partialListarFeed= $this->template->loadPartial(
             'lista',
-            array(),
+            array('feeds_usuario' => $feeds_usuario,
+                  'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
+                  'haFeeds' => !empty($feeds_usuario)),
             'usuario/feed'
         );
-        $dados= array('criarFeed' => $partialCriarFeed , 'listarFeed' => $partialListarFeed);
+        $dados= array('criarFeed' => $partialCriarFeed , 'listarFeed' => $partialListarFeed,'paginacao' =>$dadosPaginados);
         $this->_renderTemplateHome('usuario/feed/index',$dados);
+
+    }
+
+    public function proxima_pagina($inicio)
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+        try{
+        $feeds_usuario = $this->carregarFeeds($inicio,'',$this->_count);
+        $this->load->helper('paginacao_cassandra');
+        $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
+
+        $response = array(
+            'success' => true,
+            'htmlListaFeeds' => $this->template->loadPartial(
+                'lista',
+                array(
+                    'feeds_usuario' => $feeds_usuario,
+                    'paginacao' => $dadosPaginados
+                ),
+                'usuario/feed'
+            ),
+            'paginacao' => $dadosPaginados
+        );
+
+        $json = Zend_Json::encode($response);
+        }catch (UUIDException $e) {
+
+            log_message(
+                'error',
+                'Ocorreu um erro ao tentar recupera uma nova página de mensagens: '
+                    . create_exception_description($e)
+            );
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro inesperado, já estamos verificando.
+Tente novamente mais tarde.'
+            );
+
+            $json = create_json_feedback(false, $error);
+
+        }
+        echo $json;
+
+    }
+
+    private function carregarFeeds($de='',$ate='',$count)
+    {
+        try{
+        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+        $feedDao = WeLearn_DAO_DAOFactory::create('FeedDAO');
+        $filtros = array('usuario' => $usuarioAutenticado , 'count' => $count+1);
+        $feeds = $feedDao->recuperarTodos($de,$ate,$filtros);
+        return $feeds;
+        }catch(cassandra_NotFoundException $e)
+        {
+            return array();
+        }
     }
 }
 

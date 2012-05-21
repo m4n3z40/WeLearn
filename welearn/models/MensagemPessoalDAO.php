@@ -98,7 +98,11 @@ class MensagemPessoalDAO extends WeLearn_DAO_AbstractDAO {
 
     public function recuperarListaAmigosMensagens(WeLearn_DTO_IDTO &$dto)
     {
-        return $this->_MPListaAmigosCF->get($dto->getID());
+        $amigos= $this->_MPListaAmigosCF->get($dto->getID());
+        foreach ($amigos as $row) {
+            $lista[]=$this->_usuarioDao->recuperar($row);
+        }
+        return $lista;
     }
 
 

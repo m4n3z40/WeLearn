@@ -563,6 +563,18 @@ and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'UTF8Type';
 
+create column family compartilhamento_feed
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family compartilhamento_usuario_timeline
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
 create column family contadores_timeuuid
 with comparator = 'TimeUUIDType'
 and column_type = 'Standard'

@@ -7,19 +7,14 @@
  * To change this template use File | Settings | File Templates.
  */
 ?>
-<?php if ($success==true): ?>
+<?php if ($haConvites): ?>
 <header>
     <hgroup>
         <h1>convites <?=$tipo?></h1>
     </hgroup>
 </header>
 
-<?php if($haConvites): ?>
-    <div>
-        <a href="convite/proxima_pagina/" data-proximo="<?php echo $inicioProxPagina ?>" id="paginacao-convite">convites mais antigos</a>
-        <input type='hidden' value='<?=$inicioProxPagina?>' id='id-prox-pagina'/>
-    </div>
-    <?php endif;?>
+
 
 <ul id="lista-convites">
     <?=$partialListaConvites?>
@@ -31,7 +26,16 @@
     <div id="confirmar-amizade" title="Aceitar Convite" style="display: none;">
         Você Tem Certeza Que Deseja Aceitar Este Convite?
     </div>
-
+</ul>
+    <footer>
+            <nav id="paginacao-enquete">
+                <?php if($haMaisPaginas): ?>
+                <div>
+                    <a href="convite/proxima_pagina/" data-proximo="<?php echo $inicioProxPagina ?>" id="paginacao-convite">convites mais antigos</a>
+                    <input type='hidden' value='<?=$inicioProxPagina?>' id='id-prox-pagina'/>
+                </div>
+            <?php endif;?>
+    </footer>
 </ul>
 <?php else: ?>
 <h3>Voce não possui nenhum convite pendente</h3>
