@@ -9,14 +9,14 @@
 
 (function(){
 
-    $( "#enviar-convite" ).click(function(e) {
-        e.preventDefault();
-        $( "#convite-form" ).dialog( "open");
-        return false;
-    });
+    var formConvite = $('<form action="http://welearn.com/convite/enviar" method="post" accept-charset="utf-8" id="form-enviar-convite">'+
+                        '<div class="hidden">'+
+                        '<input type="hidden" name="welearn_csrf_token" value="c1fdb7a7921841d3cea0c96e8867b472" />'+
+                        '</div>'+
+                        '<input type="hidden" name="destinatario" value="'+$('#id-usuario-perfil').val()+'"/>'+
+                        '<textarea name="txt-convite" cols="43" rows="5" ></textarea></form>');
 
-
-    $( "#convite-form" ).dialog({
+        formConvite.dialog({
         autoOpen: false,
         modal: true,
         resizable: false,
@@ -25,7 +25,7 @@
         height: 200,
         buttons:{
             "Enviar Convite": function(){
-               var formConvite=document.getElementById('form-enviar-convite');
+
                 WeLearn.validarForm(formConvite,
                     $(formConvite).attr('action'),
                     function(res)
@@ -48,6 +48,16 @@
 
         }
     });
+
+
+    $( "#enviar-convite" ).click(function(e) {
+        e.preventDefault();
+        formConvite.dialog( "open");
+        return false;
+    });
+
+
+
 
 
     $('#exibir-convite-pendente').click(
@@ -134,8 +144,14 @@
 
 
 
-    var formMensagem=document.getElementById('form-criar-mensagem');
-    $( "#form-criar-mensagem" ).dialog({
+    var formMensagem=$('<form action="http://welearn.com/usuario/mensagem/criar" method="post" accept-charset="utf-8" id="form-criar-mensagem" title="Digite sua mensagem" style="display:none">'+
+        '<div class="hidden">'+
+        '<input type="hidden" name="welearn_csrf_token" value="c1fdb7a7921841d3cea0c96e8867b472" />'+
+        '</div>'+
+        '<input type="hidden" name="destinatario" value="'+$('#id-usuario-perfil').val()+'" />'+
+        '<textarea rows="5" cols="43" name="mensagem" id="txt-mensagem"></textarea>'+
+        '</form>');
+    formMensagem.dialog({
         autoOpen: false,
         modal: true,
         draggable: false,
@@ -167,7 +183,7 @@
 
     $( "#enviar-mensagem" ).click(function(e) {
         e.preventDefault();
-        $( "#form-criar-mensagem" ).dialog( "open");
+        formMensagem.dialog( "open");
     });
 
     var divRemoverAmizade= $('<div>Tem certeza que deseja remover a amizade?</div>');
@@ -202,8 +218,5 @@
             divRemoverAmizade.dialog('open');
         }
     );
-
-
-
 
 })();

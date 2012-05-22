@@ -28,13 +28,7 @@ class Perfil extends Perfil_Controller {
             $saoAmigos=$amizadeUsuarioDao->SaoAmigos($usuarioAutenticado,$usuarioPerfil);
             $dados['saoAmigos']=$saoAmigos;
 
-            if($saoAmigos == WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS ){
-                $partialEnviarConvite = $this->template->loadPartial('enviar_convite',
-                    array('usuarioPerfil' => $usuarioPerfil->getId()),
-                    'usuario/convite'
-                );
-                $dados['partialEnviarConvite']=$partialEnviarConvite;
-            }
+
 
             if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
             {
@@ -47,13 +41,7 @@ class Perfil extends Perfil_Controller {
                 $dados['partialConvitePendente']=$partialExibirConvite;
             }
 
-            $partialEnviarMensagem = $this->template->loadPartial(
-                'mensagem_perfil',
-                array('idDestinatario' => $usuarioPerfil->getId()),
-                'usuario/mensagem'
-            );
 
-            $dados['partialEnviarMensagem']=$partialEnviarMensagem;
         }
         $this->_renderTemplatePerfil('usuario/perfil/index',$dados);
     }
