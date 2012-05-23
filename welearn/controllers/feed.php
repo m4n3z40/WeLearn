@@ -58,9 +58,19 @@ class Feed extends Home_Controller
         $this->load->helper('notificacao_js');
         try{
             $feedDao->salvar($feedUsuario);
-            $response = array('notificacao' => create_notificacao_array('sucesso','Feed Adicionado com Sucesso'));
-            $json = create_json_feedback(true,'',$response);
+            //$response = array('notificacao' => create_notificacao_array('sucesso','Feed Adicionado com Sucesso'));
+            $notificacoesFlash = create_notificacao_json(
+                'sucesso',
+                'Feed enviado com sucesso!'
+            );
+            $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+            $json = create_json_feedback(true);
         }catch(cassandra_NotFoundException $e){
+            $notificacoesFlash = create_notificacao_json(
+                'sucesso',
+                'Feed enviado com sucesso!'
+            );
+            $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
             $json=create_json_feedback(false);
         }
 
@@ -78,6 +88,36 @@ class Feed extends Home_Controller
         {
             return TRUE;
         }
+    }
+
+
+    public function validar_url()
+    {
+        $url=$this->input->post('conteudo-feed');
+        $this->load->library('autoembed');
+        $isValid = $this->autoembed->parseUrl($url);
+
+        if($isValid)
+        {
+            $json = create_json_feedback(true);
+        }
+        else{
+            log_message(
+                'error',
+                'A url do video enviado nao é valida'
+            );
+
+            $error = create_json_feedback_error_json(
+                'A url do video enviado não é valida, verifique se a url está correta.'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+
+        echo $json;
+
+
     }
 
 }

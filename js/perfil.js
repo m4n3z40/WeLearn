@@ -9,9 +9,12 @@
 
 (function(){
 
-    var formConvite = $('<form action="http://welearn.com/convite/enviar" method="post" accept-charset="utf-8" id="form-enviar-convite">'+
+    var csrf= $('input[name=welearn_csrf_token]').val();    //csrf do perfil
+
+
+    var formConvite = $('<form action="'+WeLearn.url.siteURL('convite/enviar')+'" method="post" accept-charset="utf-8" id="form-enviar-convite">'+
                         '<div class="hidden">'+
-                        '<input type="hidden" name="welearn_csrf_token" value="c1fdb7a7921841d3cea0c96e8867b472" />'+
+                        '<input type="hidden" name="welearn_csrf_token" value="'+csrf+'" />'+
                         '</div>'+
                         '<input type="hidden" name="destinatario" value="'+$('#id-usuario-perfil').val()+'"/>'+
                         '<textarea name="txt-convite" cols="43" rows="5" ></textarea></form>');
@@ -59,52 +62,54 @@
 
 
 
-
-    $('#exibir-convite-pendente').click(
-        function(e)
-        {
-            e.preventDefault();
-            $( "#container-convite-pendente" ).dialog( "open");
-            return false;
-        }
-    );
-
-
-    var param = $('.param-tipo-convite').val();
+    var param = $('#tipo-convite').val();
     var idConvite = $('#id-convite').val();
-    var idRemetente=$('#id-remetente').val();
-    var idDestinatario=$('#id-destinatario').val();
+    var idDestinatario = $('#id-destinatario').val();
+    var idRemetente = $('#id-remetente').val();
+
+    if(param == 'enviado')
+    {
+
+        var containerConvite = $('<form action="'+WeLearn.url.siteURL('convite/aceitar')+'" method="post" accept-charset="utf-8" id="form-criar-mensagem">'+
+                                 'você enviou uma solicitação de amizade para '+$('#id-usuario-perfil').val()+
+                                '</form>');
 
 
-    if(param=='enviado'){
-        $('#container-convite-pendente').dialog(
-            {
-                autoOpen: false,
+        containerConvite.dialog(
+
+        {
+            autoOpen: false,
                 modal: true,
-                draggable: false,
-                resizable: false,
-                width: 400,
-                height: 170,
-                buttons: {
-                    "Cancelar Requisicao": function() {
-                        var tipoView='perfil';
-                        var url='/convite/remover/'+idConvite+'/'+idRemetente+'/'+idDestinatario+'/'+tipoView;
-                        $.post(
-                            WeLearn.url.siteURL(url),
-                            function(result) {
-                                location.reload();
-                            },
-                            'json'
-                        );
-                        $( this ).dialog( "close" );
-                    }
-                }
+            draggable: false,
+            resizable: false,
+            width: 400,
+            height: 170,
+            buttons: {
+            "Cancelar Requisicao": function() {
+                var tipoView='perfil';
+                var url='/convite/remover/'+idConvite+'/'+idRemetente+'/'+idDestinatario+'/'+tipoView;
+                $.post(
+                    WeLearn.url.siteURL(url),
+                    function(result) {
+                        location.reload();
+                    },
+                    'json'
+                );
+                $( this ).dialog( "close" );
             }
+        }
+        }
+
         );
+    }
 
+    else if(param == 'recebido')
+    {
+        var containerConvite = $('<form action="'+WeLearn.url.siteURL('convite/recusar')+'" method="post" accept-charset="utf-8" id="form-criar-mensagem">'+
+                                    'você recebeu uma solicitação de amizade de '+$('#id-usuario-perfil').val()+
+                                '</form>');
 
-    }else{
-        $('#container-convite-pendente').dialog(
+        containerConvite.dialog(
             {
                 autoOpen: false,
                 modal: true,
@@ -142,16 +147,27 @@
     }
 
 
+    $('#exibir-convite-pendente').click(
+        function(e)
+        {
+            e.preventDefault();
 
+            containerConvite.dialog( "open");
+            return false;
+
+        }
+    );
 
     var formMensagem=$('<form action="http://welearn.com/usuario/mensagem/criar" method="post" accept-charset="utf-8" id="form-criar-mensagem" title="Digite sua mensagem" style="display:none">'+
-        '<div class="hidden">'+
-        '<input type="hidden" name="welearn_csrf_token" value="c1fdb7a7921841d3cea0c96e8867b472" />'+
-        '</div>'+
-        '<input type="hidden" name="destinatario" value="'+$('#id-usuario-perfil').val()+'" />'+
-        '<textarea rows="5" cols="43" name="mensagem" id="txt-mensagem"></textarea>'+
-        '</form>');
-    formMensagem.dialog({
+                        '<div class="hidden">'+
+                        '<input type="hidden" name="welearn_csrf_token" value="'+csrf+'" />'+
+                        '</div>'+
+                        '<input type="hidden" name="destinatario" value="'+$('#id-usuario-perfil').val()+'" />'+
+                        '<textarea rows="5" cols="43" name="mensagem" id="txt-mensagem"></textarea>'+
+                        '</form>'
+                        );
+
+   formMensagem.dialog({
         autoOpen: false,
         modal: true,
         draggable: false,
@@ -179,17 +195,14 @@
         }
     });
 
-
-
     $( "#enviar-mensagem" ).click(function(e) {
         e.preventDefault();
         formMensagem.dialog( "open");
     });
 
+
+
     var divRemoverAmizade= $('<div>Tem certeza que deseja remover a amizade?</div>');
-
-
-
 
     $('#remover-amizade').click(
         function(e){

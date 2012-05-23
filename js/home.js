@@ -3,13 +3,33 @@ $(document).ready(function() {
     $('#feed-submit').click(
         function(e){
            e.preventDefault();
-           var form= document.getElementById('form-criar-feed');
-           var url=$(form).attr('action');
-           WeLearn.validarForm(form,url,function(res){
-               if(res.success){
-                   WeLearn.notificar(res.notificacao);
-               }
-           });
+            if($('#feed-video').is(':checked'))// verifica se o feed é um video, caso sim, verifica se a url é valida
+            {
+                var form= document.getElementById('form-criar-feed');
+                var url = 'feed/validar_url';
+                WeLearn.validarForm(form,url,function(res){
+                    if(res.success){
+                        var form= document.getElementById('form-criar-feed');
+                        var url=$(form).attr('action');
+                        WeLearn.validarForm(form,url,function(res){
+                            if(res.success){
+                                location.reload();
+                            }
+                        });
+                    }else
+                    {
+                        location.reload();
+                    }
+                });
+            }else{
+                var form= document.getElementById('form-criar-feed');
+                var url=$(form).attr('action');
+                WeLearn.validarForm(form,url,function(res){
+                    if(res.success){
+                        location.reload();
+                    }
+                });
+            }
         }
     );
 
@@ -53,7 +73,7 @@ $(document).ready(function() {
                 (WeLearn.url.queryString != '') ? WeLearn.url.queryString : null,
                 function(res) {
                     if (res.success) {
-                        $('#feed-lista-feeds').prepend(res.htmlListaFeeds);
+                        $('#feed-lista-feeds').append(res.htmlListaFeeds);
 
                         if(res.paginacao.proxima_pagina) {
                             $('#id-prox-pagina').val(res.paginacao.inicio_proxima_pagina);

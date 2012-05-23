@@ -1,3 +1,4 @@
+
 <section id="perfil-left-bar" class="inner-sidebar-container inner-sidebar-container-left">
     <nav>
         <h3>perfil</h3>
@@ -17,9 +18,18 @@
                     <li><?= anchor('/usuario/amigos/remover/'.$usuarioPerfil->getId(),'Remover Amizade',array('id' => 'remover-amizade'))?></li>
                 <?php elseif($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA):?>
                     <li><?= anchor('#','Convite Pendente', array('id' => 'exibir-convite-pendente'))?>
-                    <?php echo $partialConvitePendente; ?>
+                    <input type = 'hidden' id = 'id-convite' value = '<?= $convitePendente->id?>'/>
+                    <input type = 'hidden' id = 'id-destinatario'  value = '<?= $convitePendente->destinatario->id?>'/>
+                    <input type = 'hidden' id = 'id-remetente'  value = '<?= $convitePendente->remetente->id?>'/>
+                    <?php if($convitePendente->destinatario->id == $usuarioAutenticado->id): ?>
+                    <input type = 'hidden' id = 'tipo-convite' value = 'recebido'/>
+                    <?php else:?>
+                    <input type = 'hidden' id = 'tipo-convite' value = 'enviado'/>
+                    <?php endif;?>
+
                 <?php endif;?>
                     <li><?= anchor('usuario/mensagem/criar','Enviar Mensagem',array('id' => 'enviar-mensagem'))?></li>
+
             <?php else: ?>
                    <?= anchor('/home','home')?>
             <?php endif; ?>

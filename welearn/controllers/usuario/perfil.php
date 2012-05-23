@@ -33,12 +33,7 @@ class Perfil extends Perfil_Controller {
             if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
             {
                 $convitePendente = $conviteCadastradoDao->recuperarPendentes($usuarioAutenticado,$usuarioPerfil);
-                $partialExibirConvite = $this->template->loadPartial(
-                    'exibicao_convite',
-                    array( 'convite_pendente' => $convitePendente,'usuarioAutenticado' => $usuarioAutenticado),
-                    'usuario/convite'
-                );
-                $dados['partialConvitePendente']=$partialExibirConvite;
+                $dados['convitePendente']=$convitePendente;
             }
 
 
