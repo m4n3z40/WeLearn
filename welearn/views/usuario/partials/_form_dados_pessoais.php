@@ -62,8 +62,10 @@
                     <table id="tbl-lista-rs">
                         <tbody>
                         <?php foreach($listaDeRS as $RS): ?>
+                        <tr>
                             <td><?php echo $RS['rs'] ?></td>
                             <td><?php echo $RS['rsUsuario'] ?></td>
+                        </tr>
                         <?php endforeach; ?>
                         </tbody>
                         <tfoot>

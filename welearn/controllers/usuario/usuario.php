@@ -2,9 +2,15 @@
 
 class Usuario extends WL_Controller
 {
+    private $_tempUploadDir;
+    private $_userpicDir;
+
     function __construct()
     {
         parent::__construct();
+
+        $this->_tempUploadDir = TEMP_UPLOAD_DIR . 'img/';
+        $this->_userpicDir = USER_IMG_DIR . 'userpics/';
     }
 
     public function salvar_dados_pessoais()
@@ -25,7 +31,19 @@ class Usuario extends WL_Controller
                 $dados_post = $this->input->post();
 
                 $dadosPessoaisDao = WeLearn_DAO_DAOFactory::create('DadosPessoaisUsuarioDAO');
-                $dadosPessoais = $dadosPessoaisDao->criarNovo($dados_post);
+
+                try {
+
+                    $dadosPessoais = $dadosPessoaisDao->recuperar( $usuarioAtual->getId() );
+                    $dadosPessoais->preencherPropriedades( $dados_post );
+                    $dadosPessoais->setListaDeRS(array());
+                    $dadosPessoais->setListaDeIM(array());
+
+                } catch( cassandra_NotFoundException $e ) {
+
+                    $dadosPessoais = $dadosPessoaisDao->criarNovo($dados_post);
+
+                }
 
                 for ($i = 0; $i < count($dados_post['rsId']); $i++) {
                     if ( $dados_post['rsId'][$i] ) {
@@ -54,6 +72,12 @@ class Usuario extends WL_Controller
                 $usuarioAtual->setDadosPessoais( $dadosPessoais );
 
                 $usuarioAtual->salvarDadosPessoais();
+
+                $this->load->helper('notificacao_js');
+                $this->session->set_flashdata('notificacoesFlash', create_notificacao_json(
+                    'sucesso',
+                    'Seus dados pessoais foram salvos com sucesso!'
+                ));
 
                 $json = create_json_feedback(true);
             } catch (Exception $e) {
@@ -92,7 +116,12 @@ class Usuario extends WL_Controller
                 $dadosProfissionaisDao = WeLearn_DAO_DAOFactory::create('DadosProfissionaisUsuarioDAO');
                 $segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
 
-                $dadosProfissionais = $dadosProfissionaisDao->criarNovo( $dados_post );
+                try {
+                    $dadosProfissionais = $dadosProfissionaisDao->recuperar( $usuarioAtual->getId() );
+                    $dadosProfissionais->preencherPropriedades( $dados_post );
+                } catch (cassandra_NotFoundException $e) {
+                    $dadosProfissionais = $dadosProfissionaisDao->criarNovo( $dados_post );
+                }
 
                 if ( $dados_post['segmento'] != '0' ) {
 
@@ -105,6 +134,12 @@ class Usuario extends WL_Controller
                 $usuarioAtual->setDadosProfissionais( $dadosProfissionais );
 
                 $usuarioAtual->salvarDadosProfissionais();
+
+                $this->load->helper('notificacao_js');
+                $this->session->set_flashdata('notificacoesFlash', create_notificacao_json(
+                    'sucesso',
+                    'Seus dados profissionais foram salvos com sucesso!'
+                ));
 
                 $json = create_json_feedback(true);
             } catch (Exception $e) {
@@ -125,17 +160,189 @@ class Usuario extends WL_Controller
 
     public function salvar_imagem()
     {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
 
+        set_json_header();
+
+        try {
+            $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
+            $hashUsuario = md5( $usuarioAtual->getId() );
+
+            $imagemDao = WeLearn_DAO_DAOFactory::create('ImagemUsuarioDAO');
+
+            $dadosUpload = $this->input->post('imagem');
+
+            $extensao = $dadosUpload['ext'];
+            $nomeImagem = $dadosUpload['id'] . $extensao;
+            $diretorio = $this->_userpicDir . $hashUsuario . '/';
+            $diretorioCompleto = $diretorio . $nomeImagem;
+            $url = str_replace(FCPATH, base_url(), $diretorioCompleto);
+
+            $diretorioCompletoTemp = $this->_tempUploadDir . $nomeImagem;
+
+            if ( is_file( $diretorioCompletoTemp ) ) {
+
+                if ( is_file( $diretorioCompleto ) ) {
+                    unlink( $diretorioCompleto );
+                }
+
+                if ( ! is_dir( $diretorio ) ) {
+                    mkdir( $diretorio );
+                }
+
+                rename( $diretorioCompletoTemp, $diretorioCompleto );
+
+                $dadosImagem = array(
+                    'usuarioId' => $usuarioAtual->getId(),
+                    'url' => $url,
+                    'nome' => $nomeImagem,
+                    'extensao' => $extensao,
+                    'diretorio' => $diretorio,
+                    'diretorioCompleto' => $diretorioCompleto
+                );
+
+                if ( $usuarioAtual->getImagem() instanceof WeLearn_Usuarios_ImagemUsuario ) {
+
+                    $usuarioAtual->getImagem()->preencherPropriedades( $dadosImagem );
+
+                } else {
+
+                    $imagemUsuario = $imagemDao->criarNovo( $dadosImagem );
+                    $usuarioAtual->setImagem( $imagemUsuario );
+
+                }
+
+                $usuarioAtual->salvarImagem();
+
+                $this->autenticacao->setUsuarioAutenticado( $usuarioAtual );
+
+                $this->load->helper('notificacao_js');
+                $this->session->set_flashdata('notificacoesFlash', create_notificacao_json(
+                    'sucesso',
+                    'Sua imagem de exibição foi salva com sucesso!'
+                ));
+
+                $json = create_json_feedback(true);
+            } else {
+
+                throw new WeLearn_Base_Exception('Erro ao tentar mover arquivo de usuario.');
+
+            }
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar salvar imagem de usuário. '
+                . create_exception_description($e));
+
+            $errors =  create_json_feedback_error_json(
+                'Ops! Ocorreu um erro no servidor, desculpe pelo incidente.<br/>'
+               .'Já estamos verificando, tente novamente em breve.'
+            );
+
+            $json = create_json_feedback(false, $errors);
+        }
+
+        echo $json;
     }
 
     public function upload_imagem()
     {
+        $idImagem = md5( $this->autenticacao->getUsuarioAutenticado()->getId() );
 
+        $upload_config = array(
+            'upload_path' => TEMP_UPLOAD_DIR . 'img/',
+            'allowed_types' => 'jpg|jpeg|gif|png',
+            'max_size' => '2048',
+            'max_width' => '2048',
+            'max_height' => '1536',
+            'overwrite' => true,
+            'file_name' =>  $idImagem
+        );
+
+        $this->load->library('upload', $upload_config);
+
+        if ( ! $this->upload->do_upload('imagemUsuario') ) {
+            $resultado = array(
+                'success' => false,
+                'error_msg' => $this->upload->display_errors('','')
+            );
+        } else {
+            $upload_data = $this->upload->data();
+
+            $image_config = array(
+                'source_image' => $upload_data['full_path'],
+                'width' => 160,
+                'height' => 160
+            );
+
+            $this->load->library('image_lib', $image_config);
+
+            if ( ! $this->image_lib->resize() ) {
+                $resultado = array(
+                    'success' => false,
+                    'error_msg' => $this->image_lib->display_errors('','')
+                );
+            } else {
+                $resultado = array(
+                    'success' => true,
+                    'upload_data' => array(
+                        'imagem_id' => $idImagem,
+                        'imagem_url' => site_url('/temp/img/' . $upload_data['file_name']),
+                        'imagem_ext' => $upload_data['file_ext']
+                    )
+                );
+            }
+        }
+
+        $json = Zend_Json::encode($resultado);
+
+        echo $json;
     }
 
     public function salvar_configuracao()
     {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
 
+        set_json_header();
+
+        $this->load->library('form_validation');
+
+        if ( ! $this->form_validation->run() ) {
+            $json = create_json_feedback(false, validation_errors_json());
+        } else {
+            try {
+                $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
+                $dados_post = $this->input->post();
+
+                $usuarioAtual->getConfiguracao()->preencherPropriedades( $dados_post );
+
+                $usuarioAtual->salvarConfiguracao();
+
+                $this->autenticacao->setUsuarioAutenticado( $usuarioAtual );
+
+                $this->load->helper('notificacao_js');
+                $this->session->set_flashdata('notificacoesFlash', create_notificacao_json(
+                    'sucesso',
+                    'Seus dados profissionais foram salvos com sucesso!'
+                ));
+
+                $json = create_json_feedback(true);
+            } catch (Exception $e) {
+                log_message('error', 'Erro ao tentar salvar configurações de usuário. '
+                    . create_exception_description($e));
+
+                $errors =  create_json_feedback_error_json(
+                    'Ops! Ocorreu um erro no servidor, desculpe pelo incidente.<br/>'
+                   .'Já estamos verificando, tente novamente em breve.'
+                );
+
+                $json = create_json_feedback(false, $errors);
+            }
+        }
+
+        echo $json;
     }
 
     public function validar_cadastro()

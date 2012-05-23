@@ -54,7 +54,17 @@ class DadosProfissionaisUsuarioDAO extends WeLearn_DAO_AbstractDAO
     {
         $column = $this->_cf->get($id);
 
-        $column['segmentoTrabalho'] = $this->_segmentoDao->recuperar( $column['segmentoTrabalho'] );
+        if ( $column['segmentoTrabalho'] ) {
+
+            $column['segmentoTrabalho'] = $this->_segmentoDao->recuperar(
+                $column['segmentoTrabalho']
+            );
+
+        } else {
+
+            unset( $column['segmentoTrabalho'] );
+
+        }
 
         $dadosProfissionais = $this->criarNovo();
         $dadosProfissionais->fromCassandra($column);

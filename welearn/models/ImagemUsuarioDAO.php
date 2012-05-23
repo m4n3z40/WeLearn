@@ -86,9 +86,7 @@ class ImagemUsuarioDAO extends WeLearn_DAO_AbstractDAO
      */
     public function criarNovo(array $dados = null)
     {
-        $imagem = new WeLearn_Usuarios_ImagemUsuario();
-        $imagem->preencherPropriedades($dados);
-
+        $imagem = new WeLearn_Usuarios_ImagemUsuario($dados);
         return $imagem;
     }
 }

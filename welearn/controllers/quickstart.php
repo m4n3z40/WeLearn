@@ -18,19 +18,68 @@ class Quickstart extends Home_Controller {
 
     public function index()
     {
-        $dadosView = array(
-            'formEtapa1' => $this->_partialEtapa1(),
-            'formEtapa2' => $this->_partialEtapa2(),
-            'formEtapa3' => $this->_partialEtapa3(),
-            'formEtapa4' => $this->_partialEtapa4()
-        );
+        try {
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
 
-        $this->_renderTemplateHome( 'quickstart/quickstart', $dadosView );
+            if ( $usuarioDao->passouPeloQuickstart( $this->autenticacao->getUsuarioAutenticado() ) ) {
+                $this->session->keep_flashdata('notificacoesFlash');
+
+                redirect('/home');
+            }
+
+            $dadosView = array(
+                'formEtapa1' => $this->_partialEtapa1(),
+                'formEtapa2' => $this->_partialEtapa2(),
+                'formEtapa3' => $this->_partialEtapa3(),
+                'formEtapa4' => $this->_partialEtapa4()
+            );
+
+            $this->_renderTemplateHome( 'quickstart/quickstart', $dadosView );
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar exibir quickstart ao usuário:'
+                . create_exception_description($e));
+
+            show_404();
+        }
     }
 
     public function finalizar()
     {
-        
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
+
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+
+            $usuarioDao->registrarPassouPeloQuickstart( $usuarioAtual );
+
+            $this->load->helper('notificacao_js');
+
+            $this->session->set_flashdata('notificacoesFlash', create_notificacao_json(
+                'sucesso',
+                'Quickstart finalizado com sucesso!<br>
+                Caso queira alterar desses dados, é só ir em "Configurações" no menu à esquerda.'
+            ));
+
+            $json = create_json_feedback(true);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar finalizar quickstart. '
+                . create_exception_description($e));
+
+            $errors =  create_json_feedback_error_json(
+                'Ops! Ocorreu um erro no servidor, desculpe pelo incidente.<br/>'
+               .'Já estamos verificando, tente novamente em breve.'
+            );
+
+            $json = create_json_feedback(false, $errors);
+        }
+
+        echo $json;
     }
 
     private function _partialEtapa1()

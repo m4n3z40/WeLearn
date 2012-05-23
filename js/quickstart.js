@@ -101,7 +101,7 @@
             {},
             function(res) {
                 if (res.success) {
-                    window.location = WeLearn.url.siteURL('/home');
+                    window.location.reload();
                 } else {
                     WeLearn.notificar({
                         msg: res.errors[0].error_msg,
