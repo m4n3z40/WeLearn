@@ -1,5 +1,5 @@
 
-<div id='feed-content'></div>
+<div id='feed-content'>
     <h1>Compartilhe Algo Com Seus Amigos</h1>
     <?=$criarFeed?>
     <hr>

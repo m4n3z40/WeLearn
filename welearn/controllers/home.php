@@ -22,7 +22,7 @@ class Home extends Home_Controller {
         $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
         $partialCriarFeed = $this->template->loadPartial(
             'form',
-             array(),
+             array('formAction' => 'feed/criarFeed'),
             'usuario/feed'
         );
         $partialListarFeed= $this->template->loadPartial(
@@ -93,7 +93,7 @@ Tente novamente mais tarde.'
         $feeds = $feedDao->recuperarTodos($de,$ate,$filtros);
         foreach($feeds as $row)
         {
-            if($row->getTipo())
+            if($row->getTipo() == WeLearn_Compartilhamento_TipoFeed::VIDEO)
             {
                 $isValid=$this->autoembed->parseUrl($row->getConteudo());
                 $row->setConteudo($this->autoembed->getEmbedCode());

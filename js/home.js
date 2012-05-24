@@ -13,12 +13,12 @@ $(document).ready(function() {
                         var url=$(form).attr('action');
                         WeLearn.validarForm(form,url,function(res){
                             if(res.success){
-                                location.reload();
+                                location.reload()
                             }
                         });
                     }else
                     {
-                        location.reload();
+                        location.reload()
                     }
                 });
             }else{

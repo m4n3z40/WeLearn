@@ -232,4 +232,40 @@
         }
     );
 
+
+
+    $('#feed-submit').click(
+        function(e){
+            e.preventDefault();
+            if($('#feed-video').is(':checked'))// verifica se o feed é um video, caso sim, verifica se a url é valida
+            {
+                var form= document.getElementById('form-criar-feed');
+                var url = 'feed/validar_url';
+                WeLearn.validarForm(form,url,function(res){
+                    if(res.success){
+                        var form = document.getElementById('form-criar-feed');
+                        var url=$(form).attr('action');
+                        WeLearn.validarForm(form,url,function(res){
+                            if(res.success){
+                                location.reload();
+                            }
+                        });
+                    }else
+                    {
+                        location.reload();
+                    }
+                });
+            }else{
+                var form= document.getElementById('form-criar-feed');
+                var url=$(form).attr('action');
+                WeLearn.validarForm(form,url,function(res){
+                    if(res.success){
+                        location.reload();
+                    }
+                });
+            }
+        }
+    );
+
+
 })();
