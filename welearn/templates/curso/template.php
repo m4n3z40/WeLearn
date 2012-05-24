@@ -23,9 +23,6 @@
 </head>
 <body>
 <div id="container">
-    <header>
-        {$partial:perfil/barra_usuario}
-    </header>
     <div id="main" role="main" class="clearfix">
         {$partial:curso/barra_lateral_esquerda}
         <section id="inner-content-container">
@@ -39,6 +36,7 @@
         </section>
     </footer>
 </div> <!--! end of #container -->
+{$partial:perfil/barra_usuario}
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="{$base_url}js/libs/jquery-1.7.2.min.js"><\/script>')</script>

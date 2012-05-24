@@ -36,6 +36,11 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
     private $_mediaDificuldade;
 
     /**
+     * @var int
+     */
+    private $_totalReviews;
+
+    /**
      * @var WeLearn_Usuarios_GerenciadorPrincipal
      */
     private $_criador;
@@ -152,6 +157,22 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
     }
 
     /**
+     * @param int $totalReviews
+     */
+    public function setTotalReviews($totalReviews)
+    {
+        $this->_totalReviews = $totalReviews;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTotalReviews()
+    {
+        return $this->_totalReviews;
+    }
+
+    /**
      * @param float $mediaDificuldade
      */
     public function setMediaDificuldade($mediaDificuldade)
@@ -182,6 +203,7 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
     {
         return $this->_mediaQualidade;
     }
+
 
     /**
      * @param array $opcoes

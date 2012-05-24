@@ -44,7 +44,7 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
     private $_diploma;
 
     /**
-     * @var int
+     * @var string
      */
     private $_ano;
 
@@ -89,16 +89,16 @@ class WeLearn_Usuarios_DadosProfissionaisUsuario extends WeLearn_DTO_AbstractDTO
     private $_segmentoTrabalho;
 
     /**
-     * @param $ano int
+     * @param $ano string
      * @return void
      */
     public function setAno($ano)
     {
-        $this->_ano = (int)$ano;
+        $this->_ano = (string)$ano;
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getAno()
     {

@@ -29,12 +29,8 @@
                         $.post(
                             WeLearn.url.siteURL(url),
                             function(result) {
-                                if (result.success) {
-                                    convite.remove();
-                                    WeLearn.notificar(result.notificacao);
-                                } else {
-                                    WeLearn.notificar(result.notificacao);
-                                }
+                                convite.remove();
+                                WeLearn.notificar(result.notificacao);
                             },
                             'json'
                         );
@@ -63,12 +59,8 @@
                     $.post(
                         WeLearn.url.siteURL(url),
                         function(result){
-                            if(result.success){
-                                convite.remove();
-                                WeLearn.notificar(result.notificacao);
-                            } else {
-                                WeLearn.notificar(result.notificacao);
-                            }
+                            convite.remove();
+                            WeLearn.notificar(result.notificacao);
                         },'json'
                     );
                     $(this).dialog("close");
@@ -94,7 +86,7 @@
                 (WeLearn.url.queryString != '') ? WeLearn.url.queryString : null,
                 function(res) {
                     if (res.success) {
-                        $('#lista-convites').prepend(res.htmlListaConvites);
+                        $('#lista-convites').append(res.htmlListaConvites);
                         if(res.paginacao.proxima_pagina) {
                             $('#id-prox-pagina').val(res.paginacao.inicio_proxima_pagina);
                         } else {

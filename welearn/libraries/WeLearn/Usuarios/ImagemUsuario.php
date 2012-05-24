@@ -21,17 +21,27 @@ class WeLearn_Usuarios_ImagemUsuario extends WeLearn_DTO_AbstractDTO
     /**
      * @var string
      */
+    private $_nome;
+
+    /**
+     * @var string
+     */
+    private $_extensao;
+
+    /**
+     * @var string
+     */
+    private $_diretorio;
+
+    /**
+     * @var string
+     */
+    private $_diretorioCompleto;
+
+    /**
+     * @var string
+     */
     private $_usuarioId;
-
-    public function __construct($url = '', $usuarioId = '')
-    {
-        $dados = array(
-            'url' => $url,
-            'usuarioId' => $usuarioId
-        );
-
-        parent::__construct($dados);
-    }
 
     /**
      * @param string $url
@@ -47,6 +57,71 @@ class WeLearn_Usuarios_ImagemUsuario extends WeLearn_DTO_AbstractDTO
     public function getUrl()
     {
         return $this->_url;
+    }
+
+
+    /**
+     * @param string $diretorio
+     */
+    public function setDiretorio($diretorio)
+    {
+        $this->_diretorio = (string)$diretorio;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDiretorio()
+    {
+        return $this->_diretorio;
+    }
+
+    /**
+     * @param string $diretorioCompleto
+     */
+    public function setDiretorioCompleto($diretorioCompleto)
+    {
+        $this->_diretorioCompleto = (string)$diretorioCompleto;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDiretorioCompleto()
+    {
+        return $this->_diretorioCompleto;
+    }
+
+    /**
+     * @param string $extensao
+     */
+    public function setExtensao($extensao)
+    {
+        $this->_extensao = (string)$extensao;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExtensao()
+    {
+        return $this->_extensao;
+    }
+
+    /**
+     * @param string $nome
+     */
+    public function setNome($nome)
+    {
+        $this->_nome = (string)$nome;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNome()
+    {
+        return $this->_nome;
     }
 
     /**
@@ -75,6 +150,10 @@ class WeLearn_Usuarios_ImagemUsuario extends WeLearn_DTO_AbstractDTO
     {
         return array(
             'url' => $this->getUrl(),
+            'nome' => $this->getNome(),
+            'extensao' => $this->getExtensao(),
+            'diretorio' => $this->getDiretorio(),
+            'diretorioCompleto' => $this->getDiretorioCompleto(),
             'usuarioId' => $this->getUsuarioId(),
             'persistido' => $this->isPersistido()
         );
@@ -89,7 +168,16 @@ class WeLearn_Usuarios_ImagemUsuario extends WeLearn_DTO_AbstractDTO
     {
         return array(
             'url' => $this->getUrl(),
+            'nome' => $this->getNome(),
+            'extensao' => $this->getExtensao(),
+            'diretorio' => $this->getDiretorio(),
+            'diretorioCompleto' => $this->getDiretorioCompleto(),
             'usuarioId' => $this->getUsuarioId()
         );
+    }
+
+    public function __toString()
+    {
+        return '<img src="' . $this->_url . '" alt="Imagem Atual do Usuário" />';
     }
 }

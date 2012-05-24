@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Quickstart extends WL_Controller {
+class Quickstart extends Home_Controller {
 
     /**
      * Construtor carrega configurações da classes base CI_Controller
@@ -10,58 +10,79 @@ class Quickstart extends WL_Controller {
     {
         parent::__construct();
 
-        if( ! $this->autenticacao->isAutenticado() ) {
-            redirect('/');
-        }
+        $this->template->appendJSImport( 'quickstart.js' )
+                       ->appendJSImport( 'dados_pessoais.js' )
+                       ->appendJSImport( 'dados_profissionais.js' )
+                       ->appendJSImport( 'imagem_usuario.js' );
     }
 
     public function index()
     {
-        $this->template->appendJSImport( 'quickstart.js' );
-        $this->_renderTemplate( 'quickstart/quickstart' );
+        try {
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+
+            if ( $usuarioDao->passouPeloQuickstart( $this->autenticacao->getUsuarioAutenticado() ) ) {
+                $this->session->keep_flashdata('notificacoesFlash');
+
+                redirect('/home');
+            }
+
+            $dadosView = array(
+                'formEtapa1' => $this->_partialEtapa1(),
+                'formEtapa2' => $this->_partialEtapa2(),
+                'formEtapa3' => $this->_partialEtapa3(),
+                'formEtapa4' => $this->_partialEtapa4()
+            );
+
+            $this->_renderTemplateHome( 'quickstart/quickstart', $dadosView );
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar exibir quickstart ao usuário:'
+                . create_exception_description($e));
+
+            show_404();
+        }
     }
 
-    public function carregar_etapa($etapa)
+    public function finalizar()
     {
         if ( ! $this->input->is_ajax_request() ) {
             show_404();
         }
 
-        switch($etapa) {
-            case 1: case 2: case 3: case 4: case 5:
-                $actionEtapa = '_etapa' . $etapa;
-                $this->$actionEtapa();
-                break;
-            default:
-                show_404();
-        }
-    }
-
-    public function salvar_etapa($etapa)
-    {
-        if( ! $this->input->is_ajax_request() ) {
-            show_404();
-        }
-
         set_json_header();
 
-        switch($etapa) {
-            case 1: case 2: case 3: case 4: case 5:
-                $actionSalvarEtapa = '_salvar_etapa' . $etapa;
-                $this->$actionSalvarEtapa($this->input->post());
-                break;
-            default:
-                $error = create_json_feedback_error_json('Parâmetro de etapa ou dados de posts inválidos. Não foi possível salvar esta etapa');
-                echo create_json_feedback(false, $error);
+        try {
+            $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
+
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+
+            $usuarioDao->registrarPassouPeloQuickstart( $usuarioAtual );
+
+            $this->load->helper('notificacao_js');
+
+            $this->session->set_flashdata('notificacoesFlash', create_notificacao_json(
+                'sucesso',
+                'Quickstart finalizado com sucesso!<br>
+                Caso queira alterar desses dados, é só ir em "Configurações" no menu à esquerda.'
+            ));
+
+            $json = create_json_feedback(true);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar finalizar quickstart. '
+                . create_exception_description($e));
+
+            $errors =  create_json_feedback_error_json(
+                'Ops! Ocorreu um erro no servidor, desculpe pelo incidente.<br/>'
+               .'Já estamos verificando, tente novamente em breve.'
+            );
+
+            $json = create_json_feedback(false, $errors);
         }
+
+        echo $json;
     }
 
-    public function finalizar_quickstart()
-    {
-        
-    }
-
-    private function _etapa1()
+    private function _partialEtapa1()
     {
         $listaSexo = array(
             WeLearn_Usuarios_Sexo::NAO_EXIBIR => WeLearn_Usuarios_Sexo::getDescricao(WeLearn_Usuarios_Sexo::NAO_EXIBIR),
@@ -70,13 +91,13 @@ class Quickstart extends WL_Controller {
         );
 
         $paisEstadoDao = WeLearn_DAO_DAOFactory::create('PaisEstadoDAO', null, false);
-        $listaPais = array();
-        $listaPais[0] = 'Selecione um país';
-        $listaPais = array_merge($listaPais, $paisEstadoDao->recuperarTodosPaisesSimplificado());
-
-        $listaEstado = array(
-            0 => 'Selecione um país'
+        $listaPais = array( 0 => 'Selecione um país' );
+        $listaPais = array_merge(
+            $listaPais,
+            $paisEstadoDao->recuperarTodosPaisesSimplificado()
         );
+
+        $listaEstado = array( 0 => 'Selecione um país acima' );
 
         $listaDeRS = array();
         $listaDeRS[] = array(
@@ -95,6 +116,7 @@ class Quickstart extends WL_Controller {
          );
 
         $dadosEtapa1 = array(
+            'formAction' => '/usuario/salvar_dados_pessoais',
             'extraOpenForm' => 'id="form-etapa-1" class="quickstart-form"',
             'listaSexo' => $listaSexo,
             'sexoAtual' => WeLearn_Usuarios_Sexo::NAO_EXIBIR,
@@ -114,48 +136,14 @@ class Quickstart extends WL_Controller {
         );
 
 
-        echo $this->template->loadPartial('form_dados_pessoais', $dadosEtapa1, 'usuario');
+        return $this->template->loadPartial(
+            'form_dados_pessoais',
+            $dadosEtapa1,
+            'usuario'
+        );
     }
 
-    private function _salvar_etapa1($dados_post)
-    {
-        $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
-
-        $dadosPessoaisDao = WeLearn_DAO_DAOFactory::create('DadosPessoaisUsuarioDAO');
-        $dadosPessoais = $dadosPessoaisDao->criarNovo($dados_post);
-
-        for ($i = 0; $i < count($dados_post['rsId']); $i++) {
-            if ( $dados_post['rsId'][$i] ) {
-                $dadosRS = array(
-                    'usuarioId' => $usuarioAtual->getId(),
-                    'descricaoRS' => $dados_post['rsId'][$i],
-                    'urlUsuarioRS' => $dados_post['rsUsuario'][$i]
-                );
-
-                $dadosPessoais->adicionarRS( $dadosPessoaisDao->criarNovoRS($dadosRS) );
-            }
-        }
-
-        for ($i = 0; $i < count($dados_post['imId']); $i++) {
-            if ( $dados_post['imId'][$i] ) {
-                $dadosIM = array(
-                    'usuarioId' => $usuarioAtual->getId(),
-                    'descricaoIM' => $dados_post['imId'][$i],
-                    'descricaoUsuarioIM' => $dados_post['imUsuario'][$i]
-                );
-
-                $dadosPessoais->adicionarIM( $dadosPessoaisDao->criarNovoIM($dadosIM) );
-            }
-        }
-
-        $usuarioAtual->setDadosPessoais( $dadosPessoais );
-
-        $usuarioAtual->salvarDadosPessoais();
-
-        var_dump($usuarioAtual);
-    }
-
-    private function _etapa2()
+    private function _partialEtapa2()
     {
         $this->load->helper(array('area', 'segmento'));
         $listaAreas = lista_areas_para_dados_dropdown();
@@ -163,6 +151,7 @@ class Quickstart extends WL_Controller {
         $listaSegmentos = lista_segmentos_para_dados_dropdown();
 
         $dadosEtapa2 = array(
+            'formAction' => '/usuario/salvar_dados_profissionais',
             'extraOpenForm' => 'id="form-etapa-2" class="quickstart-form"',
             'escolaridadeAtual' => '',
             'escolaAtual' => '',
@@ -183,47 +172,47 @@ class Quickstart extends WL_Controller {
             'interessesProfissionaisAtual' => ''
         );
 
-        echo $this->template->loadPartial('form_dados_profissionais',  $dadosEtapa2, 'usuario');
+        return $this->template->loadPartial(
+            'form_dados_profissionais',
+            $dadosEtapa2,
+            'usuario'
+        );
     }
 
-    private function _salvar_etapa2($dados_post)
-    {
-        echo '{"success":true}';
-    }
-
-    private function _etapa3()
+    private function _partialEtapa3()
     {
         $dadosEtapa3 = array(
+            'formAction' => '/usuario/salvar_imagem',
             'extraOpenForm' => 'id="form-etapa-3" class="quickstart-form"',
             'imagemUsuarioAtual' => ''
         );
 
-        echo $this->template->loadPartial('form_imagem_perfil', $dadosEtapa3, 'usuario');
+        return $this->template->loadPartial(
+            'form_imagem_perfil',
+            $dadosEtapa3,
+            'usuario'
+        );
     }
 
-    private function _salvar_etapa3($dados_post)
+    private function _partialEtapa4()
     {
-        echo '{"success":true}';
-    }
+        $usuario = $this->autenticacao->getUsuarioAutenticado();
 
-    private function _etapa4()
-    {
+        $dadosEtapa4 = array(
+            'formAction' => '/usuario/salvar_configuracao',
+            'extraOpenForm' => 'id="form-etapa-4" class="quickstart-form"',
+            'privacidadePerfilAtual' => $usuario->getConfiguracao()->getPrivacidadePerfil(),
+            'privacidadeMPAtual' => $usuario->getConfiguracao()->getPrivacidadeMP(),
+            'privacidadeConvitesAtual' => $usuario->getConfiguracao()->getPrivacidadeConvites(),
+            'privacidadeCompartilhamentoAtual' => $usuario->getConfiguracao()->getPrivacidadeCompartilhamento(),
+            'privacidadeNotificacoesAtual' => $usuario->getConfiguracao()->getPrivacidadeNotificacoes()
+        );
 
-    }
-
-    private function _salvar_etapa4($dados_post)
-    {
-
-    }
-
-    private function _etapa5()
-    {
-
-    }
-
-    private function _salvar_etapa5($dados_post)
-    {
-
+        return $this->template->loadPartial(
+            'form_configuracao',
+            $dadosEtapa4,
+            'usuario'
+        );
     }
 }
 

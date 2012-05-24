@@ -110,7 +110,86 @@ class Amigos extends Home_Controller
 
     }
 
+    public function buscar()
+    {
 
+        $listaResultados=null;
+        $buscaAtual = $this->input->get('busca');
+        if($buscaAtual)
+        {
+            $count = 2;
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+            $filtros = array( 'busca' => $buscaAtual, 'count' => $count + 1 );
+            $listaResultados = $usuarioDao->recuperarTodos( 0, null, $filtros );
+            $this->load->helper('paginacao_mysql');
+            $paginacao = create_paginacao_mysql($listaResultados,0, $count);
+        }
+
+
+
+        $dadosView = array(
+            'formAction' => 'usuario/amigos/buscar',
+            'txtBusca' => $buscaAtual,
+            'haResultados' => ! empty($listaResultados),
+            'resultadosBusca' => $this->template->loadPartial(
+                'lista_busca',
+                array( 'listaResultados' => $listaResultados),
+                'usuario/amigos'
+            )
+        );
+
+        if($buscaAtual)
+        {
+            $dadosView['haMaisPaginas'] = $paginacao['proxima_pagina'];
+            $dadosView['inicioProxPagina'] = $paginacao['inicio_proxima_pagina'];
+        }
+
+        $this->_renderTemplateHome('usuario/amigos/buscar', $dadosView);
+    }
+
+
+
+    public function mais_resultados($inicio)
+    {
+
+        try{
+            $texto= $this->input->get('busca');
+            $listaResultados=null;
+            $buscaAtual = $texto;
+            $count = 2;
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+            $filtros = array( 'busca' => $buscaAtual, 'count' => $count + 1 );
+            $listaResultados = $usuarioDao->recuperarTodos( $inicio, null, $filtros );
+            $this->load->helper('paginacao_mysql');
+            $paginacao = create_paginacao_mysql($listaResultados,$inicio, $count);
+
+
+            $response = Zend_Json::encode(array(
+                'htmlResultadosBusca' => $this->template->loadPartial(
+                    'lista_busca',
+                    array('listaResultados' => $listaResultados),
+                    'usuario/amigos'
+                ),
+                'paginacao' => $paginacao
+            ));
+
+            $json = create_json_feedback(true, '', $response);
+
+        } catch (Exception $e) {
+
+            log_message('error', 'Ocorreu um erro ao tentar recuperar proxima página de resultados da busca: '
+                . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro desconhecido, já estamos verificando. Tente novamente mais tarde.'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+
+    }
 
 
 
@@ -121,7 +200,7 @@ class Amigos extends Home_Controller
             $this->template->loadPartial(
                 'menu',
                 $dados,
-                'usuario/convite'
+                'usuario/amigos'
             )
         );
 

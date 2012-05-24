@@ -35,7 +35,7 @@
                         WeLearn.notificar({
                             msg: res.errors[0].error_msg,
                             nivel: 'error',
-                            tempo: 10000
+                            tempo: 5000
                         });
                     }
                 },
@@ -84,7 +84,7 @@
                                 WeLearn.notificar({
                                     nivel: 'error',
                                     msg: res.errors[0].error_msg,
-                                    tempo: 10000
+                                    tempo: 5000
                                 });
                             }
                         }
@@ -136,7 +136,7 @@
                                 WeLearn.notificar({
                                     nivel: 'error',
                                     msg: res.errors[0].error_msg,
-                                    tempo: 10000
+                                    tempo: 5000
                                 });
                             }
                         }
@@ -179,7 +179,7 @@
                         WeLearn.notificar({
                             msg: res.errors[0].error_msg,
                             nivel: 'error',
-                            tempo: 10000
+                            tempo: 5000
                         })
                     }
                 },

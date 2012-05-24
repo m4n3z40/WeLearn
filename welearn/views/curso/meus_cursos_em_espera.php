@@ -8,11 +8,18 @@
     </header>
     <div>
         <?php if ($haCursos): ?>
-        <h4>Exibindo <em><?php echo $totalCursos ?></em> Cursos em que sua inscrição se encontra pendente.</h4>
+        <h4>Exibindo <em class="em-total-requisicao-inscricao"><?php echo $totalCursos ?></em> Cursos em que sua inscrição se encontra pendente.</h4>
         <ul>
             <?php foreach ($listaCursos as $curso): ?>
             <li>
                 <?php echo $curso->toHTML(true) ?>
+                <ul>
+                    <li><?php echo anchor(
+                        '/curso/aluno/cancelar_requisicao/' . $curso->id,
+                        'Cancelar Requisição',
+                        'class="a-cancelar-requisicao-inscricao"'
+                    ) ?></li>
+                </ul>
             </li>
             <?php endforeach; ?>
         </ul>

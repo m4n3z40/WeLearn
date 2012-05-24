@@ -12,6 +12,15 @@
         $btnAddRS = $('#btn-add-rs'),
         $btnRemoveRS = $('#btn-remove-rs');
 
+    $('#txt-data-nascimento').datepicker({
+        minDate: '-100y',
+        maxDate: '-1y',
+        changeMonth: true,
+        changeYear: true,
+        yearRange: 'c-100:c0',
+        showOn: 'both'
+    });
+
     $sltPais.change(function(e){
         var $sltEstado = $('#slt-estado'),
             $error = $sltEstado.next('p.error'),

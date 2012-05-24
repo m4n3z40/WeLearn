@@ -1,5 +1,5 @@
 <h3>Dados Pessoais</h3>
-<?php echo form_open('', $extraOpenForm) ?>
+<?php echo form_open($formAction, $extraOpenForm) ?>
     <fieldset>
         <legend>Dados Principais</legend>
         <dl>
@@ -26,7 +26,7 @@
         <legend>Descrição Pessoal</legend>
         <dl>
             <dt><label for="txt-sobre-mim">Sobre Mim</label></dt>
-                <dd><textarea cols="100" rows="10" name="descricaoPessoal" id="txt-sobre-mim"><?php echo $descricaoPessoalAtual ?></textarea></dd>
+                <dd><textarea cols="60" rows="10" name="descricaoPessoal" id="txt-sobre-mim"><?php echo $descricaoPessoalAtual ?></textarea></dd>
         </dl>
     </fieldset>
     <fieldset>
@@ -62,8 +62,10 @@
                     <table id="tbl-lista-rs">
                         <tbody>
                         <?php foreach($listaDeRS as $RS): ?>
+                        <tr>
                             <td><?php echo $RS['rs'] ?></td>
                             <td><?php echo $RS['rsUsuario'] ?></td>
+                        </tr>
                         <?php endforeach; ?>
                         </tbody>
                         <tfoot>

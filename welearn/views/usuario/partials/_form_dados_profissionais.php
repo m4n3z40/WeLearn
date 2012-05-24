@@ -1,5 +1,5 @@
 <h3>Escolaridade e Dados Profissionais</h3>
-<?php echo form_open('', $extraOpenForm) ?>
+<?php echo form_open($formAction, $extraOpenForm) ?>
     <fieldset>
         <legend>Dados de Escolaridade</legend>
         <dl>
@@ -33,11 +33,11 @@
             <dt><label for="txt-cargo">Cargo</label></dt>
                 <dd><input type="text" name="cargo" id="txt-cargo" value="<?php echo $cargoAtual ?>" /></dd>
             <dt><label for="txt-descricao-trabalho">Descrição das atividades do seu trabalho</label></dt>
-                <dd><textarea cols="100" rows="10" name="descricaoTrabalho" id="txt-descricao-trabalho"><?php echo $descricaoTrabalhoAtual ?></textarea></dd>
+                <dd><textarea cols="60" rows="10" name="descricaoTrabalho" id="txt-descricao-trabalho"><?php echo $descricaoTrabalhoAtual ?></textarea></dd>
             <dt><label for="txt-habilidades-profissionais">Habilidades Profissionais</label></dt>
-                <dd><textarea cols="100" rows="10" name="habilidadesProfissionais" id="txt-habilidades-profissionais"><?php echo $habilidadesProfissionaisAtual ?></textarea></dd>
+                <dd><textarea cols="60" rows="10" name="habilidadesProfissionais" id="txt-habilidades-profissionais"><?php echo $habilidadesProfissionaisAtual ?></textarea></dd>
             <dt><label for="txt-interesses-profissionais">Interesses Profissionais</label></dt>
-                <dd><textarea cols="100" rows="10" name="interessesProfissionais" id="txt-interesses-profissionais"><?php echo $interessesProfissionaisAtual ?></textarea></dd>
+                <dd><textarea cols="60" rows="10" name="interessesProfissionais" id="txt-interesses-profissionais"><?php echo $interessesProfissionaisAtual ?></textarea></dd>
         </dl>
     </fieldset>
 <?php echo form_close() ?>

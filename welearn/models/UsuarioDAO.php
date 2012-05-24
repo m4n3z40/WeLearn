@@ -194,8 +194,6 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
 
         $usuario = $this->_criarFromCassandra( $column );
 
-        $this->recuperarConfiguracao( $usuario );
-
         return $usuario;
     }
 
@@ -342,6 +340,28 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     */
+    public function registrarPassouPeloQuickstart(WeLearn_Usuarios_Usuario $usuario)
+    {
+        $this->_cf->insert( $usuario->getId(), array('passouPeloQuickstart' => 1) );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     * @return bool
+     */
+    public function passouPeloQuickstart(WeLearn_Usuarios_Usuario $usuario)
+    {
+        try {
+            $this->_cf->get( $usuario->getId(), array('passouPeloQuickstart') );
+            return true;
+        } catch (cassandra_NotFoundException $e) {
+            return false;
+        }
+    }
+
+    /**
      * @param string $usuario
      * @param string $senha
      * @return WeLearn_DTO_IDTO
@@ -427,6 +447,11 @@ class UsuarioDAO extends WeLearn_DAO_AbstractDAO
         $usuario = $this->criarNovo();
 
         $usuario->fromCassandra( $column );
+
+        try {
+            $this->recuperarConfiguracao( $usuario );
+            $this->recuperarImagem( $usuario );
+        } catch (cassandra_NotFoundException $e) { }
 
         return $usuario;
     }

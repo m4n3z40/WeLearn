@@ -18,10 +18,10 @@ class WL_Autenticacao
     {
         $this->_ci =& get_instance();
 
-        if (isset($this->_ci->session)) {
+        if ( isset( $this->_ci->session ) ) {
             $usuarioSer = $this->_ci->session->userdata('usuario');
             
-            if ($usuarioSer != false) {
+            if ( $usuarioSer != false ) {
                 $this->_usuario = unserialize($usuarioSer);
                 $this->_autenticado = true;
             }
@@ -32,13 +32,10 @@ class WL_Autenticacao
 
     public function autenticar($login, $senha)
     {
-        if ($this->_sessaoHabilitada) {
-            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-            $this->_usuario = $usuarioDao->autenticar($login, $senha);
-            $this->_ci->session->set_userdata('usuario', serialize($this->_usuario));
-        } else {
-            throw new WeLearn_Base_SessaoDesabilitadaException();
-        }
+        $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+        $this->_usuario = $usuarioDao->autenticar($login, $senha);
+
+        $this->salvarSessao();
     }
 
     public function isAutenticado()
@@ -56,11 +53,32 @@ class WL_Autenticacao
             throw new WeLearn_Base_SessaoDesabilitadaException();
         }
 
-        if($this->_autenticado == false) {
+        if( $this->_autenticado == false ) {
             return false;
         }
 
         return $this->_usuario;
+    }
+
+    public function setUsuarioAutenticado(WeLearn_Usuarios_Usuario $usuario)
+    {
+        $this->_usuario = $usuario;
+
+        $this->salvarSessao();
+    }
+
+    public function salvarSessao()
+    {
+        if ( $this->_sessaoHabilitada ) {
+
+            $this->_ci->session->set_userdata(
+                'usuario',
+                serialize( $this->_usuario )
+            );
+
+        } else {
+            throw new WeLearn_Base_SessaoDesabilitadaException();
+        }
     }
     
     public function limparSessao()
