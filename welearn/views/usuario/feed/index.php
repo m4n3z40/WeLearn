@@ -1,5 +1,5 @@
 
-<div id='feed-content'></div>
+<div id='feed-content'>
     <h1>Compartilhe Algo Com Seus Amigos</h1>
     <?=$criarFeed?>
     <hr>
@@ -7,7 +7,7 @@
         <ul id='feed-lista-feeds'>
             <?=$listarFeed?>
         </ul>
-        <?php if($haFeeds):?>
+        <?php if($haMaisPaginas):?>
             <footer>
             <nav id="paginacao-feeds">
                 <a href="/home/proxima_pagina" data-proximo="<?php echo $inicioProxPagina ?>"  id="paginacao-feed">mais feeds</a>

@@ -9,10 +9,13 @@
  
 class FeedDAO extends WeLearn_DAO_AbstractDAO
 {
-    protected $_nomeCF = 'compartilhamento_feed';
+    protected $_nomeCF = 'usuario_compartilhamento';
 
-    private   $_nomeTimelineCF = 'compartilhamento_usuario_timeline';
+    private $_nomeFeedCF = 'usuario_compartilhamento_feed';
+    private $_nomeTimelineCF = 'usuario_compartilhamento_timeline';
+    private $_FeedCF;
     private $_TimelineCF;
+
     private $_amizadeDAO;
     private $_usuarioDAO;
 
@@ -21,6 +24,7 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
     {
         $phpCassa = WL_Phpcassa::getInstance();
         $this->_TimelineCF = $phpCassa->getColumnFamily($this->_nomeTimelineCF);
+        $this->_FeedCF = $phpCassa->getColumnFamily($this->_nomeFeedCF);
         $this->_amizadeDAO = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
         $this->_usuarioDAO = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
     }
@@ -50,7 +54,7 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
             $ate = CassandraUtil::import($ate)->bytes;
         }
 
-        $idFeeds = $this->_TimelineCF->get($filtros['usuario']->getId(),null,$de,$ate,true,$filtros['count']);
+        $idFeeds = $this->_FeedCF->get($filtros['usuario']->getId(),null,$de,$ate,true,$filtros['count']);
         $resultado = $this->_cf->multiget(array_keys($idFeeds));
         return $this->_criarVariosFromCassandra($resultado);
     }
@@ -101,30 +105,53 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
         $UUID = UUID::mint();
         $dto->setId($UUID->string);
         $this->_cf->insert($UUID->bytes,$dto->toCassandra());
-        $this->_TimelineCF->insert($dto->getCriador()->getId(),array($UUID->bytes => ''));//inserindo na timeline do usuario criador do feed
+        $this->_FeedCF->insert($dto->getCriador()->getId(),array($UUID->bytes => ''));//inserindo na timeline do usuario criador do feed
         $totalAmigos = $this->_amizadeDAO->recuperarQtdTotalAmigos($dto->getCriador());// verifica se o usuario possui algum amigo
         if($totalAmigos!=0){
             $amigos=$this->_amizadeDAO->recuperarTodosAmigos($dto->getCriador());//recuperando amigos do usuario
             foreach ($amigos as $row) {
-                $this->_TimelineCF->insert($row->getId(),array($UUID->bytes => ''));// inserindo na timeline dos amigos do criador
+                $this->_FeedCF->insert($row->getId(),array($UUID->bytes => ''));// inserindo na timeline dos amigos do criador
             }
         }
     }
 
-    public function salvarPerfil(WeLearn_DTO_IDTO &$feed, WeLearn_Usuarios_Usuario $usuarioPerfil)
+    public function salvarTimeLine(WeLearn_DTO_IDTO &$dto, WeLearn_DTO_IDTO &$usuario)
     {
-
+        if ($dto->isPersistido()) {
+            $this->_atualizarTimeline($dto,$usuario);
+        } else {
+            $this->_adicionarTimeline($dto,$usuario);
+        }
     }
 
-    protected function _adicionarPerfil()
-    {
 
+
+    protected function _adicionarTimeline(WeLearn_DTO_IDTO &$dto, WeLearn_DTO_IDTO &$usuario)
+    {
+        $UUID = UUID::mint();
+        $dto->setId($UUID->string);
+        $this->_cf->insert($UUID->bytes,$dto->toCassandra());
+        $this->_FeedCF->insert($usuario->getId(),array($UUID->bytes=>''));
+        $this->_TimelineCF->insert($usuario->getId(),array($UUID->bytes => ''));
     }
 
-    protected function _atualizarPerfil()
-    {
 
+    public function recuperarTimeline($de = '', $ate = '', array $filtros = null)
+    {
+        if ($de != '') {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+
+        if ($ate != '') {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
+        $idFeeds = $this->_TimelineCF->get($filtros['usuario']->getId(),null,$de,$ate,true,$filtros['count']);
+        $resultado = $this->_cf->multiget(array_keys($idFeeds));
+        return $this->_criarVariosFromCassandra($resultado);
     }
+
+
 
     private function _criarFromCassandra(array $column)
     {

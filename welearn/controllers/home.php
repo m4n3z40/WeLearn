@@ -2,7 +2,7 @@
 
 class Home extends Home_Controller {
 
-    private  $_count = 10;
+    private  $_count = 30;
     /**
      * Construtor carrega configurações da classes base CI_Controller
      * (Resolve bug ao utilizar this->load)
@@ -22,14 +22,16 @@ class Home extends Home_Controller {
         $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
         $partialCriarFeed = $this->template->loadPartial(
             'form',
-             array(),
+             array('formAction' => 'feed/criarFeed'),
             'usuario/feed'
         );
         $partialListarFeed= $this->template->loadPartial(
             'lista',
             array('feeds_usuario' => $feeds_usuario,
                   'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
-                  'haFeeds' => !empty($feeds_usuario)),
+                  'haFeeds' => !empty($feeds_usuario),
+                  'haMaisPaginas' => $dadosPaginados['proxima_pagina']
+            ),
             'usuario/feed'
         );
         $dados= array('criarFeed' => $partialCriarFeed , 'listarFeed' => $partialListarFeed,'paginacao' =>$dadosPaginados);
@@ -65,7 +67,7 @@ class Home extends Home_Controller {
 
             log_message(
                 'error',
-                'Ocorreu um erro ao tentar recupera uma nova página de mensagens: '
+                'Ocorreu um erro ao tentar recupera uma nova página de feeds '
                     . create_exception_description($e)
             );
 
@@ -83,11 +85,20 @@ Tente novamente mais tarde.'
 
     private function carregarFeeds($de='',$ate='',$count)
     {
+        $this->load->library('autoembed');
         try{
         $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
         $feedDao = WeLearn_DAO_DAOFactory::create('FeedDAO');
         $filtros = array('usuario' => $usuarioAutenticado , 'count' => $count+1);
         $feeds = $feedDao->recuperarTodos($de,$ate,$filtros);
+        foreach($feeds as $row)
+        {
+            if($row->getTipo() == WeLearn_Compartilhamento_TipoFeed::VIDEO)
+            {
+                $isValid=$this->autoembed->parseUrl($row->getConteudo());
+                $row->setConteudo($this->autoembed->getEmbedCode());
+            }
+        }
         return $feeds;
         }catch(cassandra_NotFoundException $e)
         {

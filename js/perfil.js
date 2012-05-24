@@ -9,14 +9,17 @@
 
 (function(){
 
-    $( "#enviar-convite" ).click(function(e) {
-        e.preventDefault();
-        $( "#convite-form" ).dialog( "open");
-        return false;
-    });
+    var csrf= $('input[name=welearn_csrf_token]').val();    //csrf do perfil
 
 
-    $( "#convite-form" ).dialog({
+    var formConvite = $('<form action="'+WeLearn.url.siteURL('convite/enviar')+'" method="post" accept-charset="utf-8" id="form-enviar-convite">'+
+                        '<div class="hidden">'+
+                        '<input type="hidden" name="welearn_csrf_token" value="'+csrf+'" />'+
+                        '</div>'+
+                        '<input type="hidden" name="destinatario" value="'+$('#id-usuario-perfil').val()+'"/>'+
+                        '<textarea name="txt-convite" cols="43" rows="5" ></textarea></form>');
+
+        formConvite.dialog({
         autoOpen: false,
         modal: true,
         resizable: false,
@@ -25,7 +28,7 @@
         height: 200,
         buttons:{
             "Enviar Convite": function(){
-               var formConvite=document.getElementById('form-enviar-convite');
+
                 WeLearn.validarForm(formConvite,
                     $(formConvite).attr('action'),
                     function(res)
@@ -50,51 +53,63 @@
     });
 
 
-    $('#exibir-convite-pendente').click(
-        function(e)
-        {
-            e.preventDefault();
-            $( "#container-convite-pendente" ).dialog( "open");
-            return false;
-        }
-    );
+    $( "#enviar-convite" ).click(function(e) {
+        e.preventDefault();
+        formConvite.dialog( "open");
+        return false;
+    });
 
 
-    var param = $('.param-tipo-convite').val();
+
+
+    var param = $('#tipo-convite').val();
     var idConvite = $('#id-convite').val();
-    var idRemetente=$('#id-remetente').val();
-    var idDestinatario=$('#id-destinatario').val();
+    var idDestinatario = $('#id-destinatario').val();
+    var idRemetente = $('#id-remetente').val();
+
+    if(param == 'enviado')
+    {
+
+        var containerConvite = $('<form action="'+WeLearn.url.siteURL('convite/aceitar')+'" method="post" accept-charset="utf-8" id="form-criar-mensagem">'+
+                                 'você enviou uma solicitação de amizade para '+$('#id-usuario-perfil').val()+
+                                '</form>');
 
 
-    if(param=='enviado'){
-        $('#container-convite-pendente').dialog(
-            {
-                autoOpen: false,
+        containerConvite.dialog(
+
+        {
+            autoOpen: false,
                 modal: true,
-                draggable: false,
-                resizable: false,
-                width: 400,
-                height: 170,
-                buttons: {
-                    "Cancelar Requisicao": function() {
-                        var tipoView='perfil';
-                        var url='/convite/remover/'+idConvite+'/'+idRemetente+'/'+idDestinatario+'/'+tipoView;
-                        $.post(
-                            WeLearn.url.siteURL(url),
-                            function(result) {
-                                location.reload();
-                            },
-                            'json'
-                        );
-                        $( this ).dialog( "close" );
-                    }
-                }
+            draggable: false,
+            resizable: false,
+            width: 400,
+            height: 170,
+            buttons: {
+            "Cancelar Requisicao": function() {
+                var tipoView='perfil';
+                var url='/convite/remover/'+idConvite+'/'+idRemetente+'/'+idDestinatario+'/'+tipoView;
+                $.post(
+                    WeLearn.url.siteURL(url),
+                    function(result) {
+                        location.reload();
+                    },
+                    'json'
+                );
+                $( this ).dialog( "close" );
             }
+        }
+        }
+
         );
+    }
 
+    else if(param == 'recebido')
+    {
+        var containerConvite = $('<form action="'+WeLearn.url.siteURL('convite/recusar')+'" method="post" accept-charset="utf-8" id="form-criar-mensagem">'+
+                                    'você recebeu uma solicitação de amizade de '+$('#id-usuario-perfil').val()+
+                                '</form>');
 
-    }else{
-        $('#container-convite-pendente').dialog(
+        containerConvite.dialog(
             {
                 autoOpen: false,
                 modal: true,
@@ -132,10 +147,27 @@
     }
 
 
+    $('#exibir-convite-pendente').click(
+        function(e)
+        {
+            e.preventDefault();
 
+            containerConvite.dialog( "open");
+            return false;
 
-    var formMensagem=document.getElementById('form-criar-mensagem');
-    $( "#form-criar-mensagem" ).dialog({
+        }
+    );
+
+    var formMensagem=$('<form action="http://welearn.com/usuario/mensagem/criar" method="post" accept-charset="utf-8" id="form-criar-mensagem" title="Digite sua mensagem" style="display:none">'+
+                        '<div class="hidden">'+
+                        '<input type="hidden" name="welearn_csrf_token" value="'+csrf+'" />'+
+                        '</div>'+
+                        '<input type="hidden" name="destinatario" value="'+$('#id-usuario-perfil').val()+'" />'+
+                        '<textarea rows="5" cols="43" name="mensagem" id="txt-mensagem"></textarea>'+
+                        '</form>'
+                        );
+
+   formMensagem.dialog({
         autoOpen: false,
         modal: true,
         draggable: false,
@@ -163,17 +195,14 @@
         }
     });
 
-
-
     $( "#enviar-mensagem" ).click(function(e) {
         e.preventDefault();
-        $( "#form-criar-mensagem" ).dialog( "open");
+        formMensagem.dialog( "open");
     });
 
+
+
     var divRemoverAmizade= $('<div>Tem certeza que deseja remover a amizade?</div>');
-
-
-
 
     $('#remover-amizade').click(
         function(e){
@@ -204,6 +233,39 @@
     );
 
 
+
+    $('#feed-submit').click(
+        function(e){
+            e.preventDefault();
+            if($('#feed-video').is(':checked'))// verifica se o feed é um video, caso sim, verifica se a url é valida
+            {
+                var form= document.getElementById('form-criar-feed');
+                var url = 'feed/validar_url';
+                WeLearn.validarForm(form,url,function(res){
+                    if(res.success){
+                        var form = document.getElementById('form-criar-feed');
+                        var url=$(form).attr('action');
+                        WeLearn.validarForm(form,url,function(res){
+                            if(res.success){
+                                location.reload();
+                            }
+                        });
+                    }else
+                    {
+                        location.reload();
+                    }
+                });
+            }else{
+                var form= document.getElementById('form-criar-feed');
+                var url=$(form).attr('action');
+                WeLearn.validarForm(form,url,function(res){
+                    if(res.success){
+                        location.reload();
+                    }
+                });
+            }
+        }
+    );
 
 
 })();

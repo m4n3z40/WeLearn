@@ -7,10 +7,11 @@
     </header>
     <div>
         <?php if($success==true){ ?>
+        <ul>
         <?php foreach ( $mensagens as $row):?>
-            <?=anchor('/usuario/mensagem/listar/'.$row->id, $row->toHTML('imagem_pequena_sem_link'))?>
-            </br>
+            <li><?=anchor('/usuario/mensagem/listar/'.$row->id, $row->toHTML('imagem_pequena_sem_link'))?></li>
         <?php endforeach;?>
+        </ul>
         <?php }else{?>
         <h3>voce nao possui conversas com nenhum amigo</h3>
         <?php } ?>
