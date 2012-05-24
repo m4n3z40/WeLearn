@@ -11,14 +11,14 @@
 class WeLearn_Cursos_Conteudo_Anotacao extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var int
-     */
-    private $_id;
-
-    /**
      * @var string
      */
     private $_conteudo;
+
+    /**
+     * @var WeLearn_Usuarios_Usuario
+     */
+    private $_usuario;
 
     /**
      * @var WeLearn_Cursos_Conteudo_Pagina
@@ -26,29 +26,27 @@ class WeLearn_Cursos_Conteudo_Anotacao extends WeLearn_DTO_AbstractDTO
     private $_pagina;
 
     /**
-     * @var WeLearn_Cursos_ParticipacaoCurso
+     * @param null $dados
      */
-    private $_participacaoCurso;
+    public function __construct($dados = null)
+    {
+        parent::__construct($dados);
+    }
 
     /**
-     * @param int $id
-     * @param string $conteudo
-     * @param null $pagina
-     * @param null $participacaoCurso
+     * @param \WeLearn_Usuarios_Usuario $usuario
      */
-    public function __construct($id = 0,
-                                $conteudo = '',
-                                WeLearn_Cursos_Conteudo_Pagina $pagina = null,
-                                WeLearn_Cursos_ParticipacaoCurso $participacaoCurso = null)
+    public function setUsuario(WeLearn_Usuarios_Usuario $usuario)
     {
-        $dados = array(
-            'id' => $id,
-            'conteudo' => $conteudo,
-            'pagina' => $pagina,
-            'participacaoCurso' => $participacaoCurso
-        );
+        $this->_usuario = $usuario;
+    }
 
-        parent::__construct($dados);
+    /**
+     * @return \WeLearn_Usuarios_Usuario
+     */
+    public function getUsuario()
+    {
+        return $this->_usuario;
     }
 
     /**
@@ -68,22 +66,6 @@ class WeLearn_Cursos_Conteudo_Anotacao extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param int $id
-     */
-    public function setId($id)
-    {
-        $this->_id = (int)$id;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->_id;
-    }
-
-    /**
      * @param \WeLearn_Cursos_Conteudo_Pagina $pagina
      */
     public function setPagina(WeLearn_Cursos_Conteudo_Pagina $pagina)
@@ -100,22 +82,6 @@ class WeLearn_Cursos_Conteudo_Anotacao extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param \WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
-     */
-    public function setParticipacaoCurso(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso)
-    {
-        $this->_participacaoCurso = $participacaoCurso;
-    }
-
-    /**
-     * @return \WeLearn_Cursos_ParticipacaoCurso
-     */
-    public function getParticipacaoCurso()
-    {
-        return $this->_participacaoCurso;
-    }
-
-    /**
      * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
      * em um array.
      *
@@ -124,11 +90,22 @@ class WeLearn_Cursos_Conteudo_Anotacao extends WeLearn_DTO_AbstractDTO
     public function toArray()
     {
         return array(
-            'id' => $this->getId(),
             'conteudo' => $this->getConteudo(),
+            'usuario' => $this->getUsuario()->toArray(),
             'pagina' => $this->getPagina()->toArray(),
-            'participacaoCurso' => $this->getParticipacaoCurso()->toArray(),
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            $this->getUsuario()->getId() => $this->getConteudo()
         );
     }
 }

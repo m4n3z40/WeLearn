@@ -9,6 +9,8 @@
  
 class AnotacaoDAO extends WeLearn_DAO_AbstractDAO
 {
+    protected $_nomeCF = 'cursos_anotacao';
+
     /**
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
@@ -73,5 +75,19 @@ class AnotacaoDAO extends WeLearn_DAO_AbstractDAO
     protected function _adicionar(WeLearn_DTO_IDTO &$dto)
     {
         // TODO: Implementar este metodo
+    }
+
+    private function _criarFromCassandra(array $column,
+                                         WeLearn_Cursos_Conteudo_Pagina $pagina = null,
+                                         WeLearn_Usuarios_Usuario $usuario = null)
+    {
+
+    }
+
+    private function _criarVariosFromCassandra(array $column,
+                                             WeLearn_Cursos_Conteudo_Pagina $pagina = null,
+                                             WeLearn_Usuarios_Usuario $usuario = null)
+    {
+
     }
 }

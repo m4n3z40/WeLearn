@@ -16,6 +16,7 @@
             <li><?php echo anchor('/usuario/mensagem', 'Mensagens') ?></li>
             <li><?php echo anchor('/usuario/notificacao', 'Notificações') ?></li>
             <li><?php echo anchor('/usuario/configuracao', 'Configurações') ?></li>
+            <li><?php echo anchor('/administracao','Adminstração')?></li>
         </ul>
     </nav>
 </section>
