@@ -100,5 +100,7 @@ $route['usuario/configuracao/([a-z_]+)']                                        
 $route['usuario/([a-z_]+)']                                                                                  = 'usuario/usuario/$1';
 $route['usuario/amigos']                                                                                     = 'usuario/amigos/index';
 
+
+
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

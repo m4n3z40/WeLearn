@@ -354,7 +354,7 @@ class Convite extends Home_Controller
             $this->template->loadPartial(
                 'menu',
                 array(),
-                'usuario/convite'
+                'usuario/amigos'
             )
         );
 
