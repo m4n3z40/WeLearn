@@ -49,15 +49,15 @@ class Amigos extends Home_Controller
         }
 
 
-            $count = 10;
+
             $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
             $amigosDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
-            $filtros= array('count' => $count+1,'usuario' => $usuarioAutenticado, 'opcao'=>'amigos');
+            $filtros= array('count' => self::$_count+1,'usuario' => $usuarioAutenticado, 'opcao'=>'amigos');
             try {
                 $listaAmigos = $amigosDao->recuperarTodos($inicio,'',$filtros);
                 //print_r($listaAmigos);
                 $this->load->helper('paginacao_cassandra');
-                $dadosPaginados = create_paginacao_cassandra($listaAmigos, $count);
+                $dadosPaginados = create_paginacao_cassandra($listaAmigos, self::$_count);
                 $response = array(
                     'success' => true,
                     'htmlListaAmigos' => $this->template->loadPartial(
@@ -117,12 +117,11 @@ class Amigos extends Home_Controller
         $buscaAtual = $this->input->get('busca');
         if($buscaAtual)
         {
-            $count = 2;
             $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-            $filtros = array( 'busca' => $buscaAtual, 'count' => $count + 1 );
+            $filtros = array( 'busca' => $buscaAtual, 'count' => self::$_count + 1 );
             $listaResultados = $usuarioDao->recuperarTodos( 0, null, $filtros );
             $this->load->helper('paginacao_mysql');
-            $paginacao = create_paginacao_mysql($listaResultados,0, $count);
+            $paginacao = create_paginacao_mysql($listaResultados,0, self::$_count);
         }
 
 
@@ -156,12 +155,11 @@ class Amigos extends Home_Controller
             $texto= $this->input->get('busca');
             $listaResultados=null;
             $buscaAtual = $texto;
-            $count = 2;
             $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-            $filtros = array( 'busca' => $buscaAtual, 'count' => $count + 1 );
+            $filtros = array( 'busca' => $buscaAtual, 'count' => self::$_count + 1 );
             $listaResultados = $usuarioDao->recuperarTodos( $inicio, null, $filtros );
             $this->load->helper('paginacao_mysql');
-            $paginacao = create_paginacao_mysql($listaResultados,$inicio, $count);
+            $paginacao = create_paginacao_mysql($listaResultados,$inicio, self::$_count);
 
 
             $response = Zend_Json::encode(array(

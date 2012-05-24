@@ -233,6 +233,32 @@
     );
 
 
+    $("input[name='tipo-feed']").change(
+        function()
+        {
+            if($(this).val()==0)
+            {
+                $('#descricao-feed').fadeOut();
+            }
+            if($(this).val()==1)
+            {
+                $('#descricao-feed').attr({placeholder:'Descreva O Seu Link'});
+                $('#descricao-feed').fadeIn();
+            }
+            if($(this).val()==2)
+            {
+                $('#descricao-feed').attr({placeholder:'Descreva Sua Imagem'});
+                $('#descricao-feed').fadeIn();
+            }
+            if($(this).val()==3)
+            {
+                $('#descricao-feed').attr({placeholder:'Descreva Seu Video'});
+                $('#descricao-feed').fadeIn();
+            }
+        }
+    );
+
+
 
     $('#feed-submit').click(
         function(e){
