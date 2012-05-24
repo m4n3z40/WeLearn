@@ -88,13 +88,22 @@ $route['curso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']  
 $route['curso/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']                     = 'curso/curso/$1/$2';
 $route['curso/([a-z_]+)']                                                                                    = 'curso/curso/$1';
 
-$route['perfil/([a-z0-9_]+)']                                                                                = 'usuario/perfil/index/$1';
+$route['perfil/([a-zA-Z0-9_]+)']                                                                                = 'usuario/perfil/index/$1';
 $route['perfil/([a-z_]+)/([a-z0-9_]+)']                                                                      = 'usuario/perfil/$1/$2';
 
 $route['usuario/mensagem']                                                                                   = 'usuario/mensagem/index';
 $route['usuario/mensagem/listar/([a-z_]+)']                                                                  = 'usuario/mensagem/listar/$1';
 $route['usuario/([a-z_]+)']                                                                                  = 'usuario/usuario/$1';
 $route['usuario/amigos']                                                                                     = 'usuario/amigos/index';
+
+$route['administracao']                                                                                      = 'administracao/administracao/index';
+$route['administracao/([a-z0-9_]+)']                                                                         = 'administracao/administracao/$1';
+
+$route['administracao/area']                                                                                 = 'administracao/area/index';
+$route['administracao/area/([a-z0-9_]+)']                                                                    = 'administracao/area/$1';
+
+$route['administracao/segmento']                                                                             = 'administracao/segmento/index';
+$route['administracao/segmento/([a-z0-9_]+)']                                                                = 'administracao/segmento/$1';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Area extends WL_Controller {
+class Area extends Home_Controller {
 
     /**
      * Construtor carrega configurações da classes base CI_Controller
@@ -13,7 +13,9 @@ class Area extends WL_Controller {
 
 	public function index()
 	{
-        $this->_renderTemplate();
+        $partialCriar = $this->template->loadPartial('form', array(),'administracao/area');
+        $this->_renderTemplateHome();
+
     }
 
     public function adicionar()
@@ -51,7 +53,32 @@ class Area extends WL_Controller {
             exit($json);
         }
     }
+
+
+
+    public function criar($idArea){
+
+        try{
+
+
+
+        }catch (Exception $e) {
+                log_message('error', 'Erro ao exibir formulário de criação de categoria de fórum: ' . create_exception_description($e));
+
+                show_404();
+            }
+    }
+    protected function _renderTemplateHome($view = '', $dados = null)
+    {
+        $this->_barraDireitaSetVar(
+            'menuContexto',
+            $this->template->loadPartial( 'menu', Array(), 'administracao' )
+        );
+
+        parent::_renderTemplateHome($view, $dados);
+    }
+
 }
 
 /* End of file area.php */
-/* Location: ./application/controllers/area.php */
+/* Location: ./application/controllers/administracao/area.php */
