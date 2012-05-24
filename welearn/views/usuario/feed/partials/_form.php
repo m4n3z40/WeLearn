@@ -10,4 +10,4 @@
     <?=form_textarea( array('name' => 'descricao-feed', 'id' => 'descricao-feed', 'rows' => '1' , 'cols' => '50','style' => 'display:none'))?>
     <?=form_textarea( array('name' => 'conteudo-feed' , 'id' => 'conteudo-feed', 'rows' => '1' ,'cols' =>'50'))?>
     <?=form_submit(array('name' => 'feed-submit' , 'id' => 'feed-submit' , 'value' => 'Enviar'))?>
-<?form_close();?>
+<?=form_close();?>
