@@ -2,6 +2,7 @@
 
 class Area extends Home_Controller {
 
+     private $_areaDAO;
     /**
      * Construtor carrega configurações da classes base CI_Controller
      * (Resolve bug ao utilizar this->load)
@@ -9,13 +10,16 @@ class Area extends Home_Controller {
     function __construct()
     {
         parent::__construct();
+
+        $this->_areaDAO = WeLearn_DAO_DAOFactory::create('AreaDAO');
+        $this->template->appendJSImport('area.js');
     }
 
 	public function index()
 	{
-        $partialCriar = $this->template->loadPartial('form', array(),'administracao/area');
-        $this->_renderTemplateHome();
-
+        //$partialCriar = $this->template->loadPartial('form', array(),'administracao/area');
+        //$this->_renderTemplateHome();
+        $this->listar();
     }
 
     public function adicionar()
@@ -54,28 +58,144 @@ class Area extends Home_Controller {
         }
     }
 
+    public function listar(){
 
+    try {
+        $count = 20;
 
-    public function criar($idArea){
+        $listaAreas = $this->_areaDAO->recuperarTodos($de = null, $ate = null, $filtros = array('count' => $count));
+        /**
+        try {
+            $listaCategorias = $categoriaDao->recuperarTodosPorCurso($curso, '', '', $count + 1);
+        } catch (cassandra_NotFoundException $e) {
+            $listaCategorias = array();
+        }**/
+
+        $this->load->helper('paginacao_cassandra');
+        $dados_paginacao = create_paginacao_cassandra($listaAreas, $count);
+
+        $dadosLista = array(
+            'listaAreas' => $listaAreas
+        );
+
+        $dadosViewListar = array(
+            'haAreas' => !empty($listaAreas),
+            'listaAreas' => $this->template->loadPartial('lista', $dadosLista, 'administracao/area'),
+            'haMaisPaginas' => $dados_paginacao['proxima_pagina'],
+            'inicioProxPagina' => $dados_paginacao['inicio_proxima_pagina']
+        );
+
+        $this->_renderTemplateHome('administracao/area/listar', $dadosViewListar);
+    } catch (Exception $e) {
+        log_message('error', 'Ocorreu um erro ao exibir a lista de Áreas:'
+            . create_exception_description($e));
+
+        show_404();
+    }
+}
+    public function proxima_pagina($areaId, $inicio){
+
+    if ( ! $this->input->is_ajax_request() ) {
+        show_404();
+    }
+
+    set_json_header();
+
+    try {
+        $count = 15;
+
+        $area = $this->_areaDao->recuperar($areaId);
+
+        $areaDao = WeLearn_DAO_DAOFactory::create('AreaDAO');
+        $listaAreas = $areaDao->recuperarTodos($de = null,$ate = null, $count + 1);
+
+        $this->load->helper('paginacao_cassandra');
+        $dados_paginacao = create_paginacao_cassandra($listaCategorias, $count);
+
+        $dadosLista = array(
+            'listaAreas' => $listaAreas
+        );
+
+        $response = array(
+            'success' => true,
+            'htmlListaAreas' => $this->template->loadPartial('lista', $dadosLista, 'administracao/area'),
+            'paginacao' => $dados_paginacao
+        );
+
+        $json = Zend_Json::encode($response);
+    } catch (Exception $e) {
+        log_message('error', 'Ocorreu um erro ao recuperar outra página de Áreas: '
+            . create_exception_description($e));
+
+        $error = create_json_feedback_error_json('Ocorreu um erro inesperado. Já estamos verificando, tente novamente mais tarde.');
+
+        $json = create_json_feedback(false, $error);
+    }
+
+    echo $json;
+}
+
+    public function criar(){
 
         try{
-
-
+            $dadosFormCriar = array(
+                'descricaoAtual'=>''
+            );
+            $dadosViewCriar = array(
+                'formAction' => 'administracao/area/salvar',
+                'extraOpenForm' => 'id="form-criar-area"',
+                'hiddenFormData' => array('acao' => 'criar'),
+                'formCriar' => $this->template->loadPartial('form', $dadosFormCriar, 'administracao/area'),
+                'textoBotaoSubmit' => 'Criar nova Á rea!'
+            );
+            $this->_renderTemplateHome('administracao/area/criar', $dadosViewCriar);
 
         }catch (Exception $e) {
-                log_message('error', 'Erro ao exibir formulário de criação de categoria de fórum: ' . create_exception_description($e));
+                log_message('error', 'Erro ao exibir formulário de criação de Area: ' . create_exception_description($e));
 
                 show_404();
             }
     }
-    protected function _renderTemplateHome($view = '', $dados = null)
-    {
-        $this->_barraDireitaSetVar(
-            'menuContexto',
-            $this->template->loadPartial( 'menu', Array(), 'administracao' )
-        );
 
-        parent::_renderTemplateHome($view, $dados);
+    public function salvar()
+    {
+
+
+        set_json_header();
+
+        $this->load->library('form_validation');
+        if ( ! $this->form_validation->run() ) {
+            $json = create_json_feedback(false, validation_errors_json());
+            echo $json;
+        } else {
+            try{
+                $descricaoArea = $this->input->post('descricao');
+
+                $this->load->helper('notificacao_js');
+
+             //  if (isset($dadosArea['acao']) && $dadosArea['acao'] == 'criar') {
+
+
+                    $novaArea = $this->_areaDAO->criarNovo();
+                    $novaArea->setDescricao($descricaoArea);
+                    $this->_areaDAO->salvar($novaArea);
+
+                    $notificacoesFlash = create_notificacao_json(
+                        'sucesso',
+                        'A nova Área foi criada com sucesso.',
+                        10000
+                    );
+                    $this->session->set_flashdata('notificacoesFlash',$notificacoesFlash);
+                    $json = create_json_feedback(true, '', '"idArea":"' . $novaArea->getDescricao() . '"');
+               // }
+            }catch (Exception $e) {
+                    log_message('error', 'Erro a criar a Área: ' . create_exception_description($e));
+
+                    $error = create_json_feedback_error_json('Ocorreu um erro inesperado! Já estamos verificando, tente novamente mais tarde.');
+                    $json = create_json_feedback(false, $error);
+    }
+            echo $json;
+        }
     }
 
 }

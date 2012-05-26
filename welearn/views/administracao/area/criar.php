@@ -1,4 +1,4 @@
-<div id='form-criar-area'>
+<div id='criar-area-content'>
     <header>
         <hgroup>
             <h1>Criar uma Nova Área</h1>
@@ -7,7 +7,7 @@
     </header>
     <div>
 
-        <?php echo form_open($formAction, $extraOpenForm, $hideFormDate) ?>
+        <?php echo form_open($formAction, $extraOpenForm, $hiddenFormData) ?>
             <?php echo $formCriar ?>
             <button type="submit" id="btn-form-area"><?php echo $textoBotaoSubmit ?></button>
         <?php echo form_close() ?>
