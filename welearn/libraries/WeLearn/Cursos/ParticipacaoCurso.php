@@ -18,7 +18,7 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
     /**
      * @var float
      */
-    private $_frequenciaTotal;
+    private $_frequenciaTotal = 0;
 
     /**
      * @var string
@@ -26,9 +26,9 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
     private $_dataUltimoAcesso;
 
     /**
-     * @var double
+     * @var float
      */
-    private $_crFinal;
+    private $_crFinal = 0;
 
     /**
      * @var WeLearn_Cursos_Curso
@@ -48,7 +48,7 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
     /**
      * @var int
      */
-    private $_situacao;
+    private $_situacao = WeLearn_Cursos_SituacaoParticipacaoCurso::INSCRICAO_EM_ESPERA;
 
     /**
      * @var WeLearn_Cursos_Conteudo_Pagina
@@ -88,15 +88,15 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param \double $crFinal
+     * @param \float $crFinal
      */
     public function setCrFinal($crFinal)
     {
-        $this->_crFinal = (double)$crFinal;
+        $this->_crFinal = (float)$crFinal;
     }
 
     /**
-     * @return \double
+     * @return \float
      */
     public function getCrFinal()
     {
@@ -252,6 +252,30 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
             'situacao' => $this->getSituacao(),
             'paginaAtual' => (is_null($this->_paginaAtual)) ? '' : $this->getPaginaAtual()->toArray(),
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'dataInscricao' => $this->getDataInscricao(),
+            'frequenciaTotal' => $this->getFrequenciaTotal(),
+            'dataUltimoAcesso' => $this->getDataUltimoAcesso(),
+            'crFinal' => $this->getCrFinal(),
+            'curso' => ( $this->_curso instanceof WeLearn_Cursos_Curso )
+                       ? $this->getCurso()->getId() : '',
+            'aluno' => ( $this->_aluno instanceof WeLearn_Usuarios_Aluno )
+                       ? $this->getAluno()->getId() : '',
+            'certificado' => ( $this->_certificado instanceof WeLearn_Cursos_Certificado )
+                             ? $this->getCertificado()->getId() : '',
+            'situacao' => $this->getSituacao(),
+            'paginaAtual' => ( $this->_paginaAtual instanceof WeLearn_Cursos_Conteudo_Pagina )
+                             ? $this->getPaginaAtual()->getId() : ''
         );
     }
 }

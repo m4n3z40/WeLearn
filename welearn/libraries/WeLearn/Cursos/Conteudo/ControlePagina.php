@@ -171,4 +171,19 @@ class WeLearn_Cursos_Conteudo_ControlePagina extends WeLearn_DTO_AbstractDTO
             'persistido' => $this->isPersistido()
         );
     }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            $this->getPagina()->getId() => $this->getStatus()
+                                   . '|' . $this->getTempoVisualizacao()
+        );
+    }
+
+
 }

@@ -27,6 +27,11 @@ abstract class WeLearn_Cursos_SituacaoParticipacaoCurso implements WeLearn_Base_
     const CURSO_CONCLUIDO = 2;
 
     /**
+     * @constant
+     */
+    const INATIVO = 3;
+
+    /**
      * Retorna a descrição do Enum passado por parametru.
      *
      * @param $codigo int Codigo da descrição do Enum a ser retornada.
@@ -42,6 +47,8 @@ abstract class WeLearn_Cursos_SituacaoParticipacaoCurso implements WeLearn_Base_
                 return 'Participação Ativa no Curso';
             case self::CURSO_CONCLUIDO:
                 return 'Curso Concluído';
+            case self::INATIVO:
+                return 'Inativo';
             default:
                 throw new WeLearn_Base_CodigoEnumIncorretoException();
         }

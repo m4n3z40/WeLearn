@@ -26,24 +26,6 @@ class WeLearn_Cursos_Conteudo_ControleAula extends WeLearn_DTO_AbstractDTO
     private $_status;
 
     /**
-     * @param null|WeLearn_Cursos_Conteudo_Aula $aula
-     * @param null|WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
-     * @param int $status
-     */
-    public function __construct(WeLearn_Cursos_Conteudo_Aula $aula = null,
-                                WeLearn_Cursos_ParticipacaoCurso $participacaoCurso = null,
-                                $status = WeLearn_Cursos_Conteudo_StatusConteudo::BLOQUEADO)
-    {
-        $dados = array(
-            'aula' => $aula,
-            'participacaoCurso' => $participacaoCurso,
-            'status' => $status
-        );
-
-        parent::__construct( $dados );
-    }
-
-    /**
      * @param \WeLearn_Cursos_Conteudo_Aula $aula
      */
     public function setAula(WeLearn_Cursos_Conteudo_Aula $aula)
@@ -128,6 +110,18 @@ class WeLearn_Cursos_Conteudo_ControleAula extends WeLearn_DTO_AbstractDTO
             'participacaoCurso' => $this->getParticipacaoCurso()->toArray(),
             'status' => $this->getStatus(),
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            $this->getAula()->getId() => $this->getStatus()
         );
     }
 }
