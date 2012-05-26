@@ -136,7 +136,7 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
     }
 
 
-    public function recuperarTimeline($de = '', $ate = '', array $filtros = null)
+    public function recuperarTodosTimeline($de = '', $ate = '', array $filtros = null)
     {
         if ($de != '') {
             $de = CassandraUtil::import($de)->bytes;
