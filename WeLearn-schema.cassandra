@@ -569,6 +569,30 @@ and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
+create column family cursos_participacao_aluno
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
+create column family cursos_participacao_aluno_modulo
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
+create column family cursos_participacao_aluno_aula
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
+create column family cursos_participacao_aluno_pagina
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
 create column family usuario_compartilhamento
 with comparator = 'UTF8Type'
 and column_type = 'Standard'
