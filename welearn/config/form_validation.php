@@ -452,6 +452,13 @@ $config = array(
             'label'=>'txt-convite',
             'rules'=>'required|max_length[125]'
         )
+    ),
+    'area/salvar' => array(
+        array(
+            'field'=>'descricao',
+            'label'=>'descricao',
+            'rules'=>'required|max_length[245]'
+        )
     )
 
 );
