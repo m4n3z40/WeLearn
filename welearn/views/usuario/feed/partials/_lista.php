@@ -25,6 +25,21 @@
                 break;
         }
             ?>
+            <?php
+                if(isset($usuarioPerfil)){
+                   if($usuarioAutenticado == $usuarioPerfil){
+                       echo anchor('feed/removerTimeLine/'.$row->id.'/'.$usuarioPerfil->id,'remover',array('id' => 'remover-timeline'));
+                   }else{
+                       if($row->criador->id == $usuarioAutenticado->id){
+                           echo anchor('feed/removerTimeLine/'.$row->id.'/'.$usuarioPerfil->id,'remover',array('id' => 'remover-timeline'));
+                       }
+                   }
+
+                }else{
+                    echo anchor('feed/remover/'.$row->id.'/'.$usuarioAutenticado->id,'removerhome',array('id' => 'remover-feed'));
+                }
+            ?>
+
         </li>
         <hr>
     <?endforeach;?>

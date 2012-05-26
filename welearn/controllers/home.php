@@ -11,12 +11,13 @@ class Home extends Home_Controller {
     {
         parent::__construct();
 
-        //$this->template->appendJSImport('home.js');
+        $this->template->appendJSImport('home.js')
+        ->appendJSImport('feed.js');
     }
 
     public function index()
     {
-
+        $usuarioAutenticado=$this->autenticacao->getUsuarioAutenticado();
         $feeds_usuario = $this->carregarFeeds('','',$this->_count);
         $this->load->helper('paginacao_cassandra');
         $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
@@ -28,6 +29,7 @@ class Home extends Home_Controller {
         $partialListarFeed= $this->template->loadPartial(
             'lista',
             array('feeds_usuario' => $feeds_usuario,
+                  'usuarioAutenticado' => $usuarioAutenticado,
                   'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
                   'haFeeds' => !empty($feeds_usuario),
                   'haMaisPaginas' => $dadosPaginados['proxima_pagina']
