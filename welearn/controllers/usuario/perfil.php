@@ -12,7 +12,8 @@ class Perfil extends Perfil_Controller {
     {
         parent::__construct();
 
-        $this->template->appendJSImport('perfil.js');
+        $this->template->appendJSImport('perfil.js')
+        ->appendJSImport('feed.js');
     }
 
     public function index($id)
@@ -30,6 +31,8 @@ class Perfil extends Perfil_Controller {
         $partialListarFeed= $this->template->loadPartial(
             'lista',
             array('feeds_usuario' => $feeds_usuario,
+                'usuarioAutenticado' => $usuarioAutenticado,
+                'usuarioPerfil' => $usuarioPerfil,
                 'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
                 'haFeeds' => !empty($feeds_usuario),
                 'haMaisPaginas' => $dadosPaginados['proxima_pagina']
@@ -71,7 +74,7 @@ class Perfil extends Perfil_Controller {
 
             $feedDao = WeLearn_DAO_DAOFactory::create('FeedDAO');
             $filtros = array('usuario' => $usuarioPerfil , 'count' => $count+1);
-            $feeds = $feedDao->recuperarTimeline($de,$ate,$filtros);
+            $feeds = $feedDao->recuperarTodosTimeline($de,$ate,$filtros);
             foreach($feeds as $row)
             {
                 if($row->getTipo()== WeLearn_Compartilhamento_TipoFeed::VIDEO)
