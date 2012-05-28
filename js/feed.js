@@ -51,7 +51,6 @@ $("#paginacao-feed").click(
         var url= $(this).attr('href');
         var proximaPagina= $('#id-prox-pagina').val();
         url+='/'+proximaPagina;
-        alert(url);
         $.get(
             WeLearn.url.siteURL(url),
             (WeLearn.url.queryString != '') ? WeLearn.url.queryString : null,
@@ -75,6 +74,38 @@ $("#paginacao-feed").click(
                 }
             },'json'
         )
+    }
+);
+
+$('#remover-timeline').live('click',function(e){
+        e.preventDefault();
+        var feed=$(this).parent();
+        var url= $(this).attr('href');
+        $.post(
+            WeLearn.url.siteURL(url),
+            function(result) {
+                 feed.remove();
+                 WeLearn.notificar(result.notificacao);
+            },
+            'json'
+        );
+    }
+);
+
+$('#remover-feed').live('click',function(e){
+        e.preventDefault();
+        var feed=$(this).parent();
+        var url= $(this).attr('href');
+        $.post(
+            WeLearn.url.siteURL(url),
+            function(result){
+                if(result.success){
+                    feed.remove();
+                }
+                WeLearn.notificar(result.notificacao);
+            },
+            'json'
+        );
     }
 );
 
