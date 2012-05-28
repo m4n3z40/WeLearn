@@ -25,22 +25,21 @@
                 break;
         }
             ?>
+            <?=date('d/m/Y à\s H:i',$row->dataEnvio)?>
             <?php
                 if(isset($usuarioPerfil)){
-                   if($usuarioAutenticado == $usuarioPerfil){
-                       echo anchor('feed/removerTimeLine/'.$row->id.'/'.$usuarioPerfil->id,'remover',array('id' => 'remover-timeline'));
-                   }else{
-                       if($row->criador->id == $usuarioAutenticado->id){
-                           echo anchor('feed/removerTimeLine/'.$row->id.'/'.$usuarioPerfil->id,'remover',array('id' => 'remover-timeline'));
-                       }
+                   if($usuarioAutenticado == $usuarioPerfil || $row->criador->id == $usuarioAutenticado->id){
+                       echo anchor('feed/remover_timeline/'.$row->id.'/'.$usuarioPerfil->id,'remover',array('id' => 'remover-timeline'));
                    }
 
                 }else{
-                    echo anchor('feed/remover/'.$row->id.'/'.$usuarioAutenticado->id,'removerhome',array('id' => 'remover-feed'));
+                    if($usuarioAutenticado->id == $row->criador->id)
+                        echo anchor('feed/remover_feed/'.$row->id,'remover',array('id' => 'remover-feed'));
                 }
             ?>
 
+            <hr>
         </li>
-        <hr>
+
     <?endforeach;?>
 </div>

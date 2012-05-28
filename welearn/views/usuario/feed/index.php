@@ -10,7 +10,7 @@
         <?php if($haMaisPaginas):?>
             <footer>
             <nav id="paginacao-feeds">
-                <a href="/home/proxima_pagina" data-proximo="<?php echo $inicioProxPagina ?>"  id="paginacao-feed">mais feeds</a>
+                <a href=<?=$linkPaginacao?> data-proximo="<?php echo $inicioProxPagina ?>"  id="paginacao-feed">mais feeds</a>
                 <input type='hidden' value='<?=$inicioProxPagina?>' id='id-prox-pagina'/>
             </nav>
             </footer>
