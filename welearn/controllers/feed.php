@@ -18,7 +18,7 @@ class Feed extends Home_Controller
 
     }
 
-    public function criarFeed()
+    public function criar_feed()
     {
 
         set_json_header();
@@ -141,17 +141,36 @@ class Feed extends Home_Controller
 
             echo $json;
 
-
-
-
         }
+    }
 
+    public function remover_feed($idFeed)
+    {
+        $feedDAO = WeLearn_DAO_DAOFactory::create('FeedDAO');
+        $this->load->helper('notificacao_js');
+        try{
+            $feedDAO->remover($idFeed);
+            $json=Zend_Json::encode(array( 'success' => true , 'notificacao'=> create_notificacao_array(
+                'sucesso',
+                'Feed removido com sucesso!'
+            )
+            ));
+        }catch(cassandra_NotFoundException $e){
+            log_message(
+                'error',
+                'falha ao remover timeline id feed '.$idFeed.'id usuario '.$idUsuario
+            );
 
-
+            $error = create_json_feedback_error_json(
+                'Falha ao remover timeline.'
+            );
+            $json = create_json_feedback(false,$error);
+        }
+        echo $json;
     }
 
 
-    public function criarTimeLine($idPerfil)
+    public function criar_timeline($idPerfil)
     {
         set_json_header();
         $isValid=false;
@@ -274,6 +293,47 @@ class Feed extends Home_Controller
 
             echo $json;
     }
+    }
+
+    public function remover_timeline($idFeed,$idUsuario)
+    {
+        $feedDAO = WeLearn_DAO_DAOFactory::create('FeedDAO');
+        $usuarioObj= WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idUsuario);
+        $this->load->helper('notificacao_js');
+        try{
+            $feedObj = $feedDAO->recuperar($idFeed);
+            $feedDAO->removerTimeline($feedObj,$usuarioObj);
+            $json=Zend_Json::encode(array( 'success' => true , 'notificacao'=> create_notificacao_array(
+                'sucesso',
+                'Feed removido com sucesso!'
+            )
+            ));
+        }catch(cassandra_NotFoundException $e){
+            log_message(
+                'error',
+                'falha ao remover timeline id feed '.$idFeed.'id usuario '.$idUsuario
+            );
+
+            $error = create_json_feedback_error_json(
+                'Falha ao remover timeline.'
+            );
+            if($idUsuario == $this->autenticacao->getUsuarioAutenticado()->getId())
+            {
+                $json=Zend_Json::encode(array( 'success' => false , 'notificacao'=> create_notificacao_array(
+                    'erro',
+                    'O feed selecionado já foi removido pelo remetente!'
+                )
+                ));
+            }else{
+                $json=Zend_Json::encode(array( 'success' => false , 'notificacao'=> create_notificacao_array(
+                    'erro',
+                    'O feed selecionado já foi removido pelo destintario!'
+                )
+                ));
+            }
+
+        }
+        echo $json;
     }
 
     public function validar_descricao($str)

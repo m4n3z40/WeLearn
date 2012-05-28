@@ -10,8 +10,6 @@ class Home extends Home_Controller {
     function __construct()
     {
         parent::__construct();
-
-
         $this->template->appendJSImport('home.js')
         ->appendJSImport('feed.js');
     }
@@ -24,7 +22,7 @@ class Home extends Home_Controller {
         $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
         $partialCriarFeed = $this->template->loadPartial(
             'form',
-             array('formAction' => 'feed/criarFeed'),
+             array('formAction' => 'feed/criar_feed'),
             'usuario/feed'
         );
         $partialListarFeed= $this->template->loadPartial(
@@ -33,7 +31,8 @@ class Home extends Home_Controller {
                   'usuarioAutenticado' => $usuarioAutenticado,
                   'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
                   'haFeeds' => !empty($feeds_usuario),
-                  'haMaisPaginas' => $dadosPaginados['proxima_pagina']
+                  'haMaisPaginas' => $dadosPaginados['proxima_pagina'],
+                  'linkPaginacao' => '/home/proxima_pagina'
             ),
             'usuario/feed'
         );
@@ -48,6 +47,7 @@ class Home extends Home_Controller {
             show_404();
         }
         try{
+        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
         $feeds_usuario = $this->carregarFeeds($inicio,'',$this->_count);
         $this->load->helper('paginacao_cassandra');
         $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
@@ -58,6 +58,7 @@ class Home extends Home_Controller {
                 'lista',
                 array(
                     'feeds_usuario' => $feeds_usuario,
+                    'usuarioAutenticado' => $usuarioAutenticado,
                     'paginacao' => $dadosPaginados
                 ),
                 'usuario/feed'

@@ -35,7 +35,8 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperar($id)
     {
-        // TODO: Implementar este metodo
+        $feed=$this->_cf->get(CassandraUtil::import($id)->bytes);
+        return $this->_criarFromCassandra($feed);
     }
 
     /**
@@ -75,7 +76,18 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
      */
     public function remover($id)
     {
-        // TODO: Implementar este metodo
+        $feed = $this->recuperar($id);
+        $uuidFeed = CassandraUtil::import($feed->getId())->bytes;
+        $this->_cf->remove($uuidFeed);
+        $this->_FeedCF->remove($feed->getCriador()->getId(),array($uuidFeed));
+        $totalAmigos = $this->_amizadeDAO->recuperarQtdTotalAmigos($feed->getCriador());// verifica se o usuario possui algum amigo
+        if($totalAmigos!=0){
+            $amigos=$this->_amizadeDAO->recuperarTodosAmigos($feed->getCriador());//recuperando amigos do usuario
+            foreach ($amigos as $row) {
+                $this->_FeedCF->remove($row->getId(),array($uuidFeed));
+            }
+        }
+
     }
 
      /**
@@ -133,6 +145,14 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
         $this->_cf->insert($UUID->bytes,$dto->toCassandra());
         $this->_FeedCF->insert($usuario->getId(),array($UUID->bytes=>''));
         $this->_TimelineCF->insert($usuario->getId(),array($UUID->bytes => ''));
+    }
+
+    public function removerTimeline(WeLearn_DTO_IDTO &$dto, WeLearn_DTO_IDTO &$usuario)
+    {
+        $idFeed= CassandraUtil::import($dto->getId())->bytes;
+        $this->_cf->remove($idFeed);
+        $this->_FeedCF->remove($usuario->getId(),array($idFeed));
+        $this->_TimelineCF->remove($usuario->getId(),array($idFeed));
     }
 
 
