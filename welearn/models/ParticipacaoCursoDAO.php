@@ -14,14 +14,35 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
     private $_nomeControleAulaCF = 'cursos_participacao_aluno_aula';
     private $_nomeControlePaginaCF = 'cursos_participacao_aluno_pagina';
 
+    /**
+     * @var ColumnFamily|null
+     */
     private $_controleModuloCF;
+
+    /**
+     * @var ColumnFamily|null
+     */
     private $_controleAulaCF;
+
+    /**
+     * @var ColumnFamily|null
+     */
     private $_controlePaginaCF;
 
     /**
      * @var PaginaDAO
      */
     private $_paginaDao;
+
+    /**
+     * @var AulaDAO
+     */
+    private $_aulaDao;
+
+    /**
+     * @var ModuloDAO
+     */
+    private $_moduloDao;
 
     /**
      * @var PaginaDAO
@@ -43,8 +64,17 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
         $this->_controlePaginaCF = $phpCassa->getColumnFamily(
             $this->_nomeControlePaginaCF
         );
+
+        $this->_paginaDao = WeLearn_DAO_DAOFactory::create('PaginaDAO');
+        $this->_aulaDao   = WeLearn_DAO_DAOFactory::create('AulaDAO');
+        $this->_moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
     }
 
+    /**
+     * @param WeLearn_Usuarios_Aluno $aluno
+     * @param WeLearn_Cursos_Curso $noCurso
+     * @return WeLearn_DTO_IDTO
+     */
     public function inscrever(WeLearn_Usuarios_Aluno $aluno, WeLearn_Cursos_Curso $noCurso)
     {
         $participacao = $this->criarNovo(array(
@@ -60,6 +90,10 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
         return $participacao;
     }
 
+    /**
+     * @param WeLearn_Usuarios_Aluno $aluno
+     * @param WeLearn_Cursos_Curso $doCurso
+     */
     public function desvincular(WeLearn_Usuarios_Aluno $aluno, WeLearn_Cursos_Curso $doCurso)
     {
         $participacao = $this->recuperarPorCurso( $aluno, $doCurso );
@@ -69,34 +103,213 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
         $this->salvar( $participacao );
     }
 
-    public function recuperarControleModulo(WeLearn_Usuarios_Aluno $aluno, WeLearn_Cursos_Curso $curso)
+    /**
+     * @param WeLearn_Cursos_Conteudo_Modulo $modulo
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @return WeLearn_Cursos_Conteudo_ControleModulo
+     */
+    public function recuperarControleModulo(WeLearn_Cursos_Conteudo_Modulo $modulo,
+                                            WeLearn_Cursos_ParticipacaoCurso $participacaoCurso)
     {
+        $CFKey = $this->getCFKey( $participacaoCurso );
+        $moduloUUID = UUID::import( $modulo->getId() )->bytes;
 
+        $column = $this->_controleModuloCF->get( $CFKey, array( $moduloUUID ) );
+
+        return $this->_criarControleModuloFromCassandra(
+            $column,
+            $participacaoCurso,
+            $modulo
+        );
     }
 
-    public function salvarControleModulo(WeLearn_Cursos_Conteudo_ControleModulo $controleModulo)
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @return array
+     */
+    public function recuperarTodosControlesModulo(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso)
     {
+        $count = ModuloDAO::MAX_MODULOS;
 
+        $CFKey = $this->getCFKey( $participacaoCurso );
+
+        $columns = $this->_controleModuloCF->get( $CFKey, null, '', '', false, $count );
+
+        $controlesModulos = array();
+
+        foreach ($columns as $column) {
+            $controlesModulos[] = $this->_criarControleModuloFromCassandra(
+                $column,
+                $participacaoCurso
+            );
+        }
+
+        return $controlesModulos;
     }
 
-    public function recuperarControleAula(WeLearn_Usuarios_Aluno $aluno, WeLearn_Cursos_Curso $curso)
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @return int
+     */
+    public function recuperarQtdTotalControlesModulo(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso)
     {
+        $CFKey = $this->getCFKey( $participacaoCurso );
 
+        return $this->_controleModuloCF->get_count( $CFKey );
     }
 
-    public function salvarControleAula(WeLearn_Cursos_Conteudo_ControleAula $controleAula)
+    /**
+     * @param WeLearn_Cursos_Conteudo_ControleModulo $controleModulo
+     */
+    public function salvarControleModulo(WeLearn_Cursos_Conteudo_ControleModulo &$controleModulo)
     {
+        $CFKey = $this->getCFKey( $controleModulo->getParticipacaoCurso() );
 
+        $this->_controleModuloCF->insert( $CFKey, $controleModulo->toCassandra() );
+
+        if ( ! $controleModulo->isPersistido() ) {
+
+            $controleModulo->setPersistido( true );
+
+        }
     }
 
-    public function recuperarControlePagina(WeLearn_Usuarios_Aluno $aluno, WeLearn_Cursos_Curso $curso)
+    /**
+     * @param WeLearn_Cursos_Conteudo_Aula $aula
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @return WeLearn_Cursos_Conteudo_ControleAula
+     */
+    public function recuperarControleAula(WeLearn_Cursos_Conteudo_Aula $aula,
+                                          WeLearn_Cursos_ParticipacaoCurso $participacaoCurso)
     {
+        $CFKey = $this->getCFKey( $participacaoCurso );
+        $aulaUUID = UUID::import( $aula->getId() )->bytes;
 
+        $column = $this->_controleAulaCF->get( $CFKey, array( $aulaUUID ) );
+
+        return $this->_criarControleAulaFromCassandra(
+            $column,
+            $participacaoCurso,
+            $aula
+        );
     }
 
-    public function salvarControlePagina(WeLearn_Cursos_Conteudo_ControlePagina $controlePagina)
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @return array
+     */
+    public function recuperarTodosControlesAula(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso)
     {
+        $count = AulaDAO::MAX_AULAS;
 
+        $CFKey = $this->getCFKey( $participacaoCurso );
+
+        $columns = $this->_controleAulaCF->get( $CFKey, null, '', '', false, $count );
+
+        $controlesAula = array();
+
+        foreach ($columns as $column) {
+            $controlesAula[] = $this->_criarControleAulaFromCassandra(
+                $column,
+                $participacaoCurso
+            );
+        }
+
+        return $controlesAula;
+    }
+
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @return int
+     */
+    public function recuperarQtdTotalControlesAula(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso)
+    {
+        $CFKey = $this->getCFKey( $participacaoCurso );
+
+        return $this->_controleAulaCF->get_count( $CFKey );
+    }
+
+    /**
+     * @param WeLearn_Cursos_Conteudo_ControleAula $controleAula
+     */
+    public function salvarControleAula(WeLearn_Cursos_Conteudo_ControleAula &$controleAula)
+    {
+        $CFKey = $this->getCFKey( $controleAula->getParticipacaoCurso() );
+
+        $this->_controleAulaCF->insert( $CFKey, $controleAula->toCassandra() );
+
+        if ( ! $controleAula->isPersistido() ) {
+
+            $controleAula->setPersistido( true );
+
+        }
+    }
+
+    /**
+     * @param WeLearn_Cursos_Conteudo_Pagina $pagina
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @return WeLearn_Cursos_Conteudo_ControlePagina
+     */
+    public function recuperarControlePagina(WeLearn_Cursos_Conteudo_Pagina $pagina,
+                                            WeLearn_Cursos_ParticipacaoCurso $participacaoCurso)
+    {
+        $CFKey = $this->getCFKey( $participacaoCurso );
+        $paginaUUID = UUID::import( $pagina )->bytes;
+
+        $column = $this->_controlePaginaCF->get( $CFKey, array( $paginaUUID ) );
+
+        return $this->_criarControlePaginaFromCassandra( $column, $participacaoCurso, $pagina );
+    }
+
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @return array
+     */
+    public function recuperarTodosControlesPagina(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso)
+    {
+        $count = PaginaDAO::MAX_PAGINAS;
+
+        $CFKey = $this->getCFKey( $participacaoCurso );
+
+        $columns = $this->_controlePaginaCF->get( $CFKey, null, '', '', false, $count );
+
+        $controlesPagina = array();
+
+        foreach ($columns as $column) {
+            $controlesPagina[] = $this->_criarControlePaginaFromCassandra(
+                $column,
+                $participacaoCurso
+            );
+        }
+
+        return $controlesPagina;
+    }
+
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @return int
+     */
+    public function recuperarQtdTotalControlesPagina(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso)
+    {
+        $CFKey = $this->getCFKey( $participacaoCurso );
+
+        return $this->_controlePaginaCF->get_count( $CFKey );
+    }
+
+    /**
+     * @param WeLearn_Cursos_Conteudo_ControlePagina $controlePagina
+     */
+    public function salvarControlePagina(WeLearn_Cursos_Conteudo_ControlePagina &$controlePagina)
+    {
+        $CFKey = $this->getCFKey( $controlePagina->getParticipacaoCurso() );
+
+        $this->_controlePaginaCF->insert( $CFKey, $controlePagina->toCassandra() );
+
+        if ( ! $controlePagina->isPersistido() ) {
+
+            $controlePagina->setPersistido( true );
+
+        }
     }
 
     /**
@@ -131,7 +344,7 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperarTodos($de = null, $ate = null, array $filtros = null)
     {
-        // TODO: Implement recuperarTodos() method.
+        return array();
     }
 
     /**
@@ -171,7 +384,7 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
      */
     public function recuperarQtdTotal($de = null, $ate = null)
     {
-        // TODO: Implement recuperarQtdTotal() method.
+        return 0;
     }
 
     /**
@@ -311,5 +524,93 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
         $participacaoCurso->fromCassandra( $column );
 
         return $participacaoCurso;
+    }
+
+    /**
+     * @param array $column
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @param null|WeLearn_Cursos_Conteudo_Modulo $modulo
+     * @return WeLearn_Cursos_Conteudo_ControleModulo
+     */
+    private function _criarControleModuloFromCassandra(
+            array $column,
+            WeLearn_Cursos_ParticipacaoCurso
+            $participacaoCurso,
+            WeLearn_Cursos_Conteudo_Modulo $modulo = null
+    ) {
+        $moduloUUID = key( $column );
+
+        $column['modulo'] = ( $modulo instanceof WeLearn_Cursos_Conteudo_Modulo )
+                            ? $modulo
+                            : $this->_moduloDao->recuperar( $moduloUUID );
+
+        $column['participacaoCurso'] = $participacaoCurso;
+
+        $column['status'] = $column[ $moduloUUID ];
+
+        $controleModulo = $this->criarNovoControleModulo();
+        $controleModulo->fromCassandra( $column );
+
+        return $controleModulo;
+    }
+
+    /**
+     * @param array $column
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @param null|WeLearn_Cursos_Conteudo_Aula $aula
+     * @return WeLearn_Cursos_Conteudo_ControleAula
+     */
+    private function _criarControleAulaFromCassandra(
+            array $column,
+            WeLearn_Cursos_ParticipacaoCurso
+            $participacaoCurso,
+            WeLearn_Cursos_Conteudo_Aula $aula = null
+    ) {
+        $aulaUUID = key( $column );
+
+        $column['aula'] = ( $aula instanceof WeLearn_Cursos_Conteudo_Aula )
+                          ? $aula
+                          : $this->_aulaDao->recuperar( $aulaUUID );
+
+        $column['participacaoCurso'] = $participacaoCurso;
+
+        $column['status'] = $column[ $aulaUUID ];
+
+        $controleAula = $this->criarNovoControleAula();
+        $controleAula->fromCassandra( $column );
+
+        return $controleAula;
+    }
+
+    /**
+     * @param array $column
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @param null|WeLearn_Cursos_Conteudo_Pagina $pagina
+     * @return WeLearn_Cursos_Conteudo_ControlePagina
+     */
+    private function _criarControlePaginaFromCassandra(
+            array $column,
+            WeLearn_Cursos_ParticipacaoCurso
+            $participacaoCurso,
+            WeLearn_Cursos_Conteudo_Pagina $pagina = null
+    ) {
+        $paginaUUID = key( $column );
+
+        $column['pagina'] = ( $pagina instanceof WeLearn_Cursos_Conteudo_Pagina )
+                            ? $pagina
+                            : $this->_paginaDao->recuperar( $paginaUUID );
+
+        $column['participacaoCurso'] = $participacaoCurso;
+
+        $arrDetalhes = explode( '|', $column[ $paginaUUID ] );
+
+        $column['status'] = $arrDetalhes[0];
+
+        $column['tempoVisualizacao'] = $arrDetalhes[1];
+
+        $controlePagina = $this->criarNovoControlePagina();
+        $controlePagina->fromCassandra( $column );
+
+        return $controlePagina;
     }
 }

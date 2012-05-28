@@ -82,21 +82,11 @@ class AulaDAO extends WeLearn_DAO_AbstractDAO
                                             $ate = '',
                                             $count = AulaDAO::MAX_AULAS)
     {
-        if ($de != '') {
-            $de = CassandraUtil::import($de)->bytes;
-        }
-
-        if ($ate != '') {
-            $ate = CassandraUtil::import($ate)->bytes;
-        }
-
         $moduloUUID = CassandraUtil::import( $modulo->getId() );
 
         $aulasIds = $this->_aulaPorModuloCF->get(
             $moduloUUID->bytes, null, $de, $ate, false, $count
         );
-        asort($aulasIds, SORT_NUMERIC);
-        $aulasIds = array_keys($aulasIds);
 
         $columns = $this->_cf->multiget($aulasIds);
 
@@ -141,7 +131,10 @@ class AulaDAO extends WeLearn_DAO_AbstractDAO
         $moduloUUID = CassandraUtil::import( $aulaRemovida->getModulo()->getId() );
 
         $this->_cf->remove($UUID->bytes);
-        $this->_aulaPorModuloCF->remove($moduloUUID->bytes, array($UUID->bytes));
+        $this->_aulaPorModuloCF->remove(
+            $moduloUUID->bytes,
+            array( $aulaRemovida->getNroOrdem() )
+        );
 
         $aulaRemovida->setPersistido(false);
 
@@ -185,35 +178,37 @@ class AulaDAO extends WeLearn_DAO_AbstractDAO
         $this->_cf->insert($UUID->bytes, $dto->toCassandra());
         $this->_aulaPorModuloCF->insert(
             $moduloUUID->bytes,
-            array( $UUID->bytes => $dto->getNroOrdem())
+            array( $dto->getNroOrdem() => $UUID->bytes )
         );
 
         $dto->setPersistido(true);
     }
 
     /**
-     * @param WeLearn_Cursos_Conteudo_Aula $Aula
-     * @param UUID $moduloUUID
-     * @return void
+     * @param WeLearn_Cursos_Conteudo_Modulo $modulo
+     * @param array $novasPosicoes
      */
-    public function atualizarPosicao(WeLearn_Cursos_Conteudo_Aula $aula,
-                                     UUID $moduloUUID)
+    public function atualizarPosicao(WeLearn_Cursos_Conteudo_Modulo $modulo,
+                                     array $novasPosicoes)
     {
-       $UUID = CassandraUtil::import( $aula->getId() );
+        $posicoes = array();
+        $rows = array();
 
-        if ( !( $moduloUUID instanceof UUID ) ) {
-            $moduloUUID = CassandraUtil::import( $aula->getModulo()->getId() );
+        foreach ($novasPosicoes as $posicao => $id) {
+            $UUID = UUID::import( $id )->bytes;
+
+            $posicoes[ $posicao ] = $UUID;
+
+            $rows[ $UUID ] = array( 'nroOrdem' => $posicao );
         }
 
-        $this->_cf->insert(
-            $UUID->bytes,
-            array( 'nroOrdem' => $aula->getNroOrdem() )
-        );
+        $moduloUUID = UUID::import( $modulo->getId() )->bytes;
 
-        $this->_aulaPorModuloCF->insert(
-            $moduloUUID->bytes,
-            array( $UUID->bytes => $aula->getNroOrdem() )
-        );
+        $this->_cf->batch_insert( $rows );
+
+        $this->_aulaPorModuloCF->remove( $moduloUUID );
+
+        $this->_aulaPorModuloCF->insert( $moduloUUID, $posicoes );
     }
 
     private function _criarFromCassandra(array $column,

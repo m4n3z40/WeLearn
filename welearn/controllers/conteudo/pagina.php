@@ -526,10 +526,10 @@ class Pagina extends Curso_Controller
     private function _salvarAlteracoesOrdem(array $arrayAlteracoes,
                                             WeLearn_Cursos_Conteudo_Aula $aula)
     {
-        $arrayAlteracoes = array_flip($arrayAlteracoes);
+        $arrayAlteracoes = array_flip( $arrayAlteracoes );
 
         $paginaDao = WeLearn_DAO_DAOFactory::create('PaginaDAO');
 
-        $paginaDao->atualizarPosicoes($aula, $arrayAlteracoes);
+        $paginaDao->atualizarPosicoes( $aula, $arrayAlteracoes );
     }
 }

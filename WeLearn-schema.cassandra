@@ -384,9 +384,9 @@ and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
 create column family cursos_modulo_por_curso
-with comparator = 'TimeUUIDType'
+with comparator = 'IntegerType'
 and column_type = 'Standard'
-and default_validation_class = 'IntegerType'
+and default_validation_class = 'TimeUUIDType'
 and key_validation_class = 'TimeUUIDType';
 
 create column family cursos_aula
@@ -396,9 +396,9 @@ and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
 create column family cursos_aula_por_modulo
-with comparator = 'TimeUUIDType'
+with comparator = 'IntegerType'
 and column_type = 'Standard'
-and default_validation_class = 'IntegerType'
+and default_validation_class = 'TimeUUIDType'
 and key_validation_class = 'TimeUUIDType';
 
 create column family cursos_pagina

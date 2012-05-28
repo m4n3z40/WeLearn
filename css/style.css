@@ -312,7 +312,7 @@ button, .button {
     border-top-right-radius: 10px;
     width: 100%;
     position: fixed;
-    z-index: 9999;
+    z-index: 1001;
     height: 50px;
     left: 0;
     bottom: 0;

@@ -31,6 +31,11 @@ class AlunoDAO extends UsuarioDAO
     private $_cursoDao;
 
     /**
+     * @var ParticipacaoCursoDAO
+     */
+    private $_participacaoCursoDAO;
+
+    /**
      *
      */
     public function __construct()
@@ -48,6 +53,7 @@ class AlunoDAO extends UsuarioDAO
         );
 
         $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+        $this->_participacaoCursoDAO = WeLearn_DAO_DAOFactory::create('ParticipacaoCursoDAO');
     }
 
     /**
@@ -68,6 +74,7 @@ class AlunoDAO extends UsuarioDAO
         );
 
         $this->_cursoDao->salvarAluno( $aluno, $noCurso );
+        $this->_participacaoCursoDAO->inscrever( $aluno, $noCurso );
 
         return $aluno;
     }
@@ -87,6 +94,7 @@ class AlunoDAO extends UsuarioDAO
         );
 
         $this->_cursoDao->removerAluno( $aluno, $noCurso );
+        $this->_participacaoCursoDAO->desvincular( $aluno, $noCurso );
     }
 
     /**

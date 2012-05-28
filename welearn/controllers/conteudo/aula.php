@@ -468,16 +468,10 @@ class Aula extends Curso_Controller
     private function _salvarAlteracoesOrdem(array $arrayAlteracoes,
                                             WeLearn_Cursos_Conteudo_Modulo $modulo)
     {
-        $moduloUUID = CassandraUtil::import( $modulo->getId() );
+        $arrayAlteracoes = array_flip( $arrayAlteracoes );
 
         $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
-        $aulaAuxiliar = $aulaDao->criarNovo();
 
-        foreach ($arrayAlteracoes as $idAula => $posicao) {
-            $aulaAuxiliar->setId( $idAula );
-            $aulaAuxiliar->setNroOrdem( $posicao );
-
-            $aulaDao->atualizarPosicao( $aulaAuxiliar, $moduloUUID );
-        }
+        $aulaDao->atualizarPosicao( $modulo, $arrayAlteracoes );
     }
 }

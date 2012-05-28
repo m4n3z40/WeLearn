@@ -14,10 +14,18 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
 
     private $_nomePaginaPorAulaCF = 'cursos_pagina_por_aula';
 
+    private $_nomeContador = 'contadores_timeuuid';
+    private $_keyContador = 'cursos_conteudo_total_paginas';
+
     /**
      * @var ColumnFamily
      */
     private $_paginaPorAulaCF;
+
+    /**
+     * @var ColumnFamily
+     */
+    private $_contadorCF;
 
     /**
      * @var AulaDAO
@@ -26,8 +34,14 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
 
     function __construct()
     {
-        $this->_paginaPorAulaCF = WL_Phpcassa::getInstance()->getColumnFamily(
+        $phpCassa = WL_Phpcassa::getInstance();
+
+        $this->_paginaPorAulaCF = $phpCassa->getColumnFamily(
             $this->_nomePaginaPorAulaCF
+        );
+
+        $this->_contadorCF = $phpCassa->getColumnFamily(
+            $this->_nomeContador
         );
 
         $this->_aulaDAO = WeLearn_DAO_DAOFactory::create('AulaDAO');
@@ -53,6 +67,11 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
                 $dto->getNroOrdem() => $UUID->bytes
             )
         );
+
+        $cursoUUID = CassandraUtil::import(
+            $dto->getAula()->getModulo()->getCurso()->getId()
+        );
+        $this->_contadorCF->add($this->_nomeContador, $cursoUUID->bytes);
 
         $dto->setPersistido(true);
     }
@@ -154,6 +173,24 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param WeLearn_Cursos_Curso $curso
+     * @return int
+     */
+    public function recuperarQtdTotalPorCurso(WeLearn_Cursos_Curso $curso)
+    {
+        $cursoUUID = CassandraUtil::import( $curso->getId() );
+
+        try {
+            $column = $this->_contadorCF->get($this->_nomeContador, array($cursoUUID->bytes));
+            $totalPaginas = $column[ $cursoUUID->bytes ];
+        } catch (cassandra_NotFoundException $e) {
+            $totalPaginas = 0;
+        }
+
+        return $totalPaginas;
+    }
+
+    /**
      * @param WeLearn_Cursos_Conteudo_Aula $aula
      * @param array $novasPosicoes
      */
@@ -161,16 +198,19 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
                                       array $novasPosicoes)
     {
         $posicoes = array();
-        foreach ($novasPosicoes as $posicao => $id) {
-            $posicoes[ $posicao ] = UUID::import( $id )->bytes;
+        $rows = array();
 
-            $this->_cf->insert(
-                $posicoes[ $posicao ],
-                array( 'nroOrdem' => $posicao )
-            );
+        foreach ($novasPosicoes as $posicao => $id) {
+            $UUID = UUID::import( $id )->bytes;
+
+            $posicoes[ $posicao ] = $UUID;
+
+            $rows[ $UUID ] = array( 'nroOrdem' => $posicao );
         }
 
         $aulaUUID = UUID::import( $aula->getId() )->bytes;
+
+        $this->_cf->batch_insert( $rows );
 
         $this->_paginaPorAulaCF->remove( $aulaUUID );
 
@@ -196,6 +236,11 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
                 $paginaRemovida->getNroOrdem()
             )
         );
+
+        $cursoUUID = CassandraUtil::import(
+            $paginaRemovida->getAula()->getModulo()->getCurso()->getId()
+        );
+        $this->_contadorCF->add($this->_nomeContador, $cursoUUID->bytes, -1);
 
         $paginaRemovida->setPersistido(false);
 

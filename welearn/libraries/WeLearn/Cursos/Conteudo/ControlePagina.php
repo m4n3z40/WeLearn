@@ -179,9 +179,10 @@ class WeLearn_Cursos_Conteudo_ControlePagina extends WeLearn_DTO_AbstractDTO
      */
     public function toCassandra()
     {
+        $UUID = UUID::import( $this->getPagina()->getId() )->bytes;
+
         return array(
-            $this->getPagina()->getId() => $this->getStatus()
-                                   . '|' . $this->getTempoVisualizacao()
+            $UUID => $this->getStatus() . '|' . $this->getTempoVisualizacao()
         );
     }
 

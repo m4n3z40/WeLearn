@@ -284,7 +284,7 @@
 
     var $divConfirmacaoRemover = $('<div id="dialogo-confirmacao-remover-pagina">' +
                                    '<p>Tem certeza que deseja remover esta página?<br/>' +
-                                   'Esta ação <strong>NÃO</strong> poderá ser desfeita!');
+                                   'Esta ação <strong>NÃO</strong> poderá ser desfeita!</div>');
     $('a.a-remover-pagina').live('click', function(e){
         e.preventDefault();
 

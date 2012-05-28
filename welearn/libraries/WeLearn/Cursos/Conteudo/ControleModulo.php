@@ -120,8 +120,10 @@ class WeLearn_Cursos_Conteudo_ControleModulo extends WeLearn_DTO_AbstractDTO
      */
     public function toCassandra()
     {
+        $UUID = UUID::import( $this->getModulo()->getId() )->bytes;
+
         return array(
-            $this->getModulo()->getId()=> $this->getStatus()
+            $UUID => $this->getStatus()
         );
     }
 }

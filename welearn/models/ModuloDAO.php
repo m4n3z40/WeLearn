@@ -36,13 +36,13 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
         $dto->setNroOrdem(
             $this->recuperarQtdTotalPorCurso( $dto->getCurso() ) + 1
         );
-        $dto->setId($UUID->string);
+        $dto->setId( $UUID->string );
 
-        $this->_cf->insert($UUID->bytes, $dto->toCassandra());
+        $this->_cf->insert( $UUID->bytes, $dto->toCassandra() );
 
         $this->_moduloPorCursoCF->insert(
             $cursoUUID->bytes,
-            array( $UUID->bytes => $dto->getNroOrdem() )
+            array( $dto->getNroOrdem() => $UUID->bytes )
         );
 
         $dto->setPersistido(true);
@@ -60,27 +60,30 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
-     * @param WeLearn_Cursos_Conteudo_Modulo $modulo
-     * @param null|UUID $cursoUUID
+     * @param WeLearn_Cursos_Curso $curso
+     * @param array $novasPosicoes
      */
-    public function atualizarPosicao(WeLearn_Cursos_Conteudo_Modulo $modulo,
-                                     UUID $cursoUUID = null)
+    public function atualizarPosicao(WeLearn_Cursos_Curso $curso,
+                                     array $novasPosicoes)
     {
-        $UUID = CassandraUtil::import( $modulo->getId() );
+        $posicoes = array();
+        $rows = array();
 
-        if ( !( $cursoUUID instanceof UUID ) ) {
-            $cursoUUID = CassandraUtil::import( $modulo->getCurso()->getId() );
+        foreach ($novasPosicoes as $posicao => $id) {
+            $UUID = UUID::import( $id )->bytes;
+
+            $posicoes[ $posicao ] = $UUID;
+
+            $rows[ $UUID ] = array( 'nroOrdem' => $posicao );
         }
 
-        $this->_cf->insert(
-            $UUID->bytes,
-            array( 'nroOrdem' => $modulo->getNroOrdem() )
-        );
+        $cursoUUID = UUID::import( $curso->getId() )->bytes;
 
-        $this->_moduloPorCursoCF->insert(
-            $cursoUUID->bytes,
-            array( $UUID->bytes => $modulo->getNroOrdem() )
-        );
+        $this->_cf->batch_insert( $rows );
+
+        $this->_moduloPorCursoCF->remove( $cursoUUID );
+
+        $this->_moduloPorCursoCF->insert( $cursoUUID, $posicoes );
     }
 
     /**
@@ -117,25 +120,15 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
                                            $ate = '',
                                            $count = ModuloDAO::MAX_MODULOS)
     {
-        if ($de != '') {
-            $de = CassandraUtil::import($de)->bytes;
-        }
-
-        if ($ate != '') {
-            $ate = CassandraUtil::import($ate)->bytes;
-        }
-
         $cursoUUID = CassandraUtil::import( $curso->getId() );
 
         $modulosIds = $this->_moduloPorCursoCF->get(
             $cursoUUID->bytes, null, $de, $ate, false, $count
         );
-        asort($modulosIds, SORT_NUMERIC);
-        $modulosIds = array_keys($modulosIds);
 
-        $columns = $this->_cf->multiget($modulosIds);
+        $columns = $this->_cf->multiget( $modulosIds );
 
-        return $this->_criarVariosFromCassandra($columns);
+        return $this->_criarVariosFromCassandra( $columns );
     }
 
     /**
@@ -189,7 +182,10 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
         $cursoUUID = CassandraUtil::import( $moduloRemovido->getCurso()->getId() );
 
         $this->_cf->remove( $UUID->bytes );
-        $this->_moduloPorCursoCF->remove($cursoUUID->bytes, array($UUID->bytes));
+        $this->_moduloPorCursoCF->remove(
+            $cursoUUID->bytes,
+            array( $moduloRemovido->getNroOrdem() )
+        );
 
         $moduloRemovido->setPersistido(false);
 
