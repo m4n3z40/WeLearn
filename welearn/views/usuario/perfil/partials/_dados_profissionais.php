@@ -1,8 +1,8 @@
 <div id="dados-perfil-index-content">
     <header>
         <hgroup>
-            <h1>Perfil de: <?=$usuarioPerfil->nome?></h1>
-            <h3>Dados Profissionais de: <?=$usuarioPerfil->nome?>:</h3>
+            <h1>Perfil de <?=$usuarioPerfil->nome?></h1>
+            <h3>Dados Profissionais de <?=$usuarioPerfil->nome?></h3>
         </hgroup>
         <p></p>
     </header>

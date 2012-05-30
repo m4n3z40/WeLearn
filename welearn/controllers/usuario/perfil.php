@@ -19,11 +19,17 @@ class Perfil extends Perfil_Controller {
 
     public function index($id)
     {
+
         $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
         $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
         $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
         $usuarioAutenticado=$this->autenticacao->getUsuarioAutenticado();
-        $usuarioPerfil=$usuarioDao->recuperar($id);
+        try{
+            $usuarioPerfil=$usuarioDao->recuperar($id);
+        }catch(cassandra_NotFoundException $e){
+            show_404();
+        }
+
 
         $feeds_usuario = $this->carregarFeeds('','',$usuarioPerfil,$this->_count);
         $this->load->helper('paginacao_cassandra');
@@ -76,6 +82,7 @@ class Perfil extends Perfil_Controller {
             show_404();
         }
         try{
+
             $usuarioPerfil = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($usuarioPerfil);
             $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
             $feeds_usuario = $this->carregarFeeds($inicio,'',$usuarioPerfil,$this->_count);

@@ -91,8 +91,8 @@ $route['curso/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']  
 $route['curso/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']                     = 'curso/curso/$1/$2';
 $route['curso/([a-z_]+)']                                                                                    = 'curso/curso/$1';
 
-$route['perfil/([a-zA-Z0-9_]+)']                                                                                = 'usuario/perfil/index/$1';
-$route['perfil/([a-z_]+)/([a-z0-9_]+)']                                                                      = 'usuario/perfil/$1/$2';
+$route['perfil/([a-zA-Z0-9_]+)']                                                                             = 'usuario/perfil/index/$1';
+$route['perfil/([a-z_]+)/([a-zA-Z0-9_]+)']                                                                   = 'usuario/perfil/$1/$2';
 
 $route['usuario/mensagem']                                                                                   = 'usuario/mensagem/index';
 $route['usuario/mensagem/listar/([a-z_]+)']                                                                  = 'usuario/mensagem/listar/$1';

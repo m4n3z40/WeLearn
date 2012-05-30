@@ -30,7 +30,7 @@
                 <?php endif;?>
                     <li><?= anchor('usuario/mensagem/criar','Enviar Mensagem',array('id' => 'enviar-mensagem'))?></li>
             <?php else: ?>
-                   <?= anchor('/home','home')?>
+                   <?= anchor('/home','Home')?>
             <?php endif; ?>
             <li><?= anchor('perfil/dados_pessoais/'.$usuarioPerfil->id,'Dados Pessoais')?></li>
             <li><?= anchor('perfil/dados_profissionais/'.$usuarioPerfil->id,'Dados Profissionais')?></li>
