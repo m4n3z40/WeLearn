@@ -3,7 +3,7 @@
         <h3>Principal</h3>
         <ul>
             <li><?php echo anchor('/curso/' . $idCurso, 'Home') ?></li>
-            <li><?php echo anchor('/curso/conteudo/exibicao/' . $idCurso, 'Frequentar Aulas') ?></li>
+            <li><?php echo anchor('/curso/conteudo/exibicao/' . $idCurso, 'Sala de Aula') ?></li>
             <li><?php echo anchor('/curso/aluno/' . $idCurso, 'Alunos') ?></li>
             <li><?php echo anchor('/curso/enquete/' . $idCurso, 'Enquetes') ?></li>
             <li><?php echo anchor('/curso/forum/' . $idCurso, 'Fóruns') ?></li>

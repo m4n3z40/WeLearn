@@ -267,7 +267,7 @@ button, .button {
     border-bottom-left-radius: 15px;
     border: solid 1px #e8e1b5;
     display: none;
-    z-index: 1001;
+    z-index: 9998;
 }
 
     #ajax-loading img {
