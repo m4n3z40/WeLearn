@@ -259,6 +259,22 @@ class Home_Controller extends WL_Controller
      */
     protected function _renderTemplateHome( $view = '', $dados = null )
     {
+        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+
+        $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+
+        $listaRandonicaAmigos = $amizadeUsuarioDao->recuperarAmigosAleatorios(
+            $usuarioAutenticado,
+            10
+        );
+
+        $widgets = array();
+        $widgets[] = $this->template->loadPartial(
+            'widget_amigos',
+            array('listaRandonicaAmigos' => $listaRandonicaAmigos),
+            'usuario/amigos'
+        );
+
         $this->_setTemplate( 'home' )
              ->_setBarraUsuarioPath( 'perfil/barra_usuario' )
              ->_setBarraEsquerdaPath( 'home/barra_lateral_esquerda' )
@@ -269,8 +285,14 @@ class Home_Controller extends WL_Controller
                  $this->autenticacao->getUsuarioAutenticado()
              )
 
+              ->_barraDireitaSetVar(
+                  'widgetsContexto',
+                  $widgets
+              )
+
              ->_renderTemplate( $view, $dados );
     }
+
 }
 
 

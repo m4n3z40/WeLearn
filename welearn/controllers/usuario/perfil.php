@@ -1,3 +1,4 @@
+
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Perfil extends Perfil_Controller {
@@ -6,23 +7,29 @@ class Perfil extends Perfil_Controller {
      * Construtor carrega configurações da classes base CI_Controller
      * (Resolve bug ao utilizar this->load)
      */
-    private  $_count = 30;
+    private $_count = 30;
 
     function __construct()
     {
         parent::__construct();
 
         $this->template->appendJSImport('perfil.js')
-        ->appendJSImport('feed.js');
+            ->appendJSImport('feed.js');
     }
 
     public function index($id)
     {
+
         $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
         $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
         $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
         $usuarioAutenticado=$this->autenticacao->getUsuarioAutenticado();
-        $usuarioPerfil=$usuarioDao->recuperar($id);
+        try{
+            $usuarioPerfil=$usuarioDao->recuperar($id);
+        }catch(cassandra_NotFoundException $e){
+            show_404();
+        }
+
 
         $feeds_usuario = $this->carregarFeeds('','',$usuarioPerfil,$this->_count);
         $this->load->helper('paginacao_cassandra');
@@ -75,6 +82,7 @@ class Perfil extends Perfil_Controller {
             show_404();
         }
         try{
+
             $usuarioPerfil = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($usuarioPerfil);
             $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
             $feeds_usuario = $this->carregarFeeds($inicio,'',$usuarioPerfil,$this->_count);
@@ -147,33 +155,31 @@ Tente novamente mais tarde.'
         $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
         $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
         try{
-            $usuarioDAO->recuperarDadosPessoais($usuarioPerfil);
+            $dadosPessoaisDao = WeLearn_DAO_DAOFactory::create('DadosPessoaisUsuarioDAO');
+            $dadosPessoais = $dadosPessoaisDao->recuperar( $usuarioPerfil->getId() );
             $paisEstadoDao = WeLearn_DAO_DAOFactory::create('PaisEstadoDAO', null, false);
             try{
-                $codigoPais = $usuarioPerfil->getDadosPessoais()->getPais();
+                $codigoPais = $dadosPessoais->getPais();
                 $pais = $paisEstadoDao->recuperarPais($codigoPais);
             }catch(cassandra_NotFoundException $e)
             {
                 $pais=array('descricao' => '');
             }
             try{
-                $codigoEstado = $usuarioPerfil->getDadosPessoais()->getEstado();
+                $codigoEstado = $dadosPessoais->getEstado();
                 $estado = $paisEstadoDao->recuperarEstado($codigoEstado);
             }catch(cassandra_NotFoundException $e)
             {
                 $estado = array('descricao' => '');
             }
         }catch(cassandra_NotFoundException $e){
-            $possuiDadosPessoais=false;
+            $dadosPessoais = null;
             $pais=array('descricao' => '');
             $estado = array('descricao' => '');
         }
-        $possuiDadosPessoais = ( $usuarioPerfil->getDadosPessoais() instanceof WeLearn_Usuarios_DadosPessoaisUsuario );
-
 
         $dados=array('usuarioPerfil' => $usuarioPerfil, 'usuarioAutenticado' => $usuarioAutenticado);
-        if($usuarioPerfil->getId() != $usuarioAutenticado->getId() )
-        {
+
             $saoAmigos=$amizadeUsuarioDao->SaoAmigos($usuarioAutenticado,$usuarioPerfil);
             $dados['saoAmigos']=$saoAmigos;
             if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
@@ -181,8 +187,8 @@ Tente novamente mais tarde.'
                 $convitePendente = $conviteCadastradoDao->recuperarPendentes($usuarioAutenticado,$usuarioPerfil);
                 $dados['convitePendente']=$convitePendente;
             }
-            $dados['view']=$this->template->loadPartial('dados_pessoais',array('usuarioPerfil' => $usuarioPerfil,'possuiDadosPessoais' => $possuiDadosPessoais, 'pais' => $pais['descricao'], 'estado' => $estado['descricao']),'usuario/perfil');
-        }
+            $dados['view']=$this->template->loadPartial('dados_pessoais',array('usuarioPerfil' => $usuarioPerfil,'dadosPessoais' => $dadosPessoais, 'pais' => $pais['descricao'], 'estado' => $estado['descricao']),'usuario/perfil');
+
         $this->_renderTemplatePerfil('usuario/perfil/index',$dados);
     }
 
@@ -193,25 +199,27 @@ Tente novamente mais tarde.'
         $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
         $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
         $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
-        try{
-            $usuarioDAO->recuperarDadosProfissionais($usuarioPerfil);
-        }catch(cassandra_NotFoundException $e){
-            $possuiDadosProfissionais=false;
+        try {
+            $dadosProfissionaisDAO = WeLearn_DAO_DAOFactory::create('DadosProfissionaisUsuarioDAO');
+
+            $dadosProfissionais = $dadosProfissionaisDAO->recuperar( $usuarioPerfil->getId() );
+        } catch(cassandra_NotFoundException $e) {
+            $dadosProfissionais = null;
         }
+
         $possuiDadosProfissionais = ( $usuarioPerfil->getDadosProfissionais() instanceof WeLearn_Usuarios_DadosProfissionaisUsuario );
 
         $dados=array('usuarioPerfil' => $usuarioPerfil, 'usuarioAutenticado' => $usuarioAutenticado);
-        if($usuarioPerfil->getId() != $usuarioAutenticado->getId() )
+
+        $saoAmigos=$amizadeUsuarioDao->SaoAmigos($usuarioAutenticado,$usuarioPerfil);
+        $dados['saoAmigos']=$saoAmigos;
+        if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
         {
-            $saoAmigos=$amizadeUsuarioDao->SaoAmigos($usuarioAutenticado,$usuarioPerfil);
-            $dados['saoAmigos']=$saoAmigos;
-            if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
-            {
-                $convitePendente = $conviteCadastradoDao->recuperarPendentes($usuarioAutenticado,$usuarioPerfil);
-                $dados['convitePendente']=$convitePendente;
-            }
-            $dados['view']=$this->template->loadPartial('dados_profissionais',array('usuarioPerfil' => $usuarioPerfil, 'possuiDadosProfissionais' => $possuiDadosProfissionais),'usuario/perfil');
+            $convitePendente = $conviteCadastradoDao->recuperarPendentes($usuarioAutenticado,$usuarioPerfil);
+            $dados['convitePendente']=$convitePendente;
         }
+        $dados['view']=$this->template->loadPartial('dados_profissionais',array('usuarioPerfil' => $usuarioPerfil, 'dadosProfissionais' => $dadosProfissionais),'usuario/perfil');
+
         $this->_renderTemplatePerfil('usuario/perfil/index',$dados);
     }
 
@@ -220,3 +228,5 @@ Tente novamente mais tarde.'
 
 /* End of file perfil.php */
 /* Location: ./application/controllers/usuario/perfil.php */
+
+
