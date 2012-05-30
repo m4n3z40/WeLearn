@@ -16,53 +16,43 @@ class Teste extends WL_Controller
 
     public function index()
     {
+        $areaDao = WeLearn_DAO_DAOFactory::create('AreaDAO');
+        $segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
 
+        $area1 = $areaDao->criarNovo(array(
+            'descricao' => 'Administração'
+        ));
 
+        $area2 = $areaDao->criarNovo(array(
+            'descricao' => 'Informática'
+        ));
 
-        for($i=0;$i<15;$i++)
-        {
-        $usuarioDao=WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-        $usuarioDestinatario=$usuarioDao->criarNovo();
-        $usuarioDestinatario->setId('thiago');
-        $usuarioRemente=$usuarioDao->criarNovo();
-        $usuarioRemente->setId('m4n3z40');
-        $mensagemDao=WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
-        $mensagemPessoal=$mensagemDao->criarNovo();
-        $mensagemPessoal->setMensagem('mensagem enviada por usuario thiago'.$i);
-        $mensagemPessoal->setRemetente($usuarioRemente);
-        $mensagemPessoal->setDestinatario($usuarioDestinatario);
-        $mensagemPessoal->setStatus(0);
-        $mensagemDao->salvar($mensagemPessoal);
-        }
-        /*
-        teste mensagem pessoal dao
-              inserir
-        recuperar
+        $segmento1 = $segmentoDao->criarNovo(array(
+            'descricao' => 'Gestão de Pequenas Empresas',
+            'area' => $area1
+        ));
 
-              $usuarioDao=WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-              $usuarioDestinatario=$usuarioDao->criarNovo();
-              $usuarioDestinatario->setId('thiago');
-                      $mensagemDao=WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
-                      $resposta=$mensagemDao->recuperarListaAmigosMensagens($usuarioDestinatario);
-                      print_r($resposta);
-                      echo 'teste';
+        $segmento2 = $segmentoDao->criarNovo(array(
+            'descricao' => 'Empreendedorismo',
+            'area' => $area1
+        ));
 
+        $segmento3 = $segmentoDao->criarNovo(array(
+            'descricao' => 'Análise de Sistemas',
+            'area' => $area2
+        ));
 
-        $mensagemDao=WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
-        $chave=$mensagemDao->gerarChave('thiago','m4n3z40');
-        $dados=$mensagemDao->recuperar($chave);
-        print_r($dados);
+        $segmento4 = $segmentoDao->criarNovo(array(
+            'descricao' => 'Redes de Computadores',
+            'area' => $area2
+        ));
 
+        $areaDao->salvar( $area1 );
+        $areaDao->salvar( $area2 );
 
-
-
-        $usuarioDao=WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-        $usuarioDestinatario=$usuarioDao->criarNovo();
-        $usuarioDestinatario->setId('thiago');
-        $mensagemDao=WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
-        $resposta=$mensagemDao->recuperarTodos(null,null,null);
-        print_r($resposta);
-
-*/
+        $segmentoDao->salvar( $segmento1 );
+        $segmentoDao->salvar( $segmento2 );
+        $segmentoDao->salvar( $segmento3 );
+        $segmentoDao->salvar( $segmento4 );
     }
 }
