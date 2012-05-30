@@ -5,4 +5,13 @@
     </nav>
     <hr>
     <?php endif ?>
+
+    <?php if (! empty($widgetsContexto)): ?>
+    <section id="curso-right-bar-contexto-widgets">
+        <?php foreach ($widgetsContexto as $widget): ?>
+        <?php echo $widget ?>
+        <hr class="curso-widget-separator">
+        <?php endforeach ?>
+    </section>
+    <?php endif ?>
 </section>

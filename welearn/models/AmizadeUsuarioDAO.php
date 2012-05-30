@@ -172,6 +172,48 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
         return $this->_recuperarUsuariosPorIds($idsAmigos);
     }
 
+    public function recuperarAmigosAleatorios(WeLearn_Usuarios_Usuario $usuario, $qtd)
+    {
+        $idsAmigos = array_values(
+            $this->_amizadeAmigosPorDataCF->get($usuario->getId(),
+                null,
+                '',
+                '',
+                false,
+                1000000)
+        );
+
+        $totalAmigos = count( $idsAmigos );
+
+        if ( $qtd > $totalAmigos ) {
+
+            $qtd = $totalAmigos;
+
+        }
+
+        $arrayAmigos = array();
+
+        for ( $i = 0; $i < $qtd; $i++ ) {
+
+            $key = array_rand( $idsAmigos );
+
+            if ( isset( $idsAmigos[ $key ] ) ) {
+
+                $arrayAmigos[] = $idsAmigos[ $key ];
+
+                unset( $idsAmigos[ $key ] );
+
+            } else {
+
+                $i--;
+
+            }
+
+        }
+
+        return $this->_recuperarUsuariosPorIds( $arrayAmigos );
+    }
+
     /**
      * @param mixed $de
      * @param mixed $ate
