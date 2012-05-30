@@ -309,6 +309,82 @@ class Recurso extends Curso_Controller
         echo $json;
     }
 
+    public function recuperar_recursos_aluno($tipoRecurso, $idParent, $idInicio = '')
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $count = 2;
+
+            $recursoDao = WeLearn_DAO_DAOFactory::create('RecursoDAO');
+
+            try {
+                if ( ( (int)$tipoRecurso ) == WeLearn_Cursos_Recursos_TipoRecurso::RESTRITO ) {
+
+                    $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
+                    $aula = $aulaDao->recuperar( $idParent );
+
+                    $listaRecursos = $recursoDao->recuperarTodosRestritos($aula,
+                                                                          $idInicio,
+                                                                          '',
+                                                                          $count + 1);
+
+                    $totalRecursos = $recursoDao->recuperarQtdTotalRestritos( $aula );
+
+                } else {
+
+                    $curso = $this->_cursoDao->recuperar( $idParent );
+
+                    $listaRecursos = $recursoDao->recuperarTodosGerais($curso,
+                                                                       $idInicio,
+                                                                       '',
+                                                                       $count + 1);
+
+                    $totalRecursos = $recursoDao->recuperarQtdTotalGerais( $curso );
+
+                }
+            } catch (cassandra_NotFoundException $e) {
+                $listaRecursos = array();
+                $totalRecursos = 0;
+            }
+
+            $this->load->helper('paginacao_cassandra');
+
+            $dadosPaginacao = create_paginacao_cassandra($listaRecursos, $count);
+
+            $response = Zend_Json::encode(array(
+                'htmlListaRecursos' => $this->template->loadPartial(
+                    'lista_aluno',
+                    array( 'listaRecursos' => $listaRecursos ),
+                    'curso/conteudo/recurso'
+                ),
+                'qtdRecuperados' => count( $listaRecursos ),
+                'totalRecursos' => $totalRecursos,
+                'nomeAula' => isset( $aula ) ? $aula->getNome() : '',
+                'paginacao' => $dadosPaginacao
+            ));
+
+            $json = create_json_feedback(true, '', $response);
+
+        } catch (Exception $e) {
+            log_message('error','Ocorreu um erro ao tentar recuperar lista de recursos para sala de aula: '
+                . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro inesperado, já estamos tentando resolver.
+                Tente novamente mais tarde!'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
     public function criar ($idCurso)
     {
         try {
