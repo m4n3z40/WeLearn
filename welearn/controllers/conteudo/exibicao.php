@@ -161,7 +161,13 @@ class Exibicao extends Curso_Controller
             }
 
             $dadosViewSalaDeAula = array(
-                'idPagina' => $paginaAtual->getId(),
+                'idCurso' => $curso->getId(),
+                'idModulo' => ( $moduloAtual instanceof WeLearn_Cursos_Conteudo_Modulo )
+                              ? $moduloAtual->getId() : '',
+                'idAula' => ( $aulaAtual instanceof WeLearn_Cursos_Conteudo_Aula )
+                            ? $aulaAtual->getId() : '',
+                'idPagina' => ($paginaAtual instanceof WeLearn_Cursos_Conteudo_Pagina)
+                              ? $paginaAtual->getId() : '',
                 'htmlSectionAnotacao' => $this->_loadSectionAnotacaoView( $paginaAtual ),
                 'htmlSectionComentarios' => $this->_loadSectionComentariosView( $paginaAtual ),
                 'htmlSectionInfoEtapa' => $this->_loadSectionInfoEtapaView( $paginaAtual ),

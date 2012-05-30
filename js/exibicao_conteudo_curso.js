@@ -21,11 +21,12 @@
                     $divJanelaAula.dialog('close');
                 }
             },
-            beforeClose: function() {
-
+            open: function() {
+                recuperarComentarios( $wrapperSalaDeAula.data('id-pagina') );
             }
         }),
         $window = $(window),
+        $wrapperSalaDeAula = $('#exibicao-conteudo-saladeaula'),
         $sltModulos = $('#slt-modulos'),
         $sltAulas = $('#slt-aulas'),
         $sltPaginas = $('#slt-paginas');
@@ -35,8 +36,6 @@
             .dialog('option', 'height', $window.height() - 6)
             .dialog('option', 'width', $window.width() - 80)
             .dialog('open');
-
-        recuperarComentarios( $sltPaginas.val() );
     });
 
     /* #################################################### */
@@ -442,19 +441,228 @@
         $divRecursosRestritos = $('#div-recursos-restritos'),
         $emQtdRecursosRestritos = $('#em-qtd-recursos-restritos'),
         $emTotalRecursosRestritos = $('#em-total-recursos-restritos'),
+        $emNomeAulaRecursosRestritos = $('#em-nome-aula-recursos-restritos'),
         $h4SemRecursosRestritos = $('#h4-msg-sem-recursos-restritos'),
         $ulListaRecursosRestritos = $('#ul-lista-recursos-restritos'),
         $fooPaginacaoRecursosRestritos = $('#foo-paginacao-recursos-restritos'),
         $h4SemMaisRecursosRestritos = $('#h4-msg-sem-mais-recursos-restritos'),
-        $aPaginacaoRecursosRestritos = $('#a-paginacao-recursos-restritos');
+        $aPaginacaoRecursosRestritos = $('#a-paginacao-recursos-restritos'),
+        requestListaRecursos = function(tipoRecurso, idParent, idProximo) {
+
+            var url = WeLearn.url.siteURL('conteudo/recurso/recuperar_recursos_aluno/'
+                                          + tipoRecurso + '/'
+                                          + idParent);
+
+            if ( idProximo ) {
+                url = url + '/' + idProximo;
+            }
+
+            return $.ajax({
+                url: url,
+                dataType: 'json',
+                success: function(res) {
+
+                    if ( ! res.success ) {
+
+                        WeLearn.notificar({
+                            nivel: 'error',
+                            msg: res.errors[0].error_msg,
+                            tempo: 5000
+                        });
+
+                    }
+
+                }
+            });
+        };
         
     $aExibirRecursosGerais.click(function(e){
         e.preventDefault();
 
+        if ( $divRecursosGerais.is(':visible') ) { return; }
+
+        $divRecursosRestritos.hide();
+
+        var $this = $(this),
+            tipoRecurso = $this.data('tipo-recurso'),
+            idCurso = $wrapperSalaDeAula.data('id-curso');
+
+        requestListaRecursos(tipoRecurso, idCurso).done(function(res){
+
+            if ( res.success ) {
+
+                if ( res.totalRecursos > 0 ) {
+
+                    $emQtdRecursosGerais.text( res.qtdRecuperados );
+                    $emTotalRecursosGerais.text( res.totalRecursos );
+                    $ulListaRecursosGerais.html( res.htmlListaRecursos).show();
+
+                    if ( res.paginacao.proxima_pagina ) {
+
+                        $h4SemMaisRecursosGerais.hide();
+
+                        $aPaginacaoRecursosGerais.data(
+                            'proximo',
+                            res.paginacao.inicio_proxima_pagina
+                        ).show();
+
+                    } else {
+
+                        $aPaginacaoRecursosGerais.data('proximo', '').hide();
+
+                        $h4SemMaisRecursosGerais.show();
+
+                    }
+
+                    $fooPaginacaoRecursosGerais.show();
+
+                } else {
+
+                    $ulListaRecursosGerais.hide();
+                    $fooPaginacaoRecursosGerais.hide();
+
+                    $h4SemRecursosGerais.show();
+
+                }
+
+                $divRecursosGerais.fadeIn();
+
+            }
+
+        });
+
+    });
+
+    $aPaginacaoRecursosGerais.click(function(e){
+        e.preventDefault();
+
+        var $this = $(this),
+            tipoRecurso = $this.data('tipo-recurso'),
+            idCurso = $wrapperSalaDeAula.data('id-curso'),
+            proximo = $this.data('proximo');
+
+        requestListaRecursos(tipoRecurso, idCurso, proximo).done(function(res){
+
+            if ( res.success ) {
+
+                $emQtdRecursosGerais.text(
+                    parseInt( $emQtdRecursosGerais.text() ) + res.qtdRecuperados
+                );
+                $ulListaRecursosGerais.append( res.htmlListaRecursos);
+
+                if ( res.paginacao.proxima_pagina ) {
+
+                    $aPaginacaoRecursosGerais.data(
+                        'proximo',
+                        res.paginacao.inicio_proxima_pagina
+                    );
+
+                } else {
+
+                    $aPaginacaoRecursosGerais.data('proximo', '').hide();
+
+                    $h4SemMaisRecursosGerais.show();
+
+                }
+
+            }
+
+        });
     });
 
     $aExibirRecursosRestritos.click(function(e){
         e.preventDefault();
+
+        if ( $divRecursosRestritos.is(':visible') ) { return; }
+
+        $divRecursosGerais.hide();
+
+        var $this = $(this),
+            tipoRecurso = $this.data('tipo-recurso'),
+            idAula = $wrapperSalaDeAula.data('id-aula');
+
+        requestListaRecursos(tipoRecurso, idAula).done(function(res){
+
+            if ( res.success ) {
+
+                if ( res.totalRecursos > 0 ) {
+
+                    $emQtdRecursosRestritos.text( res.qtdRecuperados );
+                    $emTotalRecursosRestritos.text( res.totalRecursos );
+                    $emNomeAulaRecursosRestritos.text( res.nomeAula );
+                    $ulListaRecursosRestritos.html( res.htmlListaRecursos).show();
+
+                    if ( res.paginacao.proxima_pagina ) {
+
+                        $h4SemMaisRecursosRestritos.hide();
+
+                        $aPaginacaoRecursosRestritos.data(
+                            'proximo',
+                            res.paginacao.inicio_proxima_pagina
+                        ).show();
+
+                    } else {
+
+                        $aPaginacaoRecursosRestritos.data('proximo', '').hide();
+
+                        $h4SemMaisRecursosRestritos.show();
+
+                    }
+
+                    $fooPaginacaoRecursosRestritos.show();
+
+                } else {
+
+                    $ulListaRecursosRestritos.hide();
+                    $fooPaginacaoRecursosRestritos.hide();
+
+                    $h4SemRecursosRestritos.show();
+
+                }
+
+                $divRecursosRestritos.fadeIn();
+
+            }
+
+        });
+
+    });
+
+    $aPaginacaoRecursosRestritos.click(function(e){
+        e.preventDefault();
+
+        var $this = $(this),
+            tipoRecurso = $this.data('tipo-recurso'),
+            idAula = $wrapperSalaDeAula.data('id-aula'),
+            proximo = $this.data('proximo');
+
+        requestListaRecursos(tipoRecurso, idAula, proximo).done(function(res){
+
+            if ( res.success ) {
+
+                $emQtdRecursosRestritos.text(
+                    parseInt( $emQtdRecursosRestritos.text() ) + res.qtdRecuperados
+                );
+                $ulListaRecursosRestritos.append( res.htmlListaRecursos);
+
+                if ( res.paginacao.proxima_pagina ) {
+
+                    $aPaginacaoRecursosRestritos.data(
+                        'proximo',
+                        res.paginacao.inicio_proxima_pagina
+                    );
+
+                } else {
+
+                    $aPaginacaoRecursosRestritos.data('proximo', '').hide();
+
+                    $h4SemMaisRecursosRestritos.show();
+
+                }
+
+            }
+
+        });
 
     });
 

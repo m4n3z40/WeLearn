@@ -1,4 +1,8 @@
-<div id="exibicao-conteudo-saladeaula">
+<div id="exibicao-conteudo-saladeaula"
+     data-id-curso="<?php echo $idCurso ?>"
+     data-id-modulo="<?php echo $idModulo ?>"
+     data-id-aula="<?php echo $idAula ?>"
+     data-id-pagina="<?php echo $idPagina ?>">
     <div id="main-section-container">
         <section id="section-container-iframe">
             <iframe src="<?php echo site_url('/curso/conteudo/exibicao/exibir') ?>"

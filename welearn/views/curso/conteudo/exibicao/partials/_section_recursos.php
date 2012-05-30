@@ -2,8 +2,12 @@
     <h3>Recursos Extras neste Curso</h3>
     <nav>
         <ul>
-            <li><a href="#div-recursos-gerais" id="a-exibir-recursos-gerais">Recursos Gerais</a></li>
-            <li><a href="#div-recursos-restritos" id="a-exibir-recursos-restritos">Recursos Restritos à esta Aula</a></li>
+            <li><a href="#div-recursos-gerais"
+                   id="a-exibir-recursos-gerais"
+                   data-tipo-recurso="<?php echo WeLearn_Cursos_Recursos_TipoRecurso::GERAL ?>">Recursos Gerais</a></li>
+            <li><a href="#div-recursos-restritos"
+                   id="a-exibir-recursos-restritos"
+                   data-tipo-recurso="<?php echo WeLearn_Cursos_Recursos_TipoRecurso::RESTRITO ?>">Recursos Restritos à esta Aula</a></li>
         </ul>
     </nav>
     <div id="div-recursos-gerais" style="display: none;">
@@ -17,7 +21,10 @@
             <footer style="display: none;" id="foo-paginacao-recursos-gerais">
                 <h4 id="h4-msg-sem-mais-recursos-gerais">Não há mais recursos gerais a serem
                     exibidos...</h4>
-                <a href="#" id="a-paginacao-recursos-gerais">Mais Recursos Gerais</a>
+                <a href="#"
+                   id="a-paginacao-recursos-gerais"
+                   data-tipo-recurso="<?php echo WeLearn_Cursos_Recursos_TipoRecurso::GERAL ?>"
+                   daya-proximo="">Mais Recursos Gerais</a>
             </footer>
         </div>
     </div>
@@ -33,7 +40,10 @@
             <footer style="display: none;" id="foo-paginacao-recursos-restritos">
                 <h4 id="h4-msg-sem-mais-recursos-restritos">Não há mais recursos restritos a serem
                     exibidos...</h4>
-                <a href="#" id="a-paginacao-recursos-restritos">Mais Recursos Restritos</a>
+                <a href="#"
+                   id="a-paginacao-recursos-restritos"
+                   data-tipo-recurso="<?php echo WeLearn_Cursos_Recursos_TipoRecurso::RESTRITO ?>"
+                   data-proximo="">Mais Recursos Restritos</a>
             </footer>
         </div>
     </div>

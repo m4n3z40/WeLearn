@@ -3,7 +3,7 @@
     <td>
         <div>
             <h4><?php echo $recurso->nome ?></h4>
-            <p><?php echo $recurso->descricao ?></p>
+            <p><?php echo nl2br($recurso->descricao) ?></p>
         </div>
     </td>
     <td>
