@@ -54,6 +54,11 @@ class Exibicao extends Curso_Controller
     private $_controleAvaliacaoDao;
 
     /**
+     * @var AnotacaoDAO
+     */
+    private $_anotacaoDao;
+
+    /**
      * @var ComentarioDAO
      */
     private $_comentarioDao;
@@ -155,6 +160,14 @@ class Exibicao extends Curso_Controller
                 }
             }
 
+            $dadosViewSalaDeAula = array(
+                'idPagina' => $paginaAtual->getId(),
+                'htmlSectionAnotacao' => $this->_loadSectionAnotacaoView( $paginaAtual ),
+                'htmlSectionComentarios' => $this->_loadSectionComentariosView( $paginaAtual ),
+                'htmlSectionInfoEtapa' => $this->_loadSectionInfoEtapaView( $paginaAtual ),
+                'htmlSectionRecursos' => $this->_loadSectionRecursosView( $aulaAtual )
+            );
+
             $dadosView = array(
                 'iniciouCurso' => $iniciouCurso,
                 'paginaAtual' => $paginaAtual,
@@ -163,6 +176,11 @@ class Exibicao extends Curso_Controller
                 'progressoNoCurso' => number_format(
                     ( $totalPaginasVistas / $totalPaginas) * 100,
                     2
+                ),
+                'htmlJanelaSalaDeAula' => $this->load->view(
+                    'curso/conteudo/exibicao/sala_de_aula',
+                    $dadosViewSalaDeAula,
+                    true
                 )
             );
 
@@ -177,5 +195,191 @@ class Exibicao extends Curso_Controller
 
             show_404();
         }
+    }
+
+    public function exibir()
+    {
+        echo 'Pagina';
+    }
+
+    public function salvar_anotacao($idPagina)
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+
+            $this->_anotacaoDao = WeLearn_DAO_DAOFactory::create('AnotacaoDAO');
+
+            $pagina = $this->_paginaDao->recuperar( $idPagina );
+
+            $anotacao = $this->_anotacaoDao->criarNovo(array(
+                'conteudo' => $this->input->post('anotacao'),
+                'usuario' => $this->_alunoAtual,
+                'pagina' => $pagina
+            ));
+
+            $this->_anotacaoDao->salvar( $anotacao );
+
+            $json = create_json_feedback( true );
+
+        } catch( Exception $e ) {
+            log_message('error', 'Ocorreu um erro ao tentar salvar anotação de página: '
+                . create_exception_description( $e ));
+
+            $error = create_json_feedback_error_json('Ocorreu um erro inesperado,
+                        já estamos tentando resolver. Tente novamente mais tarde!');
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    private function _loadSectionAnotacaoView(WeLearn_Cursos_Conteudo_Pagina $pagina = null)
+    {
+        $this->_anotacaoDao = WeLearn_DAO_DAOFactory::create('AnotacaoDAO');
+
+        try {
+            $anotacaoAtual = $this->_anotacaoDao->recuperarPorUsuario(
+                $pagina,
+                $this->_alunoAtual
+            );
+        } catch (cassandra_NotFoundException $e) {
+            $anotacaoAtual = null;
+        }
+
+        $dadosAnotacaoView = array(
+            'formAction' => '/curso/conteudo/exibicao/salvar_anotacao/' . $pagina->getId(),
+            'extraOpenForm' => 'id="exibicao-conteudo-anotacao-form"',
+            'formHidden' => array(),
+            'idPagina' => $pagina->getId(),
+            'anotacaoAtual' => $anotacaoAtual
+        );
+
+        return $this->template->loadPartial(
+            'section_anotacao',
+            $dadosAnotacaoView,
+            'curso/conteudo/exibicao'
+        );
+    }
+
+    private function _loadSectionComentariosView(WeLearn_Cursos_Conteudo_Pagina $pagina = null)
+    {
+        $dadosFormComentario = array(
+            'formAction' => 'conteudo/comentario/salvar',
+            'extraOpenForm' => 'id="form-comentario-criar"',
+            'formHidden' => array('acao' => 'criar', 'paginaId' => $pagina->getId()),
+            'assuntoAtual' => '',
+            'txtComentarioAtual' => '',
+            'idBotaoEnviar' => 'btn-form-comentario-criar',
+            'txtBotaoEnviar' => 'Postar Comentário!'
+        );
+
+        $dadosComentariosView = array(
+            'formCriar' => $this->template->loadPartial(
+                'form',
+                $dadosFormComentario,
+                'curso/conteudo/comentario'
+            )
+        );
+
+        return $this->template->loadPartial(
+            'section_comentarios',
+            $dadosComentariosView,
+            'curso/conteudo/exibicao'
+        );
+    }
+
+    private function _loadSectionInfoEtapaView(WeLearn_Cursos_Conteudo_Pagina $pagina = null)
+    {
+        $this->load->helper(array('modulo', 'aula', 'pagina'));
+
+        $listaModulos = $this->_moduloDao->recuperarTodosPorCurso(
+            $pagina->getAula()->getModulo()->getCurso()
+        );
+
+        $listaAulas = $this->_aulaDao->recuperarTodosPorModulo(
+            $pagina->getAula()->getModulo()
+        );
+
+        $listaPaginas = $this->_paginaDao->recuperarTodosPorAula(
+            $pagina->getAula()
+        );
+
+        $dadosInfoEtapaView = array(
+            'modulo' => $pagina->getAula()->getModulo(),
+            'aula' => $pagina->getAula(),
+            'pagina' => $pagina,
+            'selectModulos' => $this->template->loadPartial(
+                'select_modulos',
+                array(
+                    'listaModulos' => lista_modulos_para_dados_dropdown( $listaModulos ),
+                    'moduloSelecionado' => $pagina->getAula()->getModulo()->getId(),
+                    'extra' => 'id="slt-modulos"'
+                ),
+                'curso/conteudo'
+            ),
+            'selectAulas' => $this->template->loadPartial(
+                'select_aulas',
+                array(
+                    'listaAulas' => lista_aulas_para_dados_dropdown( $listaAulas ),
+                    'aulaSelecionada' => $pagina->getAula()->getId(),
+                    'extra' => 'id="slt-aulas"'
+                ),
+                'curso/conteudo'
+            ),
+            'selectPaginas' => $this->template->loadPartial(
+                'select_paginas',
+                array(
+                    'listaPaginas' => lista_paginas_para_dados_dropdown( $listaPaginas ),
+                    'paginaSelecionada' => $pagina->getId(),
+                    'extra' => 'id="slt-paginas"'
+                ),
+                'curso/conteudo'
+            )
+        );
+
+        return $this->template->loadPartial(
+            'section_info_etapa',
+            $dadosInfoEtapaView,
+            'curso/conteudo/exibicao'
+        );
+    }
+
+    private function _loadSectionRecursosView(WeLearn_Cursos_Conteudo_Aula $aula = null)
+    {
+        $dadosRecursosView = array();
+
+        return $this->template->loadPartial(
+            'section_recursos',
+            $dadosRecursosView,
+            'curso/conteudo/exibicao'
+        );
+    }
+
+    private function _loadConteudoPaginaView(WeLearn_Cursos_Conteudo_Pagina $pagina = null)
+    {
+        $dadosConteudoPaginaView = array();
+
+        return $this->template->loadPartial(
+            'conteudo_pagina',
+            $dadosConteudoPaginaView,
+            'curso/conteudo/exibicao'
+        );
+    }
+
+    private function _loadAplicacaoAvaliacaoView(WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacao = null)
+    {
+        $dadosAplicacaoAvaliacaoView = array();
+
+        return $this->template->loadPartial(
+            'aplicacao_avaliacao',
+            $dadosAplicacaoAvaliacaoView,
+            'curso/conteudo/exibicao'
+        );
     }
 }
