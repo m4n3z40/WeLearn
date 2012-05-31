@@ -259,25 +259,28 @@ class Home_Controller extends WL_Controller
      */
     protected function _renderTemplateHome( $view = '', $dados = null )
     {
-
-        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
         try{
+
+            $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
             $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
 
             $listaRandonicaAmigos = $amizadeUsuarioDao->recuperarAmigosAleatorios(
                 $usuarioAutenticado,
                 10
             );
+
         }catch(cassandra_NotFoundException $e){
+
             $listaRandonicaAmigos = null;
+
         }
 
-            $widgets = array();
-            $widgets[] = $this->template->loadPartial(
-                'widget_amigos',
-                array('listaRandonicaAmigos' => $listaRandonicaAmigos),
-                'usuario/amigos'
-            );
+        $widgets = array();
+        $widgets[] = $this->template->loadPartial(
+            'widget_amigos',
+            array('listaRandonicaAmigos' => $listaRandonicaAmigos),
+            'usuario/amigos'
+        );
 
 
         $this->_setTemplate( 'home' )
@@ -290,10 +293,10 @@ class Home_Controller extends WL_Controller
                  $this->autenticacao->getUsuarioAutenticado()
              )
 
-              ->_barraDireitaSetVar(
-                  'widgetsContexto',
-                  $widgets
-              )
+             ->_barraDireitaSetVar(
+                 'widgetsContexto',
+                 $widgets
+             )
 
              ->_renderTemplate( $view, $dados );
     }

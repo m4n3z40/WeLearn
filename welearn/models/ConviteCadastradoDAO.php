@@ -9,15 +9,11 @@
 
 class ConviteCadastradoDAO extends WeLearn_DAO_AbstractDAO
 {
-
-    protected $_nomeCF = 'convites_convite_cadastrado';
-    protected $_nomeConvitePorRemetente= 'convites_convite_cadastrado_por_remetente';
-    protected $_nomeConvitePorDestinatario= 'convites_convite_cadastrado_por_destinatario';
-    protected $_nomeConvitePorDestinatario_por_data = 'convites_convite_cadastrado_por_destinatario_por_data';
-    protected $_nomeConvitePorRemetente_por_data= 'convites_convite_cadastrado_por_remetente_por_data';
-
-
-
+    protected $_nomeCF = 'convites_amizade';
+    protected $_nomeConvitePorRemetente = 'convites_amizade_enviados';
+    protected $_nomeConvitePorDestinatario = 'convites_amizade_recebidos';
+    protected $_nomeConvitePorDestinatarioPorData = 'convites_amizade_recebidos_por_data';
+    protected $_nomeConvitePorRemetentePorData = 'convites_amizade_enviados_por_data';
 
     protected $_convitePorRemetente;
     protected $_convitePorDestinatario;
@@ -34,10 +30,12 @@ class ConviteCadastradoDAO extends WeLearn_DAO_AbstractDAO
     public function __construct()
     {
         $phpCassa = WL_Phpcassa::getInstance();
+
         $this->_convitePorRemetente = $phpCassa->getColumnFamily($this->_nomeConvitePorRemetente);
         $this->_convitePorDestinatario=$phpCassa->getColumnFamily($this->_nomeConvitePorDestinatario);
-        $this->_convitePorDestinatarioPorData=$phpCassa->getColumnFamily($this->_nomeConvitePorDestinatario_por_data);
-        $this->_convitePorRemetentePorData=$phpCassa->getColumnFamily($this->_nomeConvitePorRemetente_por_data);
+        $this->_convitePorDestinatarioPorData=$phpCassa->getColumnFamily($this->_nomeConvitePorDestinatarioPorData);
+        $this->_convitePorRemetentePorData=$phpCassa->getColumnFamily($this->_nomeConvitePorRemetentePorData);
+
         $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
         $this->_cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
     }
