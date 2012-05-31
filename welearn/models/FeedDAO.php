@@ -78,16 +78,27 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
     {
         $feed = $this->recuperar($id);
         $uuidFeed = CassandraUtil::import($feed->getId())->bytes;
-        $this->_cf->remove($uuidFeed);
-        $this->_FeedCF->remove($feed->getCriador()->getId(),array($uuidFeed));
-        $totalAmigos = $this->_amizadeDAO->recuperarQtdTotalAmigos($feed->getCriador());// verifica se o usuario possui algum amigo
-        if($totalAmigos!=0){
-            $amigos=$this->_amizadeDAO->recuperarTodosAmigos($feed->getCriador());//recuperando amigos do usuario
-            foreach ($amigos as $row) {
-                $this->_FeedCF->remove($row->getId(),array($uuidFeed));
-            }
+        try{
+            $amigosAtivos = $this->_amizadeDAO->recuperarTodosAmigosAtivos($feed->getCriador());
+        }catch(cassandra_NotFoundException $e){
+            $amigosAtivos = array();
         }
 
+        try{
+            $amigosInativos = $this->_amizadeDAO->recuperarTodosAmigosInativos($feed->getCriador());
+        }catch(cassandra_NotFoundException $e){
+            $amigosInativos = array();
+        }
+
+        $listaAmigos = array_merge($amigosAtivos,$amigosInativos);
+
+        if(count($listaAmigos)>0){
+            for($i=0; $i<count($listaAmigos);$i++)
+            {
+                $this->_FeedCF->remove($listaAmigos[$i],array($uuidFeed));
+            }
+        }
+        $this->_FeedCF->remove($feed->getCriador()->getId(),array($uuidFeed));
     }
 
      /**
@@ -118,12 +129,18 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
         $dto->setId($UUID->string);
         $this->_cf->insert($UUID->bytes,$dto->toCassandra());
         $this->_FeedCF->insert($dto->getCriador()->getId(),array($UUID->bytes => ''));//inserindo na timeline do usuario criador do feed
-        $totalAmigos = $this->_amizadeDAO->recuperarQtdTotalAmigos($dto->getCriador());// verifica se o usuario possui algum amigo
-        if($totalAmigos!=0){
-            $amigos=$this->_amizadeDAO->recuperarTodosAmigos($dto->getCriador());//recuperando amigos do usuario
-            foreach ($amigos as $row) {
-                $this->_FeedCF->insert($row->getId(),array($UUID->bytes => ''));// inserindo na timeline dos amigos do criador
-            }
+        try{
+           $amigosAtivos = $this->_amizadeDAO->recuperarTodosAmigosAtivos($dto->getCriador());
+        }catch(cassandra_NotFoundException $e){
+            $amigosAtivos = array();
+        }
+
+        if(count($amigosAtivos)>0){
+
+           for($i=0; $i<count($amigosAtivos); $i++)
+           {
+               $this->_FeedCF->insert($amigosAtivos[$i],array($UUID->bytes => ''));
+           }
         }
     }
 

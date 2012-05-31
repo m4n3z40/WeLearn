@@ -89,8 +89,8 @@ and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'UTF8Type';
 
-create column family usuarios_amizade_amigos_por_data
-with comparator = 'TimeUUIDType'
+create column family usuarios_amizade_amigos_inativos
+with comparator = 'UTF8Type'
 and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'UTF8Type';

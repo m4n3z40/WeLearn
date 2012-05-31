@@ -1,6 +1,11 @@
-<?php
-if(count($listaRandonicaAmigos)>0){
-foreach ($listaRandonicaAmigos as $row) {
-    echo $row->toHTML('imagem_pequena');
-}
-}
+
+<?if(count($listaRandonicaAmigos)>0):?>
+<div class="widget">
+    <h3>Amigos</h3>
+    <ul>
+    <?foreach ($listaRandonicaAmigos as $row):?>
+        <li><?=$row->toHTML('imagem_pequena')?></li>
+    <?endforeach;?>
+    </ul>
+</div>
+<?endif;?>
