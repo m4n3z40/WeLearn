@@ -318,7 +318,7 @@ class Recurso extends Curso_Controller
         set_json_header();
 
         try {
-            $count = 2;
+            $count = 5;
 
             $recursoDao = WeLearn_DAO_DAOFactory::create('RecursoDAO');
 

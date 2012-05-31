@@ -47,6 +47,44 @@ class AulaDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param WeLearn_Cursos_Conteudo_Modulo $doModulo
+     * @param string $idAnterior
+     * @return bool|WeLearn_Cursos_Conteudo_Aula
+     */
+    public function recuperarProxima(WeLearn_Cursos_Conteudo_Modulo $doModulo, $idAnterior = '')
+    {
+        try {
+
+            if ( $idAnterior != '' ) {
+
+                $idAnterior = UUID::import( $idAnterior )->bytes;
+
+                $count = 2;
+
+            } else {
+
+                $count = 1;
+
+            }
+
+            $aulaAtual = $this->recuperarTodosPorModulo(
+                $doModulo,
+                $idAnterior,
+                '',
+                $count
+            );
+
+            $key = $count - 1;
+
+            return isset( $aulaAtual[ $key ] ) ? $aulaAtual[ $key ] : false;
+        } catch (cassandra_NotFoundException $e) {
+
+            return false;
+
+        }
+    }
+
+    /**
      * @param mixed $de
      * @param mixed $ate
      * @param array|null $filtros

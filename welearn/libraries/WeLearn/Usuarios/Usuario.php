@@ -454,7 +454,7 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
      * @param bool $pequena
      * @return string
      */
-    private function _htmlImagem($pequena = false)
+    private function _htmlImagem($tamanho = 'grande')
     {
         $imagemUrl = ( $this->_imagem instanceof WeLearn_Usuarios_ImagemUsuario )
                      ? $this->getImagem()->getUrl()
@@ -462,13 +462,15 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
 
         $alt = $this->getNome() . ' ' . $this->getSobrenome();
 
-        if ( $pequena ) {
-
-            return "<img src=\"{$imagemUrl}\" alt=\"{$alt}\" title=\"{$alt}\" width=\"80\" height=\"80\">";
-
+        switch ( $tamanho ) {
+            case 'pequeno':
+                return "<img src=\"{$imagemUrl}\" alt=\"{$alt}\" title=\"{$alt}\" width=\"40\" height=\"40\">";
+            case 'medio':
+                return "<img src=\"{$imagemUrl}\" alt=\"{$alt}\" title=\"{$alt}\" width=\"80\" height=\"80\">";
+            case 'grande':
+            default:
+                return "<img src=\"{$imagemUrl}\" alt=\"{$alt}\" title='{$alt}'>";
         }
-
-        return "<img src=\"{$imagemUrl}\" alt=\"{$alt}\" title='{$alt}'>";
     }
 
     /**
@@ -476,9 +478,9 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
      * @param bool $semLink
      * @return string
      */
-    private function _htmlUsuario($pequeno = false, $semLink = false)
+    private function _htmlUsuario($tamanho = 'grande', $semLink = false)
     {
-        $htmlImagem = $this->_htmlImagem( $pequeno );
+        $htmlImagem = $this->_htmlImagem( $tamanho );
         $nomeCompleto = $this->getNome() . ' ' . $this->getSobrenome();
         $id = $this->getId();
         $urlPerfil = site_url( '/perfil/' . $id );
@@ -509,17 +511,21 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
     public function toHTML($tipo = 'imagem_grande')
     {
         switch ( $tipo ) {
+            case 'imagem_mini_sem_link':
+                return $this->_htmlUsuario( 'pequeno', true );
             case 'imagem_pequena_sem_link':
-                return $this->_htmlUsuario(true, true);
+                return $this->_htmlUsuario( 'medio', true );
             case 'imagem_grande_sem_link':
-                return $this->_htmlUsuario(false, true);
+                return $this->_htmlUsuario( 'grande', true );
+            case 'imagem_mini':
+                return $this->_htmlUsuario( 'pequeno' );
             case 'imagem_pequena':
-                return $this->_htmlUsuario( true );
+                return $this->_htmlUsuario( 'medio' );
             case 'somente_link':
                 return $this->_htmlLinkUsuario();
             case 'imagem_grande':
             default:
-                return $this->_htmlUsuario( false );
+                return $this->_htmlUsuario( 'grande' );
         }
     }
 

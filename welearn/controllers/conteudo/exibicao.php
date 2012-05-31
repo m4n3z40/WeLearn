@@ -87,7 +87,8 @@ class Exibicao extends Curso_Controller
             $this->autenticacao->getUsuarioAutenticado()
         );
 
-        $this->template->appendJSImport('exibicao_conteudo_curso.js');
+        $this->template->appendCSS('sala_de_aula.css')
+                       ->appendJSImport('exibicao_conteudo_curso.js');
     }
 
     public function index( $idCurso )
@@ -100,78 +101,93 @@ class Exibicao extends Curso_Controller
                 $curso
             );
 
-            $totalPaginas = $this->_paginaDao->recuperarQtdTotalPorCurso( $curso );
+            $iniciouCurso = false;
+            $totalPaginas = 0;
+            $totalPaginasVistas = 0;
 
-            if ( $participacaoCurso->getPaginaAtual() instanceof WeLearn_Cursos_Conteudo_Pagina ) {
+            //Verifica se conteudo do curso não está bloqueado nas configurações, o que resultaria na não-exibição da página
+            $conteudoAberto = ( $curso->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO );
+            if ( $conteudoAberto ) {
 
-                $iniciouCurso = true;
+                //Recupera quantidade total de páginas existente no curso para geração do gráfico de progresso.
+                $totalPaginas = $this->_paginaDao->recuperarQtdTotalPorCurso( $curso );
 
-                $paginaAtual = $participacaoCurso->getPaginaAtual();
-                $aulaAtual = $paginaAtual->getAula();
-                $moduloAtual = $aulaAtual->getModulo();
+                //Se há um obj paginaAtual no obj ParticipacaoCurso, então aluno já iniciou curso
+                if ( $participacaoCurso->getPaginaAtual() instanceof WeLearn_Cursos_Conteudo_Pagina ) {
 
-                $totalPaginasVistas = $this->_participacaoCursoDao
-                                           ->recuperarQtdTotalControlesPagina(
-                                               $participacaoCurso
-                                           );
+                    $iniciouCurso = true;
+
+                    $paginaAtual = $participacaoCurso->getPaginaAtual();
+                    $aulaAtual   = $paginaAtual->getAula();
+                    $moduloAtual = $aulaAtual->getModulo();
+
+                    $totalPaginasVistas = $this->_participacaoCursoDao
+                                               ->recuperarQtdTotalControlesPagina(
+                                                   $participacaoCurso
+                                               );
+
+                } else { //Senão, recupera-se a primeira pagina do curso inteiro para iniciação.
+
+                    $moduloAtual = $this->_moduloDao->recuperarProximo( $curso );
+                    $aulaAtual = $moduloAtual ? $this->_aulaDao->recuperarProxima( $moduloAtual ) : false;
+                    $paginaAtual = $aulaAtual ? $this->_paginaDao->recuperarProxima( $aulaAtual ) : false;
+
+                    if ( $paginaAtual ) {
+
+                        //É preciso registrar o inicio do módulo ( caso exista )
+                        $this->_participacaoCursoDao->acessarModulo(
+                            $participacaoCurso,
+                            $moduloAtual
+                        );
+
+                        //É preciso registrar o inicio da aula ( caso exista )
+                        $this->_participacaoCursoDao->acessarAula(
+                            $participacaoCurso,
+                            $aulaAtual
+                        );
+
+                        //É preciso liberar esta página (caso exista) para que o aluno possa ve-la
+                        $this->_participacaoCursoDao->acessarPagina(
+                            $participacaoCurso,
+                            $paginaAtual
+                        );
+
+                    }
+
+                }
 
             } else {
 
-                $iniciouCurso = false;
-                $totalPaginasVistas = 0;
+                $moduloAtual = null;
+                $aulaAtual = null;
+                $paginaAtual = null;
 
-                try {
-                    $moduloAtual = $this->_moduloDao->recuperarTodosPorCurso(
-                        $curso,
-                        '',
-                        '',
-                        1
-                    );
+            }
 
-                    $moduloAtual = $moduloAtual[0];
-                } catch (Exception $e) {
-                    $moduloAtual = null;
-                }
+            $haModulo = ( $moduloAtual instanceof WeLearn_Cursos_Conteudo_Modulo );
+            $haAula = ( $aulaAtual instanceof WeLearn_Cursos_Conteudo_Aula );
+            $haPagina = ( $paginaAtual instanceof WeLearn_Cursos_Conteudo_Pagina );
 
-                try {
-                    $aulaAtual = $this->_aulaDao->recuperarTodosPorModulo(
-                        $moduloAtual,
-                        '',
-                        '',
-                        1
-                    );
+            //Gera o link source do iframe onde é carregado o conteudo atual.
+            $srcIframeConteudo = site_url( 'curso/conteudo/exibicao/exibir/' . $curso->getId() );
 
-                    $aulaAtual = $aulaAtual[0];
-                } catch (Exception $e) {
-                    $aulaAtual = null;
-                }
+            if ( $haPagina ) {
 
-                try {
-                    $paginaAtual = $this->_paginaDao->recuperarTodosPorAula(
-                        $aulaAtual,
-                        '',
-                        '',
-                        1
-                    );
+                $srcIframeConteudo .= '?t=pagina&id=' . $paginaAtual->getId();
 
-                    $paginaAtual = $paginaAtual[0];
-                } catch (Exception $e) {
-                    $paginaAtual = null;
-                }
             }
 
             $dadosViewSalaDeAula = array(
+                'conteudoAberto' => $conteudoAberto,
                 'idCurso' => $curso->getId(),
-                'idModulo' => ( $moduloAtual instanceof WeLearn_Cursos_Conteudo_Modulo )
-                              ? $moduloAtual->getId() : '',
-                'idAula' => ( $aulaAtual instanceof WeLearn_Cursos_Conteudo_Aula )
-                            ? $aulaAtual->getId() : '',
-                'idPagina' => ($paginaAtual instanceof WeLearn_Cursos_Conteudo_Pagina)
-                              ? $paginaAtual->getId() : '',
-                'htmlSectionAnotacao' => $this->_loadSectionAnotacaoView( $paginaAtual ),
-                'htmlSectionComentarios' => $this->_loadSectionComentariosView( $paginaAtual ),
-                'htmlSectionInfoEtapa' => $this->_loadSectionInfoEtapaView( $paginaAtual ),
-                'htmlSectionRecursos' => $this->_loadSectionRecursosView( $aulaAtual )
+                'idModulo' => $haModulo ? $moduloAtual->getId() : '',
+                'idAula' => $haAula ? $aulaAtual->getId() : '',
+                'idPagina' => $haPagina ? $paginaAtual->getId() : '',
+                'srcIframeConteudo' => $srcIframeConteudo,
+                'htmlSectionAnotacao' => $haPagina ? $this->_loadSectionAnotacaoView( $paginaAtual ) : '',
+                'htmlSectionComentarios' => $haPagina ? $this->_loadSectionComentariosView( $paginaAtual ) : '',
+                'htmlSectionInfoEtapa' => $paginaAtual ? $this->_loadSectionInfoEtapaView( $paginaAtual ) : '',
+                'htmlSectionRecursos' => $aulaAtual ? $this->_loadSectionRecursosView( $aulaAtual ) : ''
             );
 
             $dadosView = array(
@@ -179,10 +195,9 @@ class Exibicao extends Curso_Controller
                 'paginaAtual' => $paginaAtual,
                 'aulaAtual' => $aulaAtual,
                 'moduloAtual' => $moduloAtual,
-                'progressoNoCurso' => number_format(
-                    ( $totalPaginasVistas / $totalPaginas) * 100,
-                    2
-                ),
+                'progressoNoCurso' => ( $totalPaginas > 0 )
+                    ? number_format( ( $totalPaginasVistas / $totalPaginas ) * 100, 2 )
+                    : 0,
                 'htmlJanelaSalaDeAula' => $this->load->view(
                     'curso/conteudo/exibicao/sala_de_aula',
                     $dadosViewSalaDeAula,
@@ -203,9 +218,37 @@ class Exibicao extends Curso_Controller
         }
     }
 
-    public function exibir()
+    public function exibir( $idCurso )
     {
-        echo 'Pagina';
+        try {
+            $curso = $this->_cursoDao->recuperar( $idCurso );
+
+            $participacaoCurso = $this->_participacaoCursoDao->recuperarPorCurso(
+                $this->_alunoAtual,
+                $curso
+            );
+
+            $tipoConteudo = $this->input->get('t');
+            $idConteudo   = $this->input->get('id');
+
+            switch ( $tipoConteudo ) {
+                case 'pagina':
+                    $pagina = $this->_paginaDao->recuperar( $idConteudo );
+                    $this->_exibirPagina( $participacaoCurso, $pagina );
+                    break;
+                case 'avaliacao':
+                    $avaliacao = $this->_avaliacaoDao->recuperar( $idConteudo );
+                    $this->_aplicarAvaliacao( $participacaoCurso, $avaliacao );
+                    break;
+                default:
+                    show_404();
+            }            
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar exibir conteúdo para aluna na sala de aula: '
+                . create_exception_description($e));
+
+            show_404();
+        }
     }
 
     public function salvar_anotacao($idPagina)
@@ -387,5 +430,50 @@ class Exibicao extends Curso_Controller
             $dadosAplicacaoAvaliacaoView,
             'curso/conteudo/exibicao'
         );
+    }
+
+    private function _exibirPagina(
+        WeLearn_Cursos_ParticipacaoCurso $participacaocurso,
+        WeLearn_Cursos_Conteudo_Pagina $pagina
+    ) {
+        try {
+            $controlePagina = $this->_participacaoCursoDao->recuperarControlePagina(
+                $pagina,
+                $participacaocurso
+            );
+
+            switch ( $controlePagina->getStatus() ) {
+
+                case WeLearn_Cursos_Conteudo_StatusConteudo::ACESSANDO:
+                    $controlePagina->finalizar();
+                    $this->_participacaoCursoDao->salvarControlePagina( $controlePagina );
+                    $visualizacaoDisponivel = true;
+                    break;
+                case WeLearn_Cursos_Conteudo_StatusConteudo::ACESSADO:
+                    $visualizacaoDisponivel = true;
+                    break;
+                case WeLearn_Cursos_Conteudo_StatusConteudo::BLOQUEADO:
+                default:
+                    $visualizacaoDisponivel = false;
+            }
+
+        } catch (cassandra_NotFoundException $e) {
+            $visualizacaoDisponivel = false;
+        }
+
+        if ( $visualizacaoDisponivel ) {
+
+        } else {
+
+
+
+        }
+    }
+
+    private function _aplicarAvaliacao(
+        WeLearn_Cursos_ParticipacaoCurso $participacaocurso,
+        WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacao
+    ) {
+
     }
 }

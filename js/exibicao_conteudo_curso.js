@@ -525,7 +525,7 @@
 
                 }
 
-                $divRecursosGerais.fadeIn();
+                $divRecursosGerais.slideDown();
 
             }
 
@@ -620,7 +620,7 @@
 
                 }
 
-                $divRecursosRestritos.fadeIn();
+                $divRecursosRestritos.slideDown();
 
             }
 
@@ -663,6 +663,23 @@
             }
 
         });
+
+    });
+
+    /* ############################################################ */
+
+    $('#a-nav-exibicao-inicio-aula').click(function(e){
+        e.preventDefault();
+
+    });
+
+    $('#a-nav-exibicao-pagina-anterior').click(function(e){
+        e.preventDefault();
+
+    });
+
+    $('#a-nav-exibicao-proxima-pagina').click(function(e){
+        e.preventDefault();
 
     });
 

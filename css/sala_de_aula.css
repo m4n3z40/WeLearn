@@ -1,0 +1,49 @@
+#exibicao-conteudo-saladeaula {
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+#main-section-container {
+    width: 75%;
+    float: left;
+}
+
+#main-section-container > section,
+#section-container-iframe iframe,
+#div-anotacao-form-container textarea,
+#div-anotacao-form-container pre {
+
+    width: 100%;
+    max-width: 100%;
+
+}
+
+#section-container-iframe iframe {
+    height: 600px;
+}
+
+#div-anotacao-form-container textarea, #div-anotacao-form-container pre {
+    max-height: 50px;
+    height: 50px;
+    font-size: 11pt;
+    font-family: 'Helvetica';
+}
+
+#div-anotacao-form-container pre {
+    cursor: pointer;
+}
+
+#div-anotacao-form-container pre:hover {
+    background: #fff;
+}
+
+#aside-widgets-container {
+    width: 25%;
+    float: right;
+}
+
+#aside-widgets-container:after {
+    clear: both;
+}
