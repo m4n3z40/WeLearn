@@ -10,6 +10,7 @@
             </figure>
         </header>
         <ul>
+            <li><?= anchor('/home','Home')?></li>
             <?php if($usuarioPerfil->getId() != $usuarioAutenticado->getId()):?>
                <input type='hidden' id='id-usuario-perfil' value='<?=$usuarioPerfil->id ?>'>
                 <?php if($saoAmigos == WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS):?>
@@ -29,8 +30,6 @@
 
                 <?php endif;?>
                     <li><?= anchor('usuario/mensagem/criar','Enviar Mensagem',array('id' => 'enviar-mensagem'))?></li>
-            <?php else: ?>
-                   <?= anchor('/home','Home')?>
             <?php endif; ?>
             <li><?= anchor('perfil/dados_pessoais/'.$usuarioPerfil->id,'Dados Pessoais')?></li>
             <li><?= anchor('perfil/dados_profissionais/'.$usuarioPerfil->id,'Dados Profissionais')?></li>

@@ -285,7 +285,6 @@ class Convite extends Home_Controller
                $amizadeDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
                $idAmizade = $amizadeDao->gerarIdAmizade($conviteRemovido->getDestinatario(), $conviteRemovido->getRemetente());
                $amizadeObj = $amizadeDao->recuperar($idAmizade);
-               $amizadeObj->setPersistido(true);
                $amizadeObj->setStatus(WeLearn_Usuarios_StatusAmizade::AMIGOS);
                $amizadeDao->salvar($amizadeObj);
                if($view == 'perfil'){

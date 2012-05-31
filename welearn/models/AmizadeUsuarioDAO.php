@@ -12,13 +12,13 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
     protected $_nomeCF = 'usuarios_amizade';
 
     //indexes
-    private $_nomeAmizadeAmigos = 'usuarios_amizade_amigos';
-    private $_nomeAmizadeAmigosPorDataCF = 'usuarios_amizade_amigos_por_data';
+    private $_nomeAmizadeAmigosCF = 'usuarios_amizade_amigos';
+    private $_nomeAmizadeAmigosInativosCF = 'usuarios_amizade_amigos_inativos';
     private $_nomeAmizadeRequisicoesCF = 'usuarios_amizade_requisicoes';
     private $_nomeAmizadeRequisicoesPorDataCF = 'usuarios_amizade_requisicoes_por_data';
 
     private $_amizadeAmigosCF;
-    private $_amizadeAmigosPorDataCF;
+    private $_amizadeAmigosInativosCF;
     private $_amizadeRequisicoesCF;
     private $_amizadeRequisicoesPorDataCF;
 
@@ -31,8 +31,8 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
     {
         $phpCassa = WL_Phpcassa::getInstance();
 
-        $this->_amizadeAmigosCF = $phpCassa->getColumnFamily($this->_nomeAmizadeAmigos);
-        $this->_amizadeAmigosPorDataCF = $phpCassa->getColumnFamily($this->_nomeAmizadeAmigosPorDataCF);
+        $this->_amizadeAmigosCF = $phpCassa->getColumnFamily($this->_nomeAmizadeAmigosCF);
+        $this->_amizadeAmigosInativosCF = $phpCassa->getColumnFamily($this->_nomeAmizadeAmigosInativosCF);
         $this->_amizadeRequisicoesCF = $phpCassa->getColumnFamily($this->_nomeAmizadeRequisicoesCF);
         $this->_amizadeRequisicoesPorDataCF = $phpCassa->getColumnFamily($this->_nomeAmizadeRequisicoesPorDataCF);
 
@@ -109,26 +109,7 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
         return $this->_recuperarUsuariosPorIds($idsAmigos);
     }
 
-    public function recuperarTodosAmigosPorData(WeLearn_Usuarios_Usuario $usuario, $de = '', $ate = '', $count = 10)
-    {
-        if ($de != '') {
-            $de = CassandraUtil::import($de)->bytes;
-        }
-        if ($ate != '') {
-            $ate = CassandraUtil::import($ate)->bytes;
-        }
 
-        $idsAmigos = array_values(
-            $this->_amizadeAmigosPorDataCF->get($usuario->getId(),
-                null,
-                $de,
-                $ate,
-                true,
-                $count)
-        );
-
-        return $this->_recuperarUsuariosPorIds($idsAmigos);
-    }
 
     public function recuperarTodasRequisicoes(WeLearn_Usuarios_Usuario $usuario, $de = '', $ate = '', $count = 10)
     {
@@ -174,8 +155,8 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
 
     public function recuperarAmigosAleatorios(WeLearn_Usuarios_Usuario $usuario, $qtd)
     {
-        $idsAmigos = array_values(
-            $this->_amizadeAmigosPorDataCF->get($usuario->getId(),
+        $idsAmigos = array_keys(
+            $this->_amizadeAmigosCF->get($usuario->getId(),
                 null,
                 '',
                 '',
@@ -214,6 +195,34 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
         return $this->_recuperarUsuariosPorIds( $arrayAmigos );
     }
 
+    public function recuperarTodosAmigosInativos(WeLearn_Usuarios_Usuario $usuario, $de = '', $ate = '', $count = 1000000)
+    {
+        $idsAmigos = array_keys(
+            $this->_amizadeAmigosInativosCF->get($usuario->getId(),
+                null,
+                $de,
+                $ate,
+                false,
+                $count)
+        );
+
+        return $idsAmigos;
+    }
+
+    public function recuperarTodosAmigosAtivos(WeLearn_Usuarios_Usuario $usuario, $de = '', $ate = '', $count = 1000000)
+    {
+        $idsAmigos = array_keys(
+            $this->_amizadeAmigosCF->get($usuario->getId(),
+                null,
+                $de,
+                $ate,
+                false,
+                $count)
+        );
+
+        return $idsAmigos;
+    }
+
     /**
      * @param mixed $de
      * @param mixed $ate
@@ -241,35 +250,33 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
     public function remover($id)
     {
         $column = $this->_cf->get($id);
-        $timeUUID = CassandraUtil::import($column['timeUUID'])->bytes;
-        $amizadeRemovida = $this->_criarFromCassandra($column);
-        $this->_cf->remove($id);
+        $amizadeInativa = $this->_criarFromCassandra($column);
+        $amizadeInativa->setStatus(WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS);
+        $this->_cf->insert($id,$amizadeInativa->toCassandra());
 
         $this->_amizadeAmigosCF->remove(
-            $amizadeRemovida->getUsuario()->getId(),
-            array($amizadeRemovida->getAmigo()->getId())
+            $amizadeInativa->getUsuario()->getId(),
+            array($amizadeInativa->getAmigo()->getId())
         );
 
         $this->_amizadeAmigosCF->remove(
-            $amizadeRemovida->getAmigo()->getId(),
-            array($amizadeRemovida->getUsuario()->getId())
+            $amizadeInativa->getAmigo()->getId(),
+            array($amizadeInativa->getUsuario()->getId())
         );
 
-        $this->_amizadeAmigosPorDataCF->remove(
-            $amizadeRemovida->getUsuario()->getId(),
-            array($timeUUID)
+        $this->_amizadeAmigosInativosCF->insert(
+            $amizadeInativa->getUsuario()->getId(),
+            array($amizadeInativa->getAmigo()->getId() => '')
         );
 
-        $this->_amizadeAmigosPorDataCF->remove(
-            $amizadeRemovida->getAmigo()->getId(),
-            array($timeUUID)
+        $this->_amizadeAmigosInativosCF->insert(
+            $amizadeInativa->getAmigo()->getId(),
+            array($amizadeInativa->getUsuario()->getId() => '')
         );
 
+        $amizadeInativa->setPersistido(false);
 
-
-        $amizadeRemovida->setPersistido(false);
-
-        return $amizadeRemovida;
+        return $amizadeInativa;
     }
 
     /**
@@ -320,35 +327,24 @@ class AmizadeUsuarioDAO extends WeLearn_DAO_AbstractDAO
                     array($dto->getUsuario()->getId() => '')
                 );
 
-                $this->_amizadeAmigosPorDataCF->insert(
-                    $dto->getUsuario()->getId(),
-                    array($timeUUID => $dto->getAmigo()->getId())
-                );
+                $this->_amizadeAmigosInativosCF->remove($dto->getAmigo()->getId(),array($dto->getUsuario()->getId()));
+                $this->_amizadeAmigosInativosCF->remove($dto->getUsuario()->getId(),array($dto->getAmigo()->getId()));
 
-                $this->_amizadeAmigosPorDataCF->insert(
-                    $dto->getAmigo()->getId(),
-                    array($timeUUID => $dto->getUsuario()->getId())
-                );
+
             } else {
                 $this->_amizadeAmigosCF->remove(
                     $dto->getUsuario()->getId(),
                     array($dto->getAmigo()->getId())
                 );
 
-                $this->_amizadeAmigosPorDataCF->remove(
-                    $dto->getUsuario()->getId(),
-                    array($timeUUID)
-                );
+
 
                 $this->_amizadeRequisicoesCF->insert(
                     $dto->getUsuario()->getId(),
                     array($dto->getAmigo()->getId() => '')
                 );
 
-                $this->_amizadeRequisicoesPorDataCF->insert(
-                    $dto->getUsuario()->getId(),
-                    array($timeUUID => $dto->getAmigo()->getId())
-                );
+
             }
         }
 

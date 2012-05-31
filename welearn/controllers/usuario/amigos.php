@@ -55,7 +55,6 @@ class Amigos extends Home_Controller
             $filtros= array('count' => self::$_count+1,'usuario' => $usuarioAutenticado, 'opcao'=>'amigos');
             try {
                 $listaAmigos = $amigosDao->recuperarTodos($inicio,'',$filtros);
-                //print_r($listaAmigos);
                 $this->load->helper('paginacao_cassandra');
                 $dadosPaginados = create_paginacao_cassandra($listaAmigos, self::$_count);
                 $response = array(

@@ -15,7 +15,7 @@
         && $dadosProfissionais->siteEmpresa == '' && $dadosProfissionais->cargo == ''
         && $dadosProfissionais->descricaoTrabalho == '' && $dadosProfissionais->habilidadesProfissionais == ''
         && $dadosProfissionais->interessesProfissionais == ''):?>
-        <h3>O usuario <?=$usuarioPerfil->id?> ainda não cadastrou dados profissionais pq apagou</h3>
+        <h3>O usuario <?=$usuarioPerfil->nome?> ainda não cadastrou dados profissionais pq apagou</h3>
     <?else:?>
     <?if($dadosProfissionais->escolaridade != '' || $dadosProfissionais->escola != '' || $dadosProfissionais->faculdade != ''
          || $dadosProfissionais->curso != '' || $dadosProfissionais->diploma != '' || $dadosProfissionais->ano != ''):?>
@@ -97,5 +97,5 @@
         <?endif;?>
     <?endif;?>
 <?php else:?>
-    <h3>O usuario <?=$usuarioPerfil->id?> ainda não cadastrou dados profissionais</h3>
+    <h3>O usuario <?=$usuarioPerfil->nome?> ainda não cadastrou dados profissionais</h3>
 <?php endif;?>

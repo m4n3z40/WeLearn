@@ -158,7 +158,7 @@ class Feed extends Home_Controller
         }catch(cassandra_NotFoundException $e){
             log_message(
                 'error',
-                'falha ao remover timeline id feed '.$idFeed.'id usuario '.$idUsuario
+                'falha ao remover timeline id feed '.$idFeed
             );
 
             $error = create_json_feedback_error_json(
