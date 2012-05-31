@@ -144,6 +144,40 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
         return $this->_criarFromCassandra( $column );
     }
 
+    public function recuperarProximo(WeLearn_Cursos_Curso $doCurso, $idAnterior = '')
+    {
+        try {
+
+            if ( $idAnterior != '' ) {
+
+                $idAnterior = UUID::import( $idAnterior )->bytes;
+
+                $count = 2;
+
+            } else {
+
+                $count = 1;
+
+            }
+
+            $moduloAtual = $this->recuperarTodosPorCurso(
+                $doCurso,
+                $idAnterior,
+                '',
+                $count
+            );
+
+            $key = $count - 1;
+
+            return isset( $moduloAtual[ $key ] ) ? $moduloAtual[ $key ] : false;
+
+        } catch (cassandra_NotFoundException $e) {
+
+            return false;
+
+        }
+    }
+
     /**
      * @param mixed $de
      * @param mixed $ate

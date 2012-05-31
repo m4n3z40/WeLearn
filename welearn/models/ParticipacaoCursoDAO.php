@@ -104,6 +104,61 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @param WeLearn_Cursos_Conteudo_Modulo $modulo
+     * @return WeLearn_Cursos_Conteudo_ControleModulo
+     */
+    public function acessarModulo(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso,
+                                  WeLearn_Cursos_Conteudo_Modulo $modulo)
+    {
+        $novoControleModulo = $this->criarNovoControleModulo();
+
+        $novoControleModulo->setParticipacaoCurso( $participacaoCurso );
+
+        $novoControleModulo->setModulo( $modulo );
+
+        $novoControleModulo->acessar();
+
+        $this->salvarControleModulo( $novoControleModulo );
+
+        return $novoControleModulo;
+    }
+
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @param WeLearn_Cursos_Conteudo_Modulo $modulo
+     * @return WeLearn_Cursos_Conteudo_ControleModulo
+     */
+    public function finalizarModulo(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso,
+                                  WeLearn_Cursos_Conteudo_Modulo $modulo)
+    {
+        $controleModulo = $this->recuperarControleModulo( $modulo, $participacaoCurso );
+
+        $controleModulo->finalizar();
+
+        $this->salvarControleModulo( $controleModulo );
+
+        return $controleModulo;
+    }
+
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @param WeLearn_Cursos_Conteudo_Modulo $modulo
+     * @return WeLearn_Cursos_Conteudo_ControleModulo
+     */
+    public function bloquearModulo(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso,
+                                  WeLearn_Cursos_Conteudo_Modulo $modulo)
+    {
+        $controleModulo = $this->recuperarControleModulo( $modulo, $participacaoCurso );
+
+        $controleModulo->bloquear();
+
+        $this->salvarControleModulo( $controleModulo );
+
+        return $controleModulo;
+    }
+
+    /**
      * @param WeLearn_Cursos_Conteudo_Modulo $modulo
      * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
      * @return WeLearn_Cursos_Conteudo_ControleModulo
@@ -172,6 +227,61 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
             $controleModulo->setPersistido( true );
 
         }
+    }
+
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @param WeLearn_Cursos_Conteudo_Aula $aula
+     * @return WeLearn_Cursos_Conteudo_ControleAula
+     */
+    public function acessarAula(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso,
+                                WeLearn_Cursos_Conteudo_Aula $aula)
+    {
+        $novoControleAula = $this->criarNovoControleAula();
+
+        $novoControleAula->setParticipacaoCurso( $participacaoCurso );
+
+        $novoControleAula->setAula( $aula );
+
+        $novoControleAula->acessar();
+
+        $this->salvarControleAula( $novoControleAula );
+
+        return $novoControleAula;
+    }
+
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @param WeLearn_Cursos_Conteudo_Aula $aula
+     * @return WeLearn_Cursos_Conteudo_ControleAula
+     */
+    public function finalizarAula(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso,
+                                WeLearn_Cursos_Conteudo_Aula $aula)
+    {
+        $controleAula = $this->recuperarControleAula( $aula, $participacaoCurso );
+
+        $controleAula->finalizar();
+
+        $this->salvarControleAula( $controleAula );
+
+        return $controleAula;
+    }
+
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @param WeLearn_Cursos_Conteudo_Aula $aula
+     * @return WeLearn_Cursos_Conteudo_ControleAula
+     */
+    public function bloquearAula(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso,
+                                WeLearn_Cursos_Conteudo_Aula $aula)
+    {
+        $controleAula = $this->recuperarControleAula( $aula, $participacaoCurso );
+
+        $controleAula->bloquear();
+
+        $this->salvarControleAula( $controleAula );
+
+        return $controleAula;
     }
 
     /**
@@ -246,6 +356,69 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @param WeLearn_Cursos_Conteudo_Pagina $pagina
+     * @return WeLearn_Cursos_Conteudo_ControlePagina
+     */
+    public function acessarPagina(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso,
+                                  WeLearn_Cursos_Conteudo_Pagina $pagina)
+    {
+        $novoControlePagina = $this->criarNovoControlePagina();
+
+        $novoControlePagina->setParticipacaoCurso( $participacaoCurso );
+
+        $novoControlePagina->setPagina( $pagina );
+
+        $novoControlePagina->acessar();
+
+        $this->salvarControlePagina( $novoControlePagina );
+
+        $participacaoCurso->setPaginaAtual( $pagina );
+
+        $this->salvar( $participacaoCurso );
+
+        return $novoControlePagina;
+    }
+
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @param WeLearn_Cursos_Conteudo_Pagina $pagina
+     * @param float $tempoVisualizacao
+     * @return WeLearn_Cursos_Conteudo_ControlePagina
+     */
+    public function finalizarPagina(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso,
+                                    WeLearn_Cursos_Conteudo_Pagina $pagina,
+                                    $tempoVisualizacao = 0)
+    {
+        $controlePagina = $this->recuperarControlePagina( $pagina, $participacaoCurso );
+
+        $controlePagina->setTempoVisualizacao( $tempoVisualizacao );
+
+        $controlePagina->finalizar();
+
+        $this->salvarControlePagina( $controlePagina );
+
+        return $controlePagina;
+    }
+
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @param WeLearn_Cursos_Conteudo_Pagina $pagina
+     * @return WeLearn_Cursos_Conteudo_ControlePagina
+     */
+    public function bloquearPagina(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso,
+                                  WeLearn_Cursos_Conteudo_Pagina $pagina)
+    {
+        $controlePagina = $this->recuperarControlePagina( $pagina, $participacaoCurso );
+
+        $controlePagina->bloquear();
+
+        $this->salvarControlePagina( $controlePagina );
+
+        return $controlePagina;
+    }
+
+    /**
      * @param WeLearn_Cursos_Conteudo_Pagina $pagina
      * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
      * @return WeLearn_Cursos_Conteudo_ControlePagina
@@ -254,7 +427,7 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
                                             WeLearn_Cursos_ParticipacaoCurso $participacaoCurso)
     {
         $CFKey = $this->getCFKey( $participacaoCurso );
-        $paginaUUID = UUID::import( $pagina )->bytes;
+        $paginaUUID = UUID::import( $pagina->getId() )->bytes;
 
         $column = $this->_controlePaginaCF->get( $CFKey, array( $paginaUUID ) );
 

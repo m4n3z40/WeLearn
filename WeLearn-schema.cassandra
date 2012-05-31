@@ -125,31 +125,31 @@ and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'UTF8Type';
 
-create column family convites_convite_cadastrado
+create column family convites_amizade
 with comparator = 'UTF8Type'
 and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
-create column family convites_convite_cadastrado_por_remetente
+create column family convites_amizade_enviados
 with comparator = 'UTF8Type'
 and column_type = 'Standard'
 and default_validation_class = 'TimeUUIDType'
 and key_validation_class = 'UTF8Type';
 
-create column family convites_convite_cadastrado_por_destinatario
+create column family convites_amizade_recebidos
 with comparator = 'UTF8Type'
 and column_type = 'Standard'
 and default_validation_class = 'TimeUUIDType'
 and key_validation_class = 'UTF8Type';
 
-create column family convites_convite_cadastrado_por_remetente_por_data
+create column family convites_amizade_enviados_por_data
 with comparator = 'TimeUUIDType'
 and column_type = 'Standard'
 and default_validation_class = 'TimeUUIDType'
 and key_validation_class = 'UTF8Type';
 
-create column family convites_convite_cadastrado_por_destinatario_por_data
+create column family convites_amizade_recebidos_por_data
 with comparator = 'TimeUUIDType'
 and column_type = 'Standard'
 and default_validation_class = 'TimeUUIDType'

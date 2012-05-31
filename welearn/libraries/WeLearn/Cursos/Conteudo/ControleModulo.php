@@ -78,7 +78,7 @@ class WeLearn_Cursos_Conteudo_ControleModulo extends WeLearn_DTO_AbstractDTO
      */
     public function acessar()
     {
-        //@TODO: Implementar este método!!
+        $this->setStatus( WeLearn_Cursos_Conteudo_StatusConteudo::ACESSANDO );
     }
 
     /**
@@ -86,7 +86,7 @@ class WeLearn_Cursos_Conteudo_ControleModulo extends WeLearn_DTO_AbstractDTO
      */
     public function bloquear()
     {
-        //@TODO: Implementar este método!!
+        $this->setStatus( WeLearn_Cursos_Conteudo_StatusConteudo::BLOQUEADO );
     }
 
     /**
@@ -94,7 +94,7 @@ class WeLearn_Cursos_Conteudo_ControleModulo extends WeLearn_DTO_AbstractDTO
      */
     public function finalizar()
     {
-        //@TODO: Implementar este método!!
+        $this->setStatus( WeLearn_Cursos_Conteudo_StatusConteudo::FINALIZADO );
     }
 
     /**

@@ -7,7 +7,9 @@
         <p>Clique abaixo para iniciar a visualização da ultima aula em que parou!</p>
     </header>
     <div>
-    <?php if ( $paginaAtual instanceof WeLearn_Cursos_Conteudo_Pagina ): ?>
+    <?php if (!$conteudoAberto): ?>
+        <h3>O conteúdo deste curso está bloqueado para os alunos, notifique os gerenciadores.</h3>
+    <?php elseif ( $paginaAtual instanceof WeLearn_Cursos_Conteudo_Pagina ): ?>
         <div id="div-visualizacao-conteudo-janela-aula"
              style="display: none;"
              title="Sala de Aula :: <?php echo $moduloAtual->curso->nome ?>">

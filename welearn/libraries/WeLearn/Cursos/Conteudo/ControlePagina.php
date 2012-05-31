@@ -31,27 +31,6 @@ class WeLearn_Cursos_Conteudo_ControlePagina extends WeLearn_DTO_AbstractDTO
     private $_status;
 
     /**
-     * @param int $tempoVisualizacao
-     * @param null|WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
-     * @param null|WeLearn_Cursos_Conteudo_Pagina $pagina
-     * @param int $status
-     */
-    public function __construct($tempoVisualizacao = 0,
-                                WeLearn_Cursos_ParticipacaoCurso $participacaoCurso = null,
-                                WeLearn_Cursos_Conteudo_Pagina $pagina = null,
-                                $status = WeLearn_Cursos_Conteudo_StatusConteudo::BLOQUEADO)
-    {
-        $dados = array(
-            'tempoVisualizacao' => $tempoVisualizacao,
-            'participacaoCurso' => $participacaoCurso,
-            'pagina' => $pagina,
-            'status' => $status
-        );
-
-        parent::__construct($dados);
-    }
-
-    /**
      * @param \WeLearn_Cursos_Conteudo_Pagina $pagina
      */
     public function setPagina(WeLearn_Cursos_Conteudo_Pagina $pagina)
@@ -120,7 +99,7 @@ class WeLearn_Cursos_Conteudo_ControlePagina extends WeLearn_DTO_AbstractDTO
      */
     public function acessar()
     {
-        //@TODO: Implementar este método!!
+        $this->setStatus( WeLearn_Cursos_Conteudo_StatusConteudo::ACESSANDO );
     }
 
     /**
@@ -128,7 +107,7 @@ class WeLearn_Cursos_Conteudo_ControlePagina extends WeLearn_DTO_AbstractDTO
      */
     public function bloquear()
     {
-        //@TODO: Implementar este método!!
+        $this->setStatus( WeLearn_Cursos_Conteudo_StatusConteudo::BLOQUEADO );
     }
 
     /**
@@ -136,23 +115,7 @@ class WeLearn_Cursos_Conteudo_ControlePagina extends WeLearn_DTO_AbstractDTO
      */
     public function finalizar()
     {
-        //@TODO: Implementar este método!!
-    }
-
-    /**
-     * @return void
-     */
-    public function registrarInicioVisualizacao()
-    {
-        //@TODO: Implementar este método!!
-    }
-
-    /**
-     * @return void
-     */
-    public function registrarFimVisualizacao()
-    {
-        //@TODO: Implementar este método!!
+        $this->setStatus( WeLearn_Cursos_Conteudo_StatusConteudo::ACESSADO );
     }
 
     /**

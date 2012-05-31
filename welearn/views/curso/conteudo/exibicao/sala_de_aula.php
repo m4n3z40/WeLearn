@@ -5,9 +5,16 @@
      data-id-pagina="<?php echo $idPagina ?>">
     <div id="main-section-container">
         <section id="section-container-iframe">
-            <iframe src="<?php echo site_url('/curso/conteudo/exibicao/exibir') ?>"
+            <iframe src="<?php echo $srcIframeConteudo ?>"
                     frameborder="0"
                     id="iframe-exibicao-pagina"></iframe>
+            <nav>
+                <ul>
+                    <li><a href="#" id="a-nav-exibicao-inicio-aula">Início da Aula</a></li>
+                    <li><a href="#" id="a-nav-exibicao-pagina-anterior">Página Anterior</a></li>
+                    <li><a href="#" id="a-nav-exibicao-proxima-pagina">Proxima Página</a></li>
+                </ul>
+            </nav>
         </section>
         <section id="section-container-anotacao">
             <?php echo $htmlSectionAnotacao ?>

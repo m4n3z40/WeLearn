@@ -71,7 +71,7 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
         $cursoUUID = CassandraUtil::import(
             $dto->getAula()->getModulo()->getCurso()->getId()
         );
-        $this->_contadorCF->add($this->_nomeContador, $cursoUUID->bytes);
+        $this->_contadorCF->add($this->_keyContador, $cursoUUID->bytes);
 
         $dto->setPersistido(true);
     }
@@ -148,6 +148,46 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param WeLearn_Cursos_Conteudo_Aula $daAula
+     * @param string $idAnterior
+     * @return bool|WeLearn_Cursos_Conteudo_Pagina
+     */
+    public function recuperarProxima(WeLearn_Cursos_Conteudo_Aula $daAula, $idAnterior = '')
+    {
+        try {
+
+            if ( $idAnterior != '' ) {
+
+                $idAnterior = UUID::import( $idAnterior )->bytes;
+
+                $count = 2;
+
+            } else {
+
+                $count = 1;
+
+            }
+
+            $paginaAtual = $this->recuperarTodosPorAula(
+                $daAula,
+                $idAnterior,
+                '',
+                $count
+            );
+
+            $key = $count - 1;
+
+            return isset( $paginaAtual[ $key ] ) ? $paginaAtual[ $key ] : false;
+
+        } catch (cassandra_NotFoundException $e) {
+
+            return false;
+
+        }
+    }
+
+
+    /**
      * @param mixed $de
      * @param mixed $ate
      * @return int
@@ -181,7 +221,7 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
         $cursoUUID = CassandraUtil::import( $curso->getId() );
 
         try {
-            $column = $this->_contadorCF->get($this->_nomeContador, array($cursoUUID->bytes));
+            $column = $this->_contadorCF->get($this->_keyContador, array($cursoUUID->bytes));
             $totalPaginas = $column[ $cursoUUID->bytes ];
         } catch (cassandra_NotFoundException $e) {
             $totalPaginas = 0;
@@ -240,7 +280,7 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
         $cursoUUID = CassandraUtil::import(
             $paginaRemovida->getAula()->getModulo()->getCurso()->getId()
         );
-        $this->_contadorCF->add($this->_nomeContador, $cursoUUID->bytes, -1);
+        $this->_contadorCF->add($this->_keyContador, $cursoUUID->bytes, -1);
 
         $paginaRemovida->setPersistido(false);
 
