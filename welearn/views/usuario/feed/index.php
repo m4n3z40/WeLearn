@@ -3,7 +3,7 @@
     <h1>Compartilhe Algo Com Seus Amigos</h1>
     <?=$criarFeed?>
     <hr>
-    <h1>Feeds Recentes</h1>
+    <h1>Publicações Recentes</h1>
         <ul id='feed-lista-feeds'>
             <?=$listarFeed?>
         </ul>
@@ -16,7 +16,7 @@
             </footer>
         <?php else:?>
             <h4>
-                Voce não possui nenhum feed para exibição!
+                Não Existem Novas Publicações Para Exibição!
             </h4>
         <?php endif;?>
 </div>

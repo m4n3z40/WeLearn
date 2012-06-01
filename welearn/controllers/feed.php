@@ -314,23 +314,11 @@ class Feed extends Home_Controller
                 'falha ao remover timeline id feed '.$idFeed.'id usuario '.$idUsuario
             );
 
-            $error = create_json_feedback_error_json(
-                'Falha ao remover timeline.'
+            $json=Zend_Json::encode(
+                array( 'success' => false ,
+                    'notificacao'=> create_notificacao_array( 'erro','O feed selecionado já foi removido!'))
             );
-            if($idUsuario == $this->autenticacao->getUsuarioAutenticado()->getId())
-            {
-                $json=Zend_Json::encode(array( 'success' => false , 'notificacao'=> create_notificacao_array(
-                    'erro',
-                    'O feed selecionado já foi removido pelo remetente!'
-                )
-                ));
-            }else{
-                $json=Zend_Json::encode(array( 'success' => false , 'notificacao'=> create_notificacao_array(
-                    'erro',
-                    'O feed selecionado já foi removido pelo destintario!'
-                )
-                ));
-            }
+
 
         }
         echo $json;

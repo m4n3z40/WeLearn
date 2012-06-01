@@ -1,6 +1,6 @@
 <div>
     <?foreach ( $feeds_usuario as $row):?>
-        <li>
+    <li>
         <?=$row->getCriador()->toHTML('imagem_pequena')?>
         <?php
         switch ($row->getTipo()) {
@@ -24,16 +24,16 @@
                 echo '<div>'.$row->conteudo.'</div>';
                 break;
         }
-            ?>
-            <?=date('d/m/Y à\s H:i',$row->dataEnvio)?>
-            <?php
-                if($usuarioAutenticado->id == $row->criador->id){
-                    echo anchor('feed/remover_feed/'.$row->id,'remover',array('id' => 'remover-feed'));
-                  }
-            ?>
+        ?>
+        <?=date('d/m/Y à\s H:i',$row->dataEnvio)?>
+        <?php
+            if($usuarioAutenticado == $usuarioPerfil || $row->criador->id == $usuarioAutenticado->id){
+                echo anchor('feed/remover_timeline/'.$row->id.'/'.$usuarioPerfil->id,'remover',array('id' => 'remover-timeline'));
+            }
+        ?>
 
-            <hr>
-        </li>
+        <hr>
+    </li>
 
     <?endforeach;?>
 </div>
