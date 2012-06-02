@@ -4,7 +4,7 @@
     <h3>Amigos</h3>
     <ul>
     <?foreach ($listaRandonicaAmigos as $row):?>
-        <li><?=$row->toHTML('imagem_pequena')?></li>
+        <li><?=$row->toHTML('imagem_mini')?></li>
     <?endforeach;?>
     </ul>
 </div>

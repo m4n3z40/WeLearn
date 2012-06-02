@@ -1,7 +1,6 @@
 
 <section id="perfil-left-bar" class="inner-sidebar-container inner-sidebar-container-left">
     <nav>
-        <h3>perfil</h3>
         <header>
             <figure>
                 <figcaption>

@@ -154,13 +154,13 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
     }
 
 
-
+    //so ira salvar no timeline cf do dono do perfil, no perfil da pessoa vao aparecer todos as publicaçoes que ela recebeu e ela poderá excluir todas
+    //ao receber uma nova publicação no seu perfil sera gerada uma notificação para o dono do perfil, que ira direcionar para a nova notificação recebida
     protected function _adicionarTimeline(WeLearn_DTO_IDTO &$dto, WeLearn_DTO_IDTO &$usuario)
     {
         $UUID = UUID::mint();
         $dto->setId($UUID->string);
         $this->_cf->insert($UUID->bytes,$dto->toCassandra());
-        $this->_FeedCF->insert($usuario->getId(),array($UUID->bytes=>''));
         $this->_TimelineCF->insert($usuario->getId(),array($UUID->bytes => ''));
     }
 
@@ -168,7 +168,6 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
     {
         $idFeed= CassandraUtil::import($dto->getId())->bytes;
         $this->_cf->remove($idFeed);
-        $this->_FeedCF->remove($usuario->getId(),array($idFeed));
         $this->_TimelineCF->remove($usuario->getId(),array($idFeed));
     }
 

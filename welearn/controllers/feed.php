@@ -314,31 +314,20 @@ class Feed extends Home_Controller
                 'falha ao remover timeline id feed '.$idFeed.'id usuario '.$idUsuario
             );
 
-            $error = create_json_feedback_error_json(
-                'Falha ao remover timeline.'
+            $json=Zend_Json::encode(
+                array( 'success' => false ,
+                    'notificacao'=> create_notificacao_array( 'erro','O feed selecionado já foi removido!'))
             );
-            if($idUsuario == $this->autenticacao->getUsuarioAutenticado()->getId())
-            {
-                $json=Zend_Json::encode(array( 'success' => false , 'notificacao'=> create_notificacao_array(
-                    'erro',
-                    'O feed selecionado já foi removido pelo remetente!'
-                )
-                ));
-            }else{
-                $json=Zend_Json::encode(array( 'success' => false , 'notificacao'=> create_notificacao_array(
-                    'erro',
-                    'O feed selecionado já foi removido pelo destintario!'
-                )
-                ));
-            }
+
 
         }
         echo $json;
     }
 
-    public function validar_descricao($str)
+    public function validar_descricao($descricao)
     {
-        if (is_null($str))
+        $descricao = trim($descricao);
+        if (empty($descricao))
         {
             $this->form_validation->set_message('validar_descricao', 'The %s field is required');
             return FALSE;
@@ -361,6 +350,12 @@ class Feed extends Home_Controller
     private function validar_url()
     {
         $url = $this->input->post('conteudo-feed');
+        $http = strpos($url,"http://");
+        if($http == false){
+            $search = 'www';
+            $replace = 'http://www';
+            $url = str_replace($search, $replace, $url);
+        }
         if(filter_var($url, FILTER_VALIDATE_URL) === FALSE) {
             return false;
         } else {

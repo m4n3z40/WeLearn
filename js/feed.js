@@ -11,20 +11,24 @@ $("input[name='tipo-feed']").change(
     {
         if($(this).val()==0)
         {
+            $('#conteudo-feed').attr({placeholder:'Entre com o status'});
             $('#descricao-feed').fadeOut();
         }
         if($(this).val()==1)
         {
-            $('#descricao-feed').attr({placeholder:'Descreva O Seu Link'});
+            $('#conteudo-feed').attr({placeholder:'Entre com o Link'});
+            $('#descricao-feed').attr({placeholder:'Descreva Seu Link'});
             $('#descricao-feed').fadeIn();
         }
         if($(this).val()==2)
         {
+            $('#conteudo-feed').attr({placeholder:'Entre com o Link da Imagem'});
             $('#descricao-feed').attr({placeholder:'Descreva Sua Imagem'});
             $('#descricao-feed').fadeIn();
         }
         if($(this).val()==3)
         {
+            $('#conteudo-feed').attr({placeholder:'Entre com o Link do Video'});
             $('#descricao-feed').attr({placeholder:'Descreva Seu Video'});
             $('#descricao-feed').fadeIn();
         }
