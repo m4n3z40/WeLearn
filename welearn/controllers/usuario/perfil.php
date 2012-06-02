@@ -31,12 +31,12 @@ class Perfil extends Perfil_Controller {
         }
 
 
-        $feeds_usuario = $this->carregarFeeds('','',$usuarioPerfil,$this->_count);
+        $feeds_usuario = $this->carregarTimeLine('','',$usuarioPerfil,$this->_count);
         $this->load->helper('paginacao_cassandra');
         $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
 
-        $partialListarFeed= $this->template->loadPartial(
-            'lista',
+        $partialListarTimeline= $this->template->loadPartial(
+            'lista_timeline',
             array('feeds_usuario' => $feeds_usuario,
                 'usuarioAutenticado' => $usuarioAutenticado,
                 'usuarioPerfil' => $usuarioPerfil,
@@ -54,7 +54,7 @@ class Perfil extends Perfil_Controller {
             'usuario/feed'
         );
 
-        $dados=array('usuarioPerfil' => $usuarioPerfil,'usuarioAutenticado' => $usuarioAutenticado, 'criarFeed' => $partialCriarFeed, 'listarFeed' => $partialListarFeed);
+        $dados=array('usuarioPerfil' => $usuarioPerfil,'usuarioAutenticado' => $usuarioAutenticado, 'criarFeed' => $partialCriarFeed, 'listarTimeline' => $partialListarTimeline);
 
 
         if($usuarioPerfil->getId() != $usuarioAutenticado->getId() )
@@ -72,7 +72,7 @@ class Perfil extends Perfil_Controller {
 
 
         }
-        $this->_renderTemplatePerfil('usuario/feed/index',$dados);
+        $this->_renderTemplatePerfil('usuario/feed/exibir_timeline',$dados);
     }
 
 
@@ -85,17 +85,18 @@ class Perfil extends Perfil_Controller {
 
             $usuarioPerfil = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($usuarioPerfil);
             $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
-            $feeds_usuario = $this->carregarFeeds($inicio,'',$usuarioPerfil,$this->_count);
+            $feeds_usuario = $this->carregarTimeLine($inicio,'',$usuarioPerfil,$this->_count);
             $this->load->helper('paginacao_cassandra');
             $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
 
             $response = array(
                 'success' => true,
                 'htmlListaFeeds' => $this->template->loadPartial(
-                    'lista',
+                    'lista_timeline',
                     array(
                         'feeds_usuario' => $feeds_usuario,
                         'usuarioAutenticado' => $usuarioAutenticado,
+                        'usuarioPerfil' => $usuarioPerfil,
                         'paginacao' => $dadosPaginados
                     ),
                     'usuario/feed'
@@ -124,7 +125,7 @@ Tente novamente mais tarde.'
 
     }
 
-    private function carregarFeeds($de='',$ate='',$usuarioPerfil,$count)
+    private function carregarTimeLine($de='',$ate='',$usuarioPerfil,$count)
     {
         $this->load->library('autoembed');
         try{

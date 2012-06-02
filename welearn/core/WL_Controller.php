@@ -443,6 +443,29 @@ class Perfil_Controller extends WL_Controller
 
     public function _renderTemplatePerfil( $view = '', $dados = null )
     {
+        try{
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+            $usuarioPerfil = $usuarioDao->recuperar($dados['usuarioPerfil']->getId());
+            $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+
+            $listaRandonicaAmigos = $amizadeUsuarioDao->recuperarAmigosAleatorios(
+                $usuarioPerfil,
+                10
+            );
+
+        }catch(cassandra_NotFoundException $e){
+
+            $listaRandonicaAmigos = null;
+
+        }
+
+        $widgets = array();
+        $widgets[] = $this->template->loadPartial(
+            'widget_amigos',
+            array('listaRandonicaAmigos' => $listaRandonicaAmigos),
+            'usuario/amigos'
+        );
+
         $this->_setTemplate( 'perfil' )
              ->_setBarraUsuarioPath('perfil/barra_usuario')
              ->_setBarraEsquerdaPath( 'perfil/barra_lateral_esquerda' )
@@ -450,10 +473,10 @@ class Perfil_Controller extends WL_Controller
 
              ->_barraEsquerdaSetVar( 'usuario', $dados )
 
-             ->_barraDireitaSetVar( 'imagem', 'implementar imagem' )
-             ->_barraDireitaSetVar( 'amigos','implementar amigos' )
-             ->_barraDireitaSetVar( 'cursos', 'implementar cursos' )
-
+            ->_barraDireitaSetVar(
+            'widgetsContexto',
+            $widgets
+        )
              ->_renderTemplate($view, $dados);
     }
 }
