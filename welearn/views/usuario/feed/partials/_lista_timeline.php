@@ -12,7 +12,7 @@
             case WeLearn_Compartilhamento_TipoFeed::LINK:
                 echo "compartilhou um link:";
                 echo '<div>'.$row->descricao.'</div>';
-                echo '<a href="http://'.$row->conteudo.'"TARGET="_blank">'.$row->conteudo.'</a>';
+                echo '<a href="'.prep_url($row->conteudo).'"TARGET="_blank">'.$row->conteudo.'</a>';
                 break;
             case WeLearn_Compartilhamento_TipoFeed::VIDEO:
                 echo "compartilhou um video:";
@@ -25,7 +25,7 @@
                 break;
         }
         ?>
-        <?=date('d/m/Y à\s H:i',$row->dataEnvio)?>
+        <div id="feed-data"><?=date('d/m/Y à\s H:i',$row->dataEnvio)?></div>
         <?php
             if($usuarioAutenticado == $usuarioPerfil || $row->criador->id == $usuarioAutenticado->id){
                 echo anchor('feed/remover_timeline/'.$row->id.'/'.$usuarioPerfil->id,'remover',array('id' => 'remover-timeline'));

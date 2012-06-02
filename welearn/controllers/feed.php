@@ -324,9 +324,10 @@ class Feed extends Home_Controller
         echo $json;
     }
 
-    public function validar_descricao($str)
+    public function validar_descricao($descricao)
     {
-        if (is_null($str))
+        $descricao = trim($descricao);
+        if (empty($descricao))
         {
             $this->form_validation->set_message('validar_descricao', 'The %s field is required');
             return FALSE;
@@ -349,6 +350,12 @@ class Feed extends Home_Controller
     private function validar_url()
     {
         $url = $this->input->post('conteudo-feed');
+        $http = strpos($url,"http://");
+        if($http == false){
+            $search = 'www';
+            $replace = 'http://www';
+            $url = str_replace($search, $replace, $url);
+        }
         if(filter_var($url, FILTER_VALIDATE_URL) === FALSE) {
             return false;
         } else {

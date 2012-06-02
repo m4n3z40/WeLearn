@@ -8,6 +8,6 @@
         <?= form_radio('tipo-feed',WeLearn_Compartilhamento_TipoFeed::VIDEO,false,'id = "feed-video"')?><label for="feed-video">Video</label>
     </div>
     <?=form_textarea( array('name' => 'descricao-feed', 'id' => 'descricao-feed', 'rows' => '1' , 'cols' => '50','style' => 'display:none'))?>
-    <?=form_textarea( array('name' => 'conteudo-feed' , 'id' => 'conteudo-feed', 'rows' => '1' ,'cols' =>'50'))?>
+    <?=form_textarea( array('name' => 'conteudo-feed' , 'id' => 'conteudo-feed', 'rows' => '1' ,'cols' =>'50','placeholder' => 'Entre com o status'))?>
     <?=form_submit(array('name' => 'feed-submit' , 'id' => 'feed-submit' , 'value' => 'Enviar'))?>
 <?=form_close();?>
