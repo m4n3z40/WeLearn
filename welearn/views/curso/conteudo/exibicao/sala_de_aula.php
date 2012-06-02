@@ -1,8 +1,10 @@
 <div id="exibicao-conteudo-saladeaula"
+     data-tipo-conteudo="<?php echo $tipoConteudo ?>"
      data-id-curso="<?php echo $idCurso ?>"
      data-id-modulo="<?php echo $idModulo ?>"
      data-id-aula="<?php echo $idAula ?>"
-     data-id-pagina="<?php echo $idPagina ?>">
+     data-id-pagina="<?php echo $idPagina ?>"
+     data-id-avaliacao="<?php echo $idAvaliacao ?>">
     <div id="main-section-container">
         <section id="section-container-iframe">
             <iframe src="<?php echo $srcIframeConteudo ?>"

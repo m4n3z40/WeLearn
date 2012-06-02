@@ -144,6 +144,11 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
         return $this->_criarFromCassandra( $column );
     }
 
+    /**
+     * @param WeLearn_Cursos_Curso $doCurso
+     * @param string $idAnterior
+     * @return ModuloDAO
+     */
     public function recuperarProximo(WeLearn_Cursos_Curso $doCurso, $idAnterior = '')
     {
         try {
