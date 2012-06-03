@@ -24,6 +24,7 @@
         modal: true,
         resizable: false,
         draggable: false,
+        title:'Enviar Convite',
         width: 400,
         height: 200,
         buttons:{
@@ -71,7 +72,7 @@
     {
 
         var containerConvite = $('<form action="'+WeLearn.url.siteURL('convite/aceitar')+'" method="post" accept-charset="utf-8" id="form-criar-mensagem">'+
-                                 'você enviou uma solicitação de amizade para '+$('#id-usuario-perfil').val()+
+                                 'você enviou uma solicitação de amizade para '+$('#nome-usuario-perfil').val()+
                                 '</form>');
 
 
@@ -82,6 +83,7 @@
                 modal: true,
             draggable: false,
             resizable: false,
+            title: 'Convite Pendente',
             width: 400,
             height: 170,
             buttons: {
@@ -106,7 +108,7 @@
     else if(param == 'recebido')
     {
         var containerConvite = $('<form action="'+WeLearn.url.siteURL('convite/recusar')+'" method="post" accept-charset="utf-8" id="form-criar-mensagem">'+
-                                    'você recebeu uma solicitação de amizade de '+$('#id-usuario-perfil').val()+
+                                    'você recebeu uma solicitação de amizade de '+$('#nome-usuario-perfil').val()+
                                 '</form>');
 
         containerConvite.dialog(
@@ -115,6 +117,7 @@
                 modal: true,
                 draggable: false,
                 resizable: false,
+                title: 'Convite Pendente',
                 width: 400,
                 height: 170,
                 buttons: {
@@ -213,7 +216,7 @@
                 modal: true,
                 draggable: false,
                 resizable: false,
-                title:'Enviar Mensagem',
+                title:'Remover Amizade',
                 width: 400,
                 height: 200,
                 buttons: {

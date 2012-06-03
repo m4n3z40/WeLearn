@@ -278,7 +278,7 @@ class Home_Controller extends WL_Controller
         $widgets = array();
         $widgets[] = $this->template->loadPartial(
             'widget_amigos',
-            array('listaRandonicaAmigos' => $listaRandonicaAmigos),
+            array('legenda' => 'Meus Amigos','listaRandonicaAmigos' => $listaRandonicaAmigos),
             'usuario/amigos'
         );
 
@@ -462,7 +462,7 @@ class Perfil_Controller extends WL_Controller
         $widgets = array();
         $widgets[] = $this->template->loadPartial(
             'widget_amigos',
-            array('listaRandonicaAmigos' => $listaRandonicaAmigos),
+            array('legenda' =>'Amigos de '.$usuarioPerfil->getNome(),'listaRandonicaAmigos' => $listaRandonicaAmigos),
             'usuario/amigos'
         );
 

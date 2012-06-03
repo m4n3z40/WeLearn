@@ -17,19 +17,19 @@ $("input[name='tipo-feed']").change(
         if($(this).val()==1)
         {
             $('#conteudo-feed').attr({placeholder:'Entre com o Link'});
-            $('#descricao-feed').attr({placeholder:'Descreva Seu Link'});
+            $('#descricao-feed').attr({placeholder:'Descreva seu Link'});
             $('#descricao-feed').fadeIn();
         }
         if($(this).val()==2)
         {
             $('#conteudo-feed').attr({placeholder:'Entre com o Link da Imagem'});
-            $('#descricao-feed').attr({placeholder:'Descreva Sua Imagem'});
+            $('#descricao-feed').attr({placeholder:'Descreva sua Imagem'});
             $('#descricao-feed').fadeIn();
         }
         if($(this).val()==3)
         {
             $('#conteudo-feed').attr({placeholder:'Entre com o Link do Video'});
-            $('#descricao-feed').attr({placeholder:'Descreva Seu Video'});
+            $('#descricao-feed').attr({placeholder:'Descreva seu Video'});
             $('#descricao-feed').fadeIn();
         }
     }
@@ -42,9 +42,7 @@ $('#feed-submit').click(function(e){
     var form = document.getElementById('form-criar-feed'),
     url = $(form).attr('action');
     WeLearn.validarForm(form,url,function(res){
-
-            location.reload()
-
+        window.location.reload();
     });
 });
 
