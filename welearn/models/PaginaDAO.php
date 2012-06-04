@@ -97,7 +97,7 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
     {
         $count = ( isset( $filtros['count'] ) )
                    ? $filtros['count']
-                   : PaginaDAO::MAX_PAGINAS;
+                   : self::MAX_PAGINAS;
 
         if ( isset( $filtros['aula'] ) ) {
             return $this->recuperarTodosPorAula($filtros['aula'], $de, $ate, $count);
@@ -111,12 +111,14 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
      * @param string $de
      * @param string $ate
      * @param int $count
-     * @return array(WeLearn_Cursos_Conteudo_Pagina)
+     * @param bool $invertido
+     * @return array
      */
     public function recuperarTodosPorAula(WeLearn_Cursos_Conteudo_Aula $aula,
                                           $de = '',
                                           $ate = '',
-                                          $count = PaginaDAO::MAX_PAGINAS)
+                                          $count = self::MAX_PAGINAS,
+                                          $invertido = false)
     {
         $aulaUUID = CassandraUtil::import( $aula->getId() );
 
@@ -125,7 +127,7 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
             null,
             $de,
             $ate,
-            false,
+            $invertido,
             $count
         );
 
@@ -149,37 +151,51 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
 
     /**
      * @param WeLearn_Cursos_Conteudo_Aula $daAula
-     * @param string $idAnterior
+     * @param int $nroOrdem
+     * @return WeLearn_Cursos_Conteudo_Pagina
+     */
+    public function recuperarPorOrdem(WeLearn_Cursos_Conteudo_Aula $daAula, $nroOrdem)
+    {
+        $aulaUUID = UUID::import( $daAula->getId() )->bytes;
+
+        $idPagina = $this->_paginaPorAulaCF->get( $aulaUUID, array( (int)$nroOrdem ) );
+        $idPagina = $idPagina[ $nroOrdem ];
+
+        $column = $this->_cf->get( $idPagina );
+
+        return $this->_criarFromCassandra( $column, $daAula );
+    }
+
+    /**
+     * @param WeLearn_Cursos_Conteudo_Aula $daAula
+     * @param int $ordemAnterior
      * @return bool|WeLearn_Cursos_Conteudo_Pagina
      */
-    public function recuperarProxima(WeLearn_Cursos_Conteudo_Aula $daAula, $idAnterior = '')
+    public function recuperarProxima(WeLearn_Cursos_Conteudo_Aula $daAula, $ordemAnterior = 0)
     {
         try {
 
-            if ( $idAnterior != '' ) {
-
-                $idAnterior = UUID::import( $idAnterior )->bytes;
-
-                $count = 2;
-
-            } else {
-
-                $count = 1;
-
-            }
-
-            $paginaAtual = $this->recuperarTodosPorAula(
-                $daAula,
-                $idAnterior,
-                '',
-                $count
-            );
-
-            $key = $count - 1;
-
-            return isset( $paginaAtual[ $key ] ) ? $paginaAtual[ $key ] : false;
+            return $this->recuperarPorOrdem( $daAula, (int)$ordemAnterior + 1 );
 
         } catch (cassandra_NotFoundException $e) {
+
+            return false;
+
+        }
+    }
+
+    /**
+     * @param WeLearn_Cursos_Conteudo_Aula $daAula
+     * @param int $ordemAtual
+     * @return bool|WeLearn_Cursos_Conteudo_Pagina
+     */
+    public function recuperarAnterior(WeLearn_Cursos_Conteudo_Aula $daAula, $ordemAtual = self::MAX_PAGINAS) {
+
+        try {
+
+            return $this->recuperarPorOrdem( $daAula, (int)$ordemAtual - 1 );
+
+        } catch ( cassandra_NotFoundException $e ) {
 
             return false;
 

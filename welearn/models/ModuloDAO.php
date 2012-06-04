@@ -97,7 +97,7 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
         if ( isset($filtros['count']) ) {
             $count = (int) $filtros['count'];
         } else {
-            $count = ModuloDAO::MAX_MODULOS;
+            $count = self::MAX_MODULOS;
         }
 
         if ( isset($filtros['curso'] ) &&
@@ -118,12 +118,13 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
     public function recuperarTodosPorCurso(WeLearn_Cursos_Curso $curso,
                                            $de = '',
                                            $ate = '',
-                                           $count = ModuloDAO::MAX_MODULOS)
+                                           $count = self::MAX_MODULOS,
+                                           $invertido = false)
     {
         $cursoUUID = CassandraUtil::import( $curso->getId() );
 
         $modulosIds = $this->_moduloPorCursoCF->get(
-            $cursoUUID->bytes, null, $de, $ate, false, $count
+            $cursoUUID->bytes, null, $de, $ate, $invertido, $count
         );
 
         $columns = $this->_cf->multiget( $modulosIds );
@@ -146,37 +147,51 @@ class ModuloDAO extends WeLearn_DAO_AbstractDAO
 
     /**
      * @param WeLearn_Cursos_Curso $doCurso
-     * @param string $idAnterior
-     * @return ModuloDAO
+     * @param int $nroOrdem
+     * @return WeLearn_Cursos_Conteudo_Modulo
      */
-    public function recuperarProximo(WeLearn_Cursos_Curso $doCurso, $idAnterior = '')
+    public function recuperarPorOrdem(WeLearn_Cursos_Curso $doCurso, $nroOrdem)
+    {
+        $cursoUUID = UUID::import( $doCurso->getId() )->bytes;
+
+        $idModulo = $this->_moduloPorCursoCF->get( $cursoUUID, array( (int)$nroOrdem ) );
+        $idModulo = $idModulo[$nroOrdem];
+
+        $column = $this->_cf->get( $idModulo );
+
+        return $this->_criarFromCassandra( $column, $doCurso );
+    }
+
+    /**
+     * @param WeLearn_Cursos_Curso $doCurso
+     * @param int $ordemAnterior
+     * @return WeLearn_Cursos_Conteudo_Modulo
+     */
+    public function recuperarProximo(WeLearn_Cursos_Curso $doCurso, $ordemAnterior = 0)
     {
         try {
 
-            if ( $idAnterior != '' ) {
-
-                $idAnterior = UUID::import( $idAnterior )->bytes;
-
-                $count = 2;
-
-            } else {
-
-                $count = 1;
-
-            }
-
-            $moduloAtual = $this->recuperarTodosPorCurso(
-                $doCurso,
-                $idAnterior,
-                '',
-                $count
-            );
-
-            $key = $count - 1;
-
-            return isset( $moduloAtual[ $key ] ) ? $moduloAtual[ $key ] : false;
+            return $this->recuperarPorOrdem( $doCurso, (int)$ordemAnterior + 1 );
 
         } catch (cassandra_NotFoundException $e) {
+
+            return false;
+
+        }
+    }
+
+    /**
+     * @param WeLearn_Cursos_Curso $doCurso
+     * @param int $ordemAtual
+     * @return bool|WeLearn_Cursos_Conteudo_Modulo
+     */
+    public function recuperarAnterior(WeLearn_Cursos_Curso $doCurso, $ordemAtual = self::MAX_MODULOS)
+    {
+        try {
+
+            return $this->recuperarPorOrdem( $doCurso, (int)$ordemAtual - 1 );
+
+        } catch ( cassandra_NotFoundException $e ) {
 
             return false;
 

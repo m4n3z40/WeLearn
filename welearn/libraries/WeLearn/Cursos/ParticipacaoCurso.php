@@ -56,6 +56,16 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
     private $_tipoConteudoAtual = WeLearn_Cursos_Conteudo_TipoConteudo::NENHUM;
 
     /**
+     * @var WeLearn_Cursos_Conteudo_Modulo
+     */
+    private $_moduloAtual;
+
+    /**
+     * @var WeLearn_Cursos_Conteudo_Aula
+     */
+    private $_aulaAtual;
+
+    /**
      * @var WeLearn_Cursos_Conteudo_Pagina
      */
     private $_paginaAtual;
@@ -180,7 +190,7 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
     /**
      * @param \WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacaoAtual
      */
-    public function setAvaliacaoAtual(WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacaoAtual)
+    public function setAvaliacaoAtual(WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacaoAtual = null)
     {
         $this->_avaliacaoAtual = $avaliacaoAtual;
     }
@@ -210,9 +220,41 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
     }
 
     /**
+     * @param \WeLearn_Cursos_Conteudo_Modulo $moduloAtual
+     */
+    public function setModuloAtual(WeLearn_Cursos_Conteudo_Modulo $moduloAtual)
+    {
+        $this->_moduloAtual = $moduloAtual;
+    }
+
+    /**
+     * @return \WeLearn_Cursos_Conteudo_Modulo
+     */
+    public function getModuloAtual()
+    {
+        return $this->_moduloAtual;
+    }
+
+    /**
+     * @param \WeLearn_Cursos_Conteudo_Aula $aulaAtual
+     */
+    public function setAulaAtual(WeLearn_Cursos_Conteudo_Aula $aulaAtual = null)
+    {
+        $this->_aulaAtual = $aulaAtual;
+    }
+
+    /**
+     * @return \WeLearn_Cursos_Conteudo_Aula
+     */
+    public function getAulaAtual()
+    {
+        return $this->_aulaAtual;
+    }
+
+    /**
      * @param \WeLearn_Cursos_Conteudo_Pagina $paginaAtual
      */
-    public function setPaginaAtual(WeLearn_Cursos_Conteudo_Pagina $paginaAtual)
+    public function setPaginaAtual(WeLearn_Cursos_Conteudo_Pagina $paginaAtual = null)
     {
         $this->_paginaAtual = $paginaAtual;
     }
@@ -267,6 +309,8 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
             'certificado' => is_null($this->_certificado) ? '' : $this->getCertificado()->toArray(),
             'situacao' => $this->getSituacao(),
             'tipoConteudoAtual' => $this->getTipoConteudoAtual(),
+            'moduloAtual' => is_null($this->_moduloAtual) ? '' : $this->getModuloAtual()->toArray(),
+            'aulaAtual' => is_null($this->_aulaAtual) ? '' : $this->getAulaAtual()->toArray(),
             'paginaAtual' => is_null($this->_paginaAtual) ? '' : $this->getPaginaAtual()->toArray(),
             'avaliacaoAtual' => is_null($this->_avaliacaoAtual) ? '' : $this->getAvaliacaoAtual()->toArray(),
             'persistido' => $this->isPersistido()
@@ -293,8 +337,12 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
                              ? $this->getCertificado()->getId() : '',
             'situacao' => $this->getSituacao(),
             'tipoConteudoAtual' => $this->getTipoConteudoAtual(),
+            'moduloAtual' => ( $this->_moduloAtual instanceof WeLearn_Cursos_Conteudo_Modulo )
+                             ? $this->getModuloAtual()->getNroOrdem() : '',
+            'aulaAtual' => ( $this->_aulaAtual instanceof WeLearn_Cursos_Conteudo_Aula )
+                           ? $this->getAulaAtual()->getNroOrdem() : '',
             'paginaAtual' => ( $this->_paginaAtual instanceof WeLearn_Cursos_Conteudo_Pagina )
-                             ? $this->getPaginaAtual()->getId() : '',
+                             ? $this->getPaginaAtual()->getNroOrdem() : '',
             'avaliacaoAtual' => ( $this->_avaliacaoAtual instanceof WeLearn_Cursos_Avaliacoes_Avaliacao )
                                 ? $this->getAvaliacaoAtual()->getId() : ''
         );

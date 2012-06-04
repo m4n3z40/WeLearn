@@ -21,6 +21,16 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
     private $_avaliacaoDao;
 
     /**
+     * @var ModuloDAO
+     */
+    private $_moduloDao;
+
+    /**
+     * @var AulaDAO
+     */
+    private $_aulaDao;
+
+    /**
      * @var PaginaDAO
      */
     private $_paginaDao;
@@ -44,6 +54,8 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
     {
         $this->_certificadoDao = WeLearn_DAO_DAOFactory::create('CertificadoDAO');
         $this->_avaliacaoDao   = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO');
+        $this->_moduloDao      = WeLearn_DAO_DAOFactory::create('ModuloDAO');
+        $this->_aulaDao        = WeLearn_DAO_DAOFactory::create('AulaDAO');
         $this->_paginaDao      = WeLearn_DAO_DAOFactory::create('PaginaDAO');
     }
 
@@ -204,23 +216,104 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
     private function _criarFromCassadra(array $column, WeLearn_Usuarios_Aluno $aluno,
                                         WeLearn_Cursos_Curso $curso)
     {
-        if ( $column['paginaAtual'] ) {
+        if ( $column['moduloAtual'] ) {//Tenta recuperar modulo atual se houver;
 
-            $column['paginaAtual'] = $this->_paginaDao->recuperar( $column['paginaAtual'] );
+            try {
 
-        } else { unset( $column['paginaAtual'] ); }
+                $column['moduloAtual'] = $this->_moduloDao->recuperarPorOrdem(
+                    $curso,
+                    $column['moduloAtual']
+                );
+
+            } catch ( cassandra_NotFoundException $e ) { //caso contrário unseta essa chave do array para nao causar problemas na criação do objeto.
+
+                unset( $column['moduloAtual'] );
+
+            }
+
+        } else { //caso contrário unseta essa chave do array para nao causar problemas na criação do objeto.
+
+            unset( $column['moduloAtual'] );
+
+        }
+
+        if ( $column['aulaAtual'] && isset( $column['moduloAtual'] ) ) {//Tenta recuperar aula atual se houver, e se modulo foi encontrado;
+
+            try {
+
+                $column['aulaAtual'] = $this->_aulaDao->recuperarPorOrdem(
+                    $column['moduloAtual'],
+                    $column['aulaAtual']
+                );
+
+            } catch ( cassandra_NotFoundException $e ) {//caso contrário unseta essa chave do array para nao causar problemas na criação do objeto.
+
+                unset( $column['aulaAtual'] );
+
+            }
+
+        } else { //caso contrário unseta essa chave do array para nao causar problemas na criação do objeto.
+
+            unset( $column['aulaAtual'] );
+
+        }
+
+        if ( $column['paginaAtual'] && isset( $column['aulaAtual'] ) ) {//Tenta recuperar pagina atual se houver, e se a aula foi encontrada;
+
+            try {
+
+                $column['paginaAtual'] = $this->_paginaDao->recuperarPorOrdem(
+                    $column['aulaAtual'],
+                    $column['paginaAtual']
+                );
+
+            } catch (cassandra_NotFoundException $e) {//caso contrário unseta essa chave do array para nao causar problemas na criação do objeto.
+
+                unset( $column['paginaAtual'] );
+
+            }
+
+        } else { //caso contrário unseta essa chave do array para nao causar problemas na criação do objeto.
+
+            unset( $column['paginaAtual'] );
+
+        }
 
         if ( $column['avaliacaoAtual'] ) {
 
-            $column['avaliacaoAtual'] = $this->_avaliacaoDao->recuperar( $column['avaliacaoAtual'] );
+            try {
 
-        } else { unset( $column['avaliacaoAtual'] ); }
+                $column['avaliacaoAtual'] = $this->_avaliacaoDao->recuperar( $column['avaliacaoAtual'] );
+
+            } catch (cassandra_NotFoundException $e) {
+
+                $column['avaliacaoAtual'];
+
+            }
+
+        } else {
+
+            unset( $column['avaliacaoAtual'] );
+
+        }
 
         if ( $column['certificado'] ) {
 
-            $column['certificado'] = $this->_certificadoDao->recuperar( $column['certificado'] );
+            try {
 
-        } else { unset( $column['certificado'] ); }
+                $column['certificado'] = $this->_certificadoDao->recuperar( $column['certificado'] );
+
+            } catch ( cassandra_NotFoundException $e ) {
+
+                $column['certificado'];
+
+            }
+
+        } else {
+
+            unset( $column['certificado'] );
+
+        }
 
         $column['aluno'] = $aluno;
         $column['curso'] = $curso;

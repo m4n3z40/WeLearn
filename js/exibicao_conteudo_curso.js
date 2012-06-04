@@ -671,16 +671,50 @@
     $('#a-nav-exibicao-inicio-aula').click(function(e){
         e.preventDefault();
 
+
+        var $this = $(this),
+            idCurso = $wrapperSalaDeAula.data('id-curso'),
+            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/inicio_aula/' + idCurso);
+
+        $.get(
+            url,
+            {},
+            function(res) {
+                log(res);
+            }
+        );
     });
 
     $('#a-nav-exibicao-pagina-anterior').click(function(e){
         e.preventDefault();
 
+        var $this = $(this),
+            idCurso = $wrapperSalaDeAula.data('id-curso'),
+            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/acessar_anterior/' + idCurso);
+
+        $.get(
+            url,
+            {},
+            function(res) {
+                log(res);
+            }
+        );
     });
 
     $('#a-nav-exibicao-proxima-pagina').click(function(e){
         e.preventDefault();
 
+        var $this = $(this),
+            idCurso = $wrapperSalaDeAula.data('id-curso'),
+            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/acessar_proximo/' + idCurso);
+
+        $.get(
+            url,
+            {},
+            function(res) {
+                log(res);
+            }
+        );
     });
 
 })();

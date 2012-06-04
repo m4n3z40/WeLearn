@@ -463,9 +463,9 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
         $alt = $this->getNome() . ' ' . $this->getSobrenome();
 
         switch ( $tamanho ) {
-            case 'pequeno':
+            case 'mini':
                 return "<img src=\"{$imagemUrl}\" alt=\"{$alt}\" title=\"{$alt}\" width=\"40\" height=\"40\">";
-            case 'medio':
+            case 'pequeno':
                 return "<img src=\"{$imagemUrl}\" alt=\"{$alt}\" title=\"{$alt}\" width=\"80\" height=\"80\">";
             case 'grande':
             default:
@@ -474,21 +474,19 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param bool $pequeno
-     * @param bool $semLink
+     * @param string $tamanho
+     * @param string $linkPara
      * @return string
      */
-    private function _htmlUsuario($tamanho = 'grande', $semLink = false)
+    private function _htmlUsuario($tamanho = 'grande', $linkPara = '')
     {
         $htmlImagem = $this->_htmlImagem( $tamanho );
         $nomeCompleto = $this->getNome() . ' ' . $this->getSobrenome();
-        $id = $this->getId();
-        $urlPerfil = site_url( '/perfil/' . $id );
 
-        if ( $semLink ) {
-            return "<figure>{$htmlImagem}<figcaption><span>{$nomeCompleto}</span></figcaption></figure>";
+        if ( $linkPara ) {
+            return "<figure><a href=\"{$linkPara}\" title=\"{$nomeCompleto}\">{$htmlImagem}<span>{$nomeCompleto}</span></a></figure>";
         } else {
-            return "<figure><a href=\"{$urlPerfil}\" title=\"{$nomeCompleto}\">{$htmlImagem}<figcaption><span>{$nomeCompleto}</span></figcaption></a></figure>";
+            return "<figure>{$htmlImagem}<figcaption>{$nomeCompleto}</figcaption></figure>";
         }
     }
 
@@ -501,7 +499,7 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
         $id = $this->getId();
         $urlPerfil = site_url( '/perfil/' . $id );
 
-        return "<a href=\"{$urlPerfil}\" title=\"{$nomeCompleto}\"><span>{$nomeCompleto}</span></a>";
+        return "<a href=\"{$urlPerfil}\" title=\"{$nomeCompleto}\">{$nomeCompleto}</a>";
     }
 
     /**
@@ -512,20 +510,26 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
     {
         switch ( $tipo ) {
             case 'imagem_mini_sem_link':
-                return $this->_htmlUsuario( 'pequeno', true );
+                return $this->_htmlUsuario( 'mini' );
             case 'imagem_pequena_sem_link':
-                return $this->_htmlUsuario( 'medio', true );
-            case 'imagem_grande_sem_link':
-                return $this->_htmlUsuario( 'grande', true );
-            case 'imagem_mini':
                 return $this->_htmlUsuario( 'pequeno' );
+            case 'imagem_grande_sem_link':
+                return $this->_htmlUsuario( 'grande' );
+            case 'imagem_mini_link_home':
+                return $this->_htmlUsuario( 'mini', site_url( '/home' ) );
+            case 'imagem_pequena_link_home':
+                return $this->_htmlLinkUsuario( 'pequeno', site_url( '/home' ) );
+            case 'imagem_grande_link_home':
+                return $this->_htmlUsuario( 'grande', site_url( '/home' ) );
+            case 'imagem_mini':
+                return $this->_htmlUsuario( 'mini', site_url( '/perfil/' . $this->getId() ) );
             case 'imagem_pequena':
-                return $this->_htmlUsuario( 'medio' );
+                return $this->_htmlUsuario( 'pequeno', site_url( '/perfil/' . $this->getId() ) );
             case 'somente_link':
                 return $this->_htmlLinkUsuario();
             case 'imagem_grande':
             default:
-                return $this->_htmlUsuario( 'grande' );
+                return $this->_htmlUsuario( 'grande', site_url( '/perfil/' . $this->getId() ) );
         }
     }
 

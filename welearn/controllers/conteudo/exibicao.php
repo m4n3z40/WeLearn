@@ -59,16 +59,6 @@ class Exibicao extends Curso_Controller
     private $_anotacaoDao;
 
     /**
-     * @var ComentarioDAO
-     */
-    private $_comentarioDao;
-
-    /**
-     * @var RecursoDAO
-     */
-    private $_recursoDao;
-
-    /**
      * @var WeLearn_Usuarios_Aluno
      */
     private $_alunoAtual;
@@ -82,6 +72,7 @@ class Exibicao extends Curso_Controller
         $this->_paginaDao = WeLearn_DAO_DAOFactory::create('PaginaDAO');
         $this->_aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
         $this->_moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
+        $this->_avaliacaoDao = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO');
 
         $this->_alunoAtual = $this->_alunoDao->criarAluno(
             $this->autenticacao->getUsuarioAutenticado()
@@ -195,16 +186,13 @@ class Exibicao extends Curso_Controller
             );
 
             $tipoConteudo = $this->input->get('t');
-            $idConteudo   = $this->input->get('id');
 
             switch ( $tipoConteudo ) {
                 case WeLearn_Cursos_Conteudo_TipoConteudo::PAGINA:
-                    $pagina = $this->_paginaDao->recuperar( $idConteudo );
-                    $this->_exibirPagina( $participacaoCurso, $pagina );
+                    $conteudo = $this->_exibirPagina( $participacaoCurso );
                     break;
                 case WeLearn_Cursos_Conteudo_TipoConteudo::AVALIACAO:
-                    $avaliacao = $this->_avaliacaoDao->recuperar( $idConteudo );
-                    $this->_aplicarAvaliacao( $participacaoCurso, $avaliacao );
+                    $conteudo = $this->_aplicarAvaliacao( $participacaoCurso );
                     break;
                 case WeLearn_Cursos_Conteudo_TipoConteudo::NENHUM:
                 default:
@@ -214,8 +202,17 @@ class Exibicao extends Curso_Controller
             log_message('error', 'Erro ao tentar exibir conteúdo para aluno na sala de aula: '
                 . create_exception_description($e));
 
-            show_404();
+            $conteudo = $this->template->loadPartial(
+                'conteudo_indisponivel',
+                array(),
+                'curso/conteudo/exibicao'
+            );
         }
+
+        $this->load->view(
+            'curso/conteudo/exibicao/exibir',
+            array( 'conteudo' => $conteudo )
+        );
     }
 
     public function acessar_proximo( $idcurso )
@@ -234,21 +231,7 @@ class Exibicao extends Curso_Controller
                 $curso
             );
 
-            $tipoConteudoAnterior = $this->input->get('t');
-            $idConteudoAnterior = $this->input->get('id');
-
-            switch ( $tipoConteudoAnterior ) {
-                case WeLearn_Cursos_Conteudo_TipoConteudo::PAGINA:
-
-                    break;
-                case WeLearn_Cursos_Conteudo_TipoConteudo::AVALIACAO:
-
-                    break;
-                case WeLearn_Cursos_Conteudo_TipoConteudo::NENHUM:
-                default:
-                    throw new WeLearn_Base_Exception('Tipo de conteúdo inválido!');
-            }
-
+            $json = $this->_recuperarProximoConteudo( $participacaoCurso );
         } catch( Exception $e ) {
             log_message('error', 'Ocorreu um erro ao tentar recuperar proximo conteúdo de aula: '
                 . create_exception_description( $e ));
@@ -412,64 +395,40 @@ class Exibicao extends Curso_Controller
 
     private function _loadSectionRecursosView()
     {
-        $dadosRecursosView = array();
-
         return $this->template->loadPartial(
             'section_recursos',
-            $dadosRecursosView,
+            array(),
             'curso/conteudo/exibicao'
         );
     }
 
-    private function _exibirPagina(
-        WeLearn_Cursos_ParticipacaoCurso $participacaocurso,
-        WeLearn_Cursos_Conteudo_Pagina $pagina
-    ) {
+    private function _exibirPagina( WeLearn_Cursos_ParticipacaoCurso $participacaocurso )
+    {
+        $pagina = $participacaocurso->getPaginaAtual();
+
         $paginaDisponivel = $this->_participacaoCursoDao
                                  ->getControlePaginaDAO()
                                  ->isDisponivel( $participacaocurso, $pagina );
 
         if ( $paginaDisponivel ) {
 
-            $conteudo = $this->_loadConteudoPaginaView( $pagina );
-
-        } else {
-
-            $conteudo = $this->template->loadPartial(
-                'conteudo_indisponivel',
-                array(),
+            return $this->template->loadPartial(
+                'conteudo_pagina',
+                array( 'pagina' => $pagina ),
                 'curso/conteudo/exibicao'
             );
 
         }
 
-        $this->load->view(
-            'curso/conteudo/exibicao/exibir',
-            array( 'conteudo' => $conteudo )
-        );
-    }
-
-    private function _loadConteudoPaginaView(WeLearn_Cursos_Conteudo_Pagina $pagina = null)
-    {
-        $dadosConteudoPaginaView = array(
-            'pagina' => $pagina
-        );
-
         return $this->template->loadPartial(
-            'conteudo_pagina',
-            $dadosConteudoPaginaView,
+            'conteudo_indisponivel',
+            array(),
             'curso/conteudo/exibicao'
         );
-    }
-
-    private function _aplicarAvaliacao(
-        WeLearn_Cursos_ParticipacaoCurso $participacaocurso,
-        WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacao
-    ) {
 
     }
 
-    private function _loadAplicacaoAvaliacaoView(WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacao = null)
+    private function _aplicarAvaliacao( WeLearn_Cursos_ParticipacaoCurso $participacaocurso )
     {
         $dadosAplicacaoAvaliacaoView = array();
 
@@ -492,12 +451,23 @@ class Exibicao extends Curso_Controller
 
                     return array(
                         'pagina' => $participacaoCurso->getPaginaAtual(),
-                        'aula' => $participacaoCurso->getPaginaAtual()->getAula(),
-                        'modulo' => $participacaoCurso->getPaginaAtual()->getAula()->getModulo(),
+                        'aula' => $participacaoCurso->getAulaAtual(),
+                        'modulo' => $participacaoCurso->getModuloAtual(),
                         'avaliacao' => null,
                         'url' => $url . '?t=' . $participacaoCurso->getTipoConteudoAtual()
-                                      . '&id=' . $participacaoCurso->getPaginaAtual()->getId()
                     );
+
+                } elseif ( $participacaoCurso->getAulaAtual() instanceof WeLearn_Cursos_Conteudo_Aula ) {
+
+                    //TODO: Desenvolver rotina para quando pagina atual não foi encontrada mas aula ainda existe
+
+                } elseif ( $participacaoCurso->getModuloAtual() instanceof WeLearn_Cursos_Conteudo_Modulo ) {
+
+                    //TODO: Desenvolver rotina para quando aula atual não foi encontrada mas modulo ainda existe
+
+                } else {
+
+                    //TODO: Desenvolver rotina para quando modulo atual não foi encontrado.
 
                 }
                 break;
@@ -510,13 +480,16 @@ class Exibicao extends Curso_Controller
                         'modulo' => $participacaoCurso->getAvaliacaoAtual()->getModulo(),
                         'avaliacao' => $participacaoCurso->getAvaliacaoAtual(),
                         'url' => $url . '?t=' . $participacaoCurso->getTipoConteudoAtual()
-                                      . '&id=' . $participacaoCurso->getAvaliacaoAtual()->getId()
                     );
+
+                } else {
+
+                    //TODO: Desenvolver rotina para quando avaliação atual não foi encontrada.
 
                 }
                 break;
             case WeLearn_Cursos_Conteudo_TipoConteudo::NENHUM;
-            default:
+            default: //TODO: Modificar codigo para cadastrar inicio do curso com nova estrutura ( por nro de posicoes ).
                 $moduloAtual = $this->_moduloDao->recuperarProximo( $participacaoCurso->getCurso() );
                 $aulaAtual = $moduloAtual ? $this->_aulaDao->recuperarProxima( $moduloAtual ) : false;
                 $paginaAtual = $aulaAtual ? $this->_paginaDao->recuperarProxima( $aulaAtual ) : false;
@@ -541,8 +514,7 @@ class Exibicao extends Curso_Controller
                         $paginaAtual
                     );
 
-                    $url .= '?t=' . $participacaoCurso->getTipoConteudoAtual()
-                          . '&id=' . $paginaAtual->getId();
+                    $url .= '?t=' . $participacaoCurso->getTipoConteudoAtual();
                 }
 
                 return array(
@@ -561,5 +533,152 @@ class Exibicao extends Curso_Controller
             'avaliacao' => null,
             'url' => $url
         );
+    }
+
+    private function _recuperarProximoConteudo(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso)
+    {
+        switch ( $participacaoCurso->getTipoConteudoAtual() ) {
+            case WeLearn_Cursos_Conteudo_TipoConteudo::PAGINA:
+                $paginaAnterior = $participacaoCurso->getPaginaAtual();
+                $this->_participacaoCursoDao->getControlePaginaDAO()->finalizar( $participacaoCurso, $paginaAnterior );
+
+                $proximaPagina = $this->_paginaDao->recuperarProxima(
+                    $paginaAnterior->getAula(),
+                    $paginaAnterior->getNroOrdem()
+                );
+
+                if ( $proximaPagina ) {
+
+                    return $this->_retornarJSONProximaPagina( $participacaoCurso, $proximaPagina );
+
+                } else {
+
+                    return $this->_virarAula( $participacaoCurso, $paginaAnterior->getAula() );
+
+                }
+            case WeLearn_Cursos_Conteudo_TipoConteudo::AVALIACAO:
+
+            case WeLearn_Cursos_Conteudo_TipoConteudo::NENHUM:
+            default:
+        }
+    }
+
+    private function _retornarJSONProximaPagina( WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso, $proximaPagina )
+    {
+        if ( $proximaPagina ) {
+
+            $this->_participacaoCursoDao->getControlePaginaDAO()->acessar( $participacaoCurso, $proximaPagina );
+
+            $url = site_url(
+                'curso/conteudo/exibicao/exibir/' . $participacaoCurso->getCurso()->getId()
+                                                  . '?t=' . $participacaoCurso->getTipoConteudoAtual()
+            );
+
+            $response = Zend_Json::encode(array(
+                'tipoConteudoAtual' => $participacaoCurso->getTipoConteudoAtual(),
+                'moduloAtual' => $proximaPagina->getAula()->getModulo()->getId(),
+                'aulaAtual' => $proximaPagina->getAula()->getId(),
+                'paginaAtual' => $proximaPagina->getId(),
+                'avaliacaoAtual' => '',
+                'urlConteudoAtual' => $url
+            ));
+
+            return create_json_feedback(true, '', $response);
+
+        }
+
+        $error = create_json_feedback_error_json(
+            'A aula seguinte não possui páginas para serem exibidas. O curso não pode prosseguir, contate um gerenciador!'
+        );
+
+        return create_json_feedback(false, $error);
+    }
+
+    private function _virarAula(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso,
+                                WeLearn_Cursos_Conteudo_Aula $aulaAnterior)
+    {
+        $this->_participacaoCursoDao->getControleAulaDAO()->finalizar( $participacaoCurso, $aulaAnterior );
+
+        $proximaAula = $this->_aulaDao->recuperarProxima( $aulaAnterior->getModulo(), $aulaAnterior->getNroOrdem() );
+
+        if ( $proximaAula ) {
+
+            return $this->_retornarJSONProximaAula( $participacaoCurso, $proximaAula );
+
+        } else {
+
+            return $this->_virarModulo( $participacaoCurso, $aulaAnterior->getModulo() );
+
+        }
+    }
+
+    private function _retornarJSONProximaAula( WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso, $proximaAula )
+    {
+        if ( $proximaAula ) {
+
+            $this->_participacaoCursoDao->getControleAulaDAO()->acessar( $participacaoCurso, $proximaAula );
+
+            $proximaPagina = $this->_paginaDao->recuperarProxima( $proximaAula );
+
+            return $this->_retornarJSONProximaPagina( $participacaoCurso, $proximaPagina );
+
+        }
+
+        $error = create_json_feedback_error_json(
+            'O módulo seguinte não possui aulas para serem aplicadas. O curso não pode proseguir, contate um gerenciador!'
+        );
+
+        return create_json_feedback(false, $error);
+    }
+
+    private function _virarModulo(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso,
+                                  WeLearn_Cursos_Conteudo_Modulo $moduloAnterior)
+    {
+        $this->_participacaoCursoDao->getControleModuloDAO()->finalizar( $participacaoCurso, $moduloAnterior );
+
+        try {
+
+            $avaliacao = $this->_avaliacaoDao->recuperar( $moduloAnterior->getId() );
+
+            $participacaoCurso->setTipoConteudoAtual( WeLearn_Cursos_Conteudo_TipoConteudo::AVALIACAO );
+            $participacaoCurso->setAvaliacaoAtual( $avaliacao );
+
+            $this->_avaliacaoDao->salvar( $avaliacao );
+
+            $url = $url = site_url(
+                'curso/conteudo/exibicao/exibir/' . $participacaoCurso->getCurso()->getId()
+                                                  . '?t=' . $participacaoCurso->getTipoConteudoAtual()
+            );
+
+            $response = Zend_Json::encode(array(
+                'tipoConteudoAtual' => $participacaoCurso->getTipoConteudoAtual(),
+                'moduloAtual' => $avaliacao->getModulo()->getId(),
+                'aulaAtual' => '',
+                'paginaAtual' => '',
+                'avaliacaoAtual' => $avaliacao->getId(),
+                'urlConteudoAtual' => $url
+            ));
+
+            return create_json_feedback(true, '', $response);
+
+        } catch( cassandra_NotFoundException $e ) {
+
+            $proximoModulo = $this->_moduloDao->recuperarProximo( $moduloAnterior->getCurso(), $moduloAnterior->getNroOrdem() );
+
+            if ( $proximoModulo ) {
+
+                $this->_participacaoCursoDao->getControleModuloDAO()->acessar( $participacaoCurso, $proximoModulo );
+
+                $proximaAula = $this->_aulaDao->recuperarProxima( $proximoModulo );
+
+                return $this->_retornarJSONProximaAula( $participacaoCurso, $proximaAula );
+
+            } else {
+
+                //TODO: Retornar finalização do curso. (Ultimo módulo finalizado)
+
+            }
+
+        }
     }
 }

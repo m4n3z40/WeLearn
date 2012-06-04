@@ -31,7 +31,7 @@ audio[controls], canvas, video { display: inline-block; *display: inline; *zoom:
 
 html { font-size: 100%; overflow-y: scroll; -webkit-overflow-scrolling: touch; -webkit-tap-highlight-color: rgba(0,0,0,0); -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
 
-html, body { z-index: 0; }
+html, body { z-index: 0; height: 100%; }
 
 body { margin: 0; font-size: 13px; line-height: 1.231; }
 
@@ -202,6 +202,17 @@ table { border-collapse: collapse; border-spacing: 0; }
    Primary styles
    Author: 
    ========================================================================== */
+#container {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -200px;
+}
+
+body > footer, #push-footer {;
+    height: 200px;
+}
+
 header {
     margin-bottom: 20px;
     border-bottom: 1px #000 dashed;
@@ -319,20 +330,49 @@ button, .button {
     overflow: hidden;
 }
 
-    #user-bar > h3 {
-        margin: 5px;
-        width: 100px;
-        float: left;
-    }
+#user-bar > ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    height: 40px;
+}
 
-    #user-bar > .logoutButton {
-        float:left;
-    }
+#user-bar > ul > li {
+    float: left;
+    margin-right: 40px;
+}
 
-#user-info {
-    color: #ddccdd;
-    font-weight: bold;
+#user-bar > ul > li:last-child {
+    margin-right: 0;
+}
+
+#user-bar > ul:first-child {
+    margin-left: 40px;
+    float: left;
+}
+
+#user-bar > ul:last-child {
+    margin-right: 40px;
     float: right;
+}
+
+#user-section > figure > a {
+    height: 40px;
+    line-height: 39px;
+    vertical-align: 0;
+}
+
+#user-section > figure > a > img {
+    margin-right: 5px;
+}
+
+#user-section > figure > a > span {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    white-space: nowrap;
 }
 
 /**************************************

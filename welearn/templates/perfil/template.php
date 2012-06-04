@@ -30,12 +30,13 @@
         </section>
         {$partial:perfil/barra_lateral_direita}
     </div>
-    <footer>
-        <section class="center-container">
-            <p><span>WeLearn &copy;</span> - Copyright 2011. All rights reserved.</p>
-        </section>
-    </footer>
+    <div id="push-footer"></div>
 </div> <!--! end of #container -->
+<footer>
+    <section class="center-container">
+        <p><span>WeLearn &copy;</span> - Copyright 2011. All rights reserved.</p>
+    </section>
+</footer>
 {$partial:perfil/barra_usuario}
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>

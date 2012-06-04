@@ -48,36 +48,51 @@ class AulaDAO extends WeLearn_DAO_AbstractDAO
 
     /**
      * @param WeLearn_Cursos_Conteudo_Modulo $doModulo
-     * @param string $idAnterior
+     * @param $nroOrdem
+     * @return WeLearn_Cursos_Conteudo_Aula
+     */
+    public function recuperarPorOrdem(WeLearn_Cursos_Conteudo_Modulo $doModulo, $nroOrdem)
+    {
+        $moduloUUID = UUID::import( $doModulo->getId() )->bytes;
+
+        $idAula = $this->_aulaPorModuloCF->get( $moduloUUID, array( (int)$nroOrdem ) );
+        $idAula = $idAula[ $nroOrdem ];
+
+        $column = $this->_cf->get( $idAula );
+
+        return $this->_criarFromCassandra( $column, $doModulo );
+    }
+
+    /**
+     * @param WeLearn_Cursos_Conteudo_Modulo $doModulo
+     * @param int $ordemAnterior
      * @return bool|WeLearn_Cursos_Conteudo_Aula
      */
-    public function recuperarProxima(WeLearn_Cursos_Conteudo_Modulo $doModulo, $idAnterior = '')
+    public function recuperarProxima(WeLearn_Cursos_Conteudo_Modulo $doModulo, $ordemAnterior = 0)
     {
         try {
 
-            if ( $idAnterior != '' ) {
+            return $this->recuperarPorOrdem( $doModulo, (int)$ordemAnterior + 1 );
 
-                $idAnterior = UUID::import( $idAnterior )->bytes;
-
-                $count = 2;
-
-            } else {
-
-                $count = 1;
-
-            }
-
-            $aulaAtual = $this->recuperarTodosPorModulo(
-                $doModulo,
-                $idAnterior,
-                '',
-                $count
-            );
-
-            $key = $count - 1;
-
-            return isset( $aulaAtual[ $key ] ) ? $aulaAtual[ $key ] : false;
         } catch (cassandra_NotFoundException $e) {
+
+            return false;
+
+        }
+    }
+
+    /**
+     * @param WeLearn_Cursos_Conteudo_Modulo $doModulo
+     * @param int $ordemAtual
+     * @return bool|WeLearn_Cursos_Conteudo_Aula
+     */
+    public function recuperarAnterior(WeLearn_Cursos_Conteudo_Modulo $doModulo, $ordemAtual = self::MAX_AULAS)
+    {
+        try {
+
+            return $this->recuperarPorOrdem( $doModulo, (int)$ordemAtual - 1 );
+
+        } catch ( cassandra_NotFoundException $e ) {
 
             return false;
 
@@ -95,7 +110,7 @@ class AulaDAO extends WeLearn_DAO_AbstractDAO
         if ( isset($filtros['count']) ) {
             $count = (int) $filtros['count'];
         } else {
-            $count = AulaDAO::MAX_AULAS;
+            $count = self::MAX_AULAS;
         }
 
         if ( isset($filtros['modulo'] ) &&
@@ -118,12 +133,13 @@ class AulaDAO extends WeLearn_DAO_AbstractDAO
     public function recuperarTodosPorModulo(WeLearn_Cursos_Conteudo_Modulo $modulo,
                                             $de = '',
                                             $ate = '',
-                                            $count = AulaDAO::MAX_AULAS)
+                                            $count = self::MAX_AULAS,
+                                            $invertido = false)
     {
         $moduloUUID = CassandraUtil::import( $modulo->getId() );
 
         $aulasIds = $this->_aulaPorModuloCF->get(
-            $moduloUUID->bytes, null, $de, $ate, false, $count
+            $moduloUUID->bytes, null, $de, $ate, $invertido, $count
         );
 
         $columns = $this->_cf->multiget($aulasIds);

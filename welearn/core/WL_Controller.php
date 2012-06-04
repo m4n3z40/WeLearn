@@ -206,8 +206,8 @@ class WL_Controller extends CI_Controller
         if ( $this->_barraUsuarioVar ) {
 
             $this->_barraUsuarioSetVar(
-                'nomeUsuario',
-                $this->autenticacao->getUsuarioAutenticado()->getNomeUsuario()
+                'usuario',
+                $this->autenticacao->getUsuarioAutenticado()
             );
 
             $this->template->setDefaultPartialVar(
