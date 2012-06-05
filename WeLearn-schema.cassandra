@@ -616,3 +616,9 @@ with comparator = 'TimeUUIDType'
 and column_type = 'Standard'
 and default_validation_class = 'CounterColumnType'
 and key_validation_class = 'UTF8Type';
+
+create column family contadores_utf8
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'CounterColumnType'
+and key_validation_class = 'UTF8Type';

@@ -145,7 +145,7 @@
 
             WeLearn.validarForm(
                 formAnotacao,
-                $(formAnotacao).attr('action'),
+                $(formAnotacao).attr('action') + '/' + $wrapperSalaDeAula.data('id-pagina'),
                 function(res){
                     $preAnotacao.text( anotacao );
                     $txtAnotacao.hide();
@@ -668,6 +668,24 @@
 
     /* ############################################################ */
 
+    var $iframeConteudo = $('#iframe-exibicao-pagina'),
+        $artModuloInfoetapa = $('#art-modulo-infoetapa-saladeaula'),
+        $emModuloTitulo = $artModuloInfoetapa.find('h4 > em'),
+        $emModuloNroOrdem = $emModuloTitulo.first(),
+        $emModuloNome = $emModuloTitulo.last(),
+        $ddModuloInfo = $artModuloInfoetapa.find('dl > dd'),
+        $ddModuloDescricao = $ddModuloInfo.first(),
+        $ddModuloObjetivos = $ddModuloInfo.last(),
+        $artAulaInfoEtapa = $('#art-aula-infoetapa-saladeaula'),
+        $emAulaTitulo = $artAulaInfoEtapa.find('h4 > em'),
+        $emAulaNroOrdem = $emAulaTitulo.first(),
+        $emAulaNome = $emAulaTitulo.last(),
+        $ddAulaDescricao = $artAulaInfoEtapa.find('dl > dd'),
+        $artPaginaInfoEtapa = $('#art-pagina-infoetapa-saladeaula'),
+        $emPaginaTitulo = $artPaginaInfoEtapa.find('h4 > em'),
+        $emPaginaNroOrdem = $emPaginaTitulo.first(),
+        $emPaginaNome = $emPaginaTitulo.last();
+
     $('#a-nav-exibicao-inicio-aula').click(function(e){
         e.preventDefault();
 
@@ -706,13 +724,121 @@
 
         var $this = $(this),
             idCurso = $wrapperSalaDeAula.data('id-curso'),
-            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/acessar_proximo/' + idCurso);
+            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/acessar_proximo/' + idCurso),
+            idModuloAtual = $wrapperSalaDeAula.data('id-modulo'),
+            idAulaAtual = $wrapperSalaDeAula.data('id-aula'),
+            idPaginaAtual = $wrapperSalaDeAula.data('id-pagina');
 
         $.get(
             url,
             {},
             function(res) {
-                log(res);
+                if ( res.success ) {
+
+                    $wrapperSalaDeAula.data('tipo-conteudo', res.tipoConteudoAtual);
+
+                    if ( res.tipoConteudoAtual == 'pagina' ) {
+
+                        if ( idModuloAtual != res.moduloAtual.id ) { //Virou de módulo
+
+                            $wrapperSalaDeAula.data('id-modulo', res.moduloAtual.id);
+
+                            $emModuloNroOrdem.text( res.moduloAtual.nroOrdem );
+                            $emModuloNome.text( res.moduloAtual.nome );
+                            $ddModuloDescricao.text( res.moduloAtual.descricao.replace("\n", '<br>') );
+                            $ddModuloObjetivos.text( res.moduloAtual.objetivos.replace("\n", '<br>') );
+
+                            $sltModulos.val( res.moduloAtual.id );
+                            $sltModulos.trigger('change');
+
+                        }
+
+                        if ( idAulaAtual != res.aulaAtual.id ) { //virou de aula
+
+                            $wrapperSalaDeAula.data('id-aula', res.aulaAtual.id);
+
+                            $emAulaNroOrdem.text( res.aulaAtual.nroOrdem );
+                            $emAulaNome.text( res.aulaAtual.nome );
+                            $ddAulaDescricao.text( res.aulaAtual.descricao.replace("\n", '<br>') );
+
+                            if ( idModuloAtual != res.moduloAtual.id ) {
+
+                                var selecionarAula = function(){
+
+                                    $sltAulas.val( res.aulaAtual.id );
+
+                                    if ( $sltAulas.val() != res.aulaAtual.id ) {
+
+                                        setTimeout( selecionarAula, 300 );
+
+                                    } else {
+
+                                        $sltAulas.trigger('change');
+
+                                    }
+
+                                };
+
+                                selecionarAula();
+
+                            } else {
+
+                                $sltAulas.val( res.aulaAtual.id );
+                                $sltAulas.trigger('change');
+
+                            }
+
+                        }
+
+                        $wrapperSalaDeAula.data('id-pagina', res.paginaAtual.id);
+
+                        $emPaginaNroOrdem.text( res.paginaAtual.nroOrdem );
+                        $emPaginaNome.text( res.paginaAtual.nome );
+
+                        if ( idAulaAtual != res.aulaAtual.id ) {
+
+                            var selecionarPagina = function() {
+
+                                $sltPaginas.val( res.paginaAtual.id );
+
+                                if ( $sltPaginas.val() != res.paginaAtual.id ) {
+
+                                    setTimeout( selecionarPagina, 300 );
+
+                                }
+
+                            };
+
+                            selecionarPagina();
+
+                        } else {
+
+                            $sltPaginas.val( res.paginaAtual.id );
+
+                        }
+
+                        if ( res.anotacaoAtual ) {
+
+                            $txtAnotacao.text( res.anotacaoAtual.conteudo );
+                            $preAnotacao.text( res.anotacaoAtual.conteudo );
+
+                        }
+
+                        recuperarComentarios( res.paginaAtual.id );
+
+                        $iframeConteudo.attr('src', res.urlConteudoAtual);
+
+                    } else if ( res.tipoConteudoAtual == 'avaliacao' ) {
+
+                        //TODO: tratar quando está na aplicação de avaliação.
+
+                    }
+
+                } else {
+
+                    //TODO: tratar quando o tipo do conteúdo não é conhecido.
+
+                }
             }
         );
     });

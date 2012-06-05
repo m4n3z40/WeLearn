@@ -107,7 +107,7 @@ abstract class WeLearn_DTO_AbstractDTO implements WeLearn_DTO_IDTO
      */
     public function toJSON()
     {
-        return Zend_Json::encode($this->toArray(), true);
+        return Zend_Json::encode( $this->toCassandra() );
     }
 
     /**

@@ -153,9 +153,28 @@ class AlunoDAO extends UsuarioDAO
                                            $ate = '',
                                            $count = 20)
     {
+        $ids = $this->recuperarTodasIdsPorCurso($curso, $de, $ate, $count);
+
+        $columns = $this->_cf->multiget( $ids );
+
+        return $this->_criarVariosAlunosFromCassandra( $columns );
+    }
+
+    /**
+     * @param WeLearn_Cursos_Curso $curso
+     * @param string $de
+     * @param string $ate
+     * @param int $count
+     * @return array
+     */
+    public function recuperarTodasIdsPorCurso(WeLearn_Cursos_Curso $curso,
+                                              $de = '',
+                                              $ate = '',
+                                              $count = 20)
+    {
         $cursoUUID = UUID::import( $curso->getId() );
 
-        $ids = array_keys(
+        return array_keys(
             $this->_alunosPorCursoCF->get(
                 $cursoUUID->bytes,
                 null,
@@ -165,10 +184,6 @@ class AlunoDAO extends UsuarioDAO
                 $count
             )
         );
-
-        $columns = $this->_cf->multiget( $ids );
-
-        return $this->_criarVariosAlunosFromCassandra( $columns );
     }
 
     /**

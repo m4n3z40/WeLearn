@@ -293,10 +293,22 @@ class PaginaDAO extends WeLearn_DAO_AbstractDAO
             )
         );
 
-        $cursoUUID = CassandraUtil::import(
-            $paginaRemovida->getAula()->getModulo()->getCurso()->getId()
-        );
+        $curso = $paginaRemovida->getAula()->getModulo()->getCurso();
+
+        $cursoUUID = CassandraUtil::import( $curso->getId() );
         $this->_contadorCF->add($this->_keyContador, $cursoUUID->bytes, -1);
+
+        $controlePaginaDao = WeLearn_DAO_DAOFactory::create('ControlePaginaDAO', null, false);
+        $idsAlunos = WeLearn_DAO_DAOFactory::create('AlunoDAO')->recuperarTodasIdsPorCurso(
+            $curso
+        );
+        for ($i = 0; $i < count( $idsAlunos ); $i++) {
+
+            $cfKey = $idsAlunos[ $i ] . '::' . $curso->getId();
+
+            $controlePaginaDao->decrementarPaginasVistas( $cfKey );
+
+        }
 
         $paginaRemovida->setPersistido(false);
 

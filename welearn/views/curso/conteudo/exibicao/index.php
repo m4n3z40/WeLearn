@@ -9,16 +9,19 @@
     <div>
     <?php if ( !$conteudoAberto ): ?>
         <h3>O conteúdo deste curso está bloqueado para os alunos, notifique os gerenciadores.</h3>
-    <?php elseif ( $paginaAtual instanceof WeLearn_Cursos_Conteudo_Pagina ): ?>
+    <?php elseif ( $moduloAtual ): ?>
         <div id="div-visualizacao-conteudo-janela-aula"
              style="display: none;"
              title="Sala de Aula :: <?php echo $moduloAtual->curso->nome ?>">
             <?php echo $htmlJanelaSalaDeAula ?>
         </div>
+        <?php if ( ! $paginaAtual ): ?>
+            <h3>Este curso foi interrompido por falta de conteúdo, e ainda não pode continuar :(</h3>
+            <h4>Contate os gerenciadores e informe-os!</h4>
+        <?php endif; ?>
         <h3><?php echo $iniciouCurso ? 'Continuar Curso:' : 'Iniciar Curso:' ?></h3>
-        <button id="btn-iniciar-visualizacao-conteudo"
-                data-id-pagina="<?php echo $paginaAtual->id ?>">
-            Abrir Página "<?php echo $paginaAtual->nome ?>" da Aula "<?php echo $aulaAtual->nome ?>"
+        <button id="btn-iniciar-visualizacao-conteudo">
+            <?php echo $iniciouCurso ? 'Continuar de onde parei!' : 'Começar meu aprendizado!' ?>
         </button>
         <hr>
         <?php if ( ! $iniciouCurso ): ?>
@@ -38,12 +41,20 @@
             <li>
                 <span>Você está no módulo <?php echo $moduloAtual->nroOrdem ?>: <em>"<?php echo $moduloAtual->nome ?>"</em></span>
             </li>
-            <li>
-                <span>Na aula <?php echo $aulaAtual->nroOrdem ?>: <em>"<?php echo $aulaAtual->nome ?>"</em></span>
-            </li>
+            <?php if ( $aulaAtual ): ?>
+                <li>
+                <span>Na aula <?php echo $aulaAtual->nroOrdem ?>: <em>"<?php echo $aulaAtual->nome ?>"</em>;</span>
+                </li>
+            <?php else: ?>
+            <li><span>Você não está assistindo nenhuma aula no momento;</span></li>
+            <?php endif; ?>
+            <?php if ($paginaAtual): ?>
             <li>
                 <span>Visualizando a página <?php echo $paginaAtual->nroOrdem ?>: <em>"<?php echo $paginaAtual->nome ?>"</em></span>
             </li>
+            <?php else: ?>
+            <li><span>Você não está em nenhuma página no momento.</span></li>
+            <?php endif; ?>
         </ul>
     <?php else: ?>
         <h3>Até este momento, o curso não possui conteúdo para os alunos :(</h3>

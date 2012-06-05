@@ -7,9 +7,6 @@
      data-id-avaliacao="<?php echo $idAvaliacao ?>">
     <div id="main-section-container">
         <section id="section-container-iframe">
-            <iframe src="<?php echo $srcIframeConteudo ?>"
-                    frameborder="0"
-                    id="iframe-exibicao-pagina"></iframe>
             <nav>
                 <ul>
                     <li><a href="#" id="a-nav-exibicao-inicio-aula">Início da Aula</a></li>
@@ -17,6 +14,9 @@
                     <li><a href="#" id="a-nav-exibicao-proxima-pagina">Proxima Página</a></li>
                 </ul>
             </nav>
+            <iframe src="<?php echo $srcIframeConteudo ?>"
+                    frameborder="0"
+                    id="iframe-exibicao-pagina"></iframe>
         </section>
         <section id="section-container-anotacao">
             <?php echo $htmlSectionAnotacao ?>

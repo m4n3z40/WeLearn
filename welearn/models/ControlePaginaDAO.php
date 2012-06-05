@@ -10,10 +10,18 @@ class ControlePaginaDAO
 {
     private $_nomeCF = 'cursos_participacao_aluno_pagina';
 
+    private $_nomeContadorCF = 'contadores_utf8';
+    private $_keyContador    = 'total_paginas_vistas';
+
     /**
      * @var ColumnFamily|null
      */
     private $_cf;
+
+    /**
+     * @var ColumnFamily|null
+     */
+    private $_contadorCF;
 
     /**
      * @var PaginaDAO
@@ -22,9 +30,10 @@ class ControlePaginaDAO
 
     public function __construct()
     {
-        $this->_cf = WL_Phpcassa::getInstance()->getColumnFamily(
-            $this->_nomeCF
-        );
+        $phpCassa = WL_Phpcassa::getInstance();
+
+        $this->_cf         = $phpCassa->getColumnFamily( $this->_nomeCF );
+        $this->_contadorCF = $phpCassa->getColumnFamily( $this->_nomeContadorCF );
 
         $this->_paginaDao = WeLearn_DAO_DAOFactory::create('PaginaDAO');
     }
@@ -35,14 +44,11 @@ class ControlePaginaDAO
      * @return bool
      */
     public function isDisponivel(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso,
-                                       WeLearn_Cursos_Conteudo_Pagina $pagina)
+                                 WeLearn_Cursos_Conteudo_Pagina $pagina)
     {
         try {
 
-            $controlePagina = $this->recuperar(
-                $pagina,
-                $participacaoCurso
-            );
+            $controlePagina = $this->recuperar( $pagina, $participacaoCurso );
 
             switch ( $controlePagina->getStatus() ) {
 
@@ -55,6 +61,14 @@ class ControlePaginaDAO
             }
 
         } catch (cassandra_NotFoundException $e) {
+
+            if ( $participacaoCurso->getPaginaAtual()->getNroOrdem() === $pagina->getNroOrdem() ) {
+
+                $this->acessar( $participacaoCurso, $pagina );
+
+                return true;
+
+            }
 
             return false;
 
@@ -69,15 +83,23 @@ class ControlePaginaDAO
     public function acessar(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso,
                             WeLearn_Cursos_Conteudo_Pagina $pagina)
     {
-        $novoControlePagina = $this->criarNovo();
+        try {
 
-        $novoControlePagina->setParticipacaoCurso( $participacaoCurso );
+            $controlePagina = $this->recuperar( $pagina, $participacaoCurso );
 
-        $novoControlePagina->setPagina( $pagina );
+        } catch ( cassandra_NotFoundException $e ) {
 
-        $novoControlePagina->acessar();
+            $controlePagina = $this->criarNovo();
 
-        $this->salvar( $novoControlePagina );
+            $controlePagina->setParticipacaoCurso( $participacaoCurso );
+
+            $controlePagina->setPagina( $pagina );
+
+            $controlePagina->acessar();
+
+            $this->salvar( $controlePagina );
+
+        }
 
         $participacaoCurso->setPaginaAtual( $pagina );
         $participacaoCurso->setTipoConteudoAtual( WeLearn_Cursos_Conteudo_TipoConteudo::PAGINA );
@@ -85,7 +107,7 @@ class ControlePaginaDAO
             $participacaoCurso
         );
 
-        return $novoControlePagina;
+        return $controlePagina;
     }
 
     /**
@@ -100,11 +122,19 @@ class ControlePaginaDAO
     {
         $controlePagina = $this->recuperar( $pagina, $participacaoCurso );
 
+        if ( $controlePagina->getStatus() === WeLearn_Cursos_Conteudo_StatusConteudo::ACESSADO ) {
+
+            return $controlePagina;
+
+        }
+
         $controlePagina->setTempoVisualizacao( $tempoVisualizacao );
 
         $controlePagina->finalizar();
 
         $this->salvar( $controlePagina );
+
+        $this->incrementarPaginasVistas( $participacaoCurso->getCFKey() );
 
         return $controlePagina;
     }
@@ -118,6 +148,12 @@ class ControlePaginaDAO
                                   WeLearn_Cursos_Conteudo_Pagina $pagina)
     {
         $controlePagina = $this->recuperar( $pagina, $participacaoCurso );
+
+        if ( $controlePagina->getStatus() === WeLearn_Cursos_Conteudo_StatusConteudo::BLOQUEADO ) {
+
+            return $controlePagina;
+
+        }
 
         $controlePagina->bloquear();
 
@@ -189,6 +225,44 @@ class ControlePaginaDAO
         if ( ! $controlePagina->isPersistido() ) {
 
             $controlePagina->setPersistido( true );
+
+        }
+    }
+
+    /**
+     * @param string $chaveParticipacaoCurso
+     */
+    public function incrementarPaginasVistas($chaveParticipacaoCurso)
+    {
+        $this->_contadorCF->add( $this->_keyContador, $chaveParticipacaoCurso );
+    }
+
+    /**
+     * @param string $chaveParticipacaoCurso
+     */
+    public function decrementarPaginasVistas($chaveParticipacaoCurso)
+    {
+        $this->_contadorCF->add( $this->_keyContador, $chaveParticipacaoCurso, -1 );
+    }
+
+    /**
+     * @param string $chaveParticipacaoCurso
+     * @return int
+     */
+    public function recuperarQtdTotalPaginasVistas($chaveParticipacaoCurso)
+    {
+        try {
+
+            $totalPaginasVistas = $this->_contadorCF->get(
+                $this->_keyContador,
+                array( $chaveParticipacaoCurso )
+            );
+
+            return $totalPaginasVistas[ $chaveParticipacaoCurso ];
+
+        } catch ( cassandra_NotFoundException $e ) {
+
+            return 0;
 
         }
     }

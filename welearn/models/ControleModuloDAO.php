@@ -29,25 +29,69 @@ class ControleModuloDAO
         $this->_moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
     }
 
+    public function isDisponivel(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso,
+                                 WeLearn_Cursos_Conteudo_Modulo $modulo)
+    {
+        try {
+
+            $controleModulo = $this->recuperar( $modulo, $participacaoCurso );
+
+            switch ( $controleModulo->getStatus() ) {
+                case WeLearn_Cursos_Conteudo_StatusConteudo::ACESSANDO:
+                case WeLearn_Cursos_Conteudo_StatusConteudo::FINALIZADO:
+                    return true;
+                case WeLearn_Cursos_Conteudo_StatusConteudo::BLOQUEADO:
+                default:
+                    return false;
+            }
+
+        } catch ( cassandra_NotFoundException $e ) {
+
+            if ( $participacaoCurso->getModuloAtual()->getNroOrdem() === $modulo->getNroOrdem() ) {
+
+                $this->acessar( $participacaoCurso, $modulo );
+
+                return true;
+
+            }
+
+            return false;
+
+        }
+    }
+
     /**
      * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
      * @param WeLearn_Cursos_Conteudo_Modulo $modulo
      * @return WeLearn_Cursos_Conteudo_ControleModulo
      */
-    public function acessar(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso,
-                                  WeLearn_Cursos_Conteudo_Modulo $modulo)
+    public function acessar(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso,
+                            WeLearn_Cursos_Conteudo_Modulo $modulo)
     {
-        $novoControleModulo = $this->criarNovo();
+        try {
 
-        $novoControleModulo->setParticipacaoCurso( $participacaoCurso );
+            $controleModulo = $this->recuperar( $modulo, $participacaoCurso );
 
-        $novoControleModulo->setModulo( $modulo );
+        } catch ( cassandra_NotFoundException $e ) {
 
-        $novoControleModulo->acessar();
+            $controleModulo = $this->criarNovo();
 
-        $this->salvar( $novoControleModulo );
+            $controleModulo->setParticipacaoCurso( $participacaoCurso );
 
-        return $novoControleModulo;
+            $controleModulo->setModulo( $modulo );
+
+            $controleModulo->acessar();
+
+            $this->salvar( $controleModulo );
+
+        }
+
+        $participacaoCurso->setModuloAtual( $modulo );
+        WeLearn_DAO_DAOFactory::create('ParticipacaoCursoDAO')->salvar(
+            $participacaoCurso
+        );
+
+        return $controleModulo;
     }
 
     /**
@@ -56,9 +100,15 @@ class ControleModuloDAO
      * @return WeLearn_Cursos_Conteudo_ControleModulo
      */
     public function finalizar(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso,
-                                  WeLearn_Cursos_Conteudo_Modulo $modulo)
+                              WeLearn_Cursos_Conteudo_Modulo $modulo)
     {
         $controleModulo = $this->recuperar( $modulo, $participacaoCurso );
+
+        if ( $controleModulo->getStatus() === WeLearn_Cursos_Conteudo_StatusConteudo::FINALIZADO ) {
+
+            return $controleModulo;
+
+        }
 
         $controleModulo->finalizar();
 
@@ -73,9 +123,15 @@ class ControleModuloDAO
      * @return WeLearn_Cursos_Conteudo_ControleModulo
      */
     public function bloquear(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso,
-                                  WeLearn_Cursos_Conteudo_Modulo $modulo)
+                             WeLearn_Cursos_Conteudo_Modulo $modulo)
     {
         $controleModulo = $this->recuperar( $modulo, $participacaoCurso );
+
+        if ( $controleModulo->getStatus() === WeLearn_Cursos_Conteudo_StatusConteudo::BLOQUEADO ) {
+
+            return $controleModulo;
+
+        }
 
         $controleModulo->bloquear();
 
