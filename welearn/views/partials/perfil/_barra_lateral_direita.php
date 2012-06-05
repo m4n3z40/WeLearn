@@ -13,5 +13,5 @@
         <hr class="curso-widget-separator">
         <?php endforeach ?>
     </section>
-    <?php endif ?>
+    <?php endif; ?>
 </section>

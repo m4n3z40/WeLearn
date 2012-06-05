@@ -26,7 +26,7 @@ class Feed extends Home_Controller
         $tipo=$this->input->post('tipo-feed');
         $this->load->library('form_validation');
 
-        $this->form_validation->set_rules('conteudo-feed', 'conteudo-feed', 'required');
+        $this->form_validation->set_rules('conteudo-feed', 'conteudo-feed', 'required|max_length[1000]');
         if($tipo != WeLearn_Compartilhamento_TipoFeed::STATUS)
         {
             $this->form_validation->set_rules('descricao-feed', 'descricao-feed', 'callback_validar_descricao');
@@ -330,6 +330,9 @@ class Feed extends Home_Controller
         if (empty($descricao))
         {
             $this->form_validation->set_message('validar_descricao', 'The %s field is required');
+            return FALSE;
+        }else if(strlen($descricao)>1000){
+            $this->form_validation->set_message('validar_descricao', 'The %s field can not exceed 1000 characters in length');
             return FALSE;
         }
         else
