@@ -1,12 +1,7 @@
 <?php
 
-class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO
+class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO implements WeLearn_Notificacoes_INotificacao
 {
-    /**
-     * @var string
-     */
-    private $_assunto;
-
     /**
      * @var string
      */
@@ -15,7 +10,7 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO
     /**
      * @var string
      */
-    private $_descricao;
+    private $_msg;
 
     /**
      * @var string
@@ -25,27 +20,55 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO
     /**
      * @var int
      */
-    private $_status;
+    private $_status = WeLearn_Notificacoes_StatusNotificacao::NOVO;
 
     /**
-     * @var int
+     * @var WeLearn_Usuarios_Usuario
      */
-    private $_tipoRemetente;
+    private $_destinatario;
 
     /**
-     * @param string $assunto
+     * @var SplObjectStorage
      */
-    public function setAssunto($assunto)
+    private $_notificadores;
+
+    public function __construct()
     {
-        $this->_assunto = (string)$assunto;
+        parent::__construct();
+
+        $this->_notificadores = new SplObjectStorage();
+    }
+
+    /**
+     * @param \WeLearn_Usuarios_Usuario $destinatario
+     */
+    public function setDestinatario(WeLearn_Usuarios_Usuario $destinatario)
+    {
+        $this->_destinatario = $destinatario;
+    }
+
+    /**
+     * @return \WeLearn_Usuarios_Usuario
+     */
+    public function getDestinatario()
+    {
+        return $this->_destinatario;
+    }
+
+    /**
+     * @param string $msg
+     */
+    public function setMsg($msg)
+    {
+        $this->_msg = (string)$msg;
     }
 
     /**
      * @return string
      */
-    public function getAssunto()
+    public function getMsg()
     {
-        return $this->_assunto;
+        return $this->_msg;
     }
 
     /**
@@ -62,22 +85,6 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO
     public function getDataEnvio()
     {
         return $this->_dataEnvio;
-    }
-
-    /**
-     * @param string $descricao
-     */
-    public function setDescricao($descricao)
-    {
-        $this->_descricao = (string)$descricao;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescricao()
-    {
-        return $this->_descricao;
     }
 
     /**
@@ -113,29 +120,37 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param int $tipoRemetente
+     *
      */
-    public function setTipoRemetente($tipoRemetente)
+    public function ler()
     {
-        $this->_tipoRemetente = (int)$tipoRemetente;
+        $this->setStatus( WeLearn_Notificacoes_StatusNotificacao::LIDO );
     }
 
     /**
-     * @return int
+     * @param WeLearn_Notificacoes_INotificador $notificador
      */
-    public function getTipoRemetente()
+    public function adicionarNotificador(WeLearn_Notificacoes_INotificador $notificador)
     {
-        return $this->_tipoRemetente;
+        $this->_notificadores->attach( $notificador );
     }
 
-    public function enviar()
+    /**
+     * @param WeLearn_Notificacoes_INotificador $notificador
+     */
+    public function removerNotificador(WeLearn_Notificacoes_INotificador $notificador)
     {
-        // TODO: Implementar este método!
+        $this->_notificadores->detach( $notificador );
     }
 
-    public function ler()
+    /**
+     *
+     */
+    public function notificar()
     {
-        // TODO: Implementar este método!
+        foreach ( $this->_notificadores as $notificador ) {
+            $notificador->notificar( $this );
+        }
     }
 
     /**
@@ -147,13 +162,30 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO
     public function toArray()
     {
         return array(
-            'assunto' => $this->getAssunto(),
             'dataEnvio' => $this->getDataEnvio(),
-            'descricao' => $this->getDescricao(),
             'id' => $this->getId(),
             'status' => $this->getStatus(),
-            'tipoRemetente' => $this->getTipoRemetente(),
+            'msg' => $this->getMsg(),
+            'destinatario' => ( $this->_destinatario instanceof WeLearn_Usuarios_Usuario )
+                              ? $this->getDestinatario()->toArray() : '',
             'persistido' => $this->isPersistido()
+        );
+    }
+
+    /**
+     * Converte os dados das propriedades do objeto em um array para ser persistido no BD Cassandra
+     *
+     * @return array
+     */
+    public function toCassandra()
+    {
+        return array(
+            'dataEnvio' => $this->getDataEnvio(),
+            'id' => $this->getId(),
+            'status' => $this->getStatus(),
+            'msg' => $this->getMsg(),
+            'destinatario' => ( $this->_destinatario instanceof WeLearn_Usuarios_Usuario )
+                              ? $this->getDestinatario()->getId() : ''
         );
     }
 }

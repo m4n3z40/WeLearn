@@ -769,7 +769,7 @@
 
                                     if ( $sltAulas.val() != res.aulaAtual.id ) {
 
-                                        setTimeout( selecionarAula, 300 );
+                                        setTimeout( selecionarAula, 500 );
 
                                     } else {
 
@@ -803,7 +803,7 @@
 
                                 if ( $sltPaginas.val() != res.paginaAtual.id ) {
 
-                                    setTimeout( selecionarPagina, 300 );
+                                    setTimeout( selecionarPagina, 500 );
 
                                 }
 

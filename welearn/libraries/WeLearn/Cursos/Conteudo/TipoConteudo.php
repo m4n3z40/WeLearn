@@ -6,7 +6,7 @@
  * Time: 20:11
  * To change this template use File | Settings | File Templates.
  */
-class WeLearn_Cursos_Conteudo_TipoConteudo implements  WeLearn_Base_IEnum
+abstract class WeLearn_Cursos_Conteudo_TipoConteudo implements  WeLearn_Base_IEnum
 {
     /**
      * @constant
