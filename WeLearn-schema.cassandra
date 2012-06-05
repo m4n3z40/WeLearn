@@ -611,6 +611,18 @@ and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'UTF8Type';
 
+create column family usuario_compartilhamento_comentario
+with comparator = 'UTF8Type'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
+create column family usuario_comentario_por_compartilhamento
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'TimeUUIDType';
+
 create column family contadores_timeuuid
 with comparator = 'TimeUUIDType'
 and column_type = 'Standard'

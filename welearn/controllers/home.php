@@ -2,7 +2,7 @@
 
 class Home extends Home_Controller {
 
-    private  $_count = 30;
+    private  $_count = 10;
     /**
      * Construtor carrega configurações da classes base CI_Controller
      * (Resolve bug ao utilizar this->load)
@@ -17,18 +17,36 @@ class Home extends Home_Controller {
     public function index()
     {
         $usuarioAutenticado=$this->autenticacao->getUsuarioAutenticado();
-        $feeds_usuario = $this->carregarFeeds('','',$this->_count);
+        $comentarios_feed = array();
+        $feeds_usuario = $this->carregar_feeds('','',$this->_count);
         $this->load->helper('paginacao_cassandra');
         $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
+
+        foreach($feeds_usuario as $row){
+            $comentarios_feed[$row->getId()] = $this->carregar_comentarios('','',10,$row->getId());
+            echo count($comentarios_feed[$row->getId()]);
+        }
+
+
+
+
         $partialCriarFeed = $this->template->loadPartial(
             'form',
              array('formAction' => 'feed/criar_feed'),
             'usuario/feed'
         );
+
+        $partialCriarComentario = $this->template->loadPartial(
+            'form',
+            array('usuarioAutenticado' => $usuarioAutenticado),
+            'usuario/feed/comentario'
+        );
         $partialListarFeed= $this->template->loadPartial(
             'lista',
             array('feeds_usuario' => $feeds_usuario,
+                  'comentarios_feed' => $comentarios_feed,
                   'usuarioAutenticado' => $usuarioAutenticado,
+                  'criarComentario' => $partialCriarComentario,
                   'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
                   'haFeeds' => !empty($feeds_usuario),
                   'haMaisPaginas' => $dadosPaginados['proxima_pagina'],
@@ -48,7 +66,7 @@ class Home extends Home_Controller {
         }
         try{
         $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
-        $feeds_usuario = $this->carregarFeeds($inicio,'',$this->_count);
+        $feeds_usuario = $this->carregar_feeds($inicio,'',$this->_count);
         $this->load->helper('paginacao_cassandra');
         $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
 
@@ -87,7 +105,7 @@ Tente novamente mais tarde.'
 
     }
 
-    private function carregarFeeds($de='',$ate='',$count)
+    private function carregar_feeds($de='',$ate='',$count)
     {
         $this->load->library('autoembed');
         try{
@@ -103,11 +121,24 @@ Tente novamente mais tarde.'
                 $row->setConteudo($this->autoembed->getEmbedCode());
             }
         }
-        return $feeds;
         }catch(cassandra_NotFoundException $e)
         {
-            return array();
+            $feeds = array();
         }
+        return $feeds;
+    }
+
+    private function carregar_comentarios($de='',$ate='',$count,$idFeed)
+    {
+        try{
+            $filtros = array('idFeed' => $idFeed , 'count' => $count);
+            $comentarioFeedDao = WeLearn_DAO_DAOFactory::create('ComentarioFeedDAO');
+            $comentarios = $comentarioFeedDao->recuperarTodos($de,$ate,$filtros);
+        }catch(cassandra_NotFoundException $e)
+        {
+            $comentarios = array();
+        }
+        return $comentarios;
     }
 
 

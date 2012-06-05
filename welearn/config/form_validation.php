@@ -453,6 +453,13 @@ $config = array(
             'rules'=>'required|max_length[125]'
         )
     ),
+    'comentario/criar' => array(
+        array(
+            'field' => 'txtComentario',
+            'label' => 'Comentário',
+            'rules' => 'required|max_length[125]'
+        )
+    ),
     'area/salvar' => array(
         array(
             'field'=>'descricao',

@@ -112,6 +112,31 @@ $('#remover-feed').live('click',function(e){
 );
 
 
+$('#exibir-barra-de-comentario').live('click',function(e){
+        e.preventDefault();
+        var barraComentario = $('#form-comentario-criar');
+        var idFeed = $(this).parent().children('#id-feed').val();
+        $(this).append(barraComentario);
+        $('#id-feed-comentario').val(idFeed);
+        $('#txt-comentario').val('');
+        barraComentario.show();
+        $('#txt-comentario').focus();
+    }
+);
+
+$('#comentario-submit').live('click',function(e){
+        e.preventDefault();
+        var form = document.getElementById('form-comentario-criar'),
+        url = $(form).attr('action');
+        WeLearn.validarForm(
+            form,
+            url,
+            function(result){
+                WeLearn.notificar(result.notificacao);
+            }
+        );
+    }
+);
 
 
 })();

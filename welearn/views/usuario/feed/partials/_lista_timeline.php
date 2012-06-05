@@ -34,5 +34,4 @@
 
         <hr>
     </li>
-
     <?endforeach;?>
