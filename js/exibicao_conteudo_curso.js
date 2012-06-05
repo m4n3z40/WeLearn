@@ -23,6 +23,9 @@
             },
             open: function() {
                 recuperarComentarios( $wrapperSalaDeAula.data('id-pagina') );
+            },
+            close: function() {
+                window.location.reload();
             }
         }),
         $window = $(window),
@@ -122,9 +125,75 @@
     });
 
     $sltPaginas.change(function(e){
-        var $this = $(this);
+        if ( idPagina == '0' ) { return; }
 
-        if ( $this.val() == '0' ) { return; }
+        var $this = $(this),
+            idPagina = $this.val(),
+            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/ir_para/' + idPagina);
+
+        if ( idPagina == '0' ) { return; }
+
+        $.get(
+            url,
+            {},
+            function(res) {
+                if ( res.success ) {
+
+                    $wrapperSalaDeAula.data('id-modulo', res.moduloAtual.id);
+                    $wrapperSalaDeAula.data('id-aula', res.aulaAtual.id);
+                    $wrapperSalaDeAula.data('id-pagina', res.paginaAtual.id);
+
+                    $emModuloNroOrdem.text( res.moduloAtual.nroOrdem );
+                    $emModuloNome.text( res.moduloAtual.nome );
+                    $ddModuloDescricao.text( res.moduloAtual.descricao.replace("\n", '<br>') );
+                    $ddModuloObjetivos.text( res.moduloAtual.objetivos.replace("\n", '<br>') );
+
+                    if ( res.aulaAtual.nroOrdem == 1 ) {
+                        $aNavAulaAnterior.parent().hide();
+                    } else {
+                        $aNavAulaAnterior.parent().show();
+                    }
+
+                    $divRecursosRestritos.hide();
+
+                    $emAulaNroOrdem.text( res.aulaAtual.nroOrdem );
+                    $emAulaNome.text( res.aulaAtual.nome );
+                    $ddAulaDescricao.text( res.aulaAtual.descricao.replace("\n", '<br>') );
+
+                    if ( res.paginaAtual.nroOrdem == 1 ) {
+                        $aNavPaginaAnterior.parent().hide();
+                        $aNavInicioAula.parent().hide();
+                    } else {
+                        $aNavPaginaAnterior.parent().show();
+                        $aNavInicioAula.parent().show();
+                    }
+
+                    $emPaginaNroOrdem.text( res.paginaAtual.nroOrdem );
+                    $emPaginaNome.text( res.paginaAtual.nome );
+
+                    if ( res.anotacaoAtual ) {
+                        $txtAnotacao.text( res.anotacaoAtual );
+                        $preAnotacao.text( res.anotacaoAtual );
+                    } else {
+                        $txtAnotacao.val( '' );
+                        $preAnotacao.text( 'Salve uma anotação sobre esta página aqui.' );
+                    }
+
+                    recuperarComentarios( res.paginaAtual.id );
+
+                    $iframeConteudo.attr('src', res.urlConteudoAtual);
+
+                } else {
+
+                    WeLearn.notificar({
+                        nivel: 'error',
+                        msg: res.errors[0].error_msg,
+                        tempo: 10000
+                    });
+
+                }
+            }
+        );
     });
 
     /*####################################*/
@@ -491,10 +560,11 @@
 
             if ( res.success ) {
 
+                $emQtdRecursosGerais.text( res.qtdRecuperados );
+                $emTotalRecursosGerais.text( res.totalRecursos );
+
                 if ( res.totalRecursos > 0 ) {
 
-                    $emQtdRecursosGerais.text( res.qtdRecuperados );
-                    $emTotalRecursosGerais.text( res.totalRecursos );
                     $ulListaRecursosGerais.html( res.htmlListaRecursos).show();
 
                     if ( res.paginacao.proxima_pagina ) {
@@ -585,11 +655,12 @@
 
             if ( res.success ) {
 
+                $emQtdRecursosRestritos.text( res.qtdRecuperados );
+                $emTotalRecursosRestritos.text( res.totalRecursos );
+                $emNomeAulaRecursosRestritos.text( res.nomeAula );
+
                 if ( res.totalRecursos > 0 ) {
 
-                    $emQtdRecursosRestritos.text( res.qtdRecuperados );
-                    $emTotalRecursosRestritos.text( res.totalRecursos );
-                    $emNomeAulaRecursosRestritos.text( res.nomeAula );
                     $ulListaRecursosRestritos.html( res.htmlListaRecursos).show();
 
                     if ( res.paginacao.proxima_pagina ) {
@@ -668,7 +739,11 @@
 
     /* ############################################################ */
 
-    var $iframeConteudo = $('#iframe-exibicao-pagina'),
+    var $aNavAulaAnterior = $('#a-nav-exibicao-aula-anterior'),
+        $aNavInicioAula = $('#a-nav-exibicao-inicio-aula'),
+        $aNavPaginaAnterior = $('#a-nav-exibicao-pagina-anterior'),
+        $aNavProximaPagina = $('#a-nav-exibicao-proxima-pagina'),
+        $iframeConteudo = $('#iframe-exibicao-pagina'),
         $artModuloInfoetapa = $('#art-modulo-infoetapa-saladeaula'),
         $emModuloTitulo = $artModuloInfoetapa.find('h4 > em'),
         $emModuloNroOrdem = $emModuloTitulo.first(),
@@ -684,50 +759,218 @@
         $artPaginaInfoEtapa = $('#art-pagina-infoetapa-saladeaula'),
         $emPaginaTitulo = $artPaginaInfoEtapa.find('h4 > em'),
         $emPaginaNroOrdem = $emPaginaTitulo.first(),
-        $emPaginaNome = $emPaginaTitulo.last();
+        $emPaginaNome = $emPaginaTitulo.last(),
+        atualizarDadosPaginaAtual = function(res){
 
-    $('#a-nav-exibicao-inicio-aula').click(function(e){
+            var idModuloAtual = $wrapperSalaDeAula.data('id-modulo'),
+                idAulaAtual = $wrapperSalaDeAula.data('id-aula'),
+                idPaginaAtual = $wrapperSalaDeAula.data('id-pagina');
+
+            if ( idModuloAtual != res.moduloAtual.id ) { //Virou de módulo
+
+                $wrapperSalaDeAula.data('id-modulo', res.moduloAtual.id);
+
+                $emModuloNroOrdem.text( res.moduloAtual.nroOrdem );
+                $emModuloNome.text( res.moduloAtual.nome );
+                $ddModuloDescricao.text( res.moduloAtual.descricao.replace("\n", '<br>') );
+                $ddModuloObjetivos.text( res.moduloAtual.objetivos.replace("\n", '<br>') );
+
+                $sltModulos.val( res.moduloAtual.id );
+                $sltModulos.trigger('change');
+
+            }
+
+            if ( idAulaAtual != res.aulaAtual.id ) { //virou de aula
+
+                $wrapperSalaDeAula.data('id-aula', res.aulaAtual.id);
+
+                if ( res.aulaAtual.nroOrdem == 1 ) {
+
+                    $aNavAulaAnterior.parent().hide();
+
+                } else {
+
+                    $aNavAulaAnterior.parent().show();
+
+                }
+
+                $divRecursosRestritos.hide();
+
+                $emAulaNroOrdem.text( res.aulaAtual.nroOrdem );
+                $emAulaNome.text( res.aulaAtual.nome );
+                $ddAulaDescricao.text( res.aulaAtual.descricao.replace("\n", '<br>') );
+
+                if ( idModuloAtual != res.moduloAtual.id ) {
+
+                    var selecionarAula = function(){
+
+                        $sltAulas.val( res.aulaAtual.id );
+
+                        if ( $sltAulas.val() != res.aulaAtual.id ) {
+
+                            setTimeout( selecionarAula, 500 );
+
+                        } else {
+
+                            $sltAulas.trigger('change');
+
+                        }
+
+                    };
+
+                    selecionarAula();
+
+                } else {
+
+                    $sltAulas.val( res.aulaAtual.id );
+                    $sltAulas.trigger('change');
+
+                }
+
+            }
+
+            $wrapperSalaDeAula.data('id-pagina', res.paginaAtual.id);
+
+            if ( res.paginaAtual.nroOrdem == 1 ) {
+
+                $aNavPaginaAnterior.parent().hide();
+                $aNavInicioAula.parent().hide();
+
+            } else {
+
+                $aNavPaginaAnterior.parent().show();
+                $aNavInicioAula.parent().show();
+
+            }
+
+            $emPaginaNroOrdem.text( res.paginaAtual.nroOrdem );
+            $emPaginaNome.text( res.paginaAtual.nome );
+
+            if ( idAulaAtual != res.aulaAtual.id ) {
+
+                var selecionarPagina = function() {
+
+                    $sltPaginas.val( res.paginaAtual.id );
+
+                    if ( $sltPaginas.val() != res.paginaAtual.id ) {
+
+                        setTimeout( selecionarPagina, 500 );
+
+                    }
+
+                };
+
+                selecionarPagina();
+
+            } else {
+
+                $sltPaginas.val( res.paginaAtual.id );
+
+            }
+
+            if ( res.anotacaoAtual ) {
+
+                $txtAnotacao.text( res.anotacaoAtual );
+                $preAnotacao.text( res.anotacaoAtual );
+
+            } else {
+
+                $txtAnotacao.val( '' );
+                $preAnotacao.text( 'Salve uma anotação sobre esta página aqui.' );
+
+            }
+
+            recuperarComentarios( res.paginaAtual.id );
+
+            $iframeConteudo.attr('src', res.urlConteudoAtual);
+        };
+
+    $aNavAulaAnterior.click(function(e){
         e.preventDefault();
 
-
-        var $this = $(this),
-            idCurso = $wrapperSalaDeAula.data('id-curso'),
-            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/inicio_aula/' + idCurso);
+        var idPagina = $wrapperSalaDeAula.data('id-pagina'),
+            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/aula_anterior/' + idPagina);
 
         $.get(
             url,
             {},
             function(res) {
-                log(res);
+                if ( res.success ) {
+
+                    atualizarDadosPaginaAtual( res );
+
+                } else {
+
+                    WeLearn.notificar({
+                        nivel: 'error',
+                        msg: res.errors[0].error_msg,
+                        tempo: 10000
+                    });
+
+                }
             }
         );
+
     });
 
-    $('#a-nav-exibicao-pagina-anterior').click(function(e){
+    $aNavInicioAula.click(function(e){
         e.preventDefault();
 
-        var $this = $(this),
-            idCurso = $wrapperSalaDeAula.data('id-curso'),
-            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/acessar_anterior/' + idCurso);
+        var idPagina = $wrapperSalaDeAula.data('id-pagina'),
+            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/inicio_aula/' + idPagina);
 
         $.get(
             url,
             {},
             function(res) {
-                log(res);
+                if ( res.success ) {
+
+                    atualizarDadosPaginaAtual( res );
+
+                } else {
+
+                    WeLearn.notificar({
+                        nivel: 'error',
+                        msg: res.errors[0].error_msg,
+                        tempo: 10000
+                    });
+
+                }
             }
         );
     });
 
-    $('#a-nav-exibicao-proxima-pagina').click(function(e){
+    $aNavPaginaAnterior.click(function(e){
         e.preventDefault();
 
-        var $this = $(this),
-            idCurso = $wrapperSalaDeAula.data('id-curso'),
-            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/acessar_proximo/' + idCurso),
-            idModuloAtual = $wrapperSalaDeAula.data('id-modulo'),
-            idAulaAtual = $wrapperSalaDeAula.data('id-aula'),
-            idPaginaAtual = $wrapperSalaDeAula.data('id-pagina');
+        var idPaginaAtual = $wrapperSalaDeAula.data('id-pagina'),
+            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/acessar_anterior/' + idPaginaAtual);
+
+        $.get(
+            url,
+            {},
+            function(res) {
+                if ( res.success) {
+
+                    atualizarDadosPaginaAtual( res );
+
+                } else {
+
+                    WeLearn.notificar({
+                        nivel: 'error',
+                        msg: res.errors[0].error_msg,
+                        tempo: 10000
+                    });
+                }
+            }
+        );
+    });
+
+    $aNavProximaPagina.click(function(e){
+        e.preventDefault();
+
+        var idCurso = $wrapperSalaDeAula.data('id-curso'),
+            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/acessar_proximo/' + idCurso);
 
         $.get(
             url,
@@ -739,104 +982,25 @@
 
                     if ( res.tipoConteudoAtual == 'pagina' ) {
 
-                        if ( idModuloAtual != res.moduloAtual.id ) { //Virou de módulo
-
-                            $wrapperSalaDeAula.data('id-modulo', res.moduloAtual.id);
-
-                            $emModuloNroOrdem.text( res.moduloAtual.nroOrdem );
-                            $emModuloNome.text( res.moduloAtual.nome );
-                            $ddModuloDescricao.text( res.moduloAtual.descricao.replace("\n", '<br>') );
-                            $ddModuloObjetivos.text( res.moduloAtual.objetivos.replace("\n", '<br>') );
-
-                            $sltModulos.val( res.moduloAtual.id );
-                            $sltModulos.trigger('change');
-
-                        }
-
-                        if ( idAulaAtual != res.aulaAtual.id ) { //virou de aula
-
-                            $wrapperSalaDeAula.data('id-aula', res.aulaAtual.id);
-
-                            $emAulaNroOrdem.text( res.aulaAtual.nroOrdem );
-                            $emAulaNome.text( res.aulaAtual.nome );
-                            $ddAulaDescricao.text( res.aulaAtual.descricao.replace("\n", '<br>') );
-
-                            if ( idModuloAtual != res.moduloAtual.id ) {
-
-                                var selecionarAula = function(){
-
-                                    $sltAulas.val( res.aulaAtual.id );
-
-                                    if ( $sltAulas.val() != res.aulaAtual.id ) {
-
-                                        setTimeout( selecionarAula, 500 );
-
-                                    } else {
-
-                                        $sltAulas.trigger('change');
-
-                                    }
-
-                                };
-
-                                selecionarAula();
-
-                            } else {
-
-                                $sltAulas.val( res.aulaAtual.id );
-                                $sltAulas.trigger('change');
-
-                            }
-
-                        }
-
-                        $wrapperSalaDeAula.data('id-pagina', res.paginaAtual.id);
-
-                        $emPaginaNroOrdem.text( res.paginaAtual.nroOrdem );
-                        $emPaginaNome.text( res.paginaAtual.nome );
-
-                        if ( idAulaAtual != res.aulaAtual.id ) {
-
-                            var selecionarPagina = function() {
-
-                                $sltPaginas.val( res.paginaAtual.id );
-
-                                if ( $sltPaginas.val() != res.paginaAtual.id ) {
-
-                                    setTimeout( selecionarPagina, 500 );
-
-                                }
-
-                            };
-
-                            selecionarPagina();
-
-                        } else {
-
-                            $sltPaginas.val( res.paginaAtual.id );
-
-                        }
-
-                        if ( res.anotacaoAtual ) {
-
-                            $txtAnotacao.text( res.anotacaoAtual.conteudo );
-                            $preAnotacao.text( res.anotacaoAtual.conteudo );
-
-                        }
-
-                        recuperarComentarios( res.paginaAtual.id );
-
-                        $iframeConteudo.attr('src', res.urlConteudoAtual);
+                        atualizarDadosPaginaAtual( res );
 
                     } else if ( res.tipoConteudoAtual == 'avaliacao' ) {
 
                         //TODO: tratar quando está na aplicação de avaliação.
 
+                    } else {
+
+                        //TODO: tratar quando tipo de conteudo nao é conhecido;
+
                     }
 
                 } else {
 
-                    //TODO: tratar quando o tipo do conteúdo não é conhecido.
+                    WeLearn.notificar({
+                        nivel: 'error',
+                        msg: res.errors[0].error_msg,
+                        tempo: 10000
+                    });
 
                 }
             }

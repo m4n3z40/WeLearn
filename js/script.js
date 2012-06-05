@@ -77,12 +77,14 @@ window.WeLearn = {
 
         opcoes = $.extend(opcoesPadrao, opcoes);
 
+        opcoes.msg += '<br><br><span>( Clique nesta notificação para fechá-la )</span>';
+
         opcoesNoty = {
             text: opcoes.msg,
             type: opcoes.nivel,
             closeOnSelfClick: opcoes.fechavel,
             timeout: opcoes.tempo
-        }
+        };
 
         if ( opcoes.redirecionarAoFechar ) {
             opcoesNoty.onClose = function(){

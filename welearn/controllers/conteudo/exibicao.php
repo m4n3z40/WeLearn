@@ -136,6 +136,8 @@ class Exibicao extends Curso_Controller
                 'idAula' => $aulaAtual ? $aulaAtual->getId() : '',
                 'idPagina' => $paginaAtual ? $paginaAtual->getId() : '',
                 'idAvaliacao' => $avaliacaoAtual ? $avaliacaoAtual->getId() : '',
+                'isAulaInicial' => $aulaAtual && $aulaAtual->getNroOrdem() === 1,
+                'isPaginaInicial' => $paginaAtual && $paginaAtual->getNroOrdem() === 1,
                 'srcIframeConteudo' => $srcIframeConteudo,
                 'htmlSectionAnotacao' => $paginaAtual ? $this->_loadSectionAnotacaoView( $paginaAtual ) : '',
                 'htmlSectionComentarios' => $paginaAtual ? $this->_loadSectionComentariosView( $paginaAtual ) : '',
@@ -211,6 +213,216 @@ class Exibicao extends Curso_Controller
         );
     }
 
+    public function ir_para ( $idPagina )
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $pagina = $this->_paginaDao->recuperar( $idPagina );
+
+            $participacaoCurso = $this->_participacaoCursoDao->recuperarPorCurso(
+                $this->_alunoAtual,
+                $pagina->getAula()->getModulo()->getCurso()
+            );
+
+            try {
+
+                $controlePagina = $this->_participacaoCursoDao->getControlePaginaDAO()->recuperar(
+                    $pagina,
+                    $participacaoCurso
+                );
+
+                if (   $controlePagina->getStatus() != WeLearn_Cursos_Conteudo_StatusConteudo::BLOQUEADO ) {
+
+                    $this->_participacaoCursoDao->getControleModuloDAO()->acessar(
+                        $participacaoCurso,
+                        $pagina->getAula()->getModulo()
+                    );
+
+                    $this->_participacaoCursoDao->getControleAulaDAO()->acessar(
+                        $participacaoCurso,
+                        $pagina->getAula()
+                    );
+
+                    $this->_participacaoCursoDao->getControlePaginaDAO()->acessar(
+                        $participacaoCurso,
+                        $pagina
+                    );
+
+                    $json = $this->_retornarJSONPagina( $participacaoCurso, $pagina );
+
+                } else {
+
+                    $error = create_json_feedback_error_json(
+                        'Desculpe, o conteúdo que está tentando acessar está bloqueado para você :(
+                        <br> Entre em contato com os gerenciadores.'
+                    );
+
+                    $json = create_json_feedback(false, $error);
+
+                }
+
+            } catch ( cassandra_NotFoundException $e ) {
+
+                $error = create_json_feedback_error_json(
+                    'Desculpe, o conteúdo que está tentando acessar está indisponível para você :(
+                    <br> Você deve respeitar a sequência das aulas, nenhuma página, aula ou módulo pode ser pulado .'
+                );
+
+                $json = create_json_feedback(false, $error);
+
+            }
+        } catch( Exception $e ) {
+            log_message('error', 'Ocorreu um erro ao tentar recuperar conteúdo da aula anterior: '
+                . create_exception_description( $e ));
+
+            $error = create_json_feedback_error_json('Ocorreu um erro inesperado,
+                        já estamos tentando resolver. Tente novamente mais tarde!');
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    public function aula_anterior ( $idPaginaAtual )
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $paginaAtual = $this->_paginaDao->recuperar( $idPaginaAtual );
+
+            $participacaoCurso = $this->_participacaoCursoDao->recuperarPorCurso(
+                $this->_alunoAtual,
+                $paginaAtual->getAula()->getModulo()->getCurso()
+            );
+
+            $aulaAnterior = $this->_aulaDao->recuperarAnterior(
+                $paginaAtual->getAula()->getModulo(),
+                $paginaAtual->getAula()->getNroOrdem()
+            );
+
+            $this->_participacaoCursoDao->getControleAulaDAO()->acessar(
+                $participacaoCurso,
+                $aulaAnterior
+            );
+
+            $paginaInicial = $this->_paginaDao->recuperarProxima(
+                $aulaAnterior
+            );
+
+            $this->_participacaoCursoDao->getControlePaginaDAO()->acessar(
+                $participacaoCurso,
+                $paginaInicial
+            );
+
+            $json = $this->_retornarJSONPagina( $participacaoCurso, $paginaInicial );
+        } catch( Exception $e ) {
+            log_message('error', 'Ocorreu um erro ao tentar recuperar conteúdo da aula anterior: '
+                . create_exception_description( $e ));
+
+            $error = create_json_feedback_error_json(
+                'Desculpe, o conteúdo que está tentando acessar está indisponível no momento :(
+                <br> Entre em contato com os gerenciadores.'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    public function inicio_aula( $idPaginaAtual )
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $paginaAtual = $this->_paginaDao->recuperar( $idPaginaAtual );
+
+            $participacaoCurso = $this->_participacaoCursoDao->recuperarPorCurso(
+                $this->_alunoAtual,
+                $paginaAtual->getAula()->getModulo()->getCurso()
+            );
+
+            $paginaInicial = $this->_paginaDao->recuperarProxima(
+                $paginaAtual->getAula()
+            );
+
+            $this->_participacaoCursoDao->getControlePaginaDAO()->acessar(
+                $participacaoCurso,
+                $paginaInicial
+            );
+
+            $json = $this->_retornarJSONPagina( $participacaoCurso, $paginaInicial );
+        } catch( Exception $e ) {
+            log_message('error', 'Ocorreu um erro ao tentar recuperar conteúdo inicial de aula: '
+                . create_exception_description( $e ));
+
+            $error = create_json_feedback_error_json(
+                'Desculpe, o conteúdo que está tentando acessar está indisponível no momento :(
+                <br> Entre em contato com os gerenciadores.'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
+    public function acessar_anterior( $idPaginaAtual )
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $paginaAtual = $this->_paginaDao->recuperar( $idPaginaAtual );
+
+            $participacaoCurso = $this->_participacaoCursoDao->recuperarPorCurso(
+                $this->_alunoAtual,
+                $paginaAtual->getAula()->getModulo()->getCurso()
+            );
+
+            $paginaAnterior = $this->_paginaDao->recuperarAnterior(
+                $paginaAtual->getAula(),
+                $paginaAtual->getNroOrdem()
+            );
+
+            $this->_participacaoCursoDao->getControlePaginaDAO()->acessar(
+                $participacaoCurso,
+                $paginaAnterior
+            );
+
+            $json = $this->_retornarJSONPagina( $participacaoCurso, $paginaAnterior );
+        } catch( Exception $e ) {
+            log_message('error', 'Ocorreu um erro ao tentar recuperar conteúdo anterior de aula: '
+                . create_exception_description( $e ));
+
+            $error = create_json_feedback_error_json(
+                'Desculpe, o conteúdo que está tentando acessar está indisponível no momento :(
+                <br> Entre em contato com os gerenciadores.'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
     public function acessar_proximo( $idcurso )
     {
         if ( ! $this->input->is_ajax_request() ) {
@@ -232,8 +444,10 @@ class Exibicao extends Curso_Controller
             log_message('error', 'Ocorreu um erro ao tentar recuperar proximo conteúdo de aula: '
                 . create_exception_description( $e ));
 
-            $error = create_json_feedback_error_json('Ocorreu um erro inesperado,
-                        já estamos tentando resolver. Tente novamente mais tarde!');
+            $error = create_json_feedback_error_json(
+                'Desculpe, o conteúdo que está tentando acessar está indisponível no momento :(
+                <br> Entre em contato com os gerenciadores.'
+            );
 
             $json = create_json_feedback(false, $error);
         }
@@ -629,41 +843,50 @@ class Exibicao extends Curso_Controller
         }
     }
 
+    private function _retornarJSONPagina(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso,
+                                         WeLearn_Cursos_Conteudo_Pagina $pagina)
+    {
+        $url = site_url(
+            'curso/conteudo/exibicao/exibir/' . $participacaoCurso->getCurso()->getId()
+                                              . '?t=' . $participacaoCurso->getTipoConteudoAtual()
+        );
+
+        try {
+
+            $anotacao = $this->_anotacaoDao->recuperarPorUsuario(
+                $pagina,
+                $this->_alunoAtual
+            )->getConteudo();
+
+        } catch( cassandra_NotFoundException $e ) {
+
+            $anotacao = '';
+
+        }
+
+        $response = Zend_Json::encode(array(
+            'tipoConteudoAtual' => $participacaoCurso->getTipoConteudoAtual(),
+            'moduloAtual'       => $pagina->getAula()->getModulo()->toCassandra(),
+            'aulaAtual'         => $pagina->getAula()->toCassandra(),
+            'paginaAtual'       => $pagina->toCassandra(),
+            'avaliacaoAtual'    => '',
+            'anotacaoAtual'     => $anotacao,
+            'urlConteudoAtual'  => $url
+        ));
+
+        return create_json_feedback(true, '', $response);
+    }
+
     private function _retornarJSONProximaPagina( WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso, $proximaPagina )
     {
         if ( $proximaPagina ) {
 
-            $this->_participacaoCursoDao->getControlePaginaDAO()->acessar( $participacaoCurso, $proximaPagina );
-
-            $url = site_url(
-                'curso/conteudo/exibicao/exibir/' . $participacaoCurso->getCurso()->getId()
-                                                  . '?t=' . $participacaoCurso->getTipoConteudoAtual()
+            $this->_participacaoCursoDao->getControlePaginaDAO()->acessar(
+                $participacaoCurso,
+                $proximaPagina
             );
 
-            try {
-
-                $anotacao = $this->_anotacaoDao->recuperarPorUsuario(
-                    $proximaPagina,
-                    $this->_alunoAtual
-                )->toCassandra();
-
-            } catch( cassandra_NotFoundException $e ) {
-
-                $anotacao = '';
-
-            }
-
-            $response = Zend_Json::encode(array(
-                'tipoConteudoAtual' => $participacaoCurso->getTipoConteudoAtual(),
-                'moduloAtual'       => $proximaPagina->getAula()->getModulo()->toCassandra(),
-                'aulaAtual'         => $proximaPagina->getAula()->toCassandra(),
-                'paginaAtual'       => $proximaPagina->toCassandra(),
-                'avaliacaoAtual'    => '',
-                'anotacaoAtual'     => $anotacao,
-                'urlConteudoAtual'  => $url
-            ));
-
-            return create_json_feedback(true, '', $response);
+            return $this->_retornarJSONPagina( $participacaoCurso, $proximaPagina );
 
         }
 
