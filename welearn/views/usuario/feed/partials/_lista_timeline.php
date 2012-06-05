@@ -1,4 +1,4 @@
-<div>
+
     <?foreach ( $feeds_usuario as $row):?>
     <li>
         <?=$row->getCriador()->toHTML('imagem_pequena')?>
@@ -34,6 +34,4 @@
 
         <hr>
     </li>
-
     <?endforeach;?>
-</div>
