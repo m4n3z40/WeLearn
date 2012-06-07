@@ -760,6 +760,70 @@
         $emPaginaTitulo = $artPaginaInfoEtapa.find('h4 > em'),
         $emPaginaNroOrdem = $emPaginaTitulo.first(),
         $emPaginaNome = $emPaginaTitulo.last(),
+        $divConfirmacaoContinuar = $(
+            '<div/>',
+            { id: 'div-confirm-continuar-visualizacao' }
+        ).dialog({
+            resizable: false,
+            autoOpen: false,
+            modal: true,
+            width: 400,
+            height: 400,
+            title: 'Deseja Prosseguir?',
+            close: function() {
+                $(this).empty();
+            }
+        }),
+        botoesConfimacao = function(executarAoContinuar, executarAoSair) {
+            return {
+                'Continuar!': function(){
+                    executarAoContinuar && executarAoContinuar();
+                    $(this).dialog('close');
+                },
+                'Sair': function(){
+                    executarAoSair && executarAoSair();
+                    $divJanelaAula.dialog('close');
+                    $(this).dialog('close');
+                }
+            };
+        },
+        htmlConfirmacaoContinuar = function(tipo, res) {
+
+            var nomeAula = $emAulaNome.text(),
+                nomeModulo = $emModuloNome.text(),
+                html = '';
+
+            switch (tipo) {
+                case 'aula':
+                    html ='<div>' +
+                        '<h3>Parabéns! Você acaba de finalizar a aula "<em>' +
+                        nomeAula + '</em>" do módulo "<em>' +
+                        nomeModulo + '</em>"</h3><h4>Agora você tem a opção de ' +
+                        'continuar e prosseguir para próxima aula ou sair e continuar mais tarde.</h4>' +
+                        '<h4>Informações sobre a próxima aula:</h4><ul><li>' +
+                        'Aula ' + res.aulaAtual.nroOrdem + ': "<em>'
+                        + res.aulaAtual.nome + '</em>"</li><li>' +
+                        '<span>Descrição:</span><p>' + res.aulaAtual.descricao.replace("\n", '<br>')
+                        + '</p></li></ul><p>Deseja continuar agora?</p></div>';
+                    break;
+                case 'modulo':
+                    html = '<div>' +
+                        '<h3>Parabéns! Você acaba de finalizar o módulo "<em>' +
+                        nomeModulo + '</em>"</h3><h4>Agora você tem a opção de ' +
+                        'continuar e prosseguir para o próximo módulo ou sair e continuar mais tarde.</h4>' +
+                        '<h4>Informações sobre o próximo módulo:</h4><ul><li>' +
+                        'Módulo ' + res.moduloAtual.nroOrdem + ': "<em>'
+                        + res.moduloAtual.nome + '</em>"</li><li>' +
+                        '<span>Descrição:</span><p>' + res.aulaAtual.descricao.replace("\n", '<br>')
+                        + '</p></li><li><span>Objetivos:</span><p>' +
+                        res.moduloAtual.objetivos + '</p></li></ul><p>Deseja continuar agora?</p></div>';
+                    break;
+                default:
+                    html = '';
+            }
+
+            return html;
+        },
         atualizarDadosPaginaAtual = function(res){
 
             var idModuloAtual = $wrapperSalaDeAula.data('id-modulo'),
@@ -982,7 +1046,38 @@
 
                     if ( res.tipoConteudoAtual == 'pagina' ) {
 
-                        atualizarDadosPaginaAtual( res );
+                        var idModuloAtual = $wrapperSalaDeAula.data('id-modulo'),
+                            idAulaAtual = $wrapperSalaDeAula.data('id-aula');
+
+                        if ( idAulaAtual != res.aulaAtual.id && idModuloAtual == res.moduloAtual.id ) {
+
+                            $divConfirmacaoContinuar
+                                .html( htmlConfirmacaoContinuar('aula', res) )
+                                .dialog(
+                                    'option',
+                                    'buttons',
+                                    botoesConfimacao(function(){
+                                        atualizarDadosPaginaAtual( res );
+                                    })
+                                ).dialog('open');
+
+                        } else if ( idModuloAtual != res.moduloAtual.id ) {
+
+                            $divConfirmacaoContinuar
+                                .html( htmlConfirmacaoContinuar('modulo', res) )
+                                .dialog(
+                                    'option',
+                                    'buttons',
+                                    botoesConfimacao(function(){
+                                        atualizarDadosPaginaAtual( res );
+                                    })
+                                ).dialog('open');
+
+                        } else {
+
+                            atualizarDadosPaginaAtual( res );
+
+                        }
 
                     } else if ( res.tipoConteudoAtual == 'avaliacao' ) {
 

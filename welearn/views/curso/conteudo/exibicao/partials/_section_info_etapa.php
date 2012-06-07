@@ -1,7 +1,7 @@
 <div>
     <h3>Informações sobre a etapa atual</h3>
     <article id="art-modulo-infoetapa-saladeaula">
-        <h4>Módulo <em><?php echo $modulo->nroOrdem ?></em>: <em>"<?php echo $modulo->nome ?>"</em></h4>
+        <h4>Módulo <em><?php echo $modulo->nroOrdem ?></em>: "<em><?php echo $modulo->nome ?></em>"</h4>
         <dl>
             <dt><em>Descrição do Módulo:</em></dt>
             <dd><?php echo nl2br($modulo->descricao) ?></dd>
@@ -11,7 +11,7 @@
     </article>
     <?php if ($aula): ?>
         <article id="art-aula-infoetapa-saladeaula">
-            <h4>Aula <em><?php echo $aula->nroOrdem ?></em>: <em>"<?php echo $aula->nome ?>"</em></h4>
+            <h4>Aula <em><?php echo $aula->nroOrdem ?></em>: "<em><?php echo $aula->nome ?></em>"</h4>
             <dl>
                 <dt><em>Descrição da Aula:</em></dt>
                 <dd><?php echo nl2br($aula->descricao) ?></dd>
@@ -20,7 +20,7 @@
     <?php endif; ?>
     <?php if ($pagina): ?>
         <article id="art-pagina-infoetapa-saladeaula">
-            <h4>Página <em><?php echo $aula->nroOrdem ?></em>: <em>"<?php echo $pagina->nome ?>"</em></h4>
+            <h4>Página <em><?php echo $aula->nroOrdem ?></em>: "<em><?php echo $pagina->nome ?></em>"</h4>
         </article>
     <?php endif; ?>
 </div>

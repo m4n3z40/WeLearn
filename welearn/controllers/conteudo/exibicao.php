@@ -91,7 +91,13 @@ class Exibicao extends Curso_Controller
             $participacaoCurso = $this->_participacaoCursoDao->recuperarPorCurso(
                 $this->_alunoAtual,
                 $curso
-            );;
+            );
+
+            if ( $participacaoCurso->getSituacao() === WeLearn_Cursos_SituacaoParticipacaoCurso::INATIVO
+              || $participacaoCurso->getSituacao() === WeLearn_Cursos_SituacaoParticipacaoCurso::INSCRICAO_EM_ESPERA) {
+                show_404();
+                return;
+            }
 
             $iniciouCurso = false;
             $totalPaginas = 0;
