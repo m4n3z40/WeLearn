@@ -396,7 +396,12 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
         $respostasColumnArray = array();
 
         for ($i = 0; $i < count($this->_respostas); $i++) {
-            $respostasColumnArray[ $this->_respostas[$i]->getQuestaoId() ] = $this->_respostas[$i]->getId();
+
+            $questaoUUID  = UUID::import( $this->_respostas[$i]->getQuestaoId() )->bytes;
+            $respostaUUID = UUID::import( $this->_respostas[$i]->getId() )->bytes;
+
+            $respostasColumnArray[ $questaoUUID ] = $respostaUUID;
+
         }
 
         return $respostasColumnArray;

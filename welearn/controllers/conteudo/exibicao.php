@@ -74,6 +74,7 @@ class Exibicao extends Curso_Controller
         $this->_moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
         $this->_avaliacaoDao = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO');
         $this->_anotacaoDao = WeLearn_DAO_DAOFactory::create('AnotacaoDAO');
+        $this->_controleAvaliacaoDao = WeLearn_DAO_DAOFactory::create('ControleAvaliacaoDAO');
 
         $this->_alunoAtual = $this->_alunoDao->criarAluno(
             $this->autenticacao->getUsuarioAutenticado()
@@ -196,7 +197,15 @@ class Exibicao extends Curso_Controller
                     $conteudo = $this->_exibirPagina( $participacaoCurso );
                     break;
                 case WeLearn_Cursos_Conteudo_TipoConteudo::AVALIACAO:
-                    $conteudo = $this->_aplicarAvaliacao( $participacaoCurso );
+                    $avaliacaoFeita = $this->_controleAvaliacaoDao->avaliacaoFeita(
+                        $participacaoCurso,
+                        $participacaoCurso->getAvaliacaoAtual()
+                    );
+                    if ( $avaliacaoFeita ) {
+                        $conteudo = $this->_exibirResultadosAvaliacao( $participacaoCurso );
+                    } else {
+                        $conteudo = $this->_aplicarAvaliacao( $participacaoCurso );
+                    }
                     break;
                 case WeLearn_Cursos_Conteudo_TipoConteudo::NENHUM:
                 default:
@@ -669,6 +678,8 @@ class Exibicao extends Curso_Controller
 
     private function _aplicarAvaliacao( WeLearn_Cursos_ParticipacaoCurso $participacaocurso )
     {
+        //TODO: Desenvolver rotina de aplicação de avaliação;
+
         $dadosAplicacaoAvaliacaoView = array();
 
         return $this->template->loadPartial(
@@ -676,6 +687,11 @@ class Exibicao extends Curso_Controller
             $dadosAplicacaoAvaliacaoView,
             'curso/conteudo/exibicao'
         );
+    }
+
+    private function _exibirResultadosAvaliacao( WeLearn_Cursos_ParticipacaoCurso $participacaoCurso )
+    {
+        //TODO: Desenvolver rotina para exibir resultado da avaliacao;
     }
 
     private function _recuperarConteudoAtual(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso)
@@ -946,12 +962,10 @@ class Exibicao extends Curso_Controller
         $this->_participacaoCursoDao->getControleModuloDAO()->finalizar( $participacaoCurso, $moduloAnterior );
 
         try {
+            $avaliacao = $this->_avaliacaoDao->recuperar( $moduloAnterior->getId() );
 
             $participacaoCurso->setAulaAtual(null);
             $participacaoCurso->setPaginaAtual(null);
-
-            $avaliacao = $this->_avaliacaoDao->recuperar( $moduloAnterior->getId() );
-
             $participacaoCurso->setTipoConteudoAtual( WeLearn_Cursos_Conteudo_TipoConteudo::AVALIACAO );
             $participacaoCurso->setAvaliacaoAtual( $avaliacao );
 
