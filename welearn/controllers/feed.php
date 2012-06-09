@@ -355,9 +355,7 @@ class Feed extends Home_Controller
         $url = $this->input->post('conteudo-feed');
         $http = strpos($url,"http://");
         if($http == false){
-            $search = 'www';
-            $replace = 'http://www';
-            $url = str_replace($search, $replace, $url);
+            $url = 'http://'.$url;
         }
         if(filter_var($url, FILTER_VALIDATE_URL) === FALSE) {
             return false;

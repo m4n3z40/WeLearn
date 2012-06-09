@@ -18,6 +18,7 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
 
     private $_amizadeDAO;
     private $_usuarioDAO;
+    private $_comentarioDAO;
 
 
     function __construct()
@@ -78,6 +79,7 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
     {
         $feed = $this->recuperar($id);
         $uuidFeed = CassandraUtil::import($feed->getId())->bytes;
+        $this->_comentarioDAO = WeLearn_DAO_DAOFactory::create('ComentarioFeedDAO');
         try{
             $amigosAtivos = $this->_amizadeDAO->recuperarTodosAmigosAtivos($feed->getCriador());
         }catch(cassandra_NotFoundException $e){
@@ -98,7 +100,11 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
                 $this->_FeedCF->remove($listaAmigos[$i],array($uuidFeed));
             }
         }
+        $this->_cf->remove($uuidFeed);
         $this->_FeedCF->remove($feed->getCriador()->getId(),array($uuidFeed));
+        $this->_comentarioDAO->removerTodosPorCompartilhamento($uuidFeed);
+
+
     }
 
      /**

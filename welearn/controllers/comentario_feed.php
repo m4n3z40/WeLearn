@@ -6,8 +6,9 @@
  * Time: 16:03
  * To change this template use File | Settings | File Templates.
  */
-class Comentario extends Home_Controller
+class Comentario_feed extends Home_Controller
 {
+    private $_count = 30;
 
     function __construct()
     {
@@ -42,7 +43,13 @@ class Comentario extends Home_Controller
             $comentario->setDataEnvio(time());
             $comentario->setConteudo($this->input->post('txtComentario'));
             $comentarioFeedDAO->salvar($comentario);
+
+            $htmlComentario = $this->template->loadPartial('lista_comentarios',
+                array('comentarios' => array($comentario)),
+                'usuario/feed/comentario');
             $response = Zend_Json::encode(array(
+                'idfeed'=> $comentario->getCompartilhamento()->getId(),
+                'htmlComentario' => $htmlComentario,
                 'notificacao' => create_notificacao_array(
                     'sucesso',
                     'Comentario foi Salvo com Sucesso!'
@@ -59,6 +66,29 @@ class Comentario extends Home_Controller
            $json = create_json_feedback(false,'',$response);
         }
         echo $json;
+    }
+
+    public function proxima_pagina($idProximaPagina,$idFeed)
+    {
+
+
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+
+            $this->load->helper('paginacao_cassandra');
+            $this->load->helper('comentarios_feed');
+            $comentarios = carregar_comentarios($idProximaPagina,'', 3, $idFeed);
+            $response = array(
+                'success' => true,
+                'htmlListaComentarios' => $comentarios['HTMLcomentarios'],
+                'paginacao' => $comentarios['paginacao']
+            );
+
+            $json = Zend_Json::encode($response);
+            echo $json;
+
     }
 
 }

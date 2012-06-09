@@ -35,22 +35,40 @@ class Perfil extends Perfil_Controller {
         $this->load->helper('paginacao_cassandra');
         $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
 
-        $partialListarTimeline= $this->template->loadPartial(
-            'lista_timeline',
-            array('feeds_usuario' => $feeds_usuario,
-                'usuarioAutenticado' => $usuarioAutenticado,
-                'usuarioPerfil' => $usuarioPerfil,
-                'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
-                'haFeeds' => !empty($feeds_usuario),
-                'haMaisPaginas' => $dadosPaginados['proxima_pagina'],
-                'linkPaginacao' => 'usuario/perfil/proxima_pagina/'.$usuarioPerfil->getId()
-            ),
-            'usuario/feed'
-        );
+        $qtdFeeds = count($feeds_usuario);
+        $comentarios_feed = array();
+
+        $this->load->helper('comentarios_feed');
+
+        for($i = 0; $i < $qtdFeeds; $i++){
+            $comentarios_feed[$i] = carregar_comentarios('','', 3, $feeds_usuario[$i]->getId());
+        }
 
         $partialCriarFeed = $this->template->loadPartial(
             'form',
             array('formAction' => 'feed/criar_timeline/'.$usuarioPerfil->getId()),
+            'usuario/feed'
+        );
+
+        $partialCriarComentario = $this->template->loadPartial(
+            'form',
+            array('formAction'=>'comentario_feed/criar','formExtra' => array('id'=>"form-comentario-criar",'name'=>'form-comentario-criar', 'style'=> 'display: none'),'usuarioAutenticado' => $usuarioAutenticado),
+            'usuario/feed/comentario'
+        );
+        $partialListarTimeline= $this->template->loadPartial(
+            'lista',
+            array(
+                'qtdFeeds' => $qtdFeeds,
+                'feeds_usuario' => $feeds_usuario,
+                'comentarios_feed' => $comentarios_feed,
+                'usuarioAutenticado' => $usuarioAutenticado,
+                'criarComentario' => $partialCriarComentario,
+                'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
+                'haFeeds' => !empty($feeds_usuario),
+                'haMaisPaginas' => $dadosPaginados['proxima_pagina'],
+                'linkPaginacao' => '/home/proxima_pagina',
+                'usuarioPerfil' => $usuarioPerfil
+            ),
             'usuario/feed'
         );
 

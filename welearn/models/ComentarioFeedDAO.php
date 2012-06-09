@@ -51,10 +51,19 @@ class ComentarioFeedDAO extends WeLearn_DAO_AbstractDAO
      * @param array|null $filtros
      * @return array
      */
-    public function recuperarTodos($de = null, $ate = null, array $filtros = null)
+    public function recuperarTodos($de = '', $ate = '', array $filtros = null)
     {
+
+        if ($de != '') {
+            $de = CassandraUtil::import($de)->bytes;
+        }
+
+        if ($ate != '') {
+            $ate = CassandraUtil::import($ate)->bytes;
+        }
+
        $idFeed = CassandraUtil::import($filtros['idFeed'])->bytes;
-       $idComentarios = array_keys($this->_comentarioPorCompartilhamentoCF->get($idFeed));
+       $idComentarios = array_keys($this->_comentarioPorCompartilhamentoCF->get($idFeed,null,$de,$ate,true,$filtros['count']));
        $comentarios = $this->_cf->multiget($idComentarios);
        return $this->_criarVariosFromCassandra($comentarios);
     }
@@ -82,9 +91,19 @@ class ComentarioFeedDAO extends WeLearn_DAO_AbstractDAO
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
      */
-    public function remover($id)
+    public function remover($idFeed)
     {
-        // TODO: Implement remover() method.
+        $this->_cf->remove($idFeed);
+    }
+
+    public function removerTodosPorCompartilhamento($idFeed)
+    {
+        $idComentarios = array_keys($this->_comentarioPorCompartilhamentoCF->get($idFeed));
+        foreach($idComentarios as $row)
+        {
+            $this->remover(CassandraUtil::import($row)->bytes);
+        }
+        $this->_comentarioPorCompartilhamentoCF->remove($idFeed);
     }
 
     /**

@@ -9,7 +9,6 @@
             </figure>
         </header>
         <ul>
-            <li><?= anchor('/home','Home')?></li>
             <?php if($usuarioPerfil->getId() != $usuarioAutenticado->getId()):?>
                <input type='hidden' id='id-usuario-perfil' value='<?=$usuarioPerfil->id ?>'>
                <input type='hidden' id='nome-usuario-perfil' value='<?=$usuarioPerfil->nome?>'>
