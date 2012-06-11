@@ -7,6 +7,6 @@
         <p><?echo $comentario->conteudo;?></p>
         <div>Criado em:</div>
         <span><?php echo date('d/m/Y, à\s H:i', $comentario->dataEnvio) ?></span><br>
-        <a href="comentario/remover"></a>
+        <?echo anchor('comentario_feed/remover/'.$comentario->id,'remover',array('id'=>'remover-comentario'))?>
     </li>
 <?endforeach;?>

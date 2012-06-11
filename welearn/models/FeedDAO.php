@@ -172,9 +172,11 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
 
     public function removerTimeline(WeLearn_DTO_IDTO &$dto, WeLearn_DTO_IDTO &$usuario)
     {
+        $this->_comentarioDAO = WeLearn_DAO_DAOFactory::create('ComentarioFeedDAO');
         $idFeed= CassandraUtil::import($dto->getId())->bytes;
         $this->_cf->remove($idFeed);
         $this->_TimelineCF->remove($usuario->getId(),array($idFeed));
+        $this->_comentarioDAO->removerTodosPorCompartilhamento($idFeed);
     }
 
 

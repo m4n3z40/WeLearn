@@ -1,6 +1,6 @@
 
 <?=form_open($formAction , array('id' => 'form-criar-feed'))?>
-    <legend>selecione o tipo de feed</legend>
+    <legend>Selecione o tipo de Feed</legend>
     <div>
         <?= form_radio('tipo-feed',WeLearn_Compartilhamento_TipoFeed::STATUS,true,'id = "feed-status"')?><label for="feed-status">Status</label>
         <?= form_radio('tipo-feed',WeLearn_Compartilhamento_TipoFeed::LINK,false,'id = "feed-link"')?><label for="feed-link">Link</label>

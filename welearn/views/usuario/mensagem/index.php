@@ -1,8 +1,8 @@
 <div>
     <header>
         <hgroup>
-            <h1>Mensagens de Amigos</h1>
-            <h3>Selecione um dos amigos da lista para exibir as mensagens</h3>
+            <h1>Mensagens Pessoais</h1>
+            <h3>Selecione um dos Usuários da lista para exibir as Mensagens</h3>
         </hgroup>
     </header>
     <div>
@@ -13,7 +13,7 @@
         <?php endforeach;?>
         </ul>
         <?php }else{?>
-        <h3>voce nao possui conversas com nenhum amigo</h3>
+        <h3>Voce não possui conversas com nenhum Usuário</h3>
         <?php } ?>
     </div>
 </div>

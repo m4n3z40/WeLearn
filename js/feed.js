@@ -96,9 +96,7 @@ $('<div id="dialogo-aviso-remover-compartilhamento""><p>Tem certeza que deseja r
                 $.post(
                     WeLearn.url.siteURL(url),
                     function(result){
-                        if(result.success){
-                            feed.remove();
-                        }
+                        feed.remove();
                         WeLearn.notificar(result.notificacao);
                     },
                     'json'
@@ -144,19 +142,34 @@ $('#comentario-submit').live('click',function(e){
             form,
             url,
             function(result){
-                if(result.success){
+               if(result.success){
                     if($('#item-feed-'+result.idfeed+'>ul').length){
                         $('#item-feed-'+result.idfeed+'>ul').append(result.htmlComentario);
                     }else{
                         $('#item-feed-'+result.idfeed).append('<ul>'+result.htmlComentario+'</ul>')
                     }
+                    $('#form-comentario-criar').hide();
+                    WeLearn.notificar(result.notificacao);
                 }
-                $('#form-comentario-criar').hide();
-                WeLearn.notificar(result.notificacao);
+
             }
         );
     }
 );
+
+$('#remover-comentario').live('click',function(e){
+    e.preventDefault();
+    var url = $(this).attr('href');
+    var comentario = $(this).parent();
+    $.post(
+        WeLearn.url.siteURL(url),
+        function(result){
+            comentario.remove();
+            WeLearn.notificar(result.notificacao);
+        },
+        'json'
+    );
+});
 
 $('#paginacao-comentario').live('click',
     function(e){
@@ -173,7 +186,7 @@ $('#paginacao-comentario').live('click',
                     if(res.paginacao.proxima_pagina) {
                         $('#item-feed-'+idFeed).children('#paginacao-comentario').val(res.paginacao.inicio_proxima_pagina);
                     } else {
-                        $('#item-feed-'+idFeed).children('#paginacao-comentario').parent().children('ul').prepend('<h4>Não há novos comentarios para exibiçao.</h4>');
+                        $('#item-feed-'+idFeed).children('#paginacao-comentario').parent().children('ul').prepend('<h4>Não existem mais comentários para exibição.</h4>');
                         $('#item-feed-'+idFeed).children('#paginacao-comentario').remove();
                     }
                 }else {

@@ -93,17 +93,19 @@ class ComentarioFeedDAO extends WeLearn_DAO_AbstractDAO
      */
     public function remover($idFeed)
     {
-        $this->_cf->remove($idFeed);
+        $this->_cf->remove(CassandraUtil::import($idFeed)->bytes);
     }
 
     public function removerTodosPorCompartilhamento($idFeed)
     {
+        try{
         $idComentarios = array_keys($this->_comentarioPorCompartilhamentoCF->get($idFeed));
         foreach($idComentarios as $row)
         {
-            $this->remover(CassandraUtil::import($row)->bytes);
+            $this->remover($row);
         }
         $this->_comentarioPorCompartilhamentoCF->remove($idFeed);
+        }catch(cassandra_NotFoundException $e){}
     }
 
     /**

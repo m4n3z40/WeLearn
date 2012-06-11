@@ -56,14 +56,23 @@ class Comentario_feed extends Home_Controller
                 )
             ));
             $json = create_json_feedback(true,'',$response);
-        }catch(Exception $e){
-           $response = Zend_Json::encode(array(
-               'notificacao' => create_notificacao_array(
-                   'erro',
-                   'Falha ao enviar Comentario!'
-               )
-           ));
-           $json = create_json_feedback(false,'',$response);
+        }catch(cassandra_NotFoundException $e){
+           $error = create_json_feedback_error_json("Erro, o compartilhamento selecionado não foi encontrado!");
+           $json = create_json_feedback(false,$error);
+        }
+        echo $json;
+    }
+
+    public function remover($idComentario){
+        try{
+            $comentarioDao = WeLearn_DAO_DAOFactory::create('ComentarioFeedDAO');
+            $comentarioDao->remover($idComentario);
+            $this->load->helper('notificacao_js');
+            $response = Zend_Json::encode(array('notificacao' => create_notificacao_array('sucesso','Comentario removido com Sucesso')));
+            $json = create_json_feedback(true,'',$response);
+        }catch(cassandra_NotFoundException $e){
+            $error = create_json_feedback_error_json("Erro, o comentario selecionado não foi encontrado!");
+            $json = create_json_feedback(false,$error);
         }
         echo $json;
     }

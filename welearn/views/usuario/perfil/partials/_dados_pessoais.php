@@ -8,7 +8,7 @@
     </header>
     <div>
         <?php if(!$dadosPessoais instanceof WeLearn_Usuarios_DadosPessoaisUsuario):?>
-                <h3>O usuario <?=$usuarioPerfil->nome?> ainda não cadastrou dados pessoais</h3>
+                <h3>O usuário <?=$usuarioPerfil->nome?> ainda não cadastrou dados pessoais</h3>
         <?php else:?>
             <?php if(($dadosPessoais->sexo == WeLearn_Usuarios_Sexo::NAO_EXIBIR && $dadosPessoais->dataNascimento==''
                 && $pais == '' && $estado == '' && $dadosPessoais->cidade == ''&& $dadosPessoais->endereco ==''
@@ -16,7 +16,7 @@
                 && count($dadosPessoais->listaDeIm)==0 && count($dadosPessoais->listaDeRS)==0
                 && $dadosPessoais->homepage == '')):?>
 
-                      <h3>O usuario <?=$usuarioPerfil->nome?> ainda não cadastrou dados pessoais</h3>
+                      <h3>O usuário <?=$usuarioPerfil->nome?> ainda não cadastrou dados pessoais</h3>
 
                 <?php else:?>
                     <?php if($dadosPessoais->sexo != WeLearn_Usuarios_Sexo::NAO_EXIBIR
@@ -41,19 +41,19 @@
                             <h4>Localização</h4>
                             <dl>
                                 <?if($pais != ''):?>
-                                <dt>Pais</dt>
+                                <dt>País</dt>
                                 <dd><?=$pais?></dd>
                                 <?endif;?>
                                 <?if($estado != ''):?>
-                                <dt>estado</dt>
+                                <dt>Estado</dt>
                                 <dd><?=$estado?></dd>
                                 <?endif;?>
                                 <?if($dadosPessoais->cidade != ''):?>
-                                <dt>cidade</dt>
+                                <dt>Cidade</dt>
                                 <dd><?=$dadosPessoais->cidade?></dd>
                                 <?endif;?>
                                 <?if($dadosPessoais->endereco !=''):?>
-                                <dt>endereço</dt>
+                                <dt>Endereço</dt>
                                 <dd><?=$dadosPessoais->endereco?></dd>
                                 <?endif;?>
                             </dl>
@@ -108,13 +108,13 @@
                             </dl>
                             <dl>
                                 <?if(count($dadosPessoais->listaDeRS)>0):?>
-                                <dt><label>Perfis Em Redes Sociais</label></dt>
+                                <dt><label>Perfis em Redes Sociais</label></dt>
                                 <dd>
                                     <table id='lista-de-rs'>
                                         <?foreach ($dadosPessoais->listaDeRS as $RS):?>
                                         <tr>
                                             <td>Rede Social (RS)</td>
-                                            <td>Usuario na Rede Social (RS)</td>
+                                            <td>Usuário na Rede Social (RS)</td>
                                         </tr>
                                         <tr>
                                             <td><?php echo $RS->descricaoRS;?></td>

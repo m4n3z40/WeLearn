@@ -18,6 +18,6 @@
         <?php endif;?>
     </div>
 <?php else:?>
-    Sua Lista de Amigos Está Vazia, Utilize A Barra de Busca e Encontre Seus Amigos!
+    <h4>Sua lista de Amigos está vazia, utilize a barra de busca e encontre seus Amigos!<h4>
 <?php endif;?>
 
