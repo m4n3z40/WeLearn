@@ -19,8 +19,8 @@
                 <input type='hidden' value='<?=$texto?>' id='texto'/>
             </div>
         <?php else: ?>
-                <h1>não existem mais resultados</h1>
+                <h4>Não há mais resultados há serem exibidos!</h4>
         <?php endif;?>
         <?php else: ?>
-                <h1>nenhum resultado encontrado</h1>
+                <h4>Nenhuma busca foi realizada ou nenhum resultado foi encontrado!</h4>
         <?php endif;?>

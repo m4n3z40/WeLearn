@@ -453,7 +453,7 @@ $config = array(
             'rules'=>'required|max_length[125]'
         )
     ),
-    'comentario/criar' => array(
+    'comentario_feed/criar' => array(
         array(
             'field' => 'txtComentario',
             'label' => 'Comentário',

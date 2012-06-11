@@ -79,35 +79,45 @@ $("#paginacao-feed").click(
     }
 );
 
-$('#remover-timeline').live('click',function(e){
-        e.preventDefault();
-        var feed=$(this).parent();
-        var url= $(this).attr('href');
-        $.post(
-            WeLearn.url.siteURL(url),
-            function(result) {
-                 feed.remove();
-                 WeLearn.notificar(result.notificacao);
+var feed,url;
+
+$('<div id="dialogo-aviso-remover-compartilhamento""><p>Tem certeza que deseja remover este compartilhamento? <br>' +
+    ' esta ação não poderá ser desfeita!</p></div>').dialog(
+    {
+        autoOpen: false,
+        modal: true,
+        draggable: false,
+        resizable: false,
+        title:'Remover compartilhamento',
+        width: 400,
+        height: 170,
+        buttons: {
+            "Confirmar": function() {
+                $.post(
+                    WeLearn.url.siteURL(url),
+                    function(result){
+                        feed.remove();
+                        WeLearn.notificar(result.notificacao);
+                    },
+                    'json'
+                );
+                $(this).dialog("close");
             },
-            'json'
-        );
+            "Cancelar": function(){
+                $(this).dialog("close");
+            }
+        }
     }
 );
 
-$('#remover-feed').live('click',function(e){
+
+
+
+$('#remover').live('click',function(e){
         e.preventDefault();
-        var feed=$(this).parent();
-        var url= $(this).attr('href');
-        $.post(
-            WeLearn.url.siteURL(url),
-            function(result){
-                if(result.success){
-                    feed.remove();
-                }
-                WeLearn.notificar(result.notificacao);
-            },
-            'json'
-        );
+        feed=$(this).parent();
+        url= $(this).attr('href');
+        $('#dialogo-aviso-remover-compartilhamento').dialog( "open");
     }
 );
 
@@ -116,7 +126,7 @@ $('#exibir-barra-de-comentario').live('click',function(e){
         e.preventDefault();
         var barraComentario = $('#form-comentario-criar');
         var idFeed = $(this).parent().children('#id-feed').val();
-        $(this).append(barraComentario);
+        $(this).parent().append(barraComentario);
         $('#id-feed-comentario').val(idFeed);
         $('#txt-comentario').val('');
         barraComentario.show();
@@ -132,9 +142,62 @@ $('#comentario-submit').live('click',function(e){
             form,
             url,
             function(result){
-                WeLearn.notificar(result.notificacao);
+               if(result.success){
+                    if($('#item-feed-'+result.idfeed+'>ul').length){
+                        $('#item-feed-'+result.idfeed+'>ul').append(result.htmlComentario);
+                    }else{
+                        $('#item-feed-'+result.idfeed).append('<ul>'+result.htmlComentario+'</ul>')
+                    }
+                    $('#form-comentario-criar').hide();
+                    WeLearn.notificar(result.notificacao);
+                }
+
             }
         );
+    }
+);
+
+$('#remover-comentario').live('click',function(e){
+    e.preventDefault();
+    var url = $(this).attr('href');
+    var comentario = $(this).parent();
+    $.post(
+        WeLearn.url.siteURL(url),
+        function(result){
+            comentario.remove();
+            WeLearn.notificar(result.notificacao);
+        },
+        'json'
+    );
+});
+
+$('#paginacao-comentario').live('click',
+    function(e){
+        e.preventDefault();
+        var proxComentario = $(this).data('proximo');
+        var idFeed = $(this).data('id-feed');
+        var url = WeLearn.url.siteURL($(this).attr('href')+ proxComentario + '/' + idFeed);
+        $.get(
+            url,
+            (WeLearn.url.queryString != '') ? WeLearn.url.queryString : null,
+            function(res) {
+                if (res.success) {
+                    $('#item-feed-'+idFeed).children('ul').prepend(res.htmlListaComentarios);
+                    if(res.paginacao.proxima_pagina) {
+                        $('#item-feed-'+idFeed).children('#paginacao-comentario').val(res.paginacao.inicio_proxima_pagina);
+                    } else {
+                        $('#item-feed-'+idFeed).children('#paginacao-comentario').parent().children('ul').prepend('<h4>Não existem mais comentários para exibição.</h4>');
+                        $('#item-feed-'+idFeed).children('#paginacao-comentario').remove();
+                    }
+                }else {
+                    WeLearn.notificar({
+                        msg: res.errors[0].error_msg,
+                        nivel: 'error',
+                        tempo: 10000
+                    });
+                }
+            },'json'
+        )
     }
 );
 

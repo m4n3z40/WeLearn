@@ -18,6 +18,7 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
 
     private $_amizadeDAO;
     private $_usuarioDAO;
+    private $_comentarioDAO;
 
 
     function __construct()
@@ -78,6 +79,7 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
     {
         $feed = $this->recuperar($id);
         $uuidFeed = CassandraUtil::import($feed->getId())->bytes;
+        $this->_comentarioDAO = WeLearn_DAO_DAOFactory::create('ComentarioFeedDAO');
         try{
             $amigosAtivos = $this->_amizadeDAO->recuperarTodosAmigosAtivos($feed->getCriador());
         }catch(cassandra_NotFoundException $e){
@@ -98,7 +100,11 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
                 $this->_FeedCF->remove($listaAmigos[$i],array($uuidFeed));
             }
         }
+        $this->_cf->remove($uuidFeed);
         $this->_FeedCF->remove($feed->getCriador()->getId(),array($uuidFeed));
+        $this->_comentarioDAO->removerTodosPorCompartilhamento($uuidFeed);
+
+
     }
 
      /**
@@ -166,9 +172,11 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
 
     public function removerTimeline(WeLearn_DTO_IDTO &$dto, WeLearn_DTO_IDTO &$usuario)
     {
+        $this->_comentarioDAO = WeLearn_DAO_DAOFactory::create('ComentarioFeedDAO');
         $idFeed= CassandraUtil::import($dto->getId())->bytes;
         $this->_cf->remove($idFeed);
         $this->_TimelineCF->remove($usuario->getId(),array($idFeed));
+        $this->_comentarioDAO->removerTodosPorCompartilhamento($idFeed);
     }
 
 

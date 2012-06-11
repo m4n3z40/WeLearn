@@ -1,7 +1,7 @@
 <div id="mensagem-listar-content">
     <header>
         <hgroup>
-            <h1 >mensagens de <?=$nomeAmigo?></h1>
+            <h1 >Mensagens de <?=$nomeAmigo?></h1>
             <input type="hidden" value='<?=$idAmigo?>' id='id-amigo-mensagens'/>
         </hgroup>
     </header>

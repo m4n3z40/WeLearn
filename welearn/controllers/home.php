@@ -17,18 +17,19 @@ class Home extends Home_Controller {
     public function index()
     {
         $usuarioAutenticado=$this->autenticacao->getUsuarioAutenticado();
-        $comentarios_feed = array();
         $feeds_usuario = $this->carregar_feeds('','',$this->_count);
+
         $this->load->helper('paginacao_cassandra');
         $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
 
-        foreach($feeds_usuario as $row){
-            $comentarios_feed[$row->getId()] = $this->carregar_comentarios('','',10,$row->getId());
-            echo count($comentarios_feed[$row->getId()]);
+        $qtdFeeds = count($feeds_usuario);
+        $comentarios_feed = array();
+
+        $this->load->helper('comentarios_feed');
+
+        for($i = 0; $i < $qtdFeeds; $i++){
+            $comentarios_feed[$i] = carregar_comentarios('','', 3, $feeds_usuario[$i]->getId());
         }
-
-
-
 
         $partialCriarFeed = $this->template->loadPartial(
             'form',
@@ -38,12 +39,14 @@ class Home extends Home_Controller {
 
         $partialCriarComentario = $this->template->loadPartial(
             'form',
-            array('usuarioAutenticado' => $usuarioAutenticado),
+            array('formAction'=>'comentario_feed/criar','formExtra' => array('id'=>"form-comentario-criar",'name'=>'form-comentario-criar', 'style'=> 'display: none'),'usuarioAutenticado' => $usuarioAutenticado),
             'usuario/feed/comentario'
         );
         $partialListarFeed= $this->template->loadPartial(
             'lista',
-            array('feeds_usuario' => $feeds_usuario,
+            array(
+                  'qtdFeeds' => $qtdFeeds,
+                  'feeds_usuario' => $feeds_usuario,
                   'comentarios_feed' => $comentarios_feed,
                   'usuarioAutenticado' => $usuarioAutenticado,
                   'criarComentario' => $partialCriarComentario,
@@ -65,26 +68,37 @@ class Home extends Home_Controller {
             show_404();
         }
         try{
-        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
-        $feeds_usuario = $this->carregar_feeds($inicio,'',$this->_count);
-        $this->load->helper('paginacao_cassandra');
-        $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
+            $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+            $feeds_usuario = $this->carregar_feeds($inicio,'',$this->_count);
 
-        $response = array(
-            'success' => true,
-            'htmlListaFeeds' => $this->template->loadPartial(
-                'lista',
-                array(
-                    'feeds_usuario' => $feeds_usuario,
-                    'usuarioAutenticado' => $usuarioAutenticado,
-                    'paginacao' => $dadosPaginados
+            $this->load->helper('paginacao_cassandra');
+            $dadosPaginados = create_paginacao_cassandra($feeds_usuario,$this->_count);
+
+            $qtdFeeds = count($feeds_usuario);
+            $comentarios_feed = array();
+
+            $this->load->helper('comentarios_feed');
+            for($i = 0; $i < $qtdFeeds; $i++){
+                $comentarios_feed[$i] = carregar_comentarios('','', 2, $feeds_usuario[$i]->getId());
+            }
+
+            $response = array(
+                'success' => true,
+                'htmlListaFeeds' => $this->template->loadPartial(
+                    'lista',
+                    array(
+                        'qtdFeeds' => $qtdFeeds,
+                        'feeds_usuario' => $feeds_usuario,
+                        'comentarios_feed' => $comentarios_feed,
+                        'usuarioAutenticado' => $usuarioAutenticado,
+                        'paginacao' => $dadosPaginados
+                    ),
+                    'usuario/feed'
                 ),
-                'usuario/feed'
-            ),
-            'paginacao' => $dadosPaginados
-        );
+                'paginacao' => $dadosPaginados
+            );
 
-        $json = Zend_Json::encode($response);
+            $json = Zend_Json::encode($response);
         }catch (UUIDException $e) {
 
             log_message(
@@ -109,18 +123,18 @@ Tente novamente mais tarde.'
     {
         $this->load->library('autoembed');
         try{
-        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
-        $feedDao = WeLearn_DAO_DAOFactory::create('FeedDAO');
-        $filtros = array('usuario' => $usuarioAutenticado , 'count' => $count+1);
-        $feeds = $feedDao->recuperarTodos($de,$ate,$filtros);
-        foreach($feeds as $row)
-        {
-            if($row->getTipo() == WeLearn_Compartilhamento_TipoFeed::VIDEO)
+            $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+            $feedDao = WeLearn_DAO_DAOFactory::create('FeedDAO');
+            $filtros = array('usuario' => $usuarioAutenticado , 'count' => $count+1);
+            $feeds = $feedDao->recuperarTodos($de,$ate,$filtros);
+            foreach($feeds as $row)
             {
-                $isValid=$this->autoembed->parseUrl($row->getConteudo());
-                $row->setConteudo($this->autoembed->getEmbedCode());
+                if($row->getTipo() == WeLearn_Compartilhamento_TipoFeed::VIDEO)
+                {
+                    $isValid=$this->autoembed->parseUrl($row->getConteudo());
+                    $row->setConteudo($this->autoembed->getEmbedCode());
+                }
             }
-        }
         }catch(cassandra_NotFoundException $e)
         {
             $feeds = array();
@@ -128,18 +142,7 @@ Tente novamente mais tarde.'
         return $feeds;
     }
 
-    private function carregar_comentarios($de='',$ate='',$count,$idFeed)
-    {
-        try{
-            $filtros = array('idFeed' => $idFeed , 'count' => $count);
-            $comentarioFeedDao = WeLearn_DAO_DAOFactory::create('ComentarioFeedDAO');
-            $comentarios = $comentarioFeedDao->recuperarTodos($de,$ate,$filtros);
-        }catch(cassandra_NotFoundException $e)
-        {
-            $comentarios = array();
-        }
-        return $comentarios;
-    }
+
 
 
 }

@@ -97,5 +97,5 @@
         <?endif;?>
     <?endif;?>
 <?php else:?>
-    <h3>O usuario <?=$usuarioPerfil->nome?> ainda não cadastrou dados profissionais</h3>
+    <h3>O usuário <?=$usuarioPerfil->nome?> ainda não cadastrou dados profissionais</h3>
 <?php endif;?>

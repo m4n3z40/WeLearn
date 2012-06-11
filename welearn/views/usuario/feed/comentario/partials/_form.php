@@ -1,4 +1,4 @@
-<?php echo form_open('comentario/criar',array('id'=>"form-comentario-criar",'name'=>'form-comentario-criar', 'style'=> 'display: none',)) ?>
+<?php echo form_open($formAction,$formExtra) ?>
 <fieldset>
     <dl>
         <input type='hidden' name='id-feed-comentario' id='id-feed-comentario'/>

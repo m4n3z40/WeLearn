@@ -2,7 +2,7 @@
     <header>
         <hgroup>
             <h1>Busca de Usuarios do WeLearn</h1>
-            <h3>Está procurando Alguém? Está no lugar certo!</h3>
+            <h3>Está procurando alguém? Está no lugar certo!</h3>
         </hgroup>
         <p></p>
     </header>
@@ -38,6 +38,6 @@
         <h4>Não há mais resultados há serem exibidos.</h4>
         <?php endif; ?>
     <?php else: ?>
-    <h3>Nenhuma busca foi realizada ou nenhum resultado foi encontrado :(</h3>
+    <h4>Nenhuma busca foi realizada ou nenhum resultado foi encontrado :(</h4>
     <?php endif; ?>
 </div>

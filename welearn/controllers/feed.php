@@ -152,7 +152,7 @@ class Feed extends Home_Controller
             $feedDAO->remover($idFeed);
             $json=Zend_Json::encode(array( 'success' => true , 'notificacao'=> create_notificacao_array(
                 'sucesso',
-                'Feed removido com sucesso!'
+                'Compartilhamento removido com sucesso!'
             )
             ));
         }catch(cassandra_NotFoundException $e){
@@ -161,10 +161,10 @@ class Feed extends Home_Controller
                 'falha ao remover timeline id feed '.$idFeed
             );
 
-            $error = create_json_feedback_error_json(
-                'Falha ao remover timeline.'
-            );
-            $json = create_json_feedback(false,$error);
+            $json=Zend_Json::encode(array( 'success' => false , 'notificacao'=> create_notificacao_array(
+                'erro',
+                'Falha ao remover Compartilhamento'
+            )));
         }
         echo $json;
     }
@@ -364,9 +364,7 @@ class Feed extends Home_Controller
         $url = $this->input->post('conteudo-feed');
         $http = strpos($url,"http://");
         if($http == false){
-            $search = 'www';
-            $replace = 'http://www';
-            $url = str_replace($search, $replace, $url);
+            $url = 'http://'.$url;
         }
         if(filter_var($url, FILTER_VALIDATE_URL) === FALSE) {
             return false;
