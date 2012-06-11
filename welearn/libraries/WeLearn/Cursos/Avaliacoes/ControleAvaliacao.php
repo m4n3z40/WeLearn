@@ -221,6 +221,14 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
     /**
      * @return void
      */
+    public function iniciar()
+    {
+        $this->setSituacao( WeLearn_Cursos_Avaliacoes_SituacaoAvaliacao::INICIADA );
+    }
+
+    /**
+     * @return void
+     */
     public function reprovar()
     {
         $this->setSituacao( WeLearn_Cursos_Avaliacoes_SituacaoAvaliacao::REPROVADO );

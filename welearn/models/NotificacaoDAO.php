@@ -54,6 +54,31 @@ class NotificacaoDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param SplObjectStorage $listaNotificacoes
+     * @return void
+     */
+    public function adicionarVarios(SplObjectStorage &$listaNotificacoes)
+    {
+        $batchNotificacoes = array();
+        $batchNotificacoesPorUsuario = array();
+
+        foreach ($listaNotificacoes as $notificacao) {
+
+            $UUID = UUID::mint();
+            $notificacao->setId( $UUID->string );
+            $usuarioId = $notificacao->getDestinatario()->getId();
+
+            $batchNotificacoes[ $UUID->bytes ] = $notificacao->toCassandra();
+            $batchNotificacoesPorUsuario[ $usuarioId ] = array( $UUID->bytes => '' );
+
+        }
+
+        $this->_cf->batch_insert( $batchNotificacoes );
+        $this->_notificacoesPorUsuarioCF->batch_insert( $batchNotificacoesPorUsuario );
+        $this->_notificacoesNovasPorUsuarioCF->batch_insert( $batchNotificacoesPorUsuario );
+    }
+
+    /**
      * @param WeLearn_DTO_IDTO $dto
      * @return void
      */

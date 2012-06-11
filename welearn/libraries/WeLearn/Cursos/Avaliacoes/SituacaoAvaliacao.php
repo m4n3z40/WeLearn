@@ -19,12 +19,17 @@ abstract class WeLearn_Cursos_Avaliacoes_SituacaoAvaliacao implements WeLearn_Ba
     /**
      * @constant
      */
-    const APROVADO = 1;
+    const INICIADA = 1;
 
     /**
      * @constant
      */
-    const REPROVADO = 2;
+    const APROVADO = 2;
+
+    /**
+     * @constant
+     */
+    const REPROVADO = 3;
 
     /**
      * Retorna a descrição do Enum passado por parametru.
@@ -39,6 +44,8 @@ abstract class WeLearn_Cursos_Avaliacoes_SituacaoAvaliacao implements WeLearn_Ba
         {
             case self::NAO_INICIADA:
                 return 'Avaliação não iniciada';
+            case self::INICIADA:
+                return 'Avaliação iniciada';
             case self::APROVADO:
                 return 'Aprovado na avaliação';
             case self::REPROVADO:

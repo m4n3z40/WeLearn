@@ -15,6 +15,11 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO implement
     /**
      * @var string
      */
+    private $_url;
+
+    /**
+     * @var string
+     */
     private $_id;
 
     /**
@@ -72,6 +77,22 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO implement
     }
 
     /**
+     * @param string $url
+     */
+    public function setUrl($url)
+    {
+        $this->_url = (string)$url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->_url;
+    }
+
+    /**
      * @param string $dataEnvio
      */
     public function setDataEnvio($dataEnvio)
@@ -120,7 +141,7 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO implement
     }
 
     /**
-     *
+     *@return void
      */
     public function ler()
     {
@@ -129,6 +150,7 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO implement
 
     /**
      * @param WeLearn_Notificacoes_INotificador $notificador
+     * @return void
      */
     public function adicionarNotificador(WeLearn_Notificacoes_INotificador $notificador)
     {
@@ -137,6 +159,7 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO implement
 
     /**
      * @param WeLearn_Notificacoes_INotificador $notificador
+     * @return void
      */
     public function removerNotificador(WeLearn_Notificacoes_INotificador $notificador)
     {
@@ -144,7 +167,7 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO implement
     }
 
     /**
-     *
+     *@return void
      */
     public function notificar()
     {
@@ -166,6 +189,7 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO implement
             'id' => $this->getId(),
             'status' => $this->getStatus(),
             'msg' => $this->getMsg(),
+            'url' => $this->getMsg(),
             'destinatario' => ( $this->_destinatario instanceof WeLearn_Usuarios_Usuario )
                               ? $this->getDestinatario()->toArray() : '',
             'persistido' => $this->isPersistido()
@@ -184,6 +208,7 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO implement
             'id' => $this->getId(),
             'status' => $this->getStatus(),
             'msg' => $this->getMsg(),
+            'url' => $this->getUrl(),
             'destinatario' => ( $this->_destinatario instanceof WeLearn_Usuarios_Usuario )
                               ? $this->getDestinatario()->getId() : ''
         );
