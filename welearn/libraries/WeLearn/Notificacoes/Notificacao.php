@@ -3,39 +3,39 @@
 class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO implements WeLearn_Notificacoes_INotificacao
 {
     /**
-     * @var string
+     * @var int
      */
-    private $_dataEnvio;
+    protected $_dataEnvio;
 
     /**
      * @var string
      */
-    private $_msg;
+    protected $_msg;
 
     /**
      * @var string
      */
-    private $_url;
+    protected $_url;
 
     /**
      * @var string
      */
-    private $_id;
+    protected $_id;
 
     /**
      * @var int
      */
-    private $_status = WeLearn_Notificacoes_StatusNotificacao::NOVO;
+    protected $_status = WeLearn_Notificacoes_StatusNotificacao::NOVO;
 
     /**
      * @var WeLearn_Usuarios_Usuario
      */
-    private $_destinatario;
+    protected $_destinatario;
 
     /**
      * @var SplObjectStorage
      */
-    private $_notificadores;
+    protected $_notificadores;
 
     public function __construct()
     {
@@ -93,15 +93,15 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO implement
     }
 
     /**
-     * @param string $dataEnvio
+     * @param int $dataEnvio
      */
     public function setDataEnvio($dataEnvio)
     {
-        $this->_dataEnvio = (string)$dataEnvio;
+        $this->_dataEnvio = (int)$dataEnvio;
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getDataEnvio()
     {
@@ -212,5 +212,11 @@ class WeLearn_Notificacoes_Notificacao extends WeLearn_DTO_AbstractDTO implement
             'destinatario' => ( $this->_destinatario instanceof WeLearn_Usuarios_Usuario )
                               ? $this->getDestinatario()->getId() : ''
         );
+    }
+
+    function __toString()
+    {
+        return '<p>' . $this->getMsg() . '<span> - '
+             . date('d/m/Y à\s H:i:s', $this->getDataEnvio()) . '</span></p>';
     }
 }

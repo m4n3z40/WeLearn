@@ -31,13 +31,38 @@ class WeLearn_Notificacoes_NotificacaoResenhaRespondida extends WeLearn_Notifica
 
     public function getMsg()
     {
-        //TODO: Implementar msg de notificação.
+        if ( null === $this->_msg ) {
+
+            $linkResenha = anchor(
+                '/curso/review/' . $this->getResenha()->getCurso()->getId(),
+                'avaliação'
+            );
+
+            $linkCurso = anchor(
+                '/curso/' . $this->getResenha()->getCurso()->getId(),
+                $this->getResenha()->getCurso()->getNome()
+            );
+
+            $linkGerenciador = anchor(
+                '/perfil/' . $this->getResenha()->getResposta()->getCriador()->getId(),
+                $this->getResenha()->getResposta()->getCriador()->getNome()
+            );
+
+            $this->setMsg('Sua ' . $linkResenha . ' do curso ' . $linkCurso
+                . ' foi respondida pelo Gerenciador ' . $linkGerenciador . '.');
+        }
+
         return parent::getMsg();
     }
 
     public function getUrl()
     {
-        //TODO: Implementar url da notificacao.
+        if ( null === $this->_url ) {
+
+            $this->setUrl( site_url('/curso/review/' . $this->getResenha()->getCurso()->getId()) );
+
+        }
+
         return parent::getUrl();
     }
 }

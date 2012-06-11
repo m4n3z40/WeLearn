@@ -174,6 +174,15 @@ class Aluno extends Curso_Controller
             ));
 
             $json = create_json_feedback(true, '', $response);
+
+            //Enviar notificação para aluno.
+            $notificacao = new WeLearn_Notificacoes_NotificacaoAlunoDesvinculado();
+            $notificacao->setDestinatario( $aluno );
+            $notificacao->setCurso( $curso );
+            $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+            $notificacao->notificar();
+            //fim da notificação.
+
         } catch (cassandra_NotFoundException $e) {
             log_message('error', 'Erro ao tentar recuparar proxima página da lista de alunos: '
                 . create_exception_description($e));
@@ -314,6 +323,15 @@ class Aluno extends Curso_Controller
             ));
 
             $json = create_json_feedback(true, '', $response);
+
+            //enviar notificação ao usuário;
+            $notificacao = new WeLearn_Notificacoes_NotificacaoInscricaoCursoAceita();
+            $notificacao->setCurso( $curso );
+            $notificacao->setDestinatario( $usuario );
+            $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+            $notificacao->notificar();
+            //fim da notificação;
+
         } catch (cassandra_NotFoundException $e) {
             log_message('error', 'Erro ao tentar aceitar requisição de inscricao: '
                 . create_exception_description($e));
@@ -356,6 +374,15 @@ class Aluno extends Curso_Controller
             ));
 
             $json = create_json_feedback(true, '', $response);
+
+            //enviar notificação ao usuário;
+            $notificacao = new WeLearn_Notificacoes_NotificacaoInscricaoCursoRecusada();
+            $notificacao->setCurso( $curso );
+            $notificacao->setDestinatario( $usuario );
+            $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+            $notificacao->notificar();
+            //fim da notificação;
+
         } catch (cassandra_NotFoundException $e) {
             log_message('error', 'Erro ao tentar recusar requisição de inscricao: '
                 . create_exception_description($e));

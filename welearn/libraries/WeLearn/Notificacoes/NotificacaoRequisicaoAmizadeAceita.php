@@ -31,13 +31,31 @@ class WeLearn_Notificacoes_NotificacaoRequisicaoAmizadeAceita extends WeLearn_No
 
     public function getMsg()
     {
-        //TODO: Implementar msg de notificação.
+        if ( null === $this->_msg ) {
+
+            $linkRemetente = anchor(
+                '/perfil/' . $this->getConvite()->getRemetente()->getId(),
+                $this->getConvite()->getRemetente()->getNome()
+            );
+
+            $linkAmizade = anchor('/usuario/amigos', 'amigos');
+
+            $this->setMsg(
+                $linkRemetente . ' aceitou sua requisição de amizade, e agora vocês são ' . $linkAmizade . ' no WeLearn.'
+            );
+        }
+
         return parent::getMsg();
     }
 
     public function getUrl()
     {
-        //TODO: Implementar url da notificacao.
+        if ( null === $this->_url ) {
+
+            $this->setUrl( site_url('/perfil/' . $this->getConvite()->getRemetente()->getId()) );
+
+        }
+
         return parent::getUrl();
     }
 }

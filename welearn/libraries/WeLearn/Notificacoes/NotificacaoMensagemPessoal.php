@@ -31,13 +31,33 @@ class WeLearn_Notificacoes_NotificacaoMensagemPessoal extends WeLearn_Notificaco
 
     public function getMsg()
     {
-        //TODO: Implementar msg de notificação.
+        if ( null === $this->_msg ) {
+
+            $linkMsg = anchor(
+                '/usuario/mensagem/listar/' . $this->getMensagemPessoal()->getRemetente()->getId(),
+                'mensagem pessoal'
+            );
+
+            $linkRemetente = anchor(
+                '/perfil/' . $this->getMensagemPessoal()->getRemetente()->getId(),
+                $this->getMensagemPessoal()->getRemetente()->getNome()
+            );
+
+            $this->setMsg( $linkRemetente . ' enviou uma ' . $linkMsg . ' para você.' );
+
+        }
+
         return parent::getMsg();
     }
 
     public function getUrl()
     {
-        //TODO: Implementar url da notificacao.
+        if ( null === $this->_url ) {
+
+            $this->setUrl( site_url('/usuario/mensagem/listar/' . $this->getMensagemPessoal()->getRemetente()->getId()) );
+
+        }
+
         return parent::getUrl();
     }
 }

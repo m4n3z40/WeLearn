@@ -890,6 +890,37 @@ class Curso extends Curso_Controller
                     $sugestaoDao = WeLearn_DAO_DAOFactory::create('SugestaoCursoDAO');
                     $sugestao = $sugestaoDao->recuperar($dadosNovoCurso['sugestao']);
                     $sugestao->registrarCriacaoCurso($novoCurso, $sugestaoDao);
+
+                    //Enviar notificação aos usuarios
+                    $notificadorBatch = new WeLearn_Notificacoes_NotificadorCassandraBatch();
+
+                    //notificar criador
+                    $notificacao = new WeLearn_Notificacoes_NotificacaoSugestaoCursoAceitaCriador();
+                    $notificacao->setSugestao( $sugestao );
+                    $notificacao->setCursoCriado( $novoCurso );
+                    $notificacao->setDestinatario( $sugestao->getCriador() );
+                    $notificacao->adicionarNotificador( $notificadorBatch );
+                    $notificacao->notificar();
+
+                    //Notificar votantes
+                    try {
+                        $idsVotantes = $sugestaoDao->recuperarTodosIdsVotantes( $sugestao );
+                    } catch ( cassandra_NotFoundException $e ) {
+                        $idsVotantes = array();
+                    }
+
+                    foreach($idsVotantes as $idVotante) {
+                        $votante = new WeLearn_Usuarios_Usuario();
+                        $votante->setId( $idVotante );
+
+                        $notificacao = new WeLearn_Notificacoes_NotificacaoSugestaoCursoAceitaVotante();
+                        $notificacao->setSugestao( $sugestao );
+                        $notificacao->setCursoCriado( $novoCurso );
+                        $notificacao->setDestinatario( $votante );
+                        $notificacao->adicionarNotificador( $notificadorBatch );
+                        $notificacao->notificar();
+                    }
+                    //fim notificação.
                 }
 
                 $notificacoesFlash = create_notificacao_json(

@@ -31,13 +31,29 @@ class WeLearn_Notificacoes_NotificacaoInscricaoCursoAceita extends WeLearn_Notif
 
     public function getMsg()
     {
-        //TODO: Implementar msg de notificação.
+        if ( null === $this->_url ) {
+
+            $linkCurso = anchor(
+                '/curso/' . $this->getCurso()->getId(),
+                $this->getCurso()->getNome()
+            );
+
+            $this->setMsg( 'Sua incrição para fazer parte do curso ' . $linkCurso . ' foi aceita pelos gerenciadores.
+                            Agora você é um aluno deste curso e poderá acessar seu conteúdo restrito.' );
+
+        }
+
         return parent::getMsg();
     }
 
     public function getUrl()
     {
-        //TODO: Implementar url da notificacao.
+        if ( null === $this->_url ) {
+
+            $this->setUrl( site_url('/curso/' . $this->getCurso()->getId()) );
+
+        }
+
         return parent::getUrl();
     }
 }

@@ -6,7 +6,7 @@
  * Time: 2:44 AM
  * To change this template use File | Settings | File Templates.
  */
-class WeLearn_Notificacoes_NotificacaoSugestaoCursoAceita extends WeLearn_Notificacoes_Notificacao
+class WeLearn_Notificacoes_NotificacaoSugestaoCursoAceitaCriador extends WeLearn_Notificacoes_Notificacao
 {
     /**
      * @var WeLearn_Cursos_SugestaoCurso
@@ -52,13 +52,36 @@ class WeLearn_Notificacoes_NotificacaoSugestaoCursoAceita extends WeLearn_Notifi
 
     public function getMsg()
     {
-        //TODO: Implementar msg de notificação.
+        if ( null === $this->_msg ) {
+
+            $linkSugestao = anchor(
+                '/curso/sugestao',
+                $this->getSugestao()->getNome()
+            );
+
+            $linkCurso = anchor(
+                '/curso/' . $this->getCursoCriado()->getId(),
+                $this->getCursoCriado()->getNome()
+            );
+
+            $this->setMsg(
+                'A sugestão de curso ' . $linkSugestao
+              . ' que você criou, gerou o curso ' . $linkCurso . '.'
+            );
+
+        }
+
         return parent::getMsg();
     }
 
     public function getUrl()
     {
-        //TODO: Implementar url da notificacao.
+        if ( null === $this->_url ) {
+
+            $this->setUrl( site_url('/curso/' . $this->getCursoCriado()->getId()) );
+
+        }
+
         return parent::getUrl();
     }
 }

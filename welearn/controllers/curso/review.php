@@ -602,6 +602,14 @@ class Review extends Curso_Controller
             )
         ));
 
+        //enviar notificação ao usuário;
+        $notificacao = new WeLearn_Notificacoes_NotificacaoResenhaRespondida();
+        $notificacao->setResenha( $resenha );
+        $notificacao->setDestinatario( $resenha->getCriador() );
+        $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+        $notificacao->notificar();
+        //fim da notificação;
+
         return create_json_feedback(true, '', $response);
     }
 

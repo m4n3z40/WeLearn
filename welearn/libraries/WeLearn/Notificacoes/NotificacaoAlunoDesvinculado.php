@@ -31,13 +31,29 @@ class WeLearn_Notificacoes_NotificacaoAlunoDesvinculado extends WeLearn_Notifica
 
     public function getMsg()
     {
-        //TODO: Implementar msg de notificação.
+        if ( null === $this->_msg ) {
+
+            $linkCurso = anchor(
+                '/curso/' . $this->getCurso()->getId(),
+                $this->getCurso()->getNome()
+            );
+
+            $this->setMsg( 'Você foi desvinculado do curso ' . $linkCurso . ' por um dos gerenciadores.
+                            Você não poderá mais acessar os conteúdos restrito deste curso.' );
+
+        }
+
         return parent::getMsg();
     }
 
     public function getUrl()
     {
-        //TODO: Implementar url da notificacao.
+        if ( null === $this->_url ) {
+
+            $this->setUrl( site_url('/curso/' . $this->getCurso()->getId()) );
+
+        }
+
         return parent::getUrl();
     }
 }

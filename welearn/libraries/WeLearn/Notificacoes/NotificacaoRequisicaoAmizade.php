@@ -31,13 +31,31 @@ class WeLearn_Notificacoes_NotificacaoRequisicaoAmizade extends WeLearn_Notifica
 
     public function getMsg()
     {
-        //TODO: Implementar msg de notificação.
+        if ( null === $this->_msg ) {
+
+            $linkRemetente = anchor(
+                '/perfil/' . $this->getConvite()->getRemetente()->getId(),
+                $this->getConvite()->getRemetente()->getNome()
+            );
+
+            $linkConvites = anchor('/convite/index/recebidos', 'convidando');
+
+            $this->setMsg(
+                $linkRemetente . ' está ' . $linkConvites . ' você para ser amigo dele no WeLearn.'
+            );
+        }
+
         return parent::getMsg();
     }
 
     public function getUrl()
     {
-        //TODO: Implementar url da notificacao.
+        if ( null === $this->_url ) {
+
+            $this->setUrl( site_url('/convite/index/recebidos') );
+
+        }
+
         return parent::getUrl();
     }
 }

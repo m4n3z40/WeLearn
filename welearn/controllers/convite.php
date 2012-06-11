@@ -154,6 +154,15 @@ class Convite extends Home_Controller
                         'Convite enviado com sucesso!'
                     );
                     $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
+                    //enviar notificação ao usuário;
+                    $notificacao = new WeLearn_Notificacoes_NotificacaoRequisicaoAmizade();
+                    $notificacao->setConvite( $conviteCadastrado );
+                    $notificacao->setDestinatario( $destinatario );
+                    $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+                    $notificacao->notificar();
+                    //fim da notificação;
+
                 }else if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA){
 
                     $this->load->helper('notificacao_js');
@@ -164,7 +173,6 @@ class Convite extends Home_Controller
                     );
                     $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
                 }
-
 
             }catch(Exception $e){
                 log_message(
@@ -178,8 +186,9 @@ class Convite extends Home_Controller
                     Tente novamente mais tarde.'
                 );
 
-                $json = create_json_feedback(false, $e);
+                $json = create_json_feedback(false, $error);
             }
+
             echo $json;
         }
 
@@ -295,6 +304,14 @@ class Convite extends Home_Controller
                        'Convite Aceito!'
                    ));
                }
+
+               //enviar notificação ao usuário;
+               $notificacao = new WeLearn_Notificacoes_NotificacaoRequisicaoAmizadeAceita();
+               $notificacao->setConvite( $conviteRemovido );
+               $notificacao->setDestinatario( $conviteRemovido->getRemetente() );
+               $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+               $notificacao->notificar();
+               //fim da notificação;
 
            }catch(cassandra_NotFoundException $e){
                $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');

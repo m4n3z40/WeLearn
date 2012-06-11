@@ -31,13 +31,49 @@ class WeLearn_Notificacoes_NotificacaoCompartilhamentoPerfil extends WeLearn_Not
 
     public function getMsg()
     {
-        //TODO: Implementar msg de notificação.
+        if ( null === $this->_msg ) {
+
+            switch ( $this->getCompartilhamento()->getTipo() ) {
+                case WeLearn_Compartilhamento_TipoFeed::IMAGEM:
+                    $tipoStr = 'uma imagem';
+                    break;
+                case WeLearn_Compartilhamento_TipoFeed::VIDEO:
+                    $tipoStr = 'um vídeo';
+                    break;
+                case WeLearn_Compartilhamento_TipoFeed::LINK:
+                    $tipoStr = 'um link';
+                    break;
+                case WeLearn_Compartilhamento_TipoFeed::STATUS:
+                default:
+                    $tipoStr = 'um status';
+            }
+
+            $linkRemetente = anchor(
+                '/perfil/' . $this->getCompartilhamento()->getCriador()->getId(),
+                $this->getCompartilhamento()->getCriador()->getNome()
+            );
+
+            $linkDestinatario = anchor(
+                '/perfil/' . $this->getDestinatario()->getId(),
+                'perfil'
+            );
+
+            $this->setMsg($linkRemetente . ' compartilhou ' . $tipoStr
+                         . ' no seu ' . $linkDestinatario . '.');
+
+        }
+
         return parent::getMsg();
     }
 
     public function getUrl()
     {
-        //TODO: Implementar url da notificacao.
+        if ( null === $this->_url ) {
+
+            $this->setUrl( site_url('/perfil/' . $this->getDestinatario()->getId()) );
+
+        }
+
         return parent::getUrl();
     }
 }

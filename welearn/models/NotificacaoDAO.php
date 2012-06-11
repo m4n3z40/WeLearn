@@ -11,18 +11,12 @@ class NotificacaoDAO extends WeLearn_DAO_AbstractDAO
     protected $_nomeCF = 'notificacoes_notificacao';
     
     private $_nomeNotificacoesPorUsuarioCF = 'notificacoes_notificacao_por_usuario';
-    private $_nomeNotificacoesLidasPorUsuario = 'notificacoes_notificacao_lida_por_usuario';
     private $_nomeNotificacoesNovasPorUsuario = 'notificacoes_notificacao_nova_por_usuario';
 
     /**
      * @var ColumnFamily|null
      */
     private $_notificacoesPorUsuarioCF;
-
-    /**
-     * @var ColumnFamily|null
-     */
-    private $_notificacoesLidasPorUsuarioCF;
 
     /**
      * @var ColumnFamily|null
@@ -42,10 +36,6 @@ class NotificacaoDAO extends WeLearn_DAO_AbstractDAO
             $this->_nomeNotificacoesPorUsuarioCF
         );
         
-        $this->_notificacoesLidasPorUsuarioCF = $phpCassa->getColumnFamily(
-            $this->_nomeNotificacoesLidasPorUsuario
-        );
-        
         $this->_notificacoesNovasPorUsuarioCF = $phpCassa->getColumnFamily(
             $this->_nomeNotificacoesNovasPorUsuario
         );
@@ -61,11 +51,13 @@ class NotificacaoDAO extends WeLearn_DAO_AbstractDAO
     {
         $batchNotificacoes = array();
         $batchNotificacoesPorUsuario = array();
+        $dataEnvio = time();
 
         foreach ($listaNotificacoes as $notificacao) {
 
             $UUID = UUID::mint();
             $notificacao->setId( $UUID->string );
+            $notificacao->setDataEnvio( $dataEnvio );
             $usuarioId = $notificacao->getDestinatario()->getId();
 
             $batchNotificacoes[ $UUID->bytes ] = $notificacao->toCassandra();
@@ -87,6 +79,7 @@ class NotificacaoDAO extends WeLearn_DAO_AbstractDAO
         $UUID = UUID::mint();
         
         $dto->setId( $UUID->string );
+        $dto->setDataEnvio( time() );
 
         $this->_cf->insert( $UUID->bytes, $dto->toCassandra() );
 
@@ -115,24 +108,12 @@ class NotificacaoDAO extends WeLearn_DAO_AbstractDAO
         $this->_cf->insert( $UUID, $dto->toCassandra() );
 
         $usuarioId = $dto->getDestinatario()->getId();
-
-        $this->_notificacoesLidasPorUsuarioCF->remove(
-            $usuarioId,
-            array( $UUID )
-        );
         $this->_notificacoesNovasPorUsuarioCF->remove(
             $usuarioId,
             array( $UUID )
         );
 
-        if ( $dto->getStatus() === WeLearn_Notificacoes_StatusNotificacao::LIDO ) {
-
-            $this->_notificacoesLidasPorUsuarioCF->insert(
-                $usuarioId,
-                array( $UUID => '' )
-            );
-
-        } else {
+        if ( $dto->getStatus() === WeLearn_Notificacoes_StatusNotificacao::NOVO ) {
 
             $this->_notificacoesNovasPorUsuarioCF->insert(
                 $usuarioId,
@@ -158,25 +139,15 @@ class NotificacaoDAO extends WeLearn_DAO_AbstractDAO
 
         if ( isset( $filtros['usuario'] ) ) {
 
-            if ( isset( $filtros['status'] ) ) {
+            if ( isset( $filtros['status'] )
+                && $filtros['status'] === WeLearn_Notificacoes_StatusNotificacao::NOVO ) {
 
-                switch( $filtros['status'] ) {
-                    case WeLearn_Notificacoes_StatusNotificacao::NOVO:
-                        return $this->recuperarTodosNovasPorUsuario(
-                            $filtros['usuario'],
-                            $de,
-                            $ate,
-                            $count
-                        );
-                    case WeLearn_Notificacoes_StatusNotificacao::LIDO:
-                        return $this->recuperarTodosLidasPorUsuario(
-                            $filtros['usuario'],
-                            $de,
-                            $ate,
-                            $count
-                        );
-                    default:
-                }
+                return $this->recuperarTodosNovasPorUsuario(
+                    $filtros['usuario'],
+                    $de,
+                    $ate,
+                    $count
+                );
 
             }
 
@@ -264,42 +235,6 @@ class NotificacaoDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
-     * @param WeLearn_Usuarios_Usuario $usuario
-     * @param string $de
-     * @param string $ate
-     * @param int $count
-     * @return array
-     */
-    public function recuperarTodosLidasPorUsuario(WeLearn_Usuarios_Usuario $usuario, 
-                                                  $de = '', 
-                                                  $ate ='', 
-                                                  $count = 20)
-    {
-        if ($de != '') {
-            $de = UUID::import( $de )->bytes;
-        }
-
-        if ($ate != '') {
-            $ate = UUID::import( $ate )->bytes;
-        }
-
-        $ids = array_keys(
-            $this->_notificacoesLidasPorUsuarioCF->get(
-                $usuario->getId(),
-                null,
-                $de,
-                $ate,
-                true,
-                $count
-            )
-        );
-
-        $columns = $this->_cf->multiget( $ids );
-
-        return $this->_criarVariosFromCassandra( $columns, $usuario );
-    }
-
-    /**
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
      */
@@ -345,15 +280,6 @@ class NotificacaoDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
-     * @param WeLearn_Usuarios_Usuario $usuario
-     * @return int
-     */
-    public function recuperarQtdTotalLidasPorUsuario(WeLearn_Usuarios_Usuario $usuario)
-    {
-        return $this->_notificacoesLidasPorUsuarioCF->get_count( $usuario->getId() );
-    }
-
-    /**
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
      */
@@ -369,7 +295,6 @@ class NotificacaoDAO extends WeLearn_DAO_AbstractDAO
 
         $this->_notificacoesPorUsuarioCF->remove( $usuarioId, array( $UUID ) );
         $this->_notificacoesNovasPorUsuarioCF->remove( $usuarioId, array( $UUID ) );
-        $this->_notificacoesLidasPorUsuarioCF->remove( $usuarioId, array( $UUID ) );
     }
 
     /**
@@ -396,7 +321,6 @@ class NotificacaoDAO extends WeLearn_DAO_AbstractDAO
 
         $this->_notificacoesPorUsuarioCF->remove( $usuario->getId() );
         $this->_notificacoesNovasPorUsuarioCF->remove( $usuario->getId() );
-        $this->_notificacoesLidasPorUsuarioCF->remove( $usuario->getId() );
     }
 
     /**

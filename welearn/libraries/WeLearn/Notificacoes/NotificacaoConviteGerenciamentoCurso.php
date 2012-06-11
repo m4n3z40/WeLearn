@@ -31,13 +31,35 @@ class WeLearn_Notificacoes_NotificacaoConviteGerenciamentoCurso extends WeLearn_
 
     public function getMsg()
     {
-        //TODO: Implementar msg de notificação.
+        if ( null === $this->_msg ) {
+
+            $linkCurso = anchor(
+                '/curso/' . $this->getCurso()->getId(),
+                $this->getCurso()->getId()
+            );
+
+            $linkConvite = anchor(
+                '/curso/meus_convites',
+                'convite'
+            );
+
+            $this->setMsg('Você recebeu um ' . $linkConvite
+                          . ' para fazer parte do corpo de gerenciadores do curso '
+                          . $linkCurso . '.');
+
+        }
+
         return parent::getMsg();
     }
 
     public function getUrl()
     {
-        //TODO: Implementar url da notificacao.
+        if ( null === $this->_url ) {
+
+            $this->setUrl( site_url('/curso/meus_convites') );
+
+        }
+
         return parent::getUrl();
     }
 }
