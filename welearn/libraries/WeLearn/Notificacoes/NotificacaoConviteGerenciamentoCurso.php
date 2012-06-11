@@ -35,7 +35,7 @@ class WeLearn_Notificacoes_NotificacaoConviteGerenciamentoCurso extends WeLearn_
 
             $linkCurso = anchor(
                 '/curso/' . $this->getCurso()->getId(),
-                $this->getCurso()->getId()
+                $this->getCurso()->getNome()
             );
 
             $linkConvite = anchor(

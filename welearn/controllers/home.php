@@ -11,7 +11,7 @@ class Home extends Home_Controller {
     {
         parent::__construct();
         $this->template->appendJSImport('home.js')
-        ->appendJSImport('feed.js');
+                       ->appendJSImport('feed.js');
     }
 
     public function index()

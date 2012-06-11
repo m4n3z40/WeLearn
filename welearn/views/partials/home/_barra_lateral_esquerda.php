@@ -14,7 +14,7 @@
             <li><?php echo anchor('/usuario/amigos', 'Amigos') ?></li>
             <li><?php echo anchor('/curso', 'Cursos') ?></li>
             <li><?php echo anchor('/usuario/mensagem', 'Mensagens') ?></li>
-            <li><?php echo anchor('/usuario/notificacao', 'Notificações') ?></li>
+            <li><?php echo anchor('/notificacao', 'Notificações') ?></li>
             <li><?php echo anchor('/usuario/configuracao', 'Configurações') ?></li>
             <li><?php echo anchor('/administracao','Adminstração')?></li>
         </ul>

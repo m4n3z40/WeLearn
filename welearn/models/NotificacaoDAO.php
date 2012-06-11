@@ -324,6 +324,36 @@ class NotificacaoDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param WeLearn_Usuarios_Usuario $usuario
+     * @return void
+     */
+    public function limparNovas(WeLearn_Usuarios_Usuario $usuario)
+    {
+        try {
+            $cfKeys = array_keys(
+                    $this->_notificacoesNovasPorUsuarioCF->get(
+                    $usuario->getId(),
+                    null,
+                    '',
+                    '',
+                    false,
+                    1000000
+                )
+            );
+        } catch(cassandra_NotFoundException $e) { return; }
+
+        $batchAtualizacao = array();
+        for($i=0; $i < count($cfKeys); $i++) {
+            $batchAtualizacao[ $cfKeys[$i] ] = array(
+                'status' => WeLearn_Notificacoes_StatusNotificacao::LIDO
+            );
+        }
+
+        $this->_cf->batch_insert( $batchAtualizacao );
+        $this->_notificacoesNovasPorUsuarioCF->remove( $usuario->getId() );
+    }
+
+    /**
      * @param array|null $dados
      * @return WeLearn_DTO_IDTO
      */

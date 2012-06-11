@@ -34,14 +34,14 @@ class WeLearn_Notificacoes_NotificacaoRequisicaoAmizadeAceita extends WeLearn_No
         if ( null === $this->_msg ) {
 
             $linkRemetente = anchor(
-                '/perfil/' . $this->getConvite()->getRemetente()->getId(),
-                $this->getConvite()->getRemetente()->getNome()
+                '/perfil/' . $this->getConvite()->getDestinatario()->getId(),
+                $this->getConvite()->getDestinatario()->getNome()
             );
 
             $linkAmizade = anchor('/usuario/amigos', 'amigos');
 
             $this->setMsg(
-                $linkRemetente . ' aceitou sua requisição de amizade, e agora vocês são ' . $linkAmizade . ' no WeLearn.'
+                $linkRemetente . ' aceitou sua solicitação de amizade, e agora vocês são ' . $linkAmizade . ' no WeLearn.'
             );
         }
 

@@ -38,10 +38,10 @@ class WeLearn_Notificacoes_NotificacaoRequisicaoAmizade extends WeLearn_Notifica
                 $this->getConvite()->getRemetente()->getNome()
             );
 
-            $linkConvites = anchor('/convite/index/recebidos', 'convidando');
+            $linkConvites = anchor('/convite/index/recebidos', 'solicitação de amizade');
 
             $this->setMsg(
-                $linkRemetente . ' está ' . $linkConvites . ' você para ser amigo dele no WeLearn.'
+                $linkRemetente . ' enviou uma ' . $linkConvites . ' para você.'
             );
         }
 
