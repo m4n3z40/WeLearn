@@ -286,13 +286,22 @@ class Feed extends Home_Controller
                     );
                     $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
                     $json = create_json_feedback(true);
+
+                    //Notificar ao usuário
+                    $notificacao = new WeLearn_Notificacoes_NotificacaoCompartilhamentoPerfil();
+                    $notificacao->setCompartilhamento( $feed );
+                    $notificacao->setDestinatario( $usuarioPerfil );
+                    $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+                    $notificacao->notificar();
+                    //fim da notificação.
+
                 }catch(cassandra_NotFoundException $e){
                     $json=create_json_feedback(false);
                 }
             }
 
             echo $json;
-    }
+        }
     }
 
     public function remover_timeline($idFeed,$idUsuario)

@@ -206,6 +206,14 @@ Tente novamente mais tarde.'
         $json = Zend_Json::encode($response);
 
         echo $json;
+
+        //enviar notificação ao usuário;
+        $notificacao = new WeLearn_Notificacoes_NotificacaoMensagemPessoal();
+        $notificacao->setMensagemPessoal( $mensagemObj );
+        $notificacao->setDestinatario( $destinatario );
+        $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+        $notificacao->notificar();
+        //fim da notificação;
     }
 
 

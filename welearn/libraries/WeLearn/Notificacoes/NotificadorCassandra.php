@@ -23,7 +23,6 @@ class WeLearn_Notificacoes_NotificadorCassandra implements WeLearn_Notificacoes_
      */
     public function notificar(WeLearn_Notificacoes_Notificacao $notificacao)
     {
-        // TODO: Implement notificar() method.
+        $this->_notificacaoDao->salvar( $notificacao );
     }
-
 }

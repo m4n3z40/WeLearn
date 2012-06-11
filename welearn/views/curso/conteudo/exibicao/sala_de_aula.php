@@ -9,8 +9,15 @@
         <section id="section-container-iframe">
             <nav>
                 <ul>
-                    <li><a href="#" id="a-nav-exibicao-inicio-aula">Início da Aula</a></li>
-                    <li><a href="#" id="a-nav-exibicao-pagina-anterior">Página Anterior</a></li>
+                    <li <?php echo $isAulaInicial ? 'style="display:none;"' : '' ?>>
+                        <a href="#" id="a-nav-exibicao-aula-anterior" >Aula Anterior</a>
+                    </li>
+                    <li <?php echo $isPaginaInicial ? 'style="display:none;"' : '' ?>>
+                        <a href="#" id="a-nav-exibicao-inicio-aula">Início da Aula</a>
+                    </li>
+                    <li <?php echo $isPaginaInicial ? 'style="display:none;"' : '' ?>>
+                        <a href="#" id="a-nav-exibicao-pagina-anterior">Página Anterior</a>
+                    </li>
                     <li><a href="#" id="a-nav-exibicao-proxima-pagina">Proxima Página</a></li>
                 </ul>
             </nav>

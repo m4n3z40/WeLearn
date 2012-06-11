@@ -27,6 +27,11 @@ abstract class WeLearn_Cursos_Avaliacoes_StatusAvaliacao implements WeLearn_Base
     const DESATIVADA = 2;
 
     /**
+     * @constant
+     */
+    const FINALIZADA = 3;
+
+    /**
      * Retorna a descrição do Enum passado por parametru.
      *
      * @param $codigo int Codigo da descrição do Enum a ser retornada.
@@ -42,6 +47,8 @@ abstract class WeLearn_Cursos_Avaliacoes_StatusAvaliacao implements WeLearn_Base
                 return 'Avaliação Bloqueada';
             case self::DESATIVADA:
                 return 'Avaliação Desativada';
+            case self::FINALIZADA:
+                return 'Avaliação Finalizada';
             default:
                 throw new WeLearn_Base_CodigoEnumIncorretoException();
         }

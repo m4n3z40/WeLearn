@@ -8,6 +8,9 @@
  */
 class WeLearn_Notificacoes_NotificadorCassandraBatch extends WeLearn_Notificacoes_NotificadorCassandra
 {
+    /**
+     * @var SplObjectStorage
+     */
     private $_notificacoes;
 
     public function __construct()
@@ -25,8 +28,11 @@ class WeLearn_Notificacoes_NotificadorCassandraBatch extends WeLearn_Notificacoe
         $this->_notificacoes->attach( $notificacao );
     }
 
+    /**
+     * Envia todas as notificações registradas ao destruir este objeto.
+     */
     public function __destruct()
     {
-        //TODO: Desenvolver rotina para salvamento batch das notificações.
+        $this->_notificacaoDao->adicionarVarios( $this->_notificacoes );
     }
 }

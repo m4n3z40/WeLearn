@@ -163,7 +163,7 @@
 
                                             $h4SemLista.remove();
                                             $tblListaQuestoes = $(templateListaQuestoes);
-                                            $divContainer.append($tblListaQuestoes);
+                                            $divContainer.find('nav').last().before($tblListaQuestoes);
                                             $tblListaQuestoes.append($htmlNovaQuestao);
                                         } else {
                                             $tblListaQuestoes.append($htmlNovaQuestao);

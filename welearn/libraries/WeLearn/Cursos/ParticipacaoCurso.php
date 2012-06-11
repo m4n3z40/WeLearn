@@ -13,6 +13,11 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
     /**
      * @var string
      */
+    private $_id;
+
+    /**
+     * @var string
+     */
     private $_dataInscricao;
 
     /**
@@ -74,6 +79,20 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
      * @var WeLearn_Cursos_Avaliacoes_Avaliacao
      */
     private $_avaliacaoAtual;
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        if ( null === $this->_id ) {
+
+            $this->_id = $this->getCFKey();
+
+        }
+
+        return $this->_id;
+    }
 
     /**
      * @param \WeLearn_Usuarios_Aluno $aluno
@@ -300,6 +319,7 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
     public function toArray()
     {
         return array(
+            'id' => $this->_id ? $this->getId() : $this->getCFKey(),
             'dataInscricao' => $this->getDataInscricao(),
             'frequenciaTotal' => $this->getFrequenciaTotal(),
             'dataUltimoAcesso' => $this->getDataUltimoAcesso(),
@@ -325,6 +345,7 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
     public function toCassandra()
     {
         return array(
+            'id' => $this->getId(),
             'dataInscricao' => $this->getDataInscricao(),
             'frequenciaTotal' => $this->getFrequenciaTotal(),
             'dataUltimoAcesso' => $this->getDataUltimoAcesso(),

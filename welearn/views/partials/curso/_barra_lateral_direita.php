@@ -17,7 +17,7 @@
         <?php elseif( $tipoVinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE ): ?>
             <span>Sua inscrição está sendo avaliada pelos gerenciadores.</span>
         <?php elseif( $tipoVinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE ): ?>
-            <span>">Você foi convidado à gerenciar este curso. Verifique a seção "Convites para Gerenciamento" na área "Meus Cursos". </span>
+            <span>Você foi convidado à gerenciar este curso. Verifique a seção "Convites para Gerenciamento" na área "Meus Cursos". </span>
         <?php elseif( $tipoVinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO ): ?>
             <?php echo anchor(
                 '/curso/sair/' . $idCurso,

@@ -308,6 +308,12 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
         return $this->_recuperarPorIds($idsSugestoes, $usuario);
     }
 
+    /**
+     * @param WeLearn_Cursos_SugestaoCurso $sugestao
+     * @param WeLearn_Usuarios_Usuario $votante
+     * @return array
+     * @throws WeLearn_Cursos_UsuarioJaVotouException
+     */
     public function votar(WeLearn_Cursos_SugestaoCurso &$sugestao, WeLearn_Usuarios_Usuario $votante)
     {
         $sugestaoUUID = CassandraUtil::import($sugestao->getId());
@@ -333,6 +339,26 @@ class SugestaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
             return $votos;
         }
+    }
+
+    /**
+     * @param WeLearn_Cursos_SugestaoCurso $sugestao
+     * @return array
+     */
+    public function recuperarTodosIdsVotantes(WeLearn_Cursos_SugestaoCurso $sugestao)
+    {
+        $sugestaoUUID = UUID::import( $sugestao->getId() )->bytes;
+
+        return array_keys(
+            $this->_sugestaoUsuariosVotantesCF->get(
+                $sugestaoUUID,
+                null,
+                '',
+                '',
+                false,
+                1000000
+            )
+        );
     }
 
     /**

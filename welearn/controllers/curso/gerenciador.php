@@ -373,6 +373,15 @@ class Gerenciador extends Curso_Controller
             ));
 
             $json = create_json_feedback(true, '', $response);
+
+            //enviar notificação ao usuário
+            $notificacao = new WeLearn_Notificacoes_NotificacaoGerenciadorDesvinculado();
+            $notificacao->setCurso( $curso );
+            $notificacao->setDestinatario( $gerenciador );
+            $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+            $notificacao->notificar();
+            //fim da notificação
+
         } catch (cassandra_NotFoundException $e) {
             log_message('error', 'Erro ao tentar desvincular gerenciador :'
                 . create_exception_description($e));
@@ -479,6 +488,7 @@ class Gerenciador extends Curso_Controller
             $idUsuarios = explode( ',', $this->input->get('usuarios') );
 
             $errors = array();
+            $convidados = array();
 
             foreach ($idUsuarios as $idUsuario) {
 
@@ -512,6 +522,7 @@ class Gerenciador extends Curso_Controller
                         case WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO:
                         default:
                             $this->_gerenciadorDao->convidar( $usuario, $curso );
+                            $convidados[] = $usuario;
 
                     }
 
@@ -549,6 +560,18 @@ class Gerenciador extends Curso_Controller
             $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
 
             $json = create_json_feedback(true);
+
+            //Enviar notificação ao convidado;
+            $notificadorBatch = new WeLearn_Notificacoes_NotificadorCassandraBatch();
+            foreach($convidados as $convidado) {
+                $notificacao = new WeLearn_Notificacoes_NotificacaoConviteGerenciamentoCurso();
+                $notificacao->setCurso( $curso );
+                $notificacao->setDestinatario( $convidado );
+                $notificacao->adicionarNotificador( $notificadorBatch );
+                $notificacao->notificar();
+            }
+            //Fim da notificação;
+
         } catch (cassandra_NotFoundException $e) {
             log_message('error', 'Erro ao tentar buscar usuários para convidar para gerenciamento: '
                 . create_exception_description($e));

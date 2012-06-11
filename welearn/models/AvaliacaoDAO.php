@@ -75,6 +75,10 @@ class AvaliacaoDAO extends WeLearn_DAO_AbstractDAO
         return 0;
     }
 
+    /**
+     * @param WeLearn_Cursos_Conteudo_Modulo $modulo
+     * @return bool
+     */
     public function existeAvaliacao(WeLearn_Cursos_Conteudo_Modulo $modulo)
     {
         try {

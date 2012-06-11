@@ -184,14 +184,6 @@ class WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @return void
-     */
-    public function recuperarAlternativas()
-    {
-        //@TODO: implementar este médodo!!
-    }
-
-    /**
      * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
      * em um array.
      *

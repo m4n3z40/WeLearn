@@ -217,7 +217,7 @@
 
                                 $divConfirmacaoDesvincular.dialog('close');
 
-                                window.location.reload();
+                                window.location = WeLearn.url.siteURL('/home');
 
                             } else {
                                 WeLearn.notificar({

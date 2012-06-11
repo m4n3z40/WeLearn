@@ -50,6 +50,13 @@ class AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
         return array();
     }
 
+    /**
+     * @param WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao $questao
+     * @param string $de
+     * @param string $ate
+     * @param int $count
+     * @return array
+     */
     public function recuperarTodosPorQuestao (
         WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao $questao,
         $de = '',
@@ -76,7 +83,16 @@ class AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
             $count
         ));
 
-        $columns = $this->_cf->multiget( $ids );
+        return $this->recuperarTodosPorUUIDs( $ids );
+    }
+
+    /**
+     * @param array $UUIDs
+     * @return array
+     */
+    public function recuperarTodosPorUUIDs(array $UUIDs)
+    {
+        $columns = $this->_cf->multiget( $UUIDs );
 
         return $this->_criarVariosfromCassandra( $columns );
     }
@@ -135,6 +151,10 @@ class AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
         return $alternativaRemovida;
     }
 
+    /**
+     * @param WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao $questao
+     * @return array
+     */
     public function removerTodosPorQuestao(WeLearn_Cursos_Avaliacoes_QuestaoAvaliacao $questao)
     {
         try {
@@ -157,6 +177,10 @@ class AlternativaAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
         return $alternativasRemovidas;
     }
 
+    /**
+     * @param array $listaAlternativas
+     * @return array
+     */
     public function removerTodosPorLista(array $listaAlternativas)
     {
         if ($listaAlternativas[0] instanceof WeLearn_Cursos_Avaliacoes_AlternativaAvaliacao) {
