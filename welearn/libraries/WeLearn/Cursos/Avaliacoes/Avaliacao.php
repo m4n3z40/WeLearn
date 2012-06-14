@@ -200,6 +200,27 @@ class WeLearn_Cursos_Avaliacoes_Avaliacao extends WeLearn_DTO_AbstractDTO
     }
 
     /**
+     * @return array
+     */
+    public function getQuestoesRandomizadas()
+    {
+        if ( empty($this->_questoes) ) {
+
+            return array();
+
+        }
+
+        $questoes = $this->getQuestoes();
+        shuffle( $questoes );
+
+        return array_slice(
+            $questoes,
+            0,
+            $this->getQtdQuestoesExibir()
+        );
+    }
+
+    /**
      * Converte os dados das propriedades do objeto para uma relação 'propriedade => valor'
      * em um array.
      *

@@ -143,10 +143,19 @@
                     $wrapperSalaDeAula.data('id-aula', res.aulaAtual.id);
                     $wrapperSalaDeAula.data('id-pagina', res.paginaAtual.id);
 
+                    $wrapperSalaDeAula.data('id-avaliacao', '');
+                    $artAvaliacaoInfoEtapa.hide();
+                    $artAulaInfoEtapa.show();
+                    $artPaginaInfoEtapa.show();
+                    $divAnotacaoContainer.show();
+                    $divComentarioListaContainer.show();
+
                     $emModuloNroOrdem.text( res.moduloAtual.nroOrdem );
                     $emModuloNome.text( res.moduloAtual.nome );
                     $ddModuloDescricao.text( res.moduloAtual.descricao.replace("\n", '<br>') );
                     $ddModuloObjetivos.text( res.moduloAtual.objetivos.replace("\n", '<br>') );
+
+                    $navContainer.show();
 
                     if ( res.aulaAtual.nroOrdem == 1 ) {
                         $aNavAulaAnterior.parent().hide();
@@ -198,7 +207,8 @@
 
     /*####################################*/
 
-    var $preAnotacao = $('#div-anotacao-form-container').find('pre'),
+    var $divAnotacaoContainer = $('#div-anotacao-form-container'),
+        $preAnotacao = $divAnotacaoContainer.find('pre'),
         $txtAnotacao = $('#txt-anotacao'),
         formAnotacao = document.getElementById( 'exibicao-conteudo-anotacao-form' );
 
@@ -739,7 +749,9 @@
 
     /* ############################################################ */
 
-    var $aNavAulaAnterior = $('#a-nav-exibicao-aula-anterior'),
+    var $sectionIframeContainer = $('#section-container-iframe'),
+        $navContainer = $sectionIframeContainer.children('nav'),
+        $aNavAulaAnterior = $('#a-nav-exibicao-aula-anterior'),
         $aNavInicioAula = $('#a-nav-exibicao-inicio-aula'),
         $aNavPaginaAnterior = $('#a-nav-exibicao-pagina-anterior'),
         $aNavProximaPagina = $('#a-nav-exibicao-proxima-pagina'),
@@ -760,6 +772,14 @@
         $emPaginaTitulo = $artPaginaInfoEtapa.find('h4 > em'),
         $emPaginaNroOrdem = $emPaginaTitulo.first(),
         $emPaginaNome = $emPaginaTitulo.last(),
+        $artAvaliacaoInfoEtapa = $('#art-avaliacao-infoetapa-saladeaula'),
+        $emAvaliacaoTitulo = $artAvaliacaoInfoEtapa.find('h4 > em'),
+        $emAvaliacaoOrdemModulo = $emAvaliacaoTitulo.first(),
+        $emAvaliacaoNome = $emAvaliacaoTitulo.last(),
+        $ddAvaliacaoInfo = $artAvaliacaoInfoEtapa.find('dl > dd'),
+        $ddAvaliacaoQuestoes = $ddAvaliacaoInfo.first(),
+        $ddAvaliacaoTentativas = $ddAvaliacaoQuestoes.next().next(),
+        $ddAvaliacaoTempoDuracao = $ddAvaliacaoInfo.last(),
         $divConfirmacaoContinuar = $(
             '<div/>',
             { id: 'div-confirm-continuar-visualizacao' }
@@ -800,8 +820,8 @@
                         nomeAula + '</em>" do módulo "<em>' +
                         nomeModulo + '</em>"</h3><h4>Agora você tem a opção de ' +
                         'continuar e prosseguir para próxima aula ou sair e continuar mais tarde.</h4>' +
-                        '<h4>Informações sobre a próxima aula:</h4><ul><li>' +
-                        'Aula ' + res.aulaAtual.nroOrdem + ': "<em>'
+                        '<h4>Informações sobre a próxima aula:</h4><ul><li><span>' +
+                        'Aula ' + res.aulaAtual.nroOrdem + ':</span> "<em>'
                         + res.aulaAtual.nome + '</em>"</li><li>' +
                         '<span>Descrição:</span><p>' + res.aulaAtual.descricao.replace("\n", '<br>')
                         + '</p></li></ul><p>Deseja continuar agora?</p></div>';
@@ -812,11 +832,22 @@
                         nomeModulo + '</em>"</h3><h4>Agora você tem a opção de ' +
                         'continuar e prosseguir para o próximo módulo ou sair e continuar mais tarde.</h4>' +
                         '<h4>Informações sobre o próximo módulo:</h4><ul><li>' +
-                        'Módulo ' + res.moduloAtual.nroOrdem + ': "<em>'
+                        '<span>Módulo ' + res.moduloAtual.nroOrdem + ': </span>"<em>'
                         + res.moduloAtual.nome + '</em>"</li><li>' +
                         '<span>Descrição:</span><p>' + res.aulaAtual.descricao.replace("\n", '<br>')
                         + '</p></li><li><span>Objetivos:</span><p>' +
                         res.moduloAtual.objetivos + '</p></li></ul><p>Deseja continuar agora?</p></div>';
+                    break;
+                case 'avaliacao':
+                    html = '<div>' +
+                        '<h3>Parabéns! Você acaba de finalizar o módulo "<em>' +
+                        nomeModulo + '</em>"</h3><h4>Porém, este módulo possui uma avaliação, e para que ' +
+                        'você prossiga no curso é necessário que você seja aprovado nesta avaliação!</h4>' +
+                        '<h4>Informações da Avaliação:</h4><ul><li><span>' +
+                        'Avaliação: "</span><em>' + res.avaliacaoAtual.nome + '</em>"</li><li>' +
+                        '<span>Nota Mínima: </span><em>' + res.avaliacaoAtual.notaMinima +
+                        '</em></li><li><span>Qtd. de Questões: </span><em>' + res.avaliacaoAtual.qtdQuestoesExibir
+                        + '</em></li></ul><p>Deseja continuar agora?</p></div>';
                     break;
                 default:
                     html = '';
@@ -827,8 +858,14 @@
         atualizarDadosPaginaAtual = function(res){
 
             var idModuloAtual = $wrapperSalaDeAula.data('id-modulo'),
-                idAulaAtual = $wrapperSalaDeAula.data('id-aula'),
-                idPaginaAtual = $wrapperSalaDeAula.data('id-pagina');
+                idAulaAtual = $wrapperSalaDeAula.data('id-aula');
+
+            $wrapperSalaDeAula.data('id-avaliacao', '');
+            $artAvaliacaoInfoEtapa.hide();
+            $artAulaInfoEtapa.show();
+            $artPaginaInfoEtapa.show();
+            $divAnotacaoContainer.show();
+            $divComentarioListaContainer.show();
 
             if ( idModuloAtual != res.moduloAtual.id ) { //Virou de módulo
 
@@ -894,6 +931,8 @@
             }
 
             $wrapperSalaDeAula.data('id-pagina', res.paginaAtual.id);
+
+            $navContainer.show();
 
             if ( res.paginaAtual.nroOrdem == 1 ) {
 
@@ -1081,7 +1120,35 @@
 
                     } else if ( res.tipoConteudoAtual == 'avaliacao' ) {
 
-                        //TODO: tratar quando está na aplicação de avaliação.
+                        $navContainer.hide();
+                        $artAulaInfoEtapa.hide();
+                        $artPaginaInfoEtapa.hide();
+                        $divAnotacaoContainer.hide();
+                        $divComentarioListaContainer.hide();
+
+                        $emAvaliacaoOrdemModulo.text(res.moduloAtual.nroOrdem);
+                        $emAvaliacaoNome.text(res.avaliacaoAtual.nome);
+                        $ddAvaliacaoQuestoes.text(res.avaliacaoAtual.qtdQuestoesExibir);
+                        $ddAvaliacaoTempoDuracao.text(res.avaliacaoAtual.tempoDuracaoMax);
+                        $ddAvaliacaoTentativas.text(res.avaliacaoAtual.qtdTentativasPermitidas == 0 ? 'Sem Limites' : res.avaliacaoAtual.qtdTentativasPermitidas);
+                        $artAvaliacaoInfoEtapa.show();
+
+                        $sltAulas.val('0');
+                        $sltPaginas.val('0');
+
+                        $iframeConteudo.attr('src', res.urlConteudoAtual);
+
+                        $divConfirmacaoContinuar
+                            .html( htmlConfirmacaoContinuar('avaliacao', res) )
+                            .dialog(
+                                'option',
+                                'buttons',
+                                botoesConfimacao(function(){
+                                    window.location = WeLearn.url.siteURL(
+                                        '/curso/conteudo/exibicao/avaliacoes/' + $wrapperSalaDeAula.data('id-curso')
+                                    );
+                                })
+                            ).dialog('open');
 
                     } else {
 
@@ -1100,6 +1167,64 @@
                 }
             }
         );
+    });
+
+    /*############################################################*/
+    var $divJanelaAvaliacao = $('<div/>', {id: 'div-janela-avaliacao'}).dialog({
+            autoOpen: false,
+            resizable: false,
+            draggable: false,
+            modal: true,
+            width: 610,
+            title: 'Realização de Avaliação',
+            position: 'top',
+            show: 'fade',
+            hide: 'fade',
+            buttons: {
+                'Sair' : function() {
+                    $divJanelaAvaliacao.dialog('close');
+                }
+            },
+            close: function() {
+                window.location.reload();
+            }
+        });
+
+    $('#a-realizar-avaliacao').click(function(e){
+        e.preventDefault();
+
+        var $this = $(this),
+            idAvaliacao = $this.data('id-avaliacao'),
+            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/aplicar_avaliacao/' + idAvaliacao);
+
+        $.get(
+            url,
+            {},
+            function(res){
+                if(res.success) {
+
+                    $divJanelaAvaliacao
+                        .html(res.htmlAvaliacao)
+                        .dialog('option', 'height', $window.height() - 6)
+                        .dialog('open');
+
+                } else {
+
+                    WeLearn.notificar({
+                        nivel: 'error',
+                        msg: res.errors[0].error_msg,
+                        tempo: 10000
+                    });
+
+                }
+            }
+        );
+    });
+
+    $('#a-exibir-resultados-avaliacao').click(function(e){
+        e.preventDefault();
+
+        $divJanelaAvaliacao.dialog('open');
     });
 
 })();

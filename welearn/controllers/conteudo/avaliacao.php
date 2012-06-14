@@ -316,17 +316,9 @@ class Avaliacao extends Curso_Controller
             $questao = $questaoDao->recuperar( $idQuestao );
             $avaliacao = $avaliacaoDao->recuperar( $questao->getAvaliacaoId() );
 
-            $dadosExibicao = array(
-                'questao' => $questao
-            );
-
             $dadosView = array(
                 'avaliacao' => $avaliacao,
-                'exibicaoQuestao' => $this->template->loadPartial(
-                    'exibicao_questao',
-                    $dadosExibicao,
-                    'curso/conteudo/avaliacao'
-                )
+                'questao' => $questao
             );
 
             $response = Zend_Json::encode(array(

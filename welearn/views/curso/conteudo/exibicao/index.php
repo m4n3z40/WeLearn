@@ -39,18 +39,29 @@
         <h3>Em que parte do curso eu estou?</h3>
         <ul>
             <li>
-                <span>Você está no módulo <?php echo $moduloAtual->nroOrdem ?>: <em>"<?php echo $moduloAtual->nome ?>"</em></span>
+                <span>Você está no módulo <?php echo $moduloAtual->nroOrdem ?>: <em>"<?php echo $moduloAtual->nome ?>"</em>;</span>
             </li>
+            <?php if ( $avaliacaoAtual ): ?>
+            <li>
+                <span>Você está à fazer a avaliação <em>"<?php echo $avaliacaoAtual->nome ?>"</em> do Módulo <em>"<?php echo $moduloAtual->nroOrdem ?>"</em>;</span><br>
+                <?php echo anchor(
+                    '/curso/conteudo/exibicao/avaliacoes/' . $moduloAtual->curso->id,
+                    'Ir para a Avaliação'
+                ) ?>
+            </li>
+            <?php else: ?>
+            <li><span>Você não tem nenhuma avaliação pendente no momento;</span></li>
+            <?php endif; ?>
             <?php if ( $aulaAtual ): ?>
-                <li>
-                <span>Na aula <?php echo $aulaAtual->nroOrdem ?>: <em>"<?php echo $aulaAtual->nome ?>"</em>;</span>
-                </li>
+            <li>
+            <span>Na aula <?php echo $aulaAtual->nroOrdem ?>: <em>"<?php echo $aulaAtual->nome ?>"</em>;</span>
+            </li>
             <?php else: ?>
             <li><span>Você não está assistindo nenhuma aula no momento;</span></li>
             <?php endif; ?>
             <?php if ($paginaAtual): ?>
             <li>
-                <span>Visualizando a página <?php echo $paginaAtual->nroOrdem ?>: <em>"<?php echo $paginaAtual->nome ?>"</em></span>
+                <span>Visualizando a página <?php echo $paginaAtual->nroOrdem ?>: <em>"<?php echo $paginaAtual->nome ?>"</em>.</span>
             </li>
             <?php else: ?>
             <li><span>Você não está em nenhuma página no momento.</span></li>

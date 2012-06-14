@@ -1,4 +1,4 @@
-<div id="div-anotacao-form-container">
+<div id="div-anotacao-form-container" <?php echo $pagina ? '' : 'style="display:none;"' ?>>
     <?php echo form_open($formAction, $extraOpenForm, $formHidden) ?>
     <pre><?php echo $anotacaoAtual ? $anotacaoAtual->conteudo : 'Salve uma anotação sobre esta página aqui.' ?></pre>
     <textarea name="anotacao"

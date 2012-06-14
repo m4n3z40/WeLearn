@@ -1,4 +1,4 @@
-<div id="div-comentario-lista-container">
+<div id="div-comentario-lista-container" <?php echo $pagina ? '' : 'style="display:none;"' ?>>
     <h4>Exibindo <em id="em-qtd-comentarios">0</em> de
         <em id="em-total-comentarios">0</em> Comentários em Página
         "<em id="em-nome-pagina">Página</em>" da Aula

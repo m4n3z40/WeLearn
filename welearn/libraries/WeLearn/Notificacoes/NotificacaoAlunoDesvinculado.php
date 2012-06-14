@@ -39,7 +39,7 @@ class WeLearn_Notificacoes_NotificacaoAlunoDesvinculado extends WeLearn_Notifica
             );
 
             $this->setMsg( 'Você foi desvinculado do curso ' . $linkCurso . ' por um dos gerenciadores.
-                            Você não poderá mais acessar os conteúdos restrito deste curso.' );
+                            Você não poderá mais acessar os conteúdos restritos deste curso.' );
 
         }
 

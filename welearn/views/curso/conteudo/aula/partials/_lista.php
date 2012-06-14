@@ -11,10 +11,6 @@
             <nav class="aula-adminpanel">
                 <ul>
                     <li>
-                        <?php echo anchor('curso/conteudo/aula/exibir/' . $aula->id,
-                                          'Visualizar') ?>
-                    </li>
-                    <li>
                         <?php echo anchor(
                             '/curso/conteudo/aula/alterar/' . $aula->id,
                             'Alterar',

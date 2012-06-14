@@ -44,11 +44,6 @@ class Exibicao extends Curso_Controller
     private $_questaoAvaliacaoDao;
 
     /**
-     * @var AlternativaAvaliacaoDAO
-     */
-    private $_alternativaAvaliacaoDao;
-
-    /**
      * @var ControleAvaliacaoDAO
      */
     private $_controleAvaliacaoDao;
@@ -75,6 +70,7 @@ class Exibicao extends Curso_Controller
         $this->_avaliacaoDao = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO');
         $this->_anotacaoDao = WeLearn_DAO_DAOFactory::create('AnotacaoDAO');
         $this->_controleAvaliacaoDao = WeLearn_DAO_DAOFactory::create('ControleAvaliacaoDAO');
+        $this->_questaoAvaliacaoDao = WeLearn_DAO_DAOFactory::create('QuestaoAvaliacaoDAO');
 
         $this->_alunoAtual = $this->_alunoDao->criarAluno(
             $this->autenticacao->getUsuarioAutenticado()
@@ -146,10 +142,10 @@ class Exibicao extends Curso_Controller
                 'isAulaInicial' => $aulaAtual && $aulaAtual->getNroOrdem() === 1,
                 'isPaginaInicial' => $paginaAtual && $paginaAtual->getNroOrdem() === 1,
                 'srcIframeConteudo' => $srcIframeConteudo,
-                'htmlSectionAnotacao' => $paginaAtual ? $this->_loadSectionAnotacaoView( $paginaAtual ) : '',
-                'htmlSectionComentarios' => $paginaAtual ? $this->_loadSectionComentariosView( $paginaAtual ) : '',
-                'htmlSectionInfoEtapa' => $moduloAtual ? $this->_loadSectionInfoEtapaView( $moduloAtual, $aulaAtual, $paginaAtual ) : '',
-                'htmlSectionRecursos' => $aulaAtual ? $this->_loadSectionRecursosView() : ''
+                'htmlSectionAnotacao' => $this->_loadSectionAnotacaoView( $paginaAtual ),
+                'htmlSectionComentarios' => $this->_loadSectionComentariosView( $paginaAtual ),
+                'htmlSectionInfoEtapa' => $moduloAtual ? $this->_loadSectionInfoEtapaView( $moduloAtual, $aulaAtual, $paginaAtual, $avaliacaoAtual ) : '',
+                'htmlSectionRecursos' => $this->_loadSectionRecursosView()
             );
 
             $dadosView = array(
@@ -157,6 +153,7 @@ class Exibicao extends Curso_Controller
                 'paginaAtual' => $paginaAtual,
                 'aulaAtual' => $aulaAtual,
                 'moduloAtual' => $moduloAtual,
+                'avaliacaoAtual' => $avaliacaoAtual,
                 'progressoNoCurso' => ( $totalPaginas > 0 )
                     ? number_format( ( $totalPaginasVistas / $totalPaginas ) * 100, 1 )
                     : 0,
@@ -174,7 +171,42 @@ class Exibicao extends Curso_Controller
             );
 
         } catch(Exception $e) {
-            log_message('error', 'Erro ao tentar index do modulo de visualização de conteudo do curso.');
+            log_message('error', 'Erro ao tentar exibir index do modulo de visualização de conteudo do curso.');
+
+            show_404();
+        }
+    }
+
+    public function avaliacoes ( $idCurso )
+    {
+        try {
+            $curso = $this->_cursoDao->recuperar( $idCurso );
+
+            $participacaoCurso = $this->_participacaoCursoDao->recuperarPorCurso(
+                $this->_alunoAtual,
+                $curso
+            );
+
+            try {
+                $listaControlesAvaliacoes = $this->_controleAvaliacaoDao->recuperarTodosPorParticipacao(
+                    $participacaoCurso
+                );
+            } catch (cassandra_NotFoundException $e) {
+                $listaControlesAvaliacoes = array();
+            }
+
+            $dadosView = array(
+                'haAvaliacoesDisponiveis' => count( $listaControlesAvaliacoes ) > 0,
+                'listaControlesAvaliacoes' => $listaControlesAvaliacoes
+            );
+
+            $this->_renderTemplateCurso(
+                $curso,
+                'curso/conteudo/exibicao/avaliacoes',
+                $dadosView
+            );
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar exibir avaliações disponíveis do usuário.');
 
             show_404();
         }
@@ -197,15 +229,7 @@ class Exibicao extends Curso_Controller
                     $conteudo = $this->_exibirPagina( $participacaoCurso );
                     break;
                 case WeLearn_Cursos_Conteudo_TipoConteudo::AVALIACAO:
-                    $avaliacaoFeita = $this->_controleAvaliacaoDao->avaliacaoFeita(
-                        $participacaoCurso,
-                        $participacaoCurso->getAvaliacaoAtual()
-                    );
-                    if ( $avaliacaoFeita ) {
-                        $conteudo = $this->_exibirResultadosAvaliacao( $participacaoCurso );
-                    } else {
-                        $conteudo = $this->_aplicarAvaliacao( $participacaoCurso );
-                    }
+                    $conteudo = $this->_aplicarAvaliacao( $participacaoCurso );
                     break;
                 case WeLearn_Cursos_Conteudo_TipoConteudo::NENHUM:
                 default:
@@ -226,6 +250,44 @@ class Exibicao extends Curso_Controller
             'curso/conteudo/exibicao/exibir',
             array( 'conteudo' => $conteudo )
         );
+    }
+
+    public function aplicar_avaliacao ( $idAvaliacao )
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $avaliacao = $this->_avaliacaoDao->recuperar( $idAvaliacao );
+
+            $avaliacao->setQuestoes(
+                $this->_questaoAvaliacaoDao->recuperarTodosPorAvaliacao( $avaliacao )
+            );
+
+            $response = Zend_Json::encode(array(
+                'htmlAvaliacao' => $this->template->loadPartial(
+                    'aplicacao_avaliacao',
+                    array( 'avaliacao' => $avaliacao ),
+                    'curso/conteudo/exibicao'
+                ),
+                'avaliacao' => $avaliacao->toCassandra()
+            ));
+
+            $json = create_json_feedback(true, '', $response);
+        } catch( Exception $e ) {
+            log_message('error', 'Ocorreu um erro ao tentar recuperar aplicação de avaliação: '
+                . create_exception_description( $e ));
+
+            $error = create_json_feedback_error_json('Ocorreu um erro inesperado,
+                        já estamos tentando resolver. Tente novamente mais tarde!');
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
     }
 
     public function ir_para ( $idPagina )
@@ -504,22 +566,26 @@ class Exibicao extends Curso_Controller
         echo $json;
     }
 
-    private function _loadSectionAnotacaoView(WeLearn_Cursos_Conteudo_Pagina $pagina = null)
+    private function _loadSectionAnotacaoView($pagina = null)
     {
         try {
-            $anotacaoAtual = $this->_anotacaoDao->recuperarPorUsuario(
-                $pagina,
-                $this->_alunoAtual
-            );
+            if ($pagina instanceof WeLearn_Cursos_Conteudo_Pagina) {
+                $anotacaoAtual = $this->_anotacaoDao->recuperarPorUsuario(
+                    $pagina,
+                    $this->_alunoAtual
+                );
+            } else {
+                $anotacaoAtual = null;
+            }
         } catch (cassandra_NotFoundException $e) {
             $anotacaoAtual = null;
         }
 
         $dadosAnotacaoView = array(
+            'pagina' => $pagina,
             'formAction' => '/curso/conteudo/exibicao/salvar_anotacao',
             'extraOpenForm' => 'id="exibicao-conteudo-anotacao-form"',
             'formHidden' => array(),
-            'idPagina' => $pagina->getId(),
             'anotacaoAtual' => $anotacaoAtual
         );
 
@@ -530,12 +596,12 @@ class Exibicao extends Curso_Controller
         );
     }
 
-    private function _loadSectionComentariosView(WeLearn_Cursos_Conteudo_Pagina $pagina = null)
+    private function _loadSectionComentariosView($pagina = null)
     {
         $dadosFormComentario = array(
             'formAction' => 'conteudo/comentario/salvar',
             'extraOpenForm' => 'id="form-comentario-criar"',
-            'formHidden' => array('acao' => 'criar', 'paginaId' => $pagina->getId()),
+            'formHidden' => array('acao' => 'criar', 'paginaId' => $pagina ? $pagina->getId() : ''),
             'assuntoAtual' => '',
             'txtComentarioAtual' => '',
             'idBotaoEnviar' => 'btn-form-comentario-criar',
@@ -543,6 +609,7 @@ class Exibicao extends Curso_Controller
         );
 
         $dadosComentariosView = array(
+            'pagina' => $pagina,
             'formCriar' => $this->template->loadPartial(
                 'form',
                 $dadosFormComentario,
@@ -559,7 +626,8 @@ class Exibicao extends Curso_Controller
 
     private function _loadSectionInfoEtapaView(WeLearn_Cursos_Conteudo_Modulo $modulo,
                                                $aula = null,
-                                               $pagina = null)
+                                               $pagina = null,
+                                               $avaliacao = null)
     {
         $this->load->helper(array('modulo', 'aula', 'pagina'));
 
@@ -592,6 +660,7 @@ class Exibicao extends Curso_Controller
             'modulo' => $modulo,
             'aula' => $aula,
             'pagina' => $pagina,
+            'avaliacao' => $avaliacao,
             'selectModulos' => $this->template->loadPartial(
                 'select_modulos',
                 array(
@@ -673,25 +742,43 @@ class Exibicao extends Curso_Controller
             array(),
             'curso/conteudo/exibicao'
         );
-
     }
 
     private function _aplicarAvaliacao( WeLearn_Cursos_ParticipacaoCurso $participacaocurso )
     {
-        //TODO: Desenvolver rotina de aplicação de avaliação;
+        $avaliacao = $participacaocurso->getAvaliacaoAtual();
 
-        $dadosAplicacaoAvaliacaoView = array();
+        $avaliacao->setQtdQuestoes(
+            $this->_questaoAvaliacaoDao->recuperarQtdTotalPorAvaliacao( $avaliacao )
+        );
+
+        if (
+            ( $avaliacao->getQtdQuestoesExibir() > 0 ) &&
+            ( $avaliacao->getQtdQuestoes() > 0 )
+        ) {
+
+            $controleAvaliacao = $this->_controleAvaliacaoDao->recuperarPorParticipacao(
+                $participacaocurso,
+                $avaliacao
+            );
+
+            $dadosAplicacaoAvaliacaoView = array(
+                'controleAvaliacao' => $controleAvaliacao
+            );
+
+            return $this->template->loadPartial(
+                'avaliacao',
+                $dadosAplicacaoAvaliacaoView,
+                'curso/conteudo/exibicao'
+            );
+
+        }
 
         return $this->template->loadPartial(
-            'aplicacao_avaliacao',
-            $dadosAplicacaoAvaliacaoView,
+            'conteudo_indisponivel',
+            array(),
             'curso/conteudo/exibicao'
         );
-    }
-
-    private function _exibirResultadosAvaliacao( WeLearn_Cursos_ParticipacaoCurso $participacaoCurso )
-    {
-        //TODO: Desenvolver rotina para exibir resultado da avaliacao;
     }
 
     private function _recuperarConteudoAtual(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso)
@@ -709,7 +796,9 @@ class Exibicao extends Curso_Controller
 
                 } else {
 
-                    //TODO: Desenvolver rotina para quando avaliação atual não foi encontrada.
+                    $conteudoAtual = $this->_recuperarConteudoAtualTratandoNaoEncontrados(
+                        $participacaoCurso
+                    );
 
                 }
                 break;
@@ -913,7 +1002,8 @@ class Exibicao extends Curso_Controller
         }
 
         $error = create_json_feedback_error_json(
-            'A aula seguinte não possui páginas para serem exibidas. O curso não pode prosseguir, contate um gerenciador!'
+            'A aula seguinte não possui páginas para serem exibidas.
+            O curso não pode prosseguir, contate um gerenciador!'
         );
 
         return create_json_feedback(false, $error);
@@ -950,7 +1040,8 @@ class Exibicao extends Curso_Controller
         }
 
         $error = create_json_feedback_error_json(
-            'O módulo seguinte não possui aulas para serem aplicadas. O curso não pode proseguir, contate um gerenciador!'
+            'O módulo seguinte não possui aulas para serem aplicadas.
+            O curso não pode proseguir, contate um gerenciador!'
         );
 
         return create_json_feedback(false, $error);
@@ -959,52 +1050,162 @@ class Exibicao extends Curso_Controller
     private function _virarModulo(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso,
                                   WeLearn_Cursos_Conteudo_Modulo $moduloAnterior)
     {
-        $this->_participacaoCursoDao->getControleModuloDAO()->finalizar( $participacaoCurso, $moduloAnterior );
+        $this->_participacaoCursoDao->getControleModuloDAO()->finalizar(
+            $participacaoCurso,
+            $moduloAnterior
+        );
 
         try {
+
             $avaliacao = $this->_avaliacaoDao->recuperar( $moduloAnterior->getId() );
 
-            $participacaoCurso->setAulaAtual(null);
-            $participacaoCurso->setPaginaAtual(null);
-            $participacaoCurso->setTipoConteudoAtual( WeLearn_Cursos_Conteudo_TipoConteudo::AVALIACAO );
-            $participacaoCurso->setAvaliacaoAtual( $avaliacao );
+            if ( $avaliacao->getQtdQuestoesExibir() > 0 ) {
 
-            $this->_participacaoCursoDao->salvar( $participacaoCurso );
+                try {
 
-            $url = $url = site_url(
-                'curso/conteudo/exibicao/exibir/' . $participacaoCurso->getCurso()->getId()
-                                                  . '?t=' . $participacaoCurso->getTipoConteudoAtual()
-            );
+                    $controleAvaliacao = $this->_controleAvaliacaoDao->recuperarPorParticipacao(
+                        $participacaoCurso,
+                        $avaliacao
+                    );
 
-            $response = Zend_Json::encode(array(
-                'tipoConteudoAtual' => $participacaoCurso->getTipoConteudoAtual(),
-                'moduloAtual'       => $avaliacao->getModulo()->toCassandra(),
-                'aulaAtual'         => '',
-                'paginaAtual'       => '',
-                'avaliacaoAtual'    => $avaliacao->toCassandra(),
-                'urlConteudoAtual'  => $url
-            ));
+                } catch (cassandra_NotFoundException $e) {
 
-            return create_json_feedback(true, '', $response);
+                    $controleAvaliacao = new WeLearn_Cursos_Avaliacoes_ControleAvaliacao();
+                    $controleAvaliacao->setParticipacaoCurso( $participacaoCurso );
+                    $controleAvaliacao->setAvaliacao( $avaliacao );
 
-        } catch( cassandra_NotFoundException $e ) {
+                    $this->_controleAvaliacaoDao->salvar( $controleAvaliacao );
 
-            $proximoModulo = $this->_moduloDao->recuperarProximo( $moduloAnterior->getCurso(), $moduloAnterior->getNroOrdem() );
+                }
 
-            if ( $proximoModulo ) {
+                if (
+                    $controleAvaliacao->isStatusFinalizada() &&
+                    $controleAvaliacao->isSituacaoAprovado()
+                ) {
 
-                $this->_participacaoCursoDao->getControleModuloDAO()->acessar( $participacaoCurso, $proximoModulo );
+                    return $this->_retornarJSONProximoModulo(
+                        $participacaoCurso,
+                        $moduloAnterior
+                    );
 
-                $proximaAula = $this->_aulaDao->recuperarProxima( $proximoModulo );
+                } elseif ( $controleAvaliacao->isStatusBloqueada() ) {
 
-                return $this->_retornarJSONProximaAula( $participacaoCurso, $proximaAula );
+                    $error = create_json_feedback_error_json(
+                        'Para acessar o conteúdo do módulo seguinte, você precisa primeiro
+                        ser aprovado na avaliação do módulo em que está. Por favor, refaça a
+                        avaliação quando ela estiver disponível.'
+                    );
+
+                    return create_json_feedback(false, $error);
+
+                } elseif ( $controleAvaliacao->isStatusDesativada() ) {
+
+                    $error = create_json_feedback_error_json(
+                        'Você foi reprovado muitas vezes na avaliação
+                        deste módulo, você não poderá mais avançar no curso.'
+                    );
+
+                    return create_json_feedback(false, $error);
+
+                } else {
+
+                    return $this->_retornarJSONAvaliacao(
+                        $participacaoCurso,
+                        $avaliacao
+                    );
+
+                }
 
             } else {
 
-                //TODO: Retornar finalização do curso. (Ultimo módulo finalizado)
+                $error = create_json_feedback_error_json(
+                    'Este módulo possui uma avaliação, mas ela não está ativa.
+                    Você só poderá avançar no curso quando esta avaliação for ativada ou removida.
+                    Contate os Gerenciadores do Curso.'
+                );
+
+                return create_json_feedback(false, $error);
 
             }
 
+        } catch (cassandra_NotFoundException $e) {
+
+            return $this->_retornarJSONProximoModulo(
+                $participacaoCurso,
+                $moduloAnterior
+            );
+
         }
+    }
+
+    private function _retornarJSONProximoModulo(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso,
+                                                    WeLearn_Cursos_Conteudo_Modulo $moduloAnterior)
+    {
+        $proximoModulo = $this->_moduloDao->recuperarProximo(
+            $moduloAnterior->getCurso(),
+            $moduloAnterior->getNroOrdem()
+        );
+
+        if ( $proximoModulo ) {
+
+            $this->_participacaoCursoDao->getControleModuloDAO()->acessar( $participacaoCurso, $proximoModulo );
+
+            $proximaAula = $this->_aulaDao->recuperarProxima( $proximoModulo );
+
+            return $this->_retornarJSONProximaAula( $participacaoCurso, $proximaAula );
+
+        } else {
+
+            return $this->_retornarJSONCursoFinalizado( $participacaoCurso );
+
+        }
+    }
+
+    private function _retornarJSONAvaliacao(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso,
+                                            WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacao)
+    {
+        $participacaoCurso->setAulaAtual(null);
+        $participacaoCurso->setPaginaAtual(null);
+        $participacaoCurso->setTipoConteudoAtual( WeLearn_Cursos_Conteudo_TipoConteudo::AVALIACAO );
+        $participacaoCurso->setAvaliacaoAtual( $avaliacao );
+
+        $this->_participacaoCursoDao->salvar( $participacaoCurso );
+
+        $url = $url = site_url(
+            'curso/conteudo/exibicao/exibir/' . $participacaoCurso->getCurso()->getId()
+                                              . '?t=' . $participacaoCurso->getTipoConteudoAtual()
+        );
+
+        $response = Zend_Json::encode(array(
+            'tipoConteudoAtual' => $participacaoCurso->getTipoConteudoAtual(),
+            'moduloAtual'       => $avaliacao->getModulo()->toCassandra(),
+            'aulaAtual'         => '',
+            'paginaAtual'       => '',
+            'avaliacaoAtual'    => $avaliacao->toCassandra(),
+            'urlConteudoAtual'  => $url
+        ));
+
+        return create_json_feedback(true, '', $response);
+    }
+
+    private function _retornarJSONCursoFinalizado(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso)
+    {
+        //TODO: Retornar finalização do curso. (Ultimo módulo finalizado)
+    }
+
+    protected function _renderTemplateCurso(WeLearn_Cursos_Curso $curso,
+                                            $view = '',
+                                            array $dados = null)
+    {
+        $this->_barraDireitaSetVar(
+            'menuContexto',
+            $this->template->loadPartial(
+                'menu',
+                array( 'idCurso' => $curso->getId() ),
+                'curso/conteudo/exibicao'
+            )
+        );
+
+        parent::_renderTemplateCurso($curso, $view, $dados);
     }
 }

@@ -18,12 +18,12 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
     /**
      * @var int
      */
-    private $_dataAplicacao;
+    private $_dataAplicacao = 0;
 
     /**
      * @var float
      */
-    private $_tempoDecorrido;
+    private $_tempoDecorrido = 0;
 
     /**
      * @var float
@@ -219,6 +219,38 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
     }
 
     /**
+     * @return bool
+     */
+    public function isSituacaoNaoIniciada()
+    {
+        return $this->getSituacao() === WeLearn_Cursos_Avaliacoes_SituacaoAvaliacao::NAO_INICIADA;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSituacaoIniciada()
+    {
+        return $this->getSituacao() === WeLearn_Cursos_Avaliacoes_SituacaoAvaliacao::INICIADA;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSituacaoAprovado()
+    {
+        return $this->getSituacao() === WeLearn_Cursos_Avaliacoes_SituacaoAvaliacao::APROVADO;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSituacaoReprovado()
+    {
+        return $this->getSituacao() === WeLearn_Cursos_Avaliacoes_SituacaoAvaliacao::REPROVADO;
+    }
+
+    /**
      * @return void
      */
     public function iniciar()
@@ -248,6 +280,38 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
     public function verificarDisponibilidadeTentativas()
     {
         return $this->getQtdTentativas() < $this->getAvaliacao()->getQtdTentativasPermitidas();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStatusLiberada()
+    {
+        return $this->getStatus() === WeLearn_Cursos_Avaliacoes_StatusAvaliacao::LIBERADA;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStatusBloqueada()
+    {
+        return $this->getStatus() === WeLearn_Cursos_Avaliacoes_StatusAvaliacao::BLOQUEADA;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStatusDesativada()
+    {
+        return $this->getStatus() === WeLearn_Cursos_Avaliacoes_StatusAvaliacao::DESATIVADA;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStatusFinalizada()
+    {
+        return $this->getStatus() === WeLearn_Cursos_Avaliacoes_StatusAvaliacao::LIBERADA;
     }
 
     /**

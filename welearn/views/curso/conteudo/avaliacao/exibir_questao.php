@@ -11,6 +11,21 @@
         </hgroup>
     </header>
     <div>
-        <?php echo $exibicaoQuestao; ?>
+        <div class="div-questao-exibir-enunciado">
+            <h4>Enunciado:</h4>
+            <pre><?php echo $questao->enunciado ?></pre>
+        </div>
+        <div class="div-questao-exibir-alternativas">
+            <h4>Alternativas:</h4>
+            <ul class="selectable-radios">
+                <?php foreach ($questao->alternativasRandomizadas as $alternativa): ?>
+                <li><input type="radio" name="alternativaEscolhida[<?php echo $questao->id ?>]"
+                           value="<?php echo $alternativa->id ?>"
+                           id="<?php echo $alternativa->id ?>">
+                    <label for="<?php echo $alternativa->id ?>">
+                        <?php echo $alternativa->txtAlternativa ?></label></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
     </div>
 </div>

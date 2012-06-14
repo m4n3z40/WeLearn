@@ -7,7 +7,7 @@
      data-id-avaliacao="<?php echo $idAvaliacao ?>">
     <div id="main-section-container">
         <section id="section-container-iframe">
-            <nav>
+            <nav <?php echo $idAvaliacao ? 'style="display:none;"' : '' ?>>
                 <ul>
                     <li <?php echo $isAulaInicial ? 'style="display:none;"' : '' ?>>
                         <a href="#" id="a-nav-exibicao-aula-anterior" >Aula Anterior</a>

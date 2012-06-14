@@ -6,7 +6,7 @@
 </header>
 <div>
     <ol>
-        <li>Este conteúdo foi bloqueado pelos gerenciadores;</li>
+        <li>Este conteúdo está/foi bloqueado pelos gerenciadores;</li>
         <li>Você foi bloqueado à continuar o curso devido à reprovação em alguma avaliação;</li>
         <li>Você não respeitou a sequência <strong>OBRIGATÓRIA</strong> das aulas
             e tentou acessar um módulo, aula ou página avançada demais para você;</li>

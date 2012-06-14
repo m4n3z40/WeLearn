@@ -50,33 +50,6 @@ class ControleAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
         $this->_avaliacaoDao    = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO');
     }
 
-    /**
-     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
-     * @param WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacao
-     * @return bool
-     */
-    public function avaliacaoFeita(
-        WeLearn_Cursos_ParticipacaoCurso $participacaoCurso,
-        WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacao
-    ) {
-        try {
-
-            $cfKey = WeLearn_Cursos_Avaliacoes_ControleAvaliacao::gerarCFKey(
-                $participacaoCurso,
-                $avaliacao
-            );
-
-            $this->_cf->get( $cfKey );
-
-            return true;
-
-        } catch (cassandra_NotFoundException $e) {
-
-            return false;
-
-        }
-    }
-
      /**
      * @param mixed $id
      * @return WeLearn_DTO_IDTO
@@ -92,6 +65,11 @@ class ControleAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
         return null;
     }
 
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @param WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacao
+     * @return WeLearn_DTO_IDTO
+     */
     public function recuperarPorParticipacao(
         WeLearn_Cursos_ParticipacaoCurso $participacaoCurso,
         WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacao
@@ -157,6 +135,13 @@ class ControleAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
         return array();
     }
 
+    /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     * @param string $de
+     * @param string $ate
+     * @param int $count
+     * @return array
+     */
     public function recuperarTodosPorParticipacao(WeLearn_Cursos_ParticipacaoCurso $participacaoCurso,
                                                   $de = '',
                                                   $ate = '',
