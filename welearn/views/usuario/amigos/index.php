@@ -13,7 +13,7 @@
     </ul>
     <div>
         <?php if($haAmigos):?>
-            <a href="usuario/amigos/proxima_pagina" id="paginacaoAmigo">Mais amigos</a>
+            <a href="usuario/amigos/proxima_pagina/<?php echo $idUsuario?>/" id="paginacaoAmigo">Mais amigos</a>
             <input type='hidden' value='<?=$inicioProxPagina?>' id='id-prox-pagina'/>
         <?php endif;?>
     </div>

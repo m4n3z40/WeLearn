@@ -44,17 +44,25 @@ class Perfil extends Perfil_Controller {
             $comentarios_feed[$i] = carregar_comentarios('','', 3, $feeds_usuario[$i]->getId());
         }
 
+        if($usuarioAutenticado->getId() == $usuarioPerfil->getId()){
+            $action = 'feed/criar_feed';
+        }else{
+            $action = 'feed/criar_timeline/'.$usuarioPerfil->getId();
+        }
+
         $partialCriarFeed = $this->template->loadPartial(
             'form',
-            array('formAction' => 'feed/criar_timeline/'.$usuarioPerfil->getId()),
+            array('formAction' => $action),
             'usuario/feed'
         );
+
 
         $partialCriarComentario = $this->template->loadPartial(
             'form',
             array('formAction'=>'comentario_feed/criar','formExtra' => array('id'=>"form-comentario-criar",'name'=>'form-comentario-criar', 'style'=> 'display: none'),'usuarioAutenticado' => $usuarioAutenticado),
             'usuario/feed/comentario'
         );
+
         $partialListarTimeline= $this->template->loadPartial(
             'lista',
             array(

@@ -11,7 +11,7 @@
         <h3>Principal</h3>
         <ul>
             <li><?php echo anchor('/home', 'Home') ?></li>
-            <li><?php echo anchor('/usuario/amigos', 'Amigos') ?></li>
+            <li><?php echo anchor('/usuario/amigos/listar/'.$usuario->id, 'Amigos') ?></li>
             <li><?php echo anchor('/curso', 'Cursos') ?></li>
             <li><?php echo anchor('/usuario/mensagem', 'Mensagens') ?></li>
             <li><?php echo anchor('/usuario/notificacao', 'Notificações') ?></li>

@@ -68,8 +68,7 @@ class Mensagem extends Home_Controller
                     array(
                         'mensagens' => $listaMensagens,
                         'paginacao' => $dadosPaginados,
-                        'idAmigo' => $amigo->getId(),
-                        'nomeAmigo'=>$amigo->getNome(),
+                        'amigo'=>$amigo,
                         'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
                         'haMensagens' => $dadosPaginados['proxima_pagina']
                     ),

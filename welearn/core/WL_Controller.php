@@ -259,9 +259,9 @@ class Home_Controller extends WL_Controller
      */
     protected function _renderTemplateHome( $view = '', $dados = null )
     {
+        $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
         try{
-
-            $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
             $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
 
             $listaRandonicaAmigos = $amizadeUsuarioDao->recuperarAmigosAleatorios(
@@ -275,13 +275,62 @@ class Home_Controller extends WL_Controller
 
         }
 
-        $widgets = array();
-        $widgets[] = $this->template->loadPartial(
-            'widget_amigos',
-            array('legenda' => 'Meus Amigos','listaRandonicaAmigos' => $listaRandonicaAmigos),
-            'usuario/amigos'
-        );
+        try{
+            $gerenciadorPrincipal = $usuarioDao->criarGerenciadorPrincipal($usuarioAutenticado);
+            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
 
+            $listaRandonicaCursosCriados = $cursoDao->recuperarTodosPorCriadorAleatorios(
+                $gerenciadorPrincipal,
+                10
+            );
+
+        }catch(cassandra_NotFoundException $e){
+
+            $listaRandonicaCursosCriados = null;
+
+        }
+
+        try{
+            $aluno = $usuarioDao->criarAluno($usuarioAutenticado);
+            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+
+            $listaRandonicaCursosInscritos = $cursoDao->recuperarTodosPorAlunoAleatorios(
+                $aluno,
+                10
+            );
+
+        }catch(cassandra_NotFoundException $e){
+
+            $listaRandonicaCursosInscritos = null;
+
+        }
+
+
+        $widgets = array();
+
+        if(!is_null($listaRandonicaAmigos)){
+            $widgets[] = $this->template->loadPartial(
+                'widget_amigos',
+                array('legenda' => 'Meus Amigos','link' => 'usuario/amigos/listar/'.$usuarioAutenticado->id,'listaRandonicaAmigos' => $listaRandonicaAmigos),
+                'usuario/amigos'
+            );
+        }
+
+        if(!is_null($listaRandonicaCursosCriados)){
+            $widgets[] = $this->template->loadPartial(
+                'widget_cursos_criados',
+                array('legenda' => 'Cursos criados por '.$usuarioAutenticado->getNome(),'link'=>'link para curso','listaRandonicaCursosCriados' => $listaRandonicaCursosCriados),
+                'usuario/cursos'
+            );
+        }
+
+        if(!is_null($listaRandonicaCursosInscritos)){
+            $widgets[] = $this->template->loadPartial(
+                'widget_cursos_aluno',
+                array('legenda' => 'Cursos em que '.$usuarioAutenticado->getNome().' participa','link'=>'link para curso','listaRandonicaCursosInscritos' => $listaRandonicaCursosInscritos),
+                'usuario/cursos'
+            );
+        }
 
         $this->_setTemplate( 'home' )
              ->_setBarraUsuarioPath( 'perfil/barra_usuario' )
@@ -443,9 +492,10 @@ class Perfil_Controller extends WL_Controller
 
     public function _renderTemplatePerfil( $view = '', $dados = null )
     {
+        $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+        $usuarioPerfil = $usuarioDao->recuperar($dados['usuarioPerfil']->getId());
+        $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
         try{
-            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-            $usuarioPerfil = $usuarioDao->recuperar($dados['usuarioPerfil']->getId());
             $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
 
             $listaRandonicaAmigos = $amizadeUsuarioDao->recuperarAmigosAleatorios(
@@ -459,12 +509,53 @@ class Perfil_Controller extends WL_Controller
 
         }
 
+        try{
+            $gerenciadorPrincipal = $usuarioDao->criarGerenciadorPrincipal($usuarioPerfil);
+            $listaRandonicaCursosCriados = $cursoDao->recuperarTodosPorCriadorAleatorios(
+                $gerenciadorPrincipal,
+                10
+            );
+
+        }catch(cassandra_NotFoundException $e){
+
+            $listaRandonicaCursosCriados = null;
+
+        }
+
+        try{
+            $aluno = $usuarioDao->criarAluno($usuarioPerfil);
+            $listaRandonicaCursosInscritos = $cursoDao->recuperarTodosPorAlunoAleatorios(
+               $aluno,
+               10
+            );
+        }catch(cassandra_NotFoundException $e)
+        {
+            $listaRandonicaCursosInscritos = null;
+        }
+
         $widgets = array();
-        $widgets[] = $this->template->loadPartial(
-            'widget_amigos',
-            array('legenda' =>'Amigos de '.$usuarioPerfil->getNome(),'listaRandonicaAmigos' => $listaRandonicaAmigos),
-            'usuario/amigos'
-        );
+
+        if(!is_null($listaRandonicaAmigos)){
+            $widgets[] = $this->template->loadPartial(
+                'widget_amigos',
+                array('legenda' =>'Amigos de '.$usuarioPerfil->getNome(),'link'=>'usuario/amigos/listar/'.$usuarioPerfil->id,'listaRandonicaAmigos' => $listaRandonicaAmigos),
+                'usuario/amigos'
+            );
+        }
+        if(!is_null($listaRandonicaCursosCriados)){
+            $widgets[] = $this->template->loadPartial(
+                'widget_cursos_criados',
+                array('legenda' => 'Cursos criados por '.$usuarioPerfil->getNome(),'link'=>'link para curso','listaRandonicaCursosCriados' => $listaRandonicaCursosCriados),
+                'usuario/cursos'
+            );
+        }
+        if(!is_null($listaRandonicaCursosInscritos)){
+            $widgets[] = $this->template->loadPartial(
+              'widget_cursos_aluno',
+                array('legenda' => 'Cursos em que '.$usuarioPerfil->getNome().' participa','link'=>'link para curso','listaRandonicaCursosInscritos' => $listaRandonicaCursosInscritos),
+                'usuario/cursos'
+            );
+        }
 
         $this->_setTemplate( 'perfil' )
              ->_setBarraUsuarioPath('perfil/barra_usuario')
