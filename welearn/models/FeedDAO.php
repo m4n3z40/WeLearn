@@ -102,6 +102,7 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
         }
         $this->_cf->remove($uuidFeed);
         $this->_FeedCF->remove($feed->getCriador()->getId(),array($uuidFeed));
+        $this->_TimelineCF->remove($feed->getCriador()->getId(),array($uuidFeed));
         $this->_comentarioDAO->removerTodosPorCompartilhamento($uuidFeed);
 
 
@@ -134,6 +135,7 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
         $UUID = UUID::mint();
         $dto->setId($UUID->string);
         $this->_cf->insert($UUID->bytes,$dto->toCassandra());
+        $this->_TimelineCF->insert($dto->getCriador()->getId(),array($UUID->bytes => ''));
         $this->_FeedCF->insert($dto->getCriador()->getId(),array($UUID->bytes => ''));//inserindo na timeline do usuario criador do feed
         try{
            $amigosAtivos = $this->_amizadeDAO->recuperarTodosAmigosAtivos($dto->getCriador());
@@ -160,23 +162,34 @@ class FeedDAO extends WeLearn_DAO_AbstractDAO
     }
 
 
-    //so ira salvar no timeline cf do dono do perfil, no perfil da pessoa vao aparecer todos as publicaçoes que ela recebeu e ela poderá excluir todas
-    //ao receber uma nova publicação no seu perfil sera gerada uma notificação para o dono do perfil, que ira direcionar para a nova notificação recebida
     protected function _adicionarTimeline(WeLearn_DTO_IDTO &$dto, WeLearn_DTO_IDTO &$usuario)
     {
-        $UUID = UUID::mint();
-        $dto->setId($UUID->string);
-        $this->_cf->insert($UUID->bytes,$dto->toCassandra());
-        $this->_TimelineCF->insert($usuario->getId(),array($UUID->bytes => ''));
+        if($dto->getCriador() == $usuario)
+        {
+            $this->_adicionar($dto);
+        }else{
+            $UUID = UUID::mint();
+            $dto->setId($UUID->string);
+            $this->_cf->insert($UUID->bytes,$dto->toCassandra());
+            $this->_TimelineCF->insert($usuario->getId(),array($UUID->bytes => ''));
+        }
+
     }
 
     public function removerTimeline(WeLearn_DTO_IDTO &$dto, WeLearn_DTO_IDTO &$usuario)
     {
-        $this->_comentarioDAO = WeLearn_DAO_DAOFactory::create('ComentarioFeedDAO');
-        $idFeed= CassandraUtil::import($dto->getId())->bytes;
-        $this->_cf->remove($idFeed);
-        $this->_TimelineCF->remove($usuario->getId(),array($idFeed));
-        $this->_comentarioDAO->removerTodosPorCompartilhamento($idFeed);
+        if($dto->getCriador() == $usuario)
+        {
+            $this->remover($dto->getId());
+        }else{
+            $this->_comentarioDAO = WeLearn_DAO_DAOFactory::create('ComentarioFeedDAO');
+            $idFeed= CassandraUtil::import($dto->getId())->bytes;
+            $this->_cf->remove($idFeed);
+            $this->_FeedCF->remove($dto->getCriador()->getId(),array($idFeed));
+            $this->_TimelineCF->remove($usuario->getId(),array($idFeed));
+            $this->_comentarioDAO->removerTodosPorCompartilhamento($idFeed);
+        }
+
     }
 
 

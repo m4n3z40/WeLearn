@@ -43,7 +43,7 @@ class Convite extends Home_Controller
                     ),
                     'usuario/convite'
                 );
-                $dadosView = array('partialListaConvites' => $partialListaConvites);
+                $dadosView = array('partialListaConvites' => $partialListaConvites,'idUsuario' => $this->autenticacao->getUsuarioAutenticado()->getId());
             }
         }catch(cassandra_NotFoundException $e)
         {
@@ -366,7 +366,7 @@ class Convite extends Home_Controller
             'menuContexto',
             $this->template->loadPartial(
                 'menu',
-                array(),
+                $dados,
                 'usuario/amigos'
             )
         );

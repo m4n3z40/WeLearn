@@ -340,6 +340,57 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param WeLearn_Usuarios_GerenciadorPrincipal $criador
+     * @param $qtd
+     * @return array
+     */
+    public function recuperarTodosPorCriadorAleatorios(WeLearn_Usuarios_GerenciadorPrincipal $criador, $qtd)
+    {
+        $idCursos = array_keys(
+            $this->_cursosPorCriadorCF->get(
+                $criador->getId(),
+                null,
+                '',
+                '',
+                false,
+                1000000
+            )
+        );
+
+        $totalCursos = count( $idCursos );
+
+        if ( $qtd > $totalCursos ) {
+
+            $qtd = $totalCursos;
+
+        }
+
+        $arrayCursos = array();
+
+        for ( $i = 0; $i < $qtd; $i++ ) {
+
+            $key = array_rand( $idCursos );
+
+            if ( isset( $idCursos[ $key ] ) ) {
+
+                $arrayCursos[] = $idCursos[ $key ];
+
+                unset( $idCursos[ $key ] );
+
+            } else {
+
+                $i--;
+
+            }
+
+        }
+
+        $columns = $this->_cf->multiget( $arrayCursos );
+
+        return $this->_criarVariosFromCassandra( $columns, null, $criador );
+    }
+
+    /**
      * @param WeLearn_Usuarios_Aluno $aluno
      * @param string $de
      * @param string $ate
@@ -374,6 +425,54 @@ class CursoDAO extends WeLearn_DAO_AbstractDAO
 
         return $this->_criarVariosFromCassandra( $columns );
     }
+
+    public function recuperarTodosPorAlunoAleatorios(WeLearn_Usuarios_Aluno $aluno,$qtd)
+    {
+        $idCursos = array_keys(
+            $this->_cursosPorAlunoCF->get(
+                $aluno->getId(),
+                null,
+                '',
+                '',
+                false,
+                1000000
+            )
+        );
+
+        $totalCursos = count( $idCursos );
+
+
+        if ( $qtd > $totalCursos ) {
+
+            $qtd = $totalCursos;
+
+        }
+
+        $arrayCursos = array();
+
+        for ( $i = 0; $i < $qtd; $i++ ) {
+
+            $key = array_rand( $idCursos );
+
+            if ( isset( $idCursos[ $key ] ) ) {
+
+                $arrayCursos[] = $idCursos[ $key ];
+
+                unset( $idCursos[ $key ] );
+
+            } else {
+
+                $i--;
+
+            }
+
+        }
+
+        $columns = $this->_cf->multiget( $arrayCursos );
+
+        return $this->_criarVariosFromCassandra( $columns, null, null );
+    }
+
 
     /**
      * @param WeLearn_Usuarios_Usuario $usuario

@@ -172,136 +172,148 @@ class Feed extends Home_Controller
 
     public function criar_timeline($idPerfil)
     {
-        set_json_header();
-        $isValid=false;
-        $tipo=$this->input->post('tipo-feed');
-        $this->load->library('form_validation');
-
-        $this->form_validation->set_rules('conteudo-feed', 'conteudo-feed', 'required');
-        if($tipo != WeLearn_Compartilhamento_TipoFeed::STATUS)
+        $this->load->helper('notificacao_js');
+        $usuarioPerfil = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idPerfil);
+        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+        if(($usuarioAutenticado->getId() == $usuarioPerfil->getId()) || ($usuarioAutenticado->getId() != $usuarioPerfil->getId()
+        && $usuarioPerfil->getConfiguracao()->getPrivacidadeCompartilhamento() == WeLearn_Usuarios_PrivacidadeCompartilhamento::HABILITADO))
         {
-            $this->form_validation->set_rules('descricao-feed', 'descricao-feed', 'callback_validar_descricao');
-        }
+            set_json_header();
+            $isValid=false;
+            $tipo=$this->input->post('tipo-feed');
+            $this->load->library('form_validation');
 
-        if($this->form_validation->run()===false)
-        {
-            $json = create_json_feedback(false, validation_errors_json());
-            exit($json);
-        }else{
-
-            switch($tipo)
+            $this->form_validation->set_rules('conteudo-feed', 'conteudo-feed', 'required');
+            if($tipo != WeLearn_Compartilhamento_TipoFeed::STATUS)
             {
-                case WeLearn_Compartilhamento_TipoFeed::VIDEO:
-                    $isValid = $this->validar_video();
-                    if(!$isValid)
-                    {
-                        log_message(
-                            'error',
-                            'A url do video enviado nao é valida'
-                        );
-
-                        $error = create_json_feedback_error_json(
-                            'A url do video enviado não é valida, verifique se a url está correta.'
-                        );
-
-                        $json = create_json_feedback(false, $error);
-                    }
-                    break;
-                case WeLearn_Compartilhamento_TipoFeed::IMAGEM:
-                    $isValid = $this->validar_imagem();
-                    if(!$isValid)
-                    {
-                        log_message(
-                            'error',
-                            'A url da imagem enviada nao é valida'
-                        );
-
-                        $error = create_json_feedback_error_json(
-                            'A url da imagem enviada não é valida, verifique se a url está correta.'
-                        );
-
-                        $json = create_json_feedback(false, $error);
-                    }
-                    break;
-                case WeLearn_Compartilhamento_TipoFeed::LINK;
-                    $isValid = $this->validar_url();
-                    if(!$isValid)
-                    {
-                        log_message(
-                            'error',
-                            'A url enviada nao é valida'
-                        );
-
-                        $error = create_json_feedback_error_json(
-                            'A url enviada não é valida, verifique se a url está correta.'
-                        );
-
-                        $json = create_json_feedback(false, $error);
-                    }
-                    break;
-                case WeLearn_Compartilhamento_TipoFeed::STATUS:
-                    $isValid = true;
-                    if(!$isValid)
-                    {
-                        log_message(
-                            'error',
-                            'O status enviado nao é valida'
-                        );
-
-                        $error = create_json_feedback_error_json(
-                            'O status enviado não é valido, por favor corrija- o.'
-                        );
-
-                        $json = create_json_feedback(false, $error);
-                    }
-                    break;
-
+                $this->form_validation->set_rules('descricao-feed', 'descricao-feed', 'callback_validar_descricao');
             }
 
-            if($isValid){
-                $feedDao = WeLearn_DAO_DAOFactory::create('FeedDAO');
-                $feed = $feedDao->criarNovo();
-                $criador=$this->autenticacao->getUsuarioAutenticado();
-                $conteudo=$this->input->post('conteudo-feed');
+            if($this->form_validation->run()===false)
+            {
+                $json = create_json_feedback(false, validation_errors_json());
+                exit($json);
+            }else{
 
-
-                if($tipo != WeLearn_Compartilhamento_TipoFeed::STATUS)
+                switch($tipo)
                 {
-                    $descricao=$this->input->post('descricao-feed');
-                    $feed->setDescricao($descricao);
+                    case WeLearn_Compartilhamento_TipoFeed::VIDEO:
+                        $isValid = $this->validar_video();
+                        if(!$isValid)
+                        {
+                            log_message(
+                                'error',
+                                'A url do video enviado nao é valida'
+                            );
+
+                            $error = create_json_feedback_error_json(
+                                'A url do video enviado não é valida, verifique se a url está correta.'
+                            );
+
+                            $json = create_json_feedback(false, $error);
+                        }
+                        break;
+                    case WeLearn_Compartilhamento_TipoFeed::IMAGEM:
+                        $isValid = $this->validar_imagem();
+                        if(!$isValid)
+                        {
+                            log_message(
+                                'error',
+                                'A url da imagem enviada nao é valida'
+                            );
+
+                            $error = create_json_feedback_error_json(
+                                'A url da imagem enviada não é valida, verifique se a url está correta.'
+                            );
+
+                            $json = create_json_feedback(false, $error);
+                        }
+                        break;
+                    case WeLearn_Compartilhamento_TipoFeed::LINK;
+                        $isValid = $this->validar_url();
+                        if(!$isValid)
+                        {
+                            log_message(
+                                'error',
+                                'A url enviada nao é valida'
+                            );
+
+                            $error = create_json_feedback_error_json(
+                                'A url enviada não é valida, verifique se a url está correta.'
+                            );
+
+                            $json = create_json_feedback(false, $error);
+                        }
+                        break;
+                    case WeLearn_Compartilhamento_TipoFeed::STATUS:
+                        $isValid = true;
+                        if(!$isValid)
+                        {
+                            log_message(
+                                'error',
+                                'O status enviado nao é valida'
+                            );
+
+                            $error = create_json_feedback_error_json(
+                                'O status enviado não é valido, por favor corrija- o.'
+                            );
+
+                            $json = create_json_feedback(false, $error);
+                        }
+                        break;
+
                 }
 
-                $feed->setConteudo($conteudo);
-                $feed->setTipo($tipo);
-                $feed->setCriador($criador);
-                $feed->setDataEnvio(time());
-                $usuarioPerfil = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idPerfil);
-                $this->load->helper('notificacao_js');
-                try{
 
-                    $feedDao->salvarTimeLine($feed,$usuarioPerfil);
-                    $notificacoesFlash = create_notificacao_json(
-                        'sucesso',
-                        'Feed enviado com sucesso!'
-                    );
-                    $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
-                    $json = create_json_feedback(true);
+                if($isValid){
+                    $feedDao = WeLearn_DAO_DAOFactory::create('FeedDAO');
+                    $feed = $feedDao->criarNovo();
+                    $criador=$this->autenticacao->getUsuarioAutenticado();
+                    $conteudo=$this->input->post('conteudo-feed');
 
-                    //Notificar ao usuário
-                    $notificacao = new WeLearn_Notificacoes_NotificacaoCompartilhamentoPerfil();
-                    $notificacao->setCompartilhamento( $feed );
-                    $notificacao->setDestinatario( $usuarioPerfil );
-                    $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
-                    $notificacao->notificar();
-                    //fim da notificação.
 
-                }catch(cassandra_NotFoundException $e){
-                    $json=create_json_feedback(false);
+                    if($tipo != WeLearn_Compartilhamento_TipoFeed::STATUS)
+                    {
+                        $descricao=$this->input->post('descricao-feed');
+                        $feed->setDescricao($descricao);
+                    }
+
+                    $feed->setConteudo($conteudo);
+                    $feed->setTipo($tipo);
+                    $feed->setCriador($criador);
+                    $feed->setDataEnvio(time());
+                    try{
+
+                        $feedDao->salvarTimeLine($feed,$usuarioPerfil);
+                        $notificacoesFlash = create_notificacao_json(
+                            'sucesso',
+                            'Feed enviado com sucesso!'
+                        );
+                        $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+                        $json = create_json_feedback(true);
+
+                        //Notificar ao usuário
+                        $notificacao = new WeLearn_Notificacoes_NotificacaoCompartilhamentoPerfil();
+                        $notificacao->setCompartilhamento( $feed );
+                        $notificacao->setDestinatario( $usuarioPerfil );
+                        $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+                        $notificacao->notificar();
+                        //fim da notificação.
+
+                    }catch(cassandra_NotFoundException $e){
+                        $json=create_json_feedback(false);
+                    }
                 }
             }
-
-            echo $json;
+        }else{
+            $notificacoesFlash = create_notificacao_json(
+                'erro',
+                'As configurações de privacidade não permitem que o compartilhamento seja enviado!'
+            );
+            $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+            $json=create_json_feedback(false);
         }
+        echo $json;
     }
 
     public function remover_timeline($idFeed,$idUsuario)
