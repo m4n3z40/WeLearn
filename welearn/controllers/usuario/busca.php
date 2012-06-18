@@ -21,33 +21,46 @@ class busca extends Home_Controller
 
     public function buscar()
     {
-        $count = 10;
+        $count = 2;
         $texto = $this->input->post('txt-search');
 
         $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+        $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+
 
         $filtros = array( 'busca' => $texto, 'count' => $count + 1 );
 
         $listaUsuarios = $usuarioDao->recuperarTodos( 0, null, $filtros );
+        $listaCursos = $cursoDao->recuperarTodos(0, null, $filtros );
 
         $this->load->helper('paginacao_mysql');
-        $dadosPaginados = create_paginacao_mysql($listaUsuarios,0, $count);
+        $dadosPaginadosUsuarios = create_paginacao_mysql($listaUsuarios,0, $count);
+        $dadosPaginadosCursos = create_paginacao_mysql($listaCursos, 0, $count);
 
-        $partialBuscarUsuario = $this->template->loadPartial(
+        $partialBusca = $this->template->loadPartial(
             'lista_busca',
-            array( 'ResultadoBusca' => $listaUsuarios),
+            array(
+               'texto' => $texto,
+               'listaUsuarios' => $listaUsuarios,
+               'listaCursos' => $listaCursos,
+               'paginacaoCurso' => $dadosPaginadosCursos,
+               'paginacaoUsuario' =>$dadosPaginadosUsuarios
+            ),
             'usuario/home/busca'
         );
 
-        if( ! $listaUsuarios ) {
+
+
+        if( ! $listaUsuarios &&  ! $listaCursos ) {
             $success = false;
         } else {
             $success = true;
         }
 
+
+
         $dadosView = array(
-           'listaUsuarios' => $partialBuscarUsuario,
-            'paginacao' => $dadosPaginados,
+           'listaResultados' => $partialBusca,
             'texto' => $texto,
             'success' => $success
         );
@@ -84,7 +97,7 @@ class busca extends Home_Controller
                 'lista_busca',
                 array(
                     'texto' => $texto,
-                    'haMensagens'=> !empty($dadosPaginados),
+                    'haResultados'=> !empty($dadosPaginados),
                     'ResultadoBusca' => $listaUsuarios,
                     'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina']
                 ),

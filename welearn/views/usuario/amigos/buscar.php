@@ -15,7 +15,7 @@
                         <dt><input type="text" name="busca" id="txt-busca" placeholder="Descreva aqui." value="<?php echo $txtBusca ?>"></dt>
                     </dl>
                 </fieldset>
-                <input type="submit" id="btn-form-busca-cursos" value="Buscar!">
+                <input type="submit" id="btn-form-busca-usuarios" value="Buscar!">
             </form>
         </header>
         <div>

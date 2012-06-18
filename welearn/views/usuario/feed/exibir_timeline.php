@@ -1,9 +1,13 @@
 <div id='feed-content'>
     <?php if($usuarioAutenticado->id != $usuarioPerfil->id):?>
-        <?php if(($usuarioPerfil->configuracao->privacidadeCompartilhamento == WeLearn_Usuarios_PrivacidadeCompartilhamento::HABILITADO) || ($saoAmigos == WeLearn_Usuarios_StatusAmizade::AMIGOS)):?>
-            <h1>Publique algo no TimeLine de <?=$usuarioPerfil->nome?></h1>
-                <?=$criarFeed?>
-            <hr>
+        <?php if(($usuarioPerfil->configuracao->privacidadePerfil == WeLearn_Usuarios_PrivacidadePerfil::PUBLICO) || ($saoAmigos == WeLearn_Usuarios_StatusAmizade::AMIGOS)):?>
+            <?php if($usuarioPerfil->configuracao->privacidadeCompartilhamento == WeLearn_Usuarios_PrivacidadeCompartilhamento::HABILITADO):?>
+                <h1>Publique algo no TimeLine de <?=$usuarioPerfil->nome?></h1>
+                    <?=$criarFeed?>
+                <hr>
+            <?php else:?>
+                <h4>As configurações de privacidade de <?php echo $usuarioPerfil->nome?> não permitem o envio de compartilhamentos</h4>
+            <?php endif;?>
             <h1>Publicações Recentes</h1>
             <ul id='feed-lista-feeds'>
                 <?=$listarTimeline?>

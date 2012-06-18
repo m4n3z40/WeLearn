@@ -4,7 +4,7 @@
     <?echo anchor($link,'cursos gerenciados');?>
     <ul>
         <?foreach ($listaRandonicaCursosCriados as $row):?>
-        <li><?=$row->toHTML('imagem_mini')?></li>
+        <li><?echo $row->htmlImagemLink(true);?></li>
         <?endforeach;?>
     </ul>
 </div>

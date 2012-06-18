@@ -16,59 +16,32 @@ class Amigos extends Home_Controller
                        ->appendJSImport('amizade.js');
     }
 
-    public function listar($idUsuario='')
+    public function listar()
     {
-        if( $idUsuario=='' ) {
-            show_404();
-        }else{
-            try{
-                $usuario = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idUsuario);
-            }catch(cassandra_NotFoundException $e){
-                show_404();
-            }
-
-            $amigosDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
-            $filtros= array('count' => self::$_count+1 , 'opcao' => 'amigos' , 'usuario' => $usuario);
-            try{
-                $totalAmigos = $amigosDao->recuperarQtdTotalAmigos($usuario);
-                $listaAmigos= $amigosDao->recuperarTodos('','',$filtros);
-                $this->load->helper('paginacao_cassandra');
-                $dadosPaginados=create_paginacao_cassandra($listaAmigos,self::$_count);
-                $partialListaAmigos=$this->template->loadPartial('lista',
-                    array('listaAmigos' => $listaAmigos,
-                          'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
-                          'haAmigos' => $dadosPaginados['proxima_pagina'],
-                          'idUsuario' => $usuario->getId()
-                    ),
-                    'usuario/amigos'
-                );
-                $dadosView= array('success' => true,'partialListaAmigos' => $partialListaAmigos, 'totalAmigos' => $totalAmigos,'idUsuario' => $usuario->getId());
-            }catch(cassandra_NotFoundException $e){
-                $dadosView= array('success' => false, 'totalAmigos' => 0,'idUsuario'=>$usuario->getId());
-            }
-            if($usuario == $this->autenticacao->getUsuarioAutenticado())
-            {
-                $this->_renderTemplateHome('usuario/amigos/index', $dadosView);
-            }else
-            {
-                $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
-                $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
-                $saoAmigos=$amizadeUsuarioDao->SaoAmigos($this->autenticacao->getUsuarioAutenticado(),$usuario);
-                $dadosView['saoAmigos']=$saoAmigos;
-                if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
-                {
-                    $convitePendente = $conviteCadastradoDao->recuperarPendentes($this->autenticacao->getUsuarioAutenticado(),$usuario);
-                    $dadosView['convitePendente']=$convitePendente;
-                }
-                $dadosView['usuarioPerfil']= $usuario;
-                $dadosView['usuarioAutenticado']= $this->autenticacao->getUsuarioAutenticado();
-                $this->_renderTemplatePerfil('usuario/amigos/index',$dadosView);
-            }
+        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+        $amigosDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+        $filtros= array('count' => self::$_count+1 , 'opcao' => 'amigos' , 'usuario' => $usuarioAutenticado);
+        try{
+            $totalAmigos = $amigosDao->recuperarQtdTotalAmigos($usuarioAutenticado);
+            $listaAmigos= $amigosDao->recuperarTodos('','',$filtros);
+            $this->load->helper('paginacao_cassandra');
+            $dadosPaginados=create_paginacao_cassandra($listaAmigos,self::$_count);
+            $partialListaAmigos=$this->template->loadPartial('lista',
+                array('listaAmigos' => $listaAmigos,
+                      'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
+                      'haAmigos' => $dadosPaginados['proxima_pagina'],
+                      'idUsuario' => $usuarioAutenticado->getId()
+                ),
+                'usuario/amigos'
+            );
+            $dadosView= array('success' => true,'partialListaAmigos' => $partialListaAmigos, 'totalAmigos' => $totalAmigos,'idUsuario' => $usuarioAutenticado->getId());
+        }catch(cassandra_NotFoundException $e){
+            $dadosView= array('success' => false, 'totalAmigos' => 0,'idUsuario'=>$usuarioAutenticado->getId());
         }
+
+        $this->_renderTemplateHome('usuario/amigos/index',$dadosView);
+
     }
-
-
-
 
 
 
@@ -231,44 +204,5 @@ class Amigos extends Home_Controller
         parent::_renderTemplateHome($view, $dados);
     }
 
-    protected function _renderTemplatePerfil($view = '', $dados = array())
-    {
-        {
-            try{
-                $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-                $usuarioPerfil = $usuarioDao->recuperar($dados['usuarioPerfil']->getId());
-                $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
 
-                $listaRandonicaAmigos = $amizadeUsuarioDao->recuperarAmigosAleatorios(
-                    $usuarioPerfil,
-                    10
-                );
-
-            }catch(cassandra_NotFoundException $e){
-
-                $listaRandonicaAmigos = null;
-
-            }
-
-            $widgets = array();
-            $widgets[] = $this->template->loadPartial(
-                'widget_amigos',
-                array('legenda' =>'Amigos de '.$usuarioPerfil->getNome(),'link'=>'usuario/amigos/listar/'.$usuarioPerfil->id,'listaRandonicaAmigos' => $listaRandonicaAmigos),
-                'usuario/amigos'
-            );
-
-            $this->_setTemplate( 'perfil' )
-                ->_setBarraUsuarioPath('perfil/barra_usuario')
-                ->_setBarraEsquerdaPath( 'perfil/barra_lateral_esquerda' )
-                ->_setBarraDireitaPath( 'perfil/barra_lateral_direita' )
-
-                ->_barraEsquerdaSetVar( 'usuario', $dados )
-
-                ->_barraDireitaSetVar(
-                'widgetsContexto',
-                $widgets
-            )
-                ->_renderTemplate($view, $dados);
-        }
-    }
 }

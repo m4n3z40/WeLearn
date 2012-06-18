@@ -8,7 +8,6 @@
         <div class='data-envio'><?=date('d/m/Y à\s H:i',$row->getDataEnvio())?></div>
         <a href='usuario/mensagem/remover' class='remover-mensagem'>remover</a>
     </li>
-    </br>
 <?php endforeach; ?>
 
 

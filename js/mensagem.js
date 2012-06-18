@@ -40,23 +40,24 @@
             formPost,
             $(formPost).attr('action'),
             function(res){
-                if(res.success==true)
-                {
-                    $('#mensagem-lista-mensagens').append(
-                        '<li class="item-lista-mensagem">'+
-                            '<input type="hidden" id="id-mensagem" value="'
-                            +res.mensagemId+'">'+
-                            '<div class="remetente">'+res.remetente+'</div>'+
-                            '<div class="mensagem-texto">'+res.mensagemTexto+'</div>'+
-                            '<div class="data-envio">'+res.dataEnvio+'</div>'+
-                            '<a href="usuario/mensagem/remover" class="remover-mensagem">'
-                            +'remover</a>'+
-                            '</li>'+
-                            '</div>'
-                    );
-                    $('#txt-mensagem').val('');
-                    WeLearn.notificar(res.notificacao);
-                }
+                $('#mensagem-lista-mensagens').append(
+                    '<li class="item-lista-mensagem">'+
+                        '<input type="hidden" id="id-mensagem" value="'
+                        +res.mensagemId+'">'+
+                        '<div class="remetente">'+res.remetente+'</div>'+
+                        '<div class="mensagem-texto">'+res.mensagemTexto+'</div>'+
+                        '<div class="data-envio">'+res.dataEnvio+'</div>'+
+                        '<a href="usuario/mensagem/remover" class="remover-mensagem">'
+                        +'remover</a>'+
+                        '</li>'+
+                        '</div>'
+                );
+                $('#txt-mensagem').val('');
+                WeLearn.notificar(res.notificacao);
+
+            },
+            function(res){
+                $(formPost).remove();
             }
         );
 

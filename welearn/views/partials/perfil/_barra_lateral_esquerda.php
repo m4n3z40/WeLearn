@@ -36,10 +36,12 @@
                 <?php endif;?>
 
             <?php endif; ?>
-            <?php if($usuarioPerfil->configuracao->privacidadePerfil == WeLearn_Usuarios_PrivacidadePerfil::PUBLICO):?>
+            <?php if(($usuarioPerfil->configuracao->privacidadePerfil == WeLearn_Usuarios_PrivacidadePerfil::PUBLICO) ||
+                    ($usuarioPerfil->configuracao->privacidadePerfil == WeLearn_Usuarios_PrivacidadePerfil::PRIVADO
+                    && $saoAmigos == WeLearn_Usuarios_StatusAmizade::AMIGOS)):?>
                 <li><?= anchor('perfil/dados_pessoais/'.$usuarioPerfil->id,'Dados Pessoais')?></li>
                 <li><?= anchor('perfil/dados_profissionais/'.$usuarioPerfil->id,'Dados Profissionais')?></li>
-            <?php endif;?>
+            <?php endif?>
         </ul>
     </nav>
 </section>

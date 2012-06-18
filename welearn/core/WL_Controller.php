@@ -259,78 +259,6 @@ class Home_Controller extends WL_Controller
      */
     protected function _renderTemplateHome( $view = '', $dados = null )
     {
-        $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
-        try{
-            $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
-
-            $listaRandonicaAmigos = $amizadeUsuarioDao->recuperarAmigosAleatorios(
-                $usuarioAutenticado,
-                10
-            );
-
-        }catch(cassandra_NotFoundException $e){
-
-            $listaRandonicaAmigos = null;
-
-        }
-
-        try{
-            $gerenciadorPrincipal = $usuarioDao->criarGerenciadorPrincipal($usuarioAutenticado);
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-
-            $listaRandonicaCursosCriados = $cursoDao->recuperarTodosPorCriadorAleatorios(
-                $gerenciadorPrincipal,
-                10
-            );
-
-        }catch(cassandra_NotFoundException $e){
-
-            $listaRandonicaCursosCriados = null;
-
-        }
-
-        try{
-            $aluno = $usuarioDao->criarAluno($usuarioAutenticado);
-            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
-
-            $listaRandonicaCursosInscritos = $cursoDao->recuperarTodosPorAlunoAleatorios(
-                $aluno,
-                10
-            );
-
-        }catch(cassandra_NotFoundException $e){
-
-            $listaRandonicaCursosInscritos = null;
-
-        }
-
-
-        $widgets = array();
-
-        if(!is_null($listaRandonicaAmigos)){
-            $widgets[] = $this->template->loadPartial(
-                'widget_amigos',
-                array('legenda' => 'Meus Amigos','link' => 'usuario/amigos/listar/'.$usuarioAutenticado->id,'listaRandonicaAmigos' => $listaRandonicaAmigos),
-                'usuario/amigos'
-            );
-        }
-
-        if(!is_null($listaRandonicaCursosCriados)){
-            $widgets[] = $this->template->loadPartial(
-                'widget_cursos_criados',
-                array('legenda' => 'Cursos criados por '.$usuarioAutenticado->getNome(),'link'=>'link para curso','listaRandonicaCursosCriados' => $listaRandonicaCursosCriados),
-                'usuario/cursos'
-            );
-        }
-
-        if(!is_null($listaRandonicaCursosInscritos)){
-            $widgets[] = $this->template->loadPartial(
-                'widget_cursos_aluno',
-                array('legenda' => 'Cursos em que '.$usuarioAutenticado->getNome().' participa','link'=>'link para curso','listaRandonicaCursosInscritos' => $listaRandonicaCursosInscritos),
-                'usuario/cursos'
-            );
-        }
 
         $this->_setTemplate( 'home' )
              ->_setBarraUsuarioPath( 'perfil/barra_usuario' )
@@ -340,11 +268,6 @@ class Home_Controller extends WL_Controller
              ->_barraEsquerdaSetVar(
                  'usuario',
                  $this->autenticacao->getUsuarioAutenticado()
-             )
-
-             ->_barraDireitaSetVar(
-                 'widgetsContexto',
-                 $widgets
              )
 
              ->_renderTemplate( $view, $dados );
@@ -538,7 +461,7 @@ class Perfil_Controller extends WL_Controller
         if(!is_null($listaRandonicaAmigos)){
             $widgets[] = $this->template->loadPartial(
                 'widget_amigos',
-                array('legenda' =>'Amigos de '.$usuarioPerfil->getNome(),'link'=>'usuario/amigos/listar/'.$usuarioPerfil->id,'listaRandonicaAmigos' => $listaRandonicaAmigos),
+                array('legenda' =>'Amigos de '.$usuarioPerfil->getNome(),'link'=>'usuario/perfil/listar_amigos/'.$usuarioPerfil->id,'listaRandonicaAmigos' => $listaRandonicaAmigos),
                 'usuario/amigos'
             );
         }
