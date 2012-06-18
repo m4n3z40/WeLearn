@@ -16,9 +16,9 @@ class Amigos extends Home_Controller
                        ->appendJSImport('amizade.js');
     }
 
-    public function index()
+    public function listar()
     {
-        $usuarioAutenticado=$this->autenticacao->getUsuarioAutenticado();
+        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
         $amigosDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
         $filtros= array('count' => self::$_count+1 , 'opcao' => 'amigos' , 'usuario' => $usuarioAutenticado);
         try{
@@ -29,30 +29,31 @@ class Amigos extends Home_Controller
             $partialListaAmigos=$this->template->loadPartial('lista',
                 array('listaAmigos' => $listaAmigos,
                       'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
-                      'haAmigos' => $dadosPaginados['proxima_pagina']),
+                      'haAmigos' => $dadosPaginados['proxima_pagina'],
+                      'idUsuario' => $usuarioAutenticado->getId()
+                ),
                 'usuario/amigos'
             );
-            $dadosView= array('success' => true,'partialListaAmigos' => $partialListaAmigos, 'totalAmigos' => $totalAmigos);
+            $dadosView= array('success' => true,'partialListaAmigos' => $partialListaAmigos, 'totalAmigos' => $totalAmigos,'idUsuario' => $usuarioAutenticado->getId());
         }catch(cassandra_NotFoundException $e){
-            $dadosView= array('success' => false, 'totalAmigos' => 0);
+            $dadosView= array('success' => false, 'totalAmigos' => 0,'idUsuario'=>$usuarioAutenticado->getId());
         }
-        $this->_renderTemplateHome('usuario/amigos/index', $dadosView);
+
+        $this->_renderTemplateHome('usuario/amigos/index',$dadosView);
+
     }
 
 
 
-
-    public function proxima_pagina($inicio)
+    public function proxima_pagina($idUsuario,$inicio)
     {
         if ( ! $this->input->is_ajax_request() ) {
             show_404();
         }
 
-
-
-            $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+            $usuario = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idUsuario);
             $amigosDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
-            $filtros= array('count' => self::$_count+1,'usuario' => $usuarioAutenticado, 'opcao'=>'amigos');
+            $filtros= array('count' => self::$_count+1,'usuario' => $usuario, 'opcao'=>'amigos');
             try {
                 $listaAmigos = $amigosDao->recuperarTodos($inicio,'',$filtros);
                 $this->load->helper('paginacao_cassandra');
@@ -123,8 +124,6 @@ class Amigos extends Home_Controller
             $paginacao = create_paginacao_mysql($listaResultados,0, self::$_count);
         }
 
-
-
         $dadosView = array(
             'formAction' => 'usuario/amigos/buscar',
             'txtBusca' => $buscaAtual,
@@ -133,7 +132,8 @@ class Amigos extends Home_Controller
                 'lista_busca',
                 array( 'listaResultados' => $listaResultados),
                 'usuario/amigos'
-            )
+            ),
+            'idUsuario' => $this->autenticacao->getUsuarioAutenticado()->getId()
         );
 
         if($buscaAtual)
@@ -203,4 +203,6 @@ class Amigos extends Home_Controller
 
         parent::_renderTemplateHome($view, $dados);
     }
+
+
 }

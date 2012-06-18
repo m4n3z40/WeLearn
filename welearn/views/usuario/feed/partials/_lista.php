@@ -46,8 +46,6 @@
         <?if(count($comentarios_feed[$i])>0):?>
             <?php if ($comentarios_feed[$i]['haMaisPaginas']): ?>
                 <a href="comentario_feed/proxima_pagina/"  id="paginacao-comentario" data-proximo="<?echo $comentarios_feed[$i]['paginacao']['inicio_proxima_pagina']?>" data-id-feed="<?php echo $feeds_usuario[$i]->id ?>" >Comentarios mais Antigos</a>
-            <?php else: ?>
-                <h4>Não existem novos comentarios para este compartilhamento.</h4>
             <?php endif; ?>
             <ul>
                 <?echo $comentarios_feed[$i]['HTMLcomentarios'] ?>

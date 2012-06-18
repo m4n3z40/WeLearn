@@ -142,8 +142,89 @@ Tente novamente mais tarde.'
         return $feeds;
     }
 
+    protected function _renderTemplateHome($view = '', $dados = null)
+    {
+
+        $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+        try{
+            $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+
+            $listaRandonicaAmigos = $amizadeUsuarioDao->recuperarAmigosAleatorios(
+                $usuarioAutenticado,
+                10
+            );
+
+        }catch(cassandra_NotFoundException $e){
+
+            $listaRandonicaAmigos = null;
+
+        }
+
+        try{
+            $gerenciadorPrincipal = $usuarioDao->criarGerenciadorPrincipal($usuarioAutenticado);
+            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+
+            $listaRandonicaCursosCriados = $cursoDao->recuperarTodosPorCriadorAleatorios(
+                $gerenciadorPrincipal,
+                10
+            );
+
+        }catch(cassandra_NotFoundException $e){
+
+            $listaRandonicaCursosCriados = null;
+
+        }
+
+        try{
+            $aluno = $usuarioDao->criarAluno($usuarioAutenticado);
+            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+
+            $listaRandonicaCursosInscritos = $cursoDao->recuperarTodosPorAlunoAleatorios(
+                $aluno,
+                10
+            );
+
+        }catch(cassandra_NotFoundException $e){
+
+            $listaRandonicaCursosInscritos = null;
+
+        }
 
 
+        $widgets = array();
+
+        if(!is_null($listaRandonicaAmigos)){
+            $widgets[] = $this->template->loadPartial(
+                'widget_amigos',
+                array('legenda' => 'Meus Amigos','link' => 'usuario/amigos/listar/'.$usuarioAutenticado->id,'listaRandonicaAmigos' => $listaRandonicaAmigos),
+                'usuario/amigos'
+            );
+        }
+
+        if(!is_null($listaRandonicaCursosCriados)){
+            $widgets[] = $this->template->loadPartial(
+                'widget_cursos_criados',
+                array('legenda' => 'Cursos criados por '.$usuarioAutenticado->getNome(),'link'=>site_url('/curso/meus_cursos_criador'),'listaRandonicaCursosCriados' => $listaRandonicaCursosCriados),
+                'usuario/cursos'
+            );
+        }
+
+        if(!is_null($listaRandonicaCursosInscritos)){
+            $widgets[] = $this->template->loadPartial(
+                'widget_cursos_aluno',
+                array('legenda' => 'Cursos em que '.$usuarioAutenticado->getNome().' participa','link'=>site_url('/curso/meus_cursos_aluno'),'listaRandonicaCursosInscritos' => $listaRandonicaCursosInscritos),
+                'usuario/cursos'
+            );
+        }
+
+        $this->_barraDireitaSetVar(
+            'widgetsContexto',
+            $widgets
+        );
+
+        parent::_renderTemplateHome($view, $dados);
+    }
 
 }
 

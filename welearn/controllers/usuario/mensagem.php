@@ -49,6 +49,8 @@ class Mensagem extends Home_Controller
                 $usuario = $this->autenticacao->getUsuarioAutenticado();
                 $amigo = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idAmigo);
                 $mensagemDao = WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
+                $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+                $saoAmigos = $amizadeUsuarioDao->SaoAmigos($usuario,$amigo);
                 $filtros= array('count' => self::$_count+1,'usuario' => $usuario, 'amigo' => $amigo);
 
                 try {
@@ -68,8 +70,8 @@ class Mensagem extends Home_Controller
                     array(
                         'mensagens' => $listaMensagens,
                         'paginacao' => $dadosPaginados,
-                        'idAmigo' => $amigo->getId(),
-                        'nomeAmigo'=>$amigo->getNome(),
+                        'amigo'=>$amigo,
+                        'saoAmigos' => $saoAmigos,
                         'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
                         'haMensagens' => $dadosPaginados['proxima_pagina']
                     ),
@@ -180,40 +182,58 @@ Tente novamente mais tarde.'
         $remetente = $this->autenticacao->getUsuarioAutenticado();
         $destinatario = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idDestinatario);
 
-        $mensagemDao = WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
 
-        $mensagemObj = $mensagemDao->criarNovo();
-        $mensagemObj->setMensagem($mensagem);
-        $mensagemObj->setDestinatario($destinatario);
-        $mensagemObj->setRemetente($remetente);
-        $mensagemObj->setStatus(WeLearn_Usuarios_StatusMP::NOVO);
-        $mensagemDao->salvar($mensagemObj);
-
+        $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+        $saoAmigos = $amizadeUsuarioDao->SaoAmigos($remetente,$destinatario);
         $this->load->helper('notificacao_js');
+        if($destinatario->configuracao->privacidadeMP == WeLearn_Usuarios_PrivacidadeMP::LIVRE ||
+            ($destinatario->configuracao->privacidadeMP == WeLearn_Usuarios_PrivacidadeMP::SO_AMIGOS
+            && $saoAmigos == WeLearn_Usuarios_StatusAmizade::AMIGOS))
+        {
+            try{
+            $mensagemDao = WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
+            $mensagemObj = $mensagemDao->criarNovo();
+            $mensagemObj->setMensagem($mensagem);
+            $mensagemObj->setDestinatario($destinatario);
+            $mensagemObj->setRemetente($remetente);
+            $mensagemObj->setStatus(WeLearn_Usuarios_StatusMP::NOVO);
+            $mensagemDao->salvar($mensagemObj);
 
-        $response = array(
-            'success' => true,
-            'mensagemId'=>$mensagemObj->getId(),
-            'remetente'=>$mensagemObj->getRemetente()->toHTML('imagem_pequena'),
-            'mensagemTexto'=>$mensagemObj->getMensagem(),
-            'dataEnvio'=>date('d/m/Y à\s H:i',$mensagemObj->getDataEnvio()),
-            'notificacao'=> create_notificacao_array(
-                'sucesso',
-                'Mensagem enviada com sucesso'
-            )
-        );
+            $response = array(
+                'success' => true,
+                'mensagemId'=>$mensagemObj->getId(),
+                'remetente'=>$mensagemObj->getRemetente()->toHTML('imagem_pequena'),
+                'mensagemTexto'=>$mensagemObj->getMensagem(),
+                'dataEnvio'=>date('d/m/Y à\s H:i',$mensagemObj->getDataEnvio()),
+                'notificacao'=> create_notificacao_array(
+                    'sucesso',
+                    'Mensagem enviada com sucesso'
+                )
+            );
+            $json = Zend_Json::encode($response);
 
-        $json = Zend_Json::encode($response);
+            //enviar notificação ao usuário;
+            $notificacao = new WeLearn_Notificacoes_NotificacaoMensagemPessoal();
+            $notificacao->setMensagemPessoal( $mensagemObj );
+            $notificacao->setDestinatario( $destinatario );
+            $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+            $notificacao->notificar();
+            //fim da notificação;
+
+            }catch(Exception $e){
+                $error = create_json_feedback_error_json("Erro, a mensagem não pode ser enviada!");
+                $json = create_json_feedback(false,$error);
+            }
+        }else{
+            $error = create_json_feedback_error_json("Erro, as configurações de privacidade não permitem que a mensagem seja enviada");
+            $json = create_json_feedback(false,$error);
+        }
+
+
 
         echo $json;
 
-        //enviar notificação ao usuário;
-        $notificacao = new WeLearn_Notificacoes_NotificacaoMensagemPessoal();
-        $notificacao->setMensagemPessoal( $mensagemObj );
-        $notificacao->setDestinatario( $destinatario );
-        $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
-        $notificacao->notificar();
-        //fim da notificação;
+
     }
 
 

@@ -41,9 +41,14 @@ $('#feed-submit').click(function(e){
     e.preventDefault();
     var form = document.getElementById('form-criar-feed'),
     url = $(form).attr('action');
-    WeLearn.validarForm(form,url,function(res){
+    WeLearn.validarForm(form,url,
+        function(res){
         window.location.reload();
-    });
+    },
+        function(res){
+            window.location.reload();
+        }
+    );
 });
 
 

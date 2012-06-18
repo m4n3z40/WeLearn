@@ -299,6 +299,21 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
 
     public function toHTML($pequeno=false)
     {
+        $htmlImagem = $this->htmlImagemLink($pequeno);
+        $segmento = $this->getSegmento()->getDescricao();
+        $area = $this->getSegmento()->getArea()->getDescricao();
+        $tema = $this->getTema();
+        $totalAlunos = $this->getTotalAlunos();
+
+        return "{$htmlImagem}<ul>
+                <li>Há <strong>{$totalAlunos}</strong> alunos neste curso.</li>
+                <li><strong>Segmento:</strong> {$segmento}</li>
+                <li><strong>Área:</strong> {$area}</li>
+                <li><strong>Tema:</strong> <pre>{$tema}</pre></li></ul>";
+    }
+
+    public function htmlImagemLink($pequeno=false)
+    {
         $tam = '';
 
         if ( $pequeno ) {
@@ -307,22 +322,14 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
 
         $url = site_url( '/curso/' . $this->getId() );
         $urlImagem = ( $this->_imagem instanceof WeLearn_Cursos_ImagemCurso )
-                     ? $this->getImagem()->getUrl()
-                     : site_url( get_instance()->config->item('default_curso_img_uri') );
+            ? $this->getImagem()->getUrl()
+            : site_url( get_instance()->config->item('default_curso_img_uri') );
         $nome = $this->getNome();
         $descricao = $this->getDescricao();
-        $segmento = $this->getSegmento()->getDescricao();
-        $area = $this->getSegmento()->getArea()->getDescricao();
-        $tema = $this->getTema();
-        $totalAlunos = $this->getTotalAlunos();
 
         return "<figure><a href=\"{$url}\" title=\"{$descricao}\">
                 <img src=\"{$urlImagem}\" alt=\"{$nome}\" {$tam}>
-                <figcaption>{$nome}</figcaption></a></figure><ul>
-                <li>Há <strong>{$totalAlunos}</strong> alunos neste curso.</li>
-                <li><strong>Segmento:</strong> {$segmento}</li>
-                <li><strong>Área:</strong> {$area}</li>
-                <li><strong>Tema:</strong> <pre>{$tema}</pre></li></ul>";
+                <figcaption>{$nome}</figcaption></a></figure>";
     }
 
     function __toString() {
