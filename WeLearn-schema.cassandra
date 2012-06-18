@@ -485,6 +485,12 @@ and column_type = 'Standard'
 and default_validation_class = 'UTF8Type'
 and key_validation_class = 'TimeUUIDType';
 
+create column family cursos_certificado_por_aluno
+with comparator = 'TimeUUIDType'
+and column_type = 'Standard'
+and default_validation_class = 'UTF8Type'
+and key_validation_class = 'UTF8Type';
+
 create column family cursos_resenha
 with comparator = 'UTF8Type'
 and column_type = 'Standard'

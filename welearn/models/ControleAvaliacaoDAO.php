@@ -241,6 +241,17 @@ class ControleAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
     protected function _atualizar(WeLearn_DTO_IDTO $dto)
     {
         $this->_cf->insert( $dto->getId(), $dto->toCassandra() );
+
+        if ( count( $dto->getRespostas() ) > 0 ) {
+
+            $this->_respostasAvaliacaoCF->remove( $dto->getId() );
+
+            $this->_respostasAvaliacaoCF->insert(
+                $dto->getId(),
+                $dto->respostasToCassandra()
+            );
+
+        }
     }
 
     /**
@@ -282,6 +293,23 @@ class ControleAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
 
         $controleAvaliacao = $this->criarNovo();
         $controleAvaliacao->fromCassandra( $column );
+
+        try {
+
+            $respostasIds = $this->_respostasAvaliacaoCF->get(
+                $controleAvaliacao->getId()
+            );
+
+            $UUIDs = array();
+            foreach($respostasIds as $id) {
+                $UUIDs[] = UUID::import( $id )->bytes;
+            }
+
+            $controleAvaliacao->setRespostas(
+                $this->_alternativasDao->recuperarTodosPorUUIDs( $UUIDs )
+            );
+
+        } catch(cassandra_NotFoundException $e) { }
 
         return $controleAvaliacao;
     }

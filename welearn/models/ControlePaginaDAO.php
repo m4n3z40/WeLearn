@@ -296,11 +296,7 @@ class ControlePaginaDAO
 
         $column['participacaoCurso'] = $participacaoCurso;
 
-        $arrDetalhes = explode( '|', $column[ $paginaUUID ] );
-
-        $column['status'] = $arrDetalhes[0];
-
-        $column['tempoVisualizacao'] = $arrDetalhes[1];
+        $column['status'] = $column[ $paginaUUID ];
 
         $controlePagina = $this->criarNovo();
         $controlePagina->fromCassandra( $column );

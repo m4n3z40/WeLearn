@@ -189,6 +189,61 @@ class Certificado extends Curso_Controller
         echo $json;
     }
 
+    public function exibir_aluno($idCertificado)
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        try {
+            $certificadoDao = WeLearn_DAO_DAOFactory::create('CertificadoDAO');
+            $certificado = $certificadoDao->recuperar( $idCertificado );
+
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+            $aluno = $usuarioDao->criarAluno( $this->autenticacao->getUsuarioAutenticado() );
+
+            $participacaoCursoDao = WeLearn_DAO_DAOFactory::create('ParticipacaoCursoDAO');
+            $participacaoCurso = $participacaoCursoDao->recuperarPorCurso(
+                $aluno,
+                $certificado->getCurso()
+            );
+
+            $response = Zend_Json::encode(array(
+                'htmlExibicao' => $this->load->view(
+                    'curso/certificado/exibir_aluno',
+                    array(
+                        'htmlCertificado' => $this->template->loadPartial(
+                            'exibicao_aluno',
+                            array( 'certificado' => $certificado ),
+                            'curso/certificado'
+                        ),
+                        'dataInscricao' => $participacaoCurso->getDataInscricao(),
+                        'dataUltimoAcesso' => $participacaoCurso->getDataUltimoAcesso(),
+                        'frequenciaTotal' => $participacaoCurso->getFrequenciaTotal(),
+                        'crFinal' => $participacaoCurso->getCrFinal()
+                    ),
+                    true
+                )
+            ));
+
+            $json = create_json_feedback(true, '', $response);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar exibir Certificado para aluno: '
+                . create_exception_description($e));
+
+            $error = create_json_feedback_error_json(
+                'Ocorreu um erro inesperado, já estamos tentando resolver.
+                Tente novamente mais tarde!'
+            );
+
+            $json = create_json_feedback(false, $error);
+        }
+
+        echo $json;
+    }
+
     public function remover ($idCertificado)
     {
         if ( ! $this->input->is_ajax_request() ) {

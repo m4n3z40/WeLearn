@@ -423,10 +423,28 @@ class Curso extends Curso_Controller
     public function meus_certificados()
     {
         try {
-            //TODO: Desenvolver lista de certificados do usuário.
+            $this->template->appendJSImport('certificado_aluno.js');
+
+            $certificadoDao = WeLearn_DAO_DAOFactory::create('CertificadoDAO');
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+
+            $aluno = $usuarioDao->criarAluno( $this->autenticacao->getUsuarioAutenticado() );
+
+            try {
+                $listaCertificados = $certificadoDao->recuperarTodosPorAluno(
+                    $aluno,
+                    '',
+                    '',
+                    1000000
+                );
+            } catch( cassandra_NotFoundException $e ) {
+                $listaCertificados = array();
+            }
 
             $dadosView = array(
-
+                'haCertificados' => !empty($listaCertificados),
+                'totalCertificados' => count($listaCertificados),
+                'listaCertificados' => $listaCertificados
             );
 
             $this->_renderTemplateHome('curso/meus_certificados', $dadosView);

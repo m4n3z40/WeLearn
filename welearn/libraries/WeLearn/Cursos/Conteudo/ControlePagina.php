@@ -11,11 +11,6 @@
 class WeLearn_Cursos_Conteudo_ControlePagina extends WeLearn_DTO_AbstractDTO
 {
     /**
-     * @var float
-     */
-    private $_tempoVisualizacao;
-
-    /**
      * @var WeLearn_Cursos_ParticipacaoCurso
      */
     private $_participacaoCurso;
@@ -79,22 +74,6 @@ class WeLearn_Cursos_Conteudo_ControlePagina extends WeLearn_DTO_AbstractDTO
     }
 
     /**
-     * @param float $tempoVisualizacao
-     */
-    public function setTempoVisualizacao($tempoVisualizacao)
-    {
-        $this->_tempoVisualizacao = (float)$tempoVisualizacao;
-    }
-
-    /**
-     * @return float
-     */
-    public function getTempoVisualizacao()
-    {
-        return $this->_tempoVisualizacao;
-    }
-
-    /**
      * @return void
      */
     public function acessar()
@@ -127,7 +106,6 @@ class WeLearn_Cursos_Conteudo_ControlePagina extends WeLearn_DTO_AbstractDTO
     public function toArray()
     {
         return array(
-            'tempoVisualizacao' => $this->getTempoVisualizacao(),
             'participacaoCurso' => $this->getParticipacaoCurso()->toArray(),
             'pagina' => $this->getPagina()->toArray(),
             'status' => $this->getStatus(),
@@ -145,7 +123,7 @@ class WeLearn_Cursos_Conteudo_ControlePagina extends WeLearn_DTO_AbstractDTO
         $UUID = UUID::import( $this->getPagina()->getId() )->bytes;
 
         return array(
-            $UUID => $this->getStatus() . '|' . $this->getTempoVisualizacao()
+            $UUID => $this->getStatus()
         );
     }
 

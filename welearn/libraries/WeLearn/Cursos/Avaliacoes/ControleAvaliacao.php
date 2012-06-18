@@ -58,7 +58,7 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
     /**
      * @var array
      */
-    private $_respostas;
+    private $_respostas = array();
 
     /**
      * @param \WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacao
@@ -85,7 +85,7 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getDataAplicacao()
     {
@@ -183,7 +183,7 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
      */
     public function getSituacao()
     {
-        return $this->_situacao;
+        return (int)$this->_situacao;
     }
 
     /**
@@ -199,7 +199,7 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
      */
     public function getStatus()
     {
-        return $this->_status;
+        return (int)$this->_status;
     }
 
     /**
@@ -253,6 +253,14 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
     /**
      * @return void
      */
+    public function resetarSituacao()
+    {
+        $this->setSituacao( WeLearn_Cursos_Avaliacoes_SituacaoAvaliacao::NAO_INICIADA );
+    }
+
+    /**
+     * @return void
+     */
     public function iniciar()
     {
         $this->setSituacao( WeLearn_Cursos_Avaliacoes_SituacaoAvaliacao::INICIADA );
@@ -285,6 +293,25 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
     /**
      * @return bool
      */
+    public function bloqueioExpirado()
+    {
+        if (
+            $this->isStatusBloqueada() &&
+            ( strtotime('+1 day', $this->getDataAplicacao()) <= time() )
+        ) {
+
+            $this->liberar();
+            $this->resetarSituacao();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
     public function isStatusLiberada()
     {
         return $this->getStatus() === WeLearn_Cursos_Avaliacoes_StatusAvaliacao::LIBERADA;
@@ -311,7 +338,7 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
      */
     public function isStatusFinalizada()
     {
-        return $this->getStatus() === WeLearn_Cursos_Avaliacoes_StatusAvaliacao::LIBERADA;
+        return $this->getStatus() === WeLearn_Cursos_Avaliacoes_StatusAvaliacao::FINALIZADA;
     }
 
     /**
@@ -361,9 +388,9 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
     public function calcularResultados()
     {
         $qtdCorretas = 0;
-        $qtdTotalQuestoes = count( $this->_respostas );
+        $qtdTotalQuestoes = $this->getAvaliacao()->getQtdQuestoesExibir();
 
-        for ($i = 0; $i < $qtdTotalQuestoes; $i++) {
+        for ($i = 0; $i < count($this->_respostas); $i++) {
 
             if ( $this->_respostas[$i]->isCorreta() ) {
 
@@ -377,6 +404,8 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
 
         $this->setNota( $nota );
 
+        $this->_qtdTentativas++;
+
         if ( $nota >= $this->getAvaliacao()->getNotaMinima() ) {
 
             $this->aprovar();
@@ -385,8 +414,6 @@ class WeLearn_Cursos_Avaliacoes_ControleAvaliacao extends WeLearn_DTO_AbstractDT
         } else {
 
             $this->reprovar();
-
-            $this->_qtdTentativas++;
 
             $qtdTentativasPermitidas = $this->getAvaliacao()->getQtdTentativasPermitidas();
 

@@ -501,7 +501,7 @@ class WeLearn_Cursos_Certificado extends WeLearn_DTO_AbstractDTO
         );
     }
 
-    function __toString()
+    public function __toString()
     {
         $url = $this->getUrlSmall();
         $alt = 'Certificado do curso "' . $this->getCurso()->getNome() . '"';

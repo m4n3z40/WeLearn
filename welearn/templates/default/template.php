@@ -20,6 +20,7 @@
     {$template.cssLinks}
 
 	<script src="{$base_url}js/libs/modernizr-2.0.6.min.js"></script>
+    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
 </head>
 <body>
 

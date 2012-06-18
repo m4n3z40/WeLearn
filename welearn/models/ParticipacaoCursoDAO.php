@@ -93,6 +93,18 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
+     */
+    public function finalizarCurso(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso)
+    {
+        $participacaoCurso->concluirCurso();
+
+        $this->_certificadoDao->registrarFimDeCurso( $participacaoCurso );
+
+        $this->salvar( $participacaoCurso );
+    }
+
+    /**
      * @param WeLearn_DTO_IDTO $dto
      * @return void
      */

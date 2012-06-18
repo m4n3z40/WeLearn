@@ -1,0 +1,18 @@
+<div>
+    <h3>PARABÉNS! Você finalizou este curso!</h3>
+    <h4>Você passou por todos os conteúdos e avaliações necessárias
+        para que o curso fosse concluído!</h4>
+    <p>Esperamos que você tenha assimilado bastante conhecimento, e
+        que passe este conhecimento adiante, como os gerenciadores deste curso fizeram.</p>
+    <p>Abaixo verá o certificado que ganhou, a partir de agora ele
+        se encontrará na lista de certificados, na área de cursos da sua Home.</p>
+    <figure>
+        <img src="<?php echo $certificado->urlBig ?>" alt="Certificado do Curso">
+        <figcaption>
+            <h4>Uma palavra dos Gerenciadores deste Curso:</h4>
+            <blockquote>
+                <?php echo $certificado->descricao ?>
+            </blockquote>
+        </figcaption>
+    </figure>
+</div>

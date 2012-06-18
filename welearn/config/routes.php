@@ -71,6 +71,9 @@ $route['curso/enquete/([a-z_]+)']                                               
 $route['curso/conteudo/exibicao/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']             = 'conteudo/exibicao/index/$1';
 $route['curso/conteudo/exibicao/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']   = 'conteudo/exibicao/$1/$2';
 $route['curso/conteudo/exibicao/([a-z_]+)']                                                                  = 'conteudo/exibicao/$1';
+$route['curso/conteudo/aplicacao_avaliacao/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']             = 'conteudo/aplicacao_avaliacao/index/$1';
+$route['curso/conteudo/aplicacao_avaliacao/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']   = 'conteudo/aplicacao_avaliacao/$1/$2';
+$route['curso/conteudo/aplicacao_avaliacao/([a-z_]+)']                                                                  = 'conteudo/aplicacao_avaliacao/$1';
 $route['curso/conteudo/modulo/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']               = 'conteudo/modulo/index/$1';
 $route['curso/conteudo/modulo/([a-z_]+)/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']     = 'conteudo/modulo/$1/$2';
 $route['curso/conteudo/aula/([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})']                 = 'conteudo/aula/index/$1';

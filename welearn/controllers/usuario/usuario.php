@@ -489,6 +489,35 @@ class Usuario extends WL_Controller
 
         echo create_json_feedback(true);
     }
+
+    public function verificar_sessao()
+    {
+
+        if ( ! $this->input->is_ajax_request() ) {
+                   show_404();
+        }
+
+        //O retorno será em JSON.
+        set_json_header();
+
+
+        if ( $this->autenticacao->isAutenticado() ) {
+
+            $response = Zend_Json::encode(array(
+                'sid' => $this->autenticacao->getUsuarioAutenticado()->getId(),
+                'username' => $this->autenticacao->getUsuarioAutenticado()->getNomeUsuario()
+            ));
+
+            $json = create_json_feedback(true, '', $response);
+
+        } else {
+
+            $json = create_json_feedback(false);
+
+        }
+
+        echo $json;
+    }
 }
 
 /* End of file usuario.php */

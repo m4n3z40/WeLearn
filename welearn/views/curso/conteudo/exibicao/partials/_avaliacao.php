@@ -17,7 +17,7 @@
             <li><strong>Qtd. de Questões: </strong> <?php echo $controleAvaliacao->avaliacao->qtdQuestoesExibir ?></li>
         </ul>
         <?php echo anchor(
-            '/curso/conteudo/exibicao/avaliacoes/' . $controleAvaliacao->avaliacao->modulo->curso->id,
+            '/curso/conteudo/aplicacao_avaliacao/' . $controleAvaliacao->avaliacao->modulo->curso->id,
             'Ir para a Avaliação',
             'class="button" target="_parent"'
         ) ?>

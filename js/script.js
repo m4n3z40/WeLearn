@@ -167,6 +167,28 @@ window.WeLearn = {
             return html;
         }
     },
+    socketIO : null,
+    verificarSessaoUsuario : function() {
+        $.get(
+            this.url.siteURL('/usuario/verificar_sessao'),
+            {},
+            function(res) {
+                if(res.success) {
+
+                    WeLearn.initSocketIO( res );
+
+                } else {
+
+                    if( document.URL != WeLearn.url.baseURL + '/' ) {
+
+                        window.location.reload();
+
+                    }
+
+                }
+            }
+        );
+    },
     initAjax : function () {
         var loaderHTML = '<div id="ajax-loading">' +
                          '<img src="' + this.url.siteURL('/img/ajax_loading.gif') + '" alt="Carregando..." />' +
@@ -184,6 +206,32 @@ window.WeLearn = {
         });
 
         $('body').prepend($loader);
+    },
+    initSocketIO: function(dadosSessao){
+        this.socketIO = io.connect('http://localhost:8080');
+
+        this.socketIO.emit('login', {
+            sid: dadosSessao.sid,
+            username: dadosSessao.username
+        });
+
+        this.socketIO.on('notificacao', function(dados){
+
+            $.noty({
+                text: dados.msg,
+                type: 'alert',
+                textAlign: 'center',
+                timeout: 5000,
+                layout: 'bottomRight'
+            });
+
+        });
+
+        $(window).on('beforeunload', function(){
+
+            WeLearn.socketIO.emit('desconectar', dadosSessao);
+
+        });
     },
     initNotificacoes: function () {
         if (typeof flashData != 'undefined' && flashData != false) {
@@ -223,6 +271,7 @@ window.WeLearn = {
 
     },
     init : function(){
+        this.verificarSessaoUsuario();
         this.initUrl();
         this.initAjax();
         this.initNotificacoes();

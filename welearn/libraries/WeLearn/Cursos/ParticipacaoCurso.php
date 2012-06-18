@@ -241,7 +241,7 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
     /**
      * @param \WeLearn_Cursos_Conteudo_Modulo $moduloAtual
      */
-    public function setModuloAtual(WeLearn_Cursos_Conteudo_Modulo $moduloAtual)
+    public function setModuloAtual(WeLearn_Cursos_Conteudo_Modulo $moduloAtual = null)
     {
         $this->_moduloAtual = $moduloAtual;
     }
@@ -299,7 +299,22 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
      */
     public function getSituacao()
     {
-        return $this->_situacao;
+        return (int)$this->_situacao;
+    }
+
+    /**
+     * @param float $notaAvaliacao
+     * @return float|int
+     */
+    public function atualizarCR($notaAvaliacao, $primeiraNota = false)
+    {
+        if ( $primeiraNota ) {
+            $this->_crFinal =  (float)$notaAvaliacao;
+        } else {
+            $this->_crFinal = ( $this->_crFinal + (float)$notaAvaliacao ) / 2;
+        }
+
+        return $this->_crFinal;
     }
 
     /**
@@ -308,6 +323,14 @@ class WeLearn_Cursos_ParticipacaoCurso extends WeLearn_DTO_AbstractDTO
     public function concluirCurso()
     {
         $this->setSituacao( WeLearn_Cursos_SituacaoParticipacaoCurso::CURSO_CONCLUIDO );
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCursoConcluido()
+    {
+        return $this->getSituacao() === WeLearn_Cursos_SituacaoParticipacaoCurso::CURSO_CONCLUIDO;
     }
 
     /**

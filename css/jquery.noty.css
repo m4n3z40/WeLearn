@@ -60,9 +60,9 @@
 		width: 300px; /* Fix for: http://bugs.jquery.com/ticket/2278 */
 	}
 	ul.noty_container.noty_layout_topLeft {left:20px; top:20px;}
-	ul.noty_container.noty_layout_topRight {right:40px; top:20px;}
-	ul.noty_container.noty_layout_bottomLeft {left:20px; bottom:20px}
-	ul.noty_container.noty_layout_bottomRight {right:40px; bottom:20px}
+	ul.noty_container.noty_layout_topRight {right:20px; top:20px;}
+	ul.noty_container.noty_layout_bottomLeft {left:20px; bottom:60px}
+	ul.noty_container.noty_layout_bottomRight {right:20px; bottom:60px}
 	ul.noty_container.noty_layout_topRight li {float:right}
 
 /* LAYOUTS */

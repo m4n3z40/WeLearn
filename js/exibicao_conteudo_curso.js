@@ -22,17 +22,49 @@
                 }
             },
             open: function() {
+                iniciarCronometro();
                 recuperarComentarios( $wrapperSalaDeAula.data('id-pagina') );
             },
             close: function() {
-                window.location.reload();
+                finalizarCronometro(function(){ window.location.reload(); });
             }
         }),
         $window = $(window),
         $wrapperSalaDeAula = $('#exibicao-conteudo-saladeaula'),
         $sltModulos = $('#slt-modulos'),
         $sltAulas = $('#slt-aulas'),
-        $sltPaginas = $('#slt-paginas');
+        $sltPaginas = $('#slt-paginas'),
+        tempoFrequenciaTimer,
+        idIntervalFrequenciaTimer,
+        iniciarCronometro = function() {
+            tempoFrequenciaTimer = 0;
+
+            idIntervalFrequenciaTimer = setInterval(function(){
+                tempoFrequenciaTimer++;
+                log(tempoFrequenciaTimer);
+            }, 1000);
+        },
+        finalizarCronometro = function(onComplete){
+            var url = WeLearn.url.siteURL('/curso/conteudo/exibicao/salvar_frequencia/' + $wrapperSalaDeAula.data('id-curso'));
+
+            clearInterval(idIntervalFrequenciaTimer);
+
+            $.get(
+                url,
+                { totalMinutos: tempoFrequenciaTimer / 60 },
+                function(res) {
+                    if (res.success) {
+                        onComplete();
+                    } else {
+                        WeLearn.notificar({
+                            nivel: 'error',
+                            msg: res.errors[0].error_msg,
+                            tempo: 5000
+                        });
+                    }
+                }
+            )
+        };
 
     $('#btn-iniciar-visualizacao-conteudo').click(function(e){
         $divJanelaAula
@@ -1145,14 +1177,26 @@
                                 'buttons',
                                 botoesConfimacao(function(){
                                     window.location = WeLearn.url.siteURL(
-                                        '/curso/conteudo/exibicao/avaliacoes/' + $wrapperSalaDeAula.data('id-curso')
+                                        '/curso/conteudo/aplicacao_avaliacao/' + $wrapperSalaDeAula.data('id-curso')
                                     );
                                 })
                             ).dialog('open');
 
                     } else {
 
-                        //TODO: tratar quando tipo de conteudo nao é conhecido;
+                        if ( res.cursoFinalizado ) {
+
+                            $divJanelaAula
+                                .html(res.htmlCertificado)
+                                .dialog('option', 'width', 610)
+                                .parent()
+                                .position({
+                                    my: 'center',
+                                    at: 'center',
+                                    of: window
+                                });
+
+                        }
 
                     }
 
@@ -1167,64 +1211,6 @@
                 }
             }
         );
-    });
-
-    /*############################################################*/
-    var $divJanelaAvaliacao = $('<div/>', {id: 'div-janela-avaliacao'}).dialog({
-            autoOpen: false,
-            resizable: false,
-            draggable: false,
-            modal: true,
-            width: 610,
-            title: 'Realização de Avaliação',
-            position: 'top',
-            show: 'fade',
-            hide: 'fade',
-            buttons: {
-                'Sair' : function() {
-                    $divJanelaAvaliacao.dialog('close');
-                }
-            },
-            close: function() {
-                window.location.reload();
-            }
-        });
-
-    $('#a-realizar-avaliacao').click(function(e){
-        e.preventDefault();
-
-        var $this = $(this),
-            idAvaliacao = $this.data('id-avaliacao'),
-            url = WeLearn.url.siteURL('/curso/conteudo/exibicao/aplicar_avaliacao/' + idAvaliacao);
-
-        $.get(
-            url,
-            {},
-            function(res){
-                if(res.success) {
-
-                    $divJanelaAvaliacao
-                        .html(res.htmlAvaliacao)
-                        .dialog('option', 'height', $window.height() - 6)
-                        .dialog('open');
-
-                } else {
-
-                    WeLearn.notificar({
-                        nivel: 'error',
-                        msg: res.errors[0].error_msg,
-                        tempo: 10000
-                    });
-
-                }
-            }
-        );
-    });
-
-    $('#a-exibir-resultados-avaliacao').click(function(e){
-        e.preventDefault();
-
-        $divJanelaAvaliacao.dialog('open');
     });
 
 })();
