@@ -19,6 +19,7 @@
                 <?php elseif($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA):?>
                     <li><?= anchor('#','Convite Pendente', array('id' => 'exibir-convite-pendente'))?></li>
                     <input type = 'hidden' id = 'id-convite' value = '<?= $convitePendente->id?>'/>
+                    <input type = 'hidden' id = 'msg-convite' value = '<?= $convitePendente->msgConvite?>'/>
                     <input type = 'hidden' id = 'id-destinatario'  value = '<?= $convitePendente->destinatario->id?>'/>
                     <input type = 'hidden' id = 'id-remetente'  value = '<?= $convitePendente->remetente->id?>'/>
                     <?php if($convitePendente->destinatario->id == $usuarioAutenticado->id): ?>

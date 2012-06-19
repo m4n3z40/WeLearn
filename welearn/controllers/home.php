@@ -3,6 +3,7 @@
 class Home extends Home_Controller {
 
     private  $_count = 10;
+    private $_feedDao;
     /**
      * Construtor carrega configurações da classes base CI_Controller
      * (Resolve bug ao utilizar this->load)
@@ -12,6 +13,8 @@ class Home extends Home_Controller {
         parent::__construct();
         $this->template->appendJSImport('home.js')
                        ->appendJSImport('feed.js');
+        $this->_feedDao = WeLearn_DAO_DAOFactory::create('FeedDAO');
+
     }
 
     public function index()
@@ -124,9 +127,8 @@ Tente novamente mais tarde.'
         $this->load->library('autoembed');
         try{
             $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
-            $feedDao = WeLearn_DAO_DAOFactory::create('FeedDAO');
             $filtros = array('usuario' => $usuarioAutenticado , 'count' => $count+1);
-            $feeds = $feedDao->recuperarTodos($de,$ate,$filtros);
+            $feeds = $this->_feedDao->recuperarTodos($de,$ate,$filtros);
             foreach($feeds as $row)
             {
                 if($row->getTipo() == WeLearn_Compartilhamento_TipoFeed::VIDEO)
@@ -205,7 +207,7 @@ Tente novamente mais tarde.'
         if(!is_null($listaRandonicaCursosCriados)){
             $widgets[] = $this->template->loadPartial(
                 'widget_cursos_criados',
-                array('legenda' => 'Cursos criados por '.$usuarioAutenticado->getNome(),'link'=>site_url('/curso/meus_cursos_criador'),'listaRandonicaCursosCriados' => $listaRandonicaCursosCriados),
+                array('legenda' => 'Cursos criados por mim','link'=>site_url('/curso/meus_cursos_criador'),'listaRandonicaCursosCriados' => $listaRandonicaCursosCriados),
                 'usuario/cursos'
             );
         }
@@ -213,7 +215,7 @@ Tente novamente mais tarde.'
         if(!is_null($listaRandonicaCursosInscritos)){
             $widgets[] = $this->template->loadPartial(
                 'widget_cursos_aluno',
-                array('legenda' => 'Cursos em que '.$usuarioAutenticado->getNome().' participa','link'=>site_url('/curso/meus_cursos_aluno'),'listaRandonicaCursosInscritos' => $listaRandonicaCursosInscritos),
+                array('legenda' => 'Cursos em que participo','link'=>site_url('/curso/meus_cursos_aluno'),'listaRandonicaCursosInscritos' => $listaRandonicaCursosInscritos),
                 'usuario/cursos'
             );
         }

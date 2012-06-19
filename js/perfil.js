@@ -73,6 +73,8 @@
 
         var containerConvite = $('<form action="'+WeLearn.url.siteURL('convite/aceitar')+'" method="post" accept-charset="utf-8" id="form-criar-mensagem">'+
                                  'você enviou uma solicitação de amizade para '+$('#nome-usuario-perfil').val()+
+                                 '</br>'+
+                                 $('#msg-convite').val()+
                                 '</form>');
 
 
@@ -109,6 +111,8 @@
     {
         var containerConvite = $('<form action="'+WeLearn.url.siteURL('convite/recusar')+'" method="post" accept-charset="utf-8" id="form-criar-mensagem">'+
                                     'você recebeu uma solicitação de amizade de '+$('#nome-usuario-perfil').val()+
+                                    '</br>'+
+                                    $('#msg-convite').val()+
                                 '</form>');
 
         containerConvite.dialog(

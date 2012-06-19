@@ -53,7 +53,10 @@ class Convite extends Home_Controller
 
     }
 
+    public function recuperar_convite($idConvite)
+    {
 
+    }
 
     public function proxima_pagina($param,$inicio)
     {
