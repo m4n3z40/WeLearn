@@ -61,8 +61,10 @@ class AreaDAO extends WeLearn_DAO_AbstractDAO
             $area->fromCassandra($columns);
             $area->setPersistido(true);
 
-            $listaAreas[] = $area;
+            $listaAreas[$key] = $area;
         }
+
+        ksort($listaAreas, SORT_STRING);
 
         return $listaAreas;
     }

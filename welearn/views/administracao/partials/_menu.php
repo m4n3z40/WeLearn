@@ -2,6 +2,4 @@
 
     <ul>
         <li><?php echo anchor('administracao/area','Gerenciar Areas')?></li>
-        <li><?php echo anchor('administracao/segmento','Gerenciar Segmentos')?></li>
-
     </ul>

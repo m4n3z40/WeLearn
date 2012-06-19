@@ -7,8 +7,8 @@
  */
 (function(){
 
-    var formArea = document.getElementById('form-criar-area')
-                || document.getElementById('form-alterar-area');
+    var idArea;
+    var formArea = document.getElementById('form-criar-area');
     $('#btn-form-area').click(function(e){
         e.preventDefault();
 
@@ -20,52 +20,83 @@
             });
         }
     });
-    $('.a-remover-categoria-forum').live('click', function (e) {
+
+    $('#area-lista-segmento > li > a').click(function(e){
+        $('#form-criar-segmento').val($(this).attr('data-id'));
         e.preventDefault();
-
+        idArea = $(this).attr('data-id');
+        $('#form-criar-segmento').hide();
         var $this = $(this),
-            $divConfirmacao = $('<div id="dialogo-confirmacao-remover-categoria-forum">' +
-                '<p>Tem certeza que deseja remover esta categoria?' +
-                '<br/>Essa ação <strong>NÃO</strong> poderá ser desfeita. ' +
-                '<br/><strong>TODOS</strong> os fóruns e posts vinculados' +
-                ' à esta categoria também serão removidos.</p></div>');
+            url = WeLearn.url.siteURL($this.attr('href')),
+            $parent = $this.parent(),
+            $divSegmentos = $parent.children('div');
 
-        $divConfirmacao.dialog({
-            title: 'Tem certeza?',
-            width: '450px',
-            resizable: false,
-            modal: true,
-            buttons: {
-                'Confirmar': function(){
-                    $.get(
-                        $this.attr('href'),
-                        {},
-                        function(res) {
-                            if (res.success) {
-                                WeLearn.notificar(res.notificacao);
-                                $this.parent().parent().fadeOut('slow', function(){
-                                    $(this).remove();
-                                });
-                            } else {
-                                WeLearn.notificar({
-                                    nivel: 'error',
-                                    msg: res.errors[0].error_msg,
-                                    tempo: 10000
-                                });
-                            }
+        if ( $divSegmentos.length > 0 ) {
+
+            $divSegmentos.slideToggle();
+            return;
+
+         }
+
+        var htmlListaSegmentos = '<div><h3><a href="#" id="exibir-form-segmento">Adicionar Novo Segmento</a></h3><ul>';
+        $.get(
+            url,
+            {},
+            function(res) {
+                var formSegmento = document.getElementById('form-criar-segmento');
+                if ( res.success ) {
+
+
+
+                        for ( var i = 0; i < res.segmentos.length; i++ ) {
+
+                            htmlListaSegmentos += '<li>' + res.segmentos[i].descricao + '</li>';
+
                         }
-                    );
 
-                    $( this ).dialog('close');
-                },
-                'Cancelar': function(){
-                    $( this ).dialog('close');
+
+                    htmlListaSegmentos += '</ul></div>';
+
+                    var $htmlSegmentos = $(htmlListaSegmentos).hide();
+
+                    $parent.append( $htmlSegmentos );
+
+                    $htmlSegmentos.slideDown();
+
+                }else{
+
+
+
+                    htmlListaSegmentos += '</ul></div>';
+
+                    var $htmlSegmentos = $(htmlListaSegmentos).hide();
+
+                    $parent.append( $htmlSegmentos );
+
+                    $htmlSegmentos.slideDown();
+
                 }
             }
-        });
-    });
+        );
+      });
 
+    $('#exibir-form-segmento').live('click',function(e){
+        $('#descricao-segmento').val('');
+        $('#form-criar-segmento').hide();
+        e.preventDefault();
+        $(this).parent().append($('#form-criar-segmento'));
+        $('#form-criar-segmento').show();
+        $('#descricao-segmento').focus();
+    });
+    $('#btn-form-segmento').live('click',
+        function(e){
+            e.preventDefault();
+            $('#idarea').val(idArea);
+            var form = document.getElementById('form-criar-segmento'),
+                url = $(form).attr('action');
+                WeLearn.validarForm(form,url,function(res){
+                window.location.reload();
+            });
+        });
 
 })();
-
-

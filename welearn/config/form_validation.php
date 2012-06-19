@@ -466,9 +466,16 @@ $config = array(
             'label'=>'descricao',
             'rules'=>'required|max_length[245]'
         )
+    ),
+    'segmento/salvar' => array(
+        array(
+            'field'=>'descricao',
+            'label'=>'descricao',
+            'rules'=>'required|max_length[245]'
+        )
     )
 
-);
+   );
 
 
 /************************************
