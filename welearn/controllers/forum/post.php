@@ -182,7 +182,7 @@ class Post extends Curso_Controller
     }
 
     public function remover ($idPost)
-    {
+    {;
         if ( ! $this->input->is_ajax_request() ) {
             show_404();
         }

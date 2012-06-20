@@ -4,11 +4,12 @@
 
 </head>
 
+<h3>Nome da Area</h3>
 
-<table>
-    <tr>
-        <th>Nome da Area</th>
-    </tr>
 
-           <?php echo $listaAreas; ?>
-</table>
+<ul id = 'area-lista-segmento'>
+           <?php echo $listaAreas;?>
+</ul>
+<?php echo form_open($formAction,$formExtra) ?>
+    <?php echo $criarSegmento;?>
+<?php echo form_close();?>

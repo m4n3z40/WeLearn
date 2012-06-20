@@ -61,18 +61,12 @@ class Area extends Home_Controller {
     public function listar(){
 
     try {
-        $count = 20;
 
-        $listaAreas = $this->_areaDAO->recuperarTodos($de = null, $ate = null, $filtros = array('count' => $count));
-        /**
-        try {
-            $listaCategorias = $categoriaDao->recuperarTodosPorCurso($curso, '', '', $count + 1);
-        } catch (cassandra_NotFoundException $e) {
-            $listaCategorias = array();
-        }**/
+        $viewCriarSegmento = $this->template->loadPartial('form',array('formAction'=> '/administracao/segmento/salvar','formExtra'=>array('id'=>'form-criar-segmento','name'=>'form-criar-segmento','style'=>'display:none')),'administracao/segmento');
+
+        $listaAreas = $this->_areaDAO->recuperarTodos($de = null, $ate = null, $filtros = array());
 
         $this->load->helper('paginacao_cassandra');
-        $dados_paginacao = create_paginacao_cassandra($listaAreas, $count);
 
         $dadosLista = array(
             'listaAreas' => $listaAreas
@@ -81,9 +75,8 @@ class Area extends Home_Controller {
         $dadosViewListar = array(
             'haAreas' => !empty($listaAreas),
             'listaAreas' => $this->template->loadPartial('lista', $dadosLista, 'administracao/area'),
-            'haMaisPaginas' => $dados_paginacao['proxima_pagina'],
-            'inicioProxPagina' => $dados_paginacao['inicio_proxima_pagina']
-        );
+            'criarSegmento' => $viewCriarSegmento
+            );
 
         $this->_renderTemplateHome('administracao/area/listar', $dadosViewListar);
     } catch (Exception $e) {
@@ -146,7 +139,7 @@ class Area extends Home_Controller {
                 'extraOpenForm' => 'id="form-criar-area"',
                 'hiddenFormData' => array('acao' => 'criar'),
                 'formCriar' => $this->template->loadPartial('form', $dadosFormCriar, 'administracao/area'),
-                'textoBotaoSubmit' => 'Criar nova Á rea!'
+                'textoBotaoSubmit' => 'Criar nova Área!'
             );
             $this->_renderTemplateHome('administracao/area/criar', $dadosViewCriar);
 
@@ -157,8 +150,7 @@ class Area extends Home_Controller {
             }
     }
 
-    public function salvar()
-    {
+    public function salvar(){
 
 
         set_json_header();
@@ -173,9 +165,6 @@ class Area extends Home_Controller {
 
                 $this->load->helper('notificacao_js');
 
-             //  if (isset($dadosArea['acao']) && $dadosArea['acao'] == 'criar') {
-
-
                     $novaArea = $this->_areaDAO->criarNovo();
                     $novaArea->setDescricao($descricaoArea);
                     $this->_areaDAO->salvar($novaArea);
@@ -187,13 +176,13 @@ class Area extends Home_Controller {
                     );
                     $this->session->set_flashdata('notificacoesFlash',$notificacoesFlash);
                     $json = create_json_feedback(true, '', '"idArea":"' . $novaArea->getDescricao() . '"');
-               // }
+
             }catch (Exception $e) {
                     log_message('error', 'Erro a criar a Área: ' . create_exception_description($e));
 
                     $error = create_json_feedback_error_json('Ocorreu um erro inesperado! Já estamos verificando, tente novamente mais tarde.');
                     $json = create_json_feedback(false, $error);
-    }
+            }
             echo $json;
         }
     }
