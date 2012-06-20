@@ -124,6 +124,12 @@ class Avaliacao extends Curso_Controller
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             $modulo = $moduloDao->recuperar( $idModulo );
 
+            if ( $modulo->getCurso()->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO ) {
+
+                show_404();
+
+            }
+
             $avaliacaoDao = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO');
 
             $modulo->setExisteAvaliacao(
@@ -221,8 +227,17 @@ class Avaliacao extends Curso_Controller
         
         set_json_header();
         
-        try {            
+        try {
+
             $avaliacaoDao = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO');
+
+            $avaliacao = $avaliacaoDao->recuperar( $idAvaliacao );
+
+            if ( $avaliacao->getModulo()->getCurso()->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO ) {
+
+                throw new WeLearn_Cursos_ConteudoAbertoException();
+
+            }
             
             $avaliacaoRemovida = $avaliacaoDao->remover( $idAvaliacao );
             
@@ -242,8 +257,16 @@ class Avaliacao extends Curso_Controller
                 'idCurso' => $avaliacaoRemovida->getModulo()->getCurso()->getId()
             ));
             
-            $json = create_json_feedback(true, '', $response);            
+            $json = create_json_feedback(true, '', $response);
+
+        } catch (WeLearn_Cursos_ConteudoAbertoException $e) {
+
+            $error = create_json_feedback_error_json( $e->getMessage() );
+
+            $json = create_json_feedback(false, $error);
+
         } catch (Exception $e) {
+
             log_message('error', 'Erro ao tentar remover avaliacao de módulo: ' .
                 create_exception_description($e));
 
@@ -253,6 +276,7 @@ class Avaliacao extends Curso_Controller
             );
 
             $json = create_json_feedback(false, $error);
+
         }
         
         echo $json;

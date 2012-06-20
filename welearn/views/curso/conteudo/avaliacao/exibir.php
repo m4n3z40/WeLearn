@@ -91,9 +91,14 @@
             </nav>
         </div>
     <?php else: ?>
+        <?php if ($modulo->curso->status === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO): ?>
+        <h4>Não é possível adicionar uma nova avaliação, o conteúdo do curso está aberto.
+            O gerenciamento de conteúdo está limitado.</h4>
+        <?php else: ?>
         <h4>Não há uma avaliação vinculada a este módulo até o momento.
             <?php echo anchor('/curso/conteudo/avaliacao/criar/' . $modulo->id,
                               '<br>Clique aqui para criar uma avaliação para este módulo') ?></h4>
+        <?php endif; ?>
     <?php endif; ?>
     </div>
     <footer>

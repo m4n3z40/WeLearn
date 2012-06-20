@@ -5,8 +5,13 @@
             <h3>Abaixo você verá todos módulos contidos neste curso.</h3>
         </hgroup>
         <p>
+        <?php if ($curso->status === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO): ?>
+            Não é possível adicionar um novo módulo, o conteúdo do curso está aberto.
+            O gerenciamento de conteúdo está limitado.
+        <?php else: ?>
             Quer criar um novo módulo de curso?
-            <?php echo anchor('/curso/conteudo/modulo/criar/' . $idCurso, 'É por aqui!') ?>
+            <?php echo anchor('/curso/conteudo/modulo/criar/' . $curso->id, 'É por aqui!') ?>
+        <?php endif; ?>
         </p>
     </header>
     <div>

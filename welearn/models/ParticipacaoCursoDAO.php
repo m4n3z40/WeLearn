@@ -299,7 +299,7 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
             } catch (cassandra_NotFoundException $e) {
 
-                $column['avaliacaoAtual'];
+                unset( $column['avaliacaoAtual'] );
 
             }
 
@@ -317,7 +317,7 @@ class ParticipacaoCursoDAO extends WeLearn_DAO_AbstractDAO
 
             } catch ( cassandra_NotFoundException $e ) {
 
-                $column['certificado'];
+                unset( $column['certificado'] );
 
             }
 

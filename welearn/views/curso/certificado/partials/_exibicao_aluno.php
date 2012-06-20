@@ -6,6 +6,7 @@
         que passe este conhecimento adiante, como os gerenciadores deste curso fizeram.</p>
     <p>Abaixo verá o certificado que ganhou, a partir de agora ele
         se encontrará na lista de certificados, na área de cursos da sua Home.</p>
+    <?php if ($certificado): ?>
     <figure>
         <img src="<?php echo $certificado->urlBig ?>" alt="Certificado do Curso">
         <figcaption>
@@ -15,4 +16,7 @@
             </blockquote>
         </figcaption>
     </figure>
+    <?php else: ?>
+    <h4>Seu certificado foi removido pelos gerenciadores deste curso.</h4>
+    <?php endif; ?>
 </div>

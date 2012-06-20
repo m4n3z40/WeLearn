@@ -76,6 +76,39 @@ class AvaliacaoDAO extends WeLearn_DAO_AbstractDAO
     }
 
     /**
+     * @param WeLearn_Cursos_Curso $curso
+     * @return int
+     */
+    public function recuperarQtdTotalPorCurso(WeLearn_Cursos_Curso $curso)
+    {
+        try {
+
+            $modulos = $this->_moduloDao->recuperarTodosPorCurso( $curso );
+
+            $qtdTotal = 0;
+
+            foreach ($modulos as $modulo) {
+
+                try {
+
+                    $this->_cf->get( UUID::import( $modulo->getId() )->bytes );
+
+                    $qtdTotal++;
+
+                } catch ( cassandra_NotFoundException $e ) { }
+
+            }
+
+            return $qtdTotal;
+
+        } catch ( cassandra_NotFoundException $e ) {
+
+            return 0;
+
+        }
+    }
+
+    /**
      * @param WeLearn_Cursos_Conteudo_Modulo $modulo
      * @return bool
      */

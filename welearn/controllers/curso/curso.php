@@ -999,15 +999,94 @@ class Curso extends Curso_Controller
                     }
                 }
 
+                //Rotina para verificar se conteudo está sendo aberto
+                $novoStatus = (int)$dadosConfig['status'];
+                $avisos = array();
+
+                if (//Se estiver sendo aberto
+                    $curso->getStatus() != $novoStatus &&
+                    $novoStatus === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO
+                ) {
+
+                    $totalPaginas = WeLearn_DAO_DAOFactory::create('PaginaDAO')->recuperarQtdTotalPorCurso($curso);
+                    $totalAvaliacoes = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO')->recuperarQtdTotalPorCurso($curso);
+
+                    try {
+
+                        $haCertificadoAtivo = WeLearn_DAO_DAOFactory::create('CertificadoDAO')->recuperarAtivoPorCurso($curso);
+
+                    } catch ( cassandra_NotFoundException $e ) {
+
+                        $haCertificadoAtivo = false;
+
+                    }
+
+                    if( $totalPaginas < 1 || $totalAvaliacoes < 1 || !$haCertificadoAtivo ) {//Verifica se há conteúdo mínimo para abrir
+
+                        unset( $dadosConfig['status'] );
+
+                        if ( $totalAvaliacoes == 0 ) {
+
+                            $avisos[] = 'Seu curso não possui nenhuma avaliação. Não é
+                                possível abrir o conteúdo do curso até que seja criada
+                                pelo menos uma avaliação.';
+
+                        }
+
+                        if ( $totalPaginas == 0 ) {
+
+                            $avisos[] = 'Seu curso não possui conteúdo para passar para os alunos.
+                                Não é possível abrir o conteúdo do curso até que seja criada
+                                pelo menos uma página de conteúdo.';
+
+                        }
+
+                        if ( !$haCertificadoAtivo ) {
+
+                            $avisos[] = 'Seu curso não possui um certificado ativo.
+                                Não é possível abrir o conteúdo do curso até que exista
+                                um certificado ativo vinculado a este curso.';
+
+                        }
+
+                    }
+
+                }
+                //fim da rotina
+
                 $curso->getConfiguracao()->preencherPropriedades($dadosConfig);
                 $curso->preencherPropriedades($dadosConfig);
                 $this->_cursoDao->salvar($curso);
 
-                $notificacoesFlash = create_notificacao_json(
-                    'sucesso',
-                    'As alterações nas configurações do curso foram salvas com sucesso!',
-                    5000
-                );
+                $qtdAvisos = count($avisos);
+                if ( $qtdAvisos == 0 ) {//Se não houve erros
+
+                    $notificacoesFlash = create_notificacao_json(
+                        'sucesso',
+                        'As alterações nas configurações do curso foram salvas com sucesso!',
+                        5000
+                    );
+
+                } else {//Se ouve, mostrá-los
+
+                    $msg = '<div><p>As alterações nas configurações do curso foram
+                        salvas, mas houve alguns problemas:</p><ul>';
+
+                    for ($i = 0; $i < $qtdAvisos; $i++) {
+
+                        $msg .= '<li>'. $avisos[$i] .'</li>';
+
+                    }
+
+                    $msg .= '</ul></div>';
+
+                    $notificacoesFlash = create_notificacao_json(
+                        'aviso',
+                        $msg,
+                        20000
+                    );
+
+                }
 
                 $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
 

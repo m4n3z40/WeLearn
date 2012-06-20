@@ -86,6 +86,12 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
             array('certificado')
         );
 
+        if ( ! $idCertificadoAtivo['certificado'] ) {
+
+            throw new cassandra_NotFoundException();
+
+        }
+
         $idCertificadoAtivo = UUID::import( $idCertificadoAtivo['certificado'] )->bytes;
 
         $column = $this->_cf->get( $idCertificadoAtivo );
@@ -190,7 +196,15 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
             )
         );
 
-        $columns = $this->_cf->multiget( $idsCertificados );
+        try {
+
+            $columns = $this->_cf->multiget( $idsCertificados );
+
+        } catch ( cassandra_NotFoundException $e ) {
+
+            $columns = $this->_recuperarRestantesPorAluno( $idsCertificados, $aluno );
+
+        }
 
         return $this->_criarVariosFromCassandra( $columns );
     }
@@ -407,5 +421,31 @@ class CertificadoDAO extends WeLearn_DAO_AbstractDAO
         }
 
         return $listaCertificados;
+    }
+
+    private function _recuperarRestantesPorAluno(array $ids, WeLearn_Usuarios_Aluno $aluno)
+    {
+        $columns = array();
+
+        for ($i = 0; $i < count( $ids ); $i++) {
+
+            try {
+
+                $column = $this->_cf->get( $ids[$i] );
+
+                $columns[] = $column;
+
+            } catch ( cassandra_NotFoundException $e ) {
+
+                $this->_certificadosPorAlunoCF->remove(
+                    $aluno->getId(),
+                    array( $ids[$i] )
+                );
+
+            }
+
+        }
+
+        return $columns;
     }
 }

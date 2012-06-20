@@ -193,8 +193,15 @@ class Pagina extends Curso_Controller
         set_json_header();
 
         try {
+
             $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
             $aula = $aulaDao->recuperar($idAula);
+
+            if ( $aula->getModulo()->getCurso()->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO ) {
+
+                throw new WeLearn_Cursos_ConteudoAbertoException();
+
+            }
 
             $paginaDao = WeLearn_DAO_DAOFactory::create('PaginaDAO');
 
@@ -233,7 +240,15 @@ class Pagina extends Curso_Controller
             ));
 
             $json = create_json_feedback(true, '', $response);
+
+        } catch (WeLearn_Cursos_ConteudoAbertoException $e) {
+
+            $error = create_json_feedback_error_json( $e->getMessage() );
+
+            $json = create_json_feedback(false, $error);
+
         } catch (cassandra_NotFoundException $e) {
+
             log_message('error', 'Erro ao tentar exibir formulário de criação de páginas: '
                 . create_exception_description($e));
 
@@ -243,6 +258,7 @@ class Pagina extends Curso_Controller
             );
 
             $json = create_json_feedback(false, $error);
+
         }
 
         echo $json;
@@ -316,6 +332,12 @@ class Pagina extends Curso_Controller
             $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
             $aula = $aulaDao->recuperar( $idAula );
 
+            if ( $aula->getModulo()->getCurso()->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO ) {
+
+                throw new WeLearn_Cursos_ConteudoAbertoException();
+
+            }
+
             $this->_salvarAlteracoesOrdem(
                 $this->input->get(),
                 $aula
@@ -332,7 +354,14 @@ class Pagina extends Curso_Controller
 
             $json = create_json_feedback(true, '', $response);
 
+        } catch (WeLearn_Cursos_ConteudoAbertoException $e) {
+
+            $error = create_json_feedback_error_json( $e->getMessage() );
+
+            $json = create_json_feedback(false, $error);
+
         } catch(Exception $e) {
+
             log_message('error', 'Erro ao tentar remover página: '
                 . create_exception_description($e));
 
@@ -342,6 +371,7 @@ class Pagina extends Curso_Controller
             );
 
             $json = create_json_feedback(false, $error);
+
         }
 
         echo $json;
@@ -398,7 +428,16 @@ class Pagina extends Curso_Controller
         set_json_header();
 
         try {
+
             $paginaDao = WeLearn_DAO_DAOFactory::create('PaginaDAO');
+
+            $pagina = $paginaDao->recuperar( $idPagina );
+
+            if ( $pagina->getAula()->getModulo()->getCurso()->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO ) {
+
+                throw new WeLearn_Cursos_ConteudoAbertoException();
+
+            }
 
             $paginaRemovida = $paginaDao->remover( $idPagina );
 
@@ -420,16 +459,34 @@ class Pagina extends Curso_Controller
 
             $json = create_json_feedback(true, '', $response);
 
+        } catch (WeLearn_Cursos_ConteudoAbertoException $e) {
+
+            $this->load->helper('notificacao_js');
+
+            $notificacoesFlash = create_notificacao_json(
+                'erro',
+                $e->getMessage()
+            );
+
+            $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
+            $json = create_json_feedback(false);
+
         } catch(Exception $e) {
             log_message('error', 'Erro ao tentar remover página: '
                 . create_exception_description($e));
 
-            $error = create_json_feedback_error_json(
+            $this->load->helper('notificacao_js');
+
+            $notificacoesFlash = create_notificacao_json(
+                'erro',
                 'Ocorreu um erro inesperado, já estamos tentando resolver.
                 Tente novamente mais tarde!'
             );
 
-            $json = create_json_feedback(false, $error);
+            $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
+            $json = create_json_feedback(false);
         }
 
         echo $json;

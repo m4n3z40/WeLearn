@@ -156,7 +156,15 @@ class ControleAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
             $count
         );
 
-        $columns = $this->_cf->multiget( $ids );
+        try {
+
+            $columns = $this->_cf->multiget( $ids );
+
+        } catch ( cassandra_NotFoundException $e ) {
+
+            $columns = $this->_recuperarRestantes( $ids, $participacaoCurso );
+
+        }
 
         return $this->_criarVariosFromCassandra( $columns, $participacaoCurso );
     }
@@ -319,17 +327,54 @@ class ControleAvaliacaoDAO extends WeLearn_DAO_AbstractDAO
                                                WeLearn_Cursos_Avaliacoes_Avaliacao $avaliacao = null)
     {
         $listaControles = array();
-
         foreach( $columns as $column ) {
 
-            $listaControles[] = $this->_criarFromCassandra(
-                $column,
-                $participacaoCurso,
-                $avaliacao
-            );
+            try {
+
+                $controleAvaliacao = $this->_criarFromCassandra(
+                    $column,
+                    $participacaoCurso,
+                    $avaliacao
+                );
+
+                $listaControles[] = $controleAvaliacao;
+
+            } catch ( cassandra_NotFoundException $e ) {
+
+                $this->_cf->remove( $column['id'] );
+                $this->_respostasAvaliacaoCF->remove( $column['id'] );
+
+            }
 
         }
 
         return $listaControles;
+    }
+
+    private function _recuperarRestantes(array $ids,
+                                         WeLearn_Cursos_ParticipacaoCurso $participacaoCurso)
+    {
+        $columns = array();
+
+        foreach ($ids as $nroOrdem => $id) {
+
+            try {
+
+                $column = $this->_cf->get( $id );
+
+                $columns[] = $column;
+
+            } catch ( cassandra_NotFoundException $e ) {
+
+                $this->_controleAvaliacaoPorParticipacaoCF->remove(
+                    $participacaoCurso->getId(),
+                    array( $nroOrdem )
+                );
+
+            }
+
+        }
+
+        return $columns;
     }
 }

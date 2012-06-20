@@ -103,8 +103,8 @@ class Exibicao extends Curso_Controller
             $totalPaginasVistas = 0;
 
             //Verifica se conteudo do curso não está bloqueado nas configurações, o que resultaria na não-exibição da página
-            $conteudoAberto = ( $curso->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO );
-            if ( $conteudoAberto ) {
+            $conteudoBloqueado = ( $curso->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_BLOQUEADO );
+            if ( !$conteudoBloqueado ) {
 
                 //Recupera quantidade total de páginas existente no curso para geração do gráfico de progresso.
                 $totalPaginas = $this->_paginaDao->recuperarQtdTotalPorCurso( $curso );
@@ -142,7 +142,7 @@ class Exibicao extends Curso_Controller
             }
 
             $dadosViewSalaDeAula = array(
-                'conteudoAberto' => $conteudoAberto,
+                'conteudoBloqueado' => $conteudoBloqueado,
                 'tipoConteudo' => $participacaoCurso->getTipoConteudoAtual(),
                 'idCurso' => $curso->getId(),
                 'idModulo' => $moduloAtual ? $moduloAtual->getId() : '',

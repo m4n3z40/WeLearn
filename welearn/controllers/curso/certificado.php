@@ -253,7 +253,17 @@ class Certificado extends Curso_Controller
         set_json_header();
 
         try {
+
             $certificadoDao = WeLearn_DAO_DAOFactory::create('CertificadoDAO');
+
+            $certificado = $certificadoDao->recuperar( $idCertificado );
+
+            if( $certificado->getCurso()->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO ) {
+
+                throw new WeLearn_Cursos_ConteudoAbertoException();
+
+            }
+
             $certificadoRemovido = $certificadoDao->remover( $idCertificado );
 
             unlink( $certificadoRemovido->getCaminhoCompletoBig() );
@@ -279,7 +289,15 @@ class Certificado extends Curso_Controller
             ));
 
             $json = create_json_feedback(true, '', $response);
+
+        } catch (WeLearn_Cursos_ConteudoAbertoException $e) {
+
+            $error = create_json_feedback_error_json( $e->getMessage() );
+
+            $json = create_json_feedback(false, $error);
+
         } catch (Exception $e) {
+
             log_message('error', 'Erro ao tentar remover Certificado: '
                 . create_exception_description($e));
 
@@ -289,6 +307,7 @@ class Certificado extends Curso_Controller
             );
 
             $json = create_json_feedback(false, $error);
+
         }
 
         echo $json;

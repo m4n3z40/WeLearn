@@ -7,7 +7,9 @@
         <p>Quer voltar para sala de aula? <?php echo anchor('/curso/conteudo/exibicao/' . $idCurso, 'Clique Aqui!') ?></p>
     </header>
     <div>
-        <?php if ($haAvaliacoesDisponiveis): ?>
+        <?php if ($conteudoBloqueado): ?>
+        <h3>O conteúdo deste curso está bloqueado para os alunos, notifique os gerenciadores.</h3>
+        <?php elseif ($haAvaliacoesDisponiveis): ?>
         <table>
             <tr>
                 <th>Referente ao Módulo</th>

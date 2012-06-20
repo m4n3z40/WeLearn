@@ -116,6 +116,7 @@ class Aplicacao_avaliacao extends Curso_Controller
 
             $dadosView = array(
                 'idCurso' => $curso->getId(),
+                'conteudoBloqueado' => $curso->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_BLOQUEADO,
                 'haAvaliacoesDisponiveis' => $qtdAvaliacoes > 0,
                 'listaControlesAvaliacoes' => $listaControlesAvaliacoes
             );

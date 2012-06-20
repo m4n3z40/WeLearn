@@ -316,11 +316,7 @@
                                      if (res.success) {
                                          WeLearn.notificar(res.notificacao);
                                      } else {
-                                         WeLearn.notificar({
-                                             nivel: 'error',
-                                             msg: res.errors[0].error_msg,
-                                             tempo: 5000
-                                         });
+                                         window.location.reload();
                                      }
                                  }
                              );

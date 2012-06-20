@@ -6,10 +6,15 @@
                 "<?php echo $modulo->nome ?>"</h3>
         </hgroup>
         <p>
+            <?php if ($modulo->curso->status === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO): ?>
+            Não é possível adicionar uma nova aula, o conteúdo do curso está aberto.
+            O gerenciamento de conteúdo está limitado.
+            <br><br>
+            <?php else: ?>
             Quer criar uma nova aula para este módulo?
             <?php echo anchor('/curso/conteudo/aula/criar/' . $modulo->id, 'Clique aqui!') ?>
-            <br>
-            <br>
+            <br><br>
+            <?php endif; ?>
             Quer gerenciar as aulas de outro módulo?
             <?php echo anchor('#', 'Clique aqui!', array('id' => 'a-aula-alterar-modulo')) ?>
         </p>

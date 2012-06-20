@@ -194,6 +194,12 @@ class Aula extends Curso_Controller
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             $modulo = $moduloDao->recuperar($idModulo);
 
+            if ( $modulo->getCurso()->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO ) {
+
+                show_404();
+
+            }
+
             $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
             $ultrapassouLimite = ( $aulaDao->recuperarQtdTotalPorModulo($modulo)
                                     >= AulaDAO::MAX_AULAS );
@@ -283,8 +289,15 @@ class Aula extends Curso_Controller
         set_json_header();
 
         try {
+
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             $modulo = $moduloDao->recuperar( $idModulo );
+
+            if ( $modulo->getCurso()->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO ) {
+
+                throw new WeLearn_Cursos_ConteudoAbertoException();
+
+            }
 
             $this->_salvarAlteracoesOrdem( $this->input->get(), $modulo );
 
@@ -298,7 +311,15 @@ class Aula extends Curso_Controller
             ));
 
             $json = create_json_feedback(true, '', $notificacao);
+
+        } catch (WeLearn_Cursos_ConteudoAbertoException $e) {
+
+            $error = create_json_feedback_error_json( $e->getMessage() );
+
+            $json = create_json_feedback(false, $error);
+
         } catch (Exception $e) {
+
             log_message('error', 'Ocorreu um erro ao salvar novas posicoes
                         de aula de um módulo: ' . create_exception_description($e));
 
@@ -308,6 +329,7 @@ class Aula extends Curso_Controller
             );
 
             $json = create_json_feedback(false, $error);
+
         }
 
         echo $json;
@@ -324,7 +346,17 @@ class Aula extends Curso_Controller
         $this->load->helper('notificacao_js');
 
         try {
+
             $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
+
+            $aula = $aulaDao->recuperar( $idAula );
+
+            if ( $aula->getModulo()->getCurso()->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO ) {
+
+                throw new WeLearn_Cursos_ConteudoAbertoException();
+
+            }
+
             $aulaRemovida = $aulaDao->remover($idAula);
 
             $this->_salvarAlteracoesOrdem(
@@ -341,7 +373,20 @@ class Aula extends Curso_Controller
             ));
 
             $json = create_json_feedback(true, '', $notificacao);
+
+        } catch (WeLearn_Cursos_ConteudoAbertoException $e) {
+
+            $notificacoesFlash = create_notificacao_json(
+                'erro',
+                $e->getMessage()
+            );
+
+            $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
+            $json = create_json_feedback(false);
+
         } catch (Exception $e) {
+
             log_message('error', 'Ocorreu um erro ao tentar remover
                          uma aula de um módulo: ' . create_exception_description($e));
 
@@ -354,6 +399,7 @@ class Aula extends Curso_Controller
             $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
 
             $json = create_json_feedback(false);
+
         }
 
         echo $json;
