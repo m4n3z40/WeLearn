@@ -11,7 +11,7 @@
         <figcaption>
             <h4>Uma palavra dos Gerenciadores deste Curso:</h4>
             <blockquote>
-                <?php echo $certificado->descricao ?>
+                <?php echo nl2br($certificado->descricao) ?>
             </blockquote>
         </figcaption>
     </figure>

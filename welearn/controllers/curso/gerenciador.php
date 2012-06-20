@@ -379,6 +379,7 @@ class Gerenciador extends Curso_Controller
             $notificacao->setCurso( $curso );
             $notificacao->setDestinatario( $gerenciador );
             $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+            $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorTempoReal() );
             $notificacao->notificar();
             //fim da notificação
 
@@ -563,11 +564,13 @@ class Gerenciador extends Curso_Controller
 
             //Enviar notificação ao convidado;
             $notificadorBatch = new WeLearn_Notificacoes_NotificadorCassandraBatch();
+            $notificadorTempoReal = new WeLearn_Notificacoes_NotificadorTempoReal();
             foreach($convidados as $convidado) {
                 $notificacao = new WeLearn_Notificacoes_NotificacaoConviteGerenciamentoCurso();
                 $notificacao->setCurso( $curso );
                 $notificacao->setDestinatario( $convidado );
                 $notificacao->adicionarNotificador( $notificadorBatch );
+                $notificacao->adicionarNotificador( $notificadorTempoReal );
                 $notificacao->notificar();
             }
             //Fim da notificação;

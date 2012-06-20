@@ -297,6 +297,7 @@ class Feed extends Home_Controller
                         $notificacao->setCompartilhamento( $feed );
                         $notificacao->setDestinatario( $usuarioPerfil );
                         $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+                        $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorTempoReal() );
                         $notificacao->notificar();
                         //fim da notificação.
 

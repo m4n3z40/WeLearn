@@ -607,6 +607,7 @@ class Review extends Curso_Controller
         $notificacao->setResenha( $resenha );
         $notificacao->setDestinatario( $resenha->getCriador() );
         $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+        $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorTempoReal() );
         $notificacao->notificar();
         //fim da notificação;
 

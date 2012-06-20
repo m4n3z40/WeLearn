@@ -49,7 +49,43 @@ class WeLearn_Usuarios_Autorizacao_PermissaoUsuario implements WeLearn_Usuarios_
     protected function _aplicarPermissoes()
     {
         $this->_permissoes = array(
-
+            'curso/index' => true,
+            'curso/exibir' => true,
+            'curso/buscar' => true,
+            'curso/mais_resultados' => true,
+            'curso/meus_cursos_criador' => true,
+            'curso/meus_cursos_gerenciador' => true,
+            'curso/meus_cursos_aluno' => true,
+            'curso/meus_cursos_em_espera' => true,
+            'curso/meus_convites' => true,
+            'curso/meus_certificados' => true,
+            'curso/inscrever' => true,
+            'curso/criar' => true,
+            'curso/salvar' => true,
+            'aluno/listar' => true,
+            'aluno/mais_alunos' => true,
+            'enquete/index' => true,
+            'enquete/listar' => true,
+            'enquete/proxima_pagina' => true,
+            'enquete/exibir' => true,
+            'enquete/exibir_resultados' => true,
+            'enquete/votar' => true,
+            'forum/index' => true,
+            'forum/listar' => true,
+            'forum/proxima_pagina' => true,
+            'forum/listar_categorias' => true,
+            'forum/proxima_pagina_categorias' => true,
+            'post/index' => true,
+            'post/listar' => true,
+            'post/proxima_pagina' => true,
+            'post/salvar' => true,
+            'gerenciador/index' => true,
+            'gerenciador/listar' => true,
+            'gerenciador/mais_gerenciadores' => true,
+            'gerenciador/aceitar_convite' => true,
+            'gerenciador/recusar_convite' => true,
+            'aluno/cancelar_requisicao' => true,
+            'certificado/exibir_aluno' => true
         );
     }
 }
