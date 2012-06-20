@@ -911,6 +911,7 @@ class Curso extends Curso_Controller
 
                     //Enviar notificação aos usuarios
                     $notificadorBatch = new WeLearn_Notificacoes_NotificadorCassandraBatch();
+                    $notificadorTempoReal = new WeLearn_Notificacoes_NotificadorTempoReal();
 
                     //notificar criador
                     $notificacao = new WeLearn_Notificacoes_NotificacaoSugestaoCursoAceitaCriador();
@@ -918,6 +919,7 @@ class Curso extends Curso_Controller
                     $notificacao->setCursoCriado( $novoCurso );
                     $notificacao->setDestinatario( $sugestao->getCriador() );
                     $notificacao->adicionarNotificador( $notificadorBatch );
+                    $notificacao->adicionarNotificador( $notificadorTempoReal );
                     $notificacao->notificar();
 
                     //Notificar votantes
@@ -936,6 +938,7 @@ class Curso extends Curso_Controller
                         $notificacao->setCursoCriado( $novoCurso );
                         $notificacao->setDestinatario( $votante );
                         $notificacao->adicionarNotificador( $notificadorBatch );
+                        $notificacao->adicionarNotificador( $notificadorTempoReal );
                         $notificacao->notificar();
                     }
                     //fim notificação.

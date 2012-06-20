@@ -180,6 +180,7 @@ class Aluno extends Curso_Controller
             $notificacao->setDestinatario( $aluno );
             $notificacao->setCurso( $curso );
             $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+            $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorTempoReal() );
             $notificacao->notificar();
             //fim da notificação.
 
@@ -329,6 +330,7 @@ class Aluno extends Curso_Controller
             $notificacao->setCurso( $curso );
             $notificacao->setDestinatario( $usuario );
             $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+            $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorTempoReal() );
             $notificacao->notificar();
             //fim da notificação;
 
@@ -380,6 +382,7 @@ class Aluno extends Curso_Controller
             $notificacao->setCurso( $curso );
             $notificacao->setDestinatario( $usuario );
             $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+            $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorTempoReal() );
             $notificacao->notificar();
             //fim da notificação;
 

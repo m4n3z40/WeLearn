@@ -38,7 +38,7 @@ class WeLearn_Cursos_Conteudo_Pagina extends WeLearn_DTO_AbstractDTO
     /**
      * @var int
      */
-    private $_qtdTotalComentarios;
+    private $_qtdTotalComentarios = 0;
 
     /**
      * @param \WeLearn_Cursos_Conteudo_Aula $aula

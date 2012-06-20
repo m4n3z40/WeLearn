@@ -108,10 +108,6 @@ class Convite extends Home_Controller
 
     }
 
-
-
-
-
     public function enviar(){
 
 
@@ -160,6 +156,7 @@ class Convite extends Home_Controller
                     $notificacao->setConvite( $conviteCadastrado );
                     $notificacao->setDestinatario( $destinatario );
                     $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+                    $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorTempoReal() );
                     $notificacao->notificar();
                     //fim da notificação;
 
@@ -310,6 +307,7 @@ class Convite extends Home_Controller
                $notificacao->setConvite( $conviteRemovido );
                $notificacao->setDestinatario( $conviteRemovido->getRemetente() );
                $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+               $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorTempoReal() );
                $notificacao->notificar();
                //fim da notificação;
 

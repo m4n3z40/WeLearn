@@ -77,7 +77,7 @@ window.WeLearn = {
 
         opcoes = $.extend(opcoesPadrao, opcoes);
 
-        opcoes.msg += '<br><br><span>( Clique nesta notificação para fechá-la )</span>';
+        opcoes.msg += '<br><p>( Clique nesta notificação para fechá-la )</p>';
 
         opcoesNoty = {
             text: opcoes.msg,
@@ -218,10 +218,10 @@ window.WeLearn = {
         this.socketIO.on('notificacao', function(dados){
 
             $.noty({
-                text: dados.msg,
+                text: dados.msg + '<br><p>( Clique nesta notificação para fechá-la )</p>',
                 type: 'alert',
                 textAlign: 'center',
-                timeout: 5000,
+                timeout: 15000,
                 layout: 'bottomRight'
             });
 

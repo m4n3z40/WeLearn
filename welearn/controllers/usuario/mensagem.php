@@ -217,6 +217,7 @@ Tente novamente mais tarde.'
             $notificacao->setMensagemPessoal( $mensagemObj );
             $notificacao->setDestinatario( $destinatario );
             $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+            $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorTempoReal() );
             $notificacao->notificar();
             //fim da notificação;
 

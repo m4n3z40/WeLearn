@@ -72,7 +72,12 @@
 
             return m + (s / 60);
         },
-        iniciarCronometro = function( $emMin, $emSeg ) {
+        $divTempoAvaliacaoEsgotado = $(
+            '<div id="dialogo-msg-tempo-esgotado">' +
+            '<p>O tempo de avaliação se esgotou, o que foi realizado até agora será enviado para correção.<br>' +
+                'Achou pouco tempo? Fale com os gerenciadores do curso.</p></div>'
+        ),
+        decrementarCronometro = function( $emMin, $emSeg ) {
 
             var m = parseInt( $emMin.text() ),
                 s = parseInt( $emSeg.text().charAt(0) == '0' ? $emSeg.text().charAt(1) : $emSeg.text() );
@@ -86,6 +91,43 @@
 
             $emMin.text( m );
             $emSeg.text( s < 10 ? '0' + s : s );
+
+        },
+        cronometro = function($emTempoDuracaoM, $emTempoDuracaoS, $formAvaliacao, idInterval){
+
+            var tempo = converterTimerParaFracao(
+                $emTempoDuracaoM,
+                $emTempoDuracaoS
+            );
+
+            if ( tempo <= 0 ) {
+
+                clearInterval( idInterval );
+
+                $divTempoAvaliacaoEsgotado.dialog({
+                    title: 'Tempo de Avaliação Esgotado!',
+                    width: '450px',
+                    resizable: false,
+                    modal: true,
+                    close: function(){
+                        enviarDadosAvaliacao(
+                            $emTempoDuracaoM,
+                            $emTempoDuracaoS,
+                            $formAvaliacao
+                        );
+                    },
+                    buttons: {
+                        'Ok' : function() {
+                            $( this ).dialog('close');
+                        }
+                    }
+                });
+
+            } else {
+
+                decrementarCronometro($emTempoDuracaoM, $emTempoDuracaoS);
+
+            }
 
         },
         $divConfirmacaoFinalizacaoAvaliacao = $(
@@ -146,7 +188,7 @@
             });
         };
 
-    $('#a-realizar-avaliacao').click(function(e){
+    $('a.a-realizar-avaliacao').click(function(e){
         e.preventDefault();
 
         var $this = $(this),
@@ -172,7 +214,7 @@
 
                     var idInterval = setInterval(function(){
 
-                        iniciarCronometro($emTempoDuracaoM, $emTempoDuracaoS);
+                        cronometro( $emTempoDuracaoM, $emTempoDuracaoS, $formAvaliacao, idInterval );
 
                     }, 1000);
 
@@ -227,7 +269,7 @@
         );
     });
 
-    $('#a-exibir-resultados-avaliacao').click(function(e){
+    $('a.a-exibir-resultados-avaliacao').click(function(e){
         e.preventDefault();
 
         var $this = $(this),

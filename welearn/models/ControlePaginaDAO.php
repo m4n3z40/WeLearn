@@ -113,12 +113,10 @@ class ControlePaginaDAO
     /**
      * @param WeLearn_Cursos_ParticipacaoCurso $participacaoCurso
      * @param WeLearn_Cursos_Conteudo_Pagina $pagina
-     * @param int $tempoVisualizacao
      * @return WeLearn_Cursos_Conteudo_ControlePagina
      */
     public function finalizar(WeLearn_Cursos_ParticipacaoCurso &$participacaoCurso,
-                                    WeLearn_Cursos_Conteudo_Pagina $pagina,
-                                    $tempoVisualizacao = 0)
+                                    WeLearn_Cursos_Conteudo_Pagina $pagina)
     {
         $controlePagina = $this->recuperar( $pagina, $participacaoCurso );
 
@@ -127,8 +125,6 @@ class ControlePaginaDAO
             return $controlePagina;
 
         }
-
-        $controlePagina->setTempoVisualizacao( $tempoVisualizacao );
 
         $controlePagina->finalizar();
 

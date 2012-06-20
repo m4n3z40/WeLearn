@@ -34,7 +34,7 @@
                             ( $controleAvaliacao->situacaoNaoIniciada || $controleAvaliacao->situacaoIniciada ) &&
                             $controleAvaliacao->statusLiberada
                         ): ?>
-                        <li><a href="#" id="a-realizar-avaliacao" data-id-avaliacao="<?php echo $controleAvaliacao->avaliacao->id ?>">Realizar Avaliação</a></li>
+                        <li><a href="#" class="a-realizar-avaliacao" data-id-avaliacao="<?php echo $controleAvaliacao->avaliacao->id ?>">Realizar Avaliação</a></li>
                         <?php elseif(
                             ( $controleAvaliacao->situacaoAprovado || $controleAvaliacao->situacaoReprovado ) &&
                             !$controleAvaliacao->statusDesativada
@@ -42,7 +42,7 @@
                         <li><strong>Nota: </strong><?php echo number_format($controleAvaliacao->nota, 1, ',', '.') ?></li>
                         <li><strong>Finalizada em: </strong><?php echo round($controleAvaliacao->tempoDecorrido) ?> min.</li>
                         <li><strong>Realizada em: </strong><?php echo date('d/m/Y à\s H:m:i', $controleAvaliacao->dataAplicacao) ?></li>
-                        <li><a href="#" id="a-exibir-resultados-avaliacao" data-id-avaliacao="<?php echo $controleAvaliacao->avaliacao->id ?>">Exibir Resultados</a></li>
+                        <li><a href="#" class="a-exibir-resultados-avaliacao" data-id-avaliacao="<?php echo $controleAvaliacao->avaliacao->id ?>">Exibir Resultados</a></li>
                         <?php else: ?>
                         <li>Infelizmente você não poderá mais continuar o curso porque falhou muitas vezes nesta avaliação :(</li>
                         <?php endif; ?>

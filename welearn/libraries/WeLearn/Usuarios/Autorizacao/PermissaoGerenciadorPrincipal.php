@@ -20,7 +20,15 @@ class WeLearn_Usuarios_Autorizacao_PermissaoGerenciadorPrincipal extends WeLearn
         $this->_permissoes = array_merge(
             $this->_permissoes,
             array(
-
+                'gerenciador/convites' => true,
+                'gerenciador/mais_convites' => true,
+                'gerenciador/cancelar_convite' => true,
+                'gerenciador/desvincular' => true,
+                'gerenciador/convidar' => true,
+                'gerenciador/buscar_usuarios' => true,
+                'gerenciador/enviar_convites' => true,
+                'curso/configurar' => true,
+                'curso/salvar_imagem_temporaria' => true
             )
         );
     }
