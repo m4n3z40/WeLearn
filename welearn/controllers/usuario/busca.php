@@ -21,7 +21,7 @@ class busca extends Home_Controller
 
     public function buscar()
     {
-        $count = 2;
+        $count = 5;
         $texto = $this->input->post('txt-search');
 
         $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');

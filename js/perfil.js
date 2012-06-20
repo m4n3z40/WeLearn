@@ -26,7 +26,7 @@
         draggable: false,
         title:'Enviar Convite',
         width: 400,
-        height: 200,
+        height: 220,
         buttons:{
             "Enviar Convite": function(){
 
@@ -165,7 +165,7 @@
         }
     );
 
-    var formMensagem=$('<form action="http://welearn.com/usuario/mensagem/criar" method="post" accept-charset="utf-8" id="form-criar-mensagem" title="Digite sua mensagem" style="display:none">'+
+    var formMensagem=$('<form action="http://welearn.com/usuario/perfil/enviar_mensagem" method="post" accept-charset="utf-8" id="form-criar-mensagem" title="Digite sua mensagem" style="display:none">'+
                         '<div class="hidden">'+
                         '<input type="hidden" name="welearn_csrf_token" value="'+csrf+'" />'+
                         '</div>'+
@@ -181,7 +181,7 @@
         resizable: false,
         title:'Enviar Mensagem',
         width: 400,
-        height: 200,
+        height: 220,
         buttons: {
             "Confirmar": function() {
 
@@ -189,15 +189,14 @@
                     $(formMensagem).attr('action'),
                     function(res)
                     {
-                        if(res.success){
-                            WeLearn.notificar(res.notificacao);
-                        }
+                        WeLearn.notificar(res.notificacao);
+                        formMensagem.dialog("close");
                     }
                 )
-                $(this).dialog("close");
+
             },
             "Cancelar": function(){
-                $(this).dialog("close");
+                formMensagem.dialog("close");
             }
         }
     });
@@ -236,6 +235,39 @@
                 }
             });
             divRemoverAmizade.dialog('open');
+        }
+    );
+
+
+
+    $('#denunciar-perfil').click(
+        function(e)
+        {
+
+            var containerDenuncia = $('<form action="'+WeLearn.url.siteURL('denuncia/criar')+'" method="post" accept-charset="utf-8" id="form-criar-denuncia">'+
+                                        'Descreva o motivo da Denuncia de forma Clara e Objetiva!'+
+                                        '<textarea rows="5" cols="20"></textarea>'+
+                                        '</form>');
+
+            containerDenuncia.dialog({
+                    autoOpen: false,
+                    modal: true,
+                    draggable: false,
+                    resizable: false,
+                    title: 'Denucia de Perfil',
+                    width: 400,
+                    height: 170,
+                    buttons: {
+                        "Cancelar": function() {
+                            $( this ).dialog( "close" );
+                        },
+                        "Envia Denuncia": function(){
+
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                });
+            containerDenuncia.dialog('open');
         }
     );
 

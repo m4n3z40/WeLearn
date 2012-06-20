@@ -360,6 +360,81 @@ Tente novamente mais tarde.'
 
     }
 
+    public function enviar_mensagem(){
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        $this->load->library('form_validation');
+
+        if ($this->form_validation->run() === FALSE) {
+
+            $json = create_json_feedback(false, validation_errors_json());
+
+            exit($json);
+        }
+
+        $mensagem = $this->input->post('mensagem');
+        $idDestinatario = $this->input->post('destinatario');
+
+        $remetente = $this->autenticacao->getUsuarioAutenticado();
+        $destinatario = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idDestinatario);
+
+
+        $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+        $saoAmigos = $amizadeUsuarioDao->SaoAmigos($remetente,$destinatario);
+        $this->load->helper('notificacao_js');
+        if($destinatario->configuracao->privacidadeMP == WeLearn_Usuarios_PrivacidadeMP::LIVRE ||
+            ($destinatario->configuracao->privacidadeMP == WeLearn_Usuarios_PrivacidadeMP::SO_AMIGOS
+                && $saoAmigos == WeLearn_Usuarios_StatusAmizade::AMIGOS))
+        {
+            try{
+                $mensagemDao = WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
+                $mensagemObj = $mensagemDao->criarNovo();
+                $mensagemObj->setMensagem($mensagem);
+                $mensagemObj->setDestinatario($destinatario);
+                $mensagemObj->setRemetente($remetente);
+                $mensagemObj->setStatus(WeLearn_Usuarios_StatusMP::NOVO);
+                $mensagemDao->salvar($mensagemObj);
+
+                $response = array(
+                    'success' => true,
+                    'mensagemId'=>$mensagemObj->getId(),
+                    'remetente'=>$mensagemObj->getRemetente()->toHTML('imagem_pequena'),
+                    'mensagemTexto'=>$mensagemObj->getMensagem(),
+                    'dataEnvio'=>date('d/m/Y à\s H:i',$mensagemObj->getDataEnvio()),
+                    'notificacao'=> create_notificacao_array(
+                        'sucesso',
+                        'Mensagem enviada com sucesso'
+                    )
+                );
+                $json = Zend_Json::encode($response);
+
+                //enviar notificação ao usuário;
+                $notificacao = new WeLearn_Notificacoes_NotificacaoMensagemPessoal();
+                $notificacao->setMensagemPessoal( $mensagemObj );
+                $notificacao->setDestinatario( $destinatario );
+                $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+                $notificacao->notificar();
+                //fim da notificação;
+
+            }catch(Exception $e){
+                $error = create_json_feedback_error_json("Erro, a mensagem não pode ser enviada!");
+                $json = create_json_feedback(false,$error);
+            }
+        }else{
+            $error = create_json_feedback_error_json("Erro, as configurações de privacidade não permitem que a mensagem seja enviada");
+            $json = create_json_feedback(false,$error);
+        }
+
+
+
+        echo $json;
+
+    }
+
 }
 
 /* End of file perfil.php */
