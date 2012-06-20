@@ -10,8 +10,9 @@
         </header>
         <ul>
             <?php if($usuarioPerfil->getId() != $usuarioAutenticado->getId()):?>
-               <input type='hidden' id='id-usuario-perfil' value='<?=$usuarioPerfil->id ?>'>
-               <input type='hidden' id='nome-usuario-perfil' value='<?=$usuarioPerfil->nome?>'>
+               <input type='hidden' id='id-usuario-perfil' value='<?echo $usuarioPerfil->id ?>'>
+               <input type='hidden' id='nome-usuario-perfil' value='<?echo $usuarioPerfil->nome?>'>
+               <a href='#' id='denunciar-perfil' data-id = '<?echo $usuarioPerfil->id?>'>Denunciar</a>
                 <?php if($saoAmigos == WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS):?>
                     <li><?= anchor('','Adicionar Amigo',array('id' => 'enviar-convite')) ?></li>
                 <?php elseif($saoAmigos == WeLearn_Usuarios_StatusAmizade::AMIGOS):?>
@@ -19,6 +20,7 @@
                 <?php elseif($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA):?>
                     <li><?= anchor('#','Convite Pendente', array('id' => 'exibir-convite-pendente'))?></li>
                     <input type = 'hidden' id = 'id-convite' value = '<?= $convitePendente->id?>'/>
+                    <input type = 'hidden' id = 'msg-convite' value = '<?= $convitePendente->msgConvite?>'/>
                     <input type = 'hidden' id = 'id-destinatario'  value = '<?= $convitePendente->destinatario->id?>'/>
                     <input type = 'hidden' id = 'id-remetente'  value = '<?= $convitePendente->remetente->id?>'/>
                     <?php if($convitePendente->destinatario->id == $usuarioAutenticado->id): ?>

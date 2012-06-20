@@ -285,6 +285,13 @@ $config = array(
             'rules'=>'required|max_length[1024]'
         )
     ),
+    'perfil/enviar_mensagem' => array(
+        array(
+            'field'=>'mensagem',
+            'label'=>'Mensagem',
+            'rules'=>'required|max_length[1024]'
+        )
+    ),
     'avaliacao/salvar' => array(
         array(
             'field' => 'nome',

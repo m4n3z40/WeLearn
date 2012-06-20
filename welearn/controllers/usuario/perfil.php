@@ -8,29 +8,31 @@ class Perfil extends Perfil_Controller {
      * (Resolve bug ao utilizar this->load)
      */
     private $_count = 30;
+    private $_usuarioDao;
 
     function __construct()
     {
         parent::__construct();
-
+        $this->_usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
         $this->template->appendJSImport('perfil.js')
             ->appendJSImport('feed.js')
             ->appendJSImport('amizade.js');
     }
 
-    public function index($id)
+    public function index($idUsuario='')
     {
+        if( $idUsuario=='' ) {
+            show_404();
+        }
 
-        $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-        $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
-        $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
-        $usuarioAutenticado=$this->autenticacao->getUsuarioAutenticado();
         try{
-            $usuarioPerfil=$usuarioDao->recuperar($id);
+            $usuarioPerfil=$this->_usuarioDao->recuperar($idUsuario);
         }catch(cassandra_NotFoundException $e){
             show_404();
         }
 
+
+        $usuarioAutenticado=$this->autenticacao->getUsuarioAutenticado();
 
         $feeds_usuario = $this->carregarTimeLine('','',$usuarioPerfil,$this->_count);
         $this->load->helper('paginacao_cassandra');
@@ -84,33 +86,19 @@ class Perfil extends Perfil_Controller {
         $dados=array('usuarioPerfil' => $usuarioPerfil,'usuarioAutenticado' => $usuarioAutenticado, 'criarFeed' => $partialCriarFeed, 'listarTimeline' => $partialListarTimeline);
 
 
-        if($usuarioPerfil->getId() != $usuarioAutenticado->getId() )
-        {
-            $saoAmigos=$amizadeUsuarioDao->SaoAmigos($usuarioAutenticado,$usuarioPerfil);
-            $dados['saoAmigos']=$saoAmigos;
 
-
-
-            if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
-            {
-                $convitePendente = $conviteCadastradoDao->recuperarPendentes($usuarioAutenticado,$usuarioPerfil);
-                $dados['convitePendente']=$convitePendente;
-            }
-
-
-        }
         $this->_renderTemplatePerfil('usuario/feed/exibir_timeline',$dados);
     }
 
 
-    public function proxima_pagina($usuarioPerfil,$inicio)
+    public function proxima_pagina($idUsuario,$inicio)
     {
         if ( ! $this->input->is_ajax_request() ) {
             show_404();
         }
         try{
 
-            $usuarioPerfil = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($usuarioPerfil);
+            $usuarioPerfil = $this->_usuarioDao->recuperar($idUsuario);
             $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
             $feeds_usuario = $this->carregarTimeLine($inicio,'',$usuarioPerfil,$this->_count);
             $this->load->helper('paginacao_cassandra');
@@ -152,13 +140,13 @@ Tente novamente mais tarde.'
 
     }
 
-    private function carregarTimeLine($de='',$ate='',$usuarioPerfil,$count)
+    private function carregarTimeLine($de='',$ate='',$idUsuario,$count)
     {
         $this->load->library('autoembed');
         try{
 
             $feedDao = WeLearn_DAO_DAOFactory::create('FeedDAO');
-            $filtros = array('usuario' => $usuarioPerfil , 'count' => $count+1);
+            $filtros = array('usuario' => $idUsuario , 'count' => $count+1);
             $feeds = $feedDao->recuperarTodosTimeline($de,$ate,$filtros);
             foreach($feeds as $row)
             {
@@ -179,60 +167,52 @@ Tente novamente mais tarde.'
     {
         if( $idUsuario=='' ) {
             show_404();
-        }else{
-            try{
-                $usuario = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idUsuario);
-            }catch(cassandra_NotFoundException $e){
-                show_404();
-            }
-
-            $amigosDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
-            $filtros= array('count' => $this->_count+1 , 'opcao' => 'amigos' , 'usuario' => $usuario);
-            try{
-                $totalAmigos = $amigosDao->recuperarQtdTotalAmigos($usuario);
-                $listaAmigos= $amigosDao->recuperarTodos('','',$filtros);
-                $this->load->helper('paginacao_cassandra');
-                $dadosPaginados=create_paginacao_cassandra($listaAmigos,$this->_count);
-                $partialListaAmigos=$this->template->loadPartial('lista',
-                    array('listaAmigos' => $listaAmigos,
-                        'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
-                        'haAmigos' => $dadosPaginados['proxima_pagina'],
-                        'idUsuario' => $usuario->getId()
-                    ),
-                    'usuario/amigos'
-                );
-                $dadosView= array('success' => true,'partialListaAmigos' => $partialListaAmigos, 'totalAmigos' => $totalAmigos,'idUsuario' => $usuario->getId());
-            }catch(cassandra_NotFoundException $e){
-                $dadosView= array('success' => false, 'totalAmigos' => 0,'idUsuario'=>$usuario->getId());
-            }
-            if($usuario == $this->autenticacao->getUsuarioAutenticado())
-            {
-                $this->_renderTemplateHome('usuario/amigos/index', $dadosView);
-            }else
-            {
-                $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
-                $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
-                $saoAmigos=$amizadeUsuarioDao->SaoAmigos($this->autenticacao->getUsuarioAutenticado(),$usuario);
-                $dadosView['saoAmigos']=$saoAmigos;
-                if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
-                {
-                    $convitePendente = $conviteCadastradoDao->recuperarPendentes($this->autenticacao->getUsuarioAutenticado(),$usuario);
-                    $dadosView['convitePendente']=$convitePendente;
-                }
-                $dadosView['usuarioPerfil']= $usuario;
-                $dadosView['usuarioAutenticado']= $this->autenticacao->getUsuarioAutenticado();
-                $this->_renderTemplatePerfil('usuario/amigos/index',$dadosView);
-            }
         }
+
+        try{
+            $usuarioPerfil =$this->_usuarioDao->recuperar($idUsuario);
+        }catch(cassandra_NotFoundException $e){
+            show_404();
+        }
+        $amigosDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+        $filtros= array('count' => $this->_count+1 , 'opcao' => 'amigos' , 'usuario' => $usuarioPerfil);
+        try{
+            $totalAmigos = $amigosDao->recuperarQtdTotalAmigos($usuarioPerfil);
+            $listaAmigos= $amigosDao->recuperarTodos('','',$filtros);
+            $this->load->helper('paginacao_cassandra');
+            $dadosPaginados=create_paginacao_cassandra($listaAmigos,$this->_count);
+            $partialListaAmigos=$this->template->loadPartial('lista',
+                array('listaAmigos' => $listaAmigos,
+                    'inicioProxPagina' => $dadosPaginados['inicio_proxima_pagina'],
+                    'haAmigos' => $dadosPaginados['proxima_pagina'],
+                    'idUsuario' => $usuarioPerfil->getId()
+                ),
+                'usuario/amigos'
+            );
+            $dadosView= array('success' => true,'partialListaAmigos' => $partialListaAmigos, 'totalAmigos' => $totalAmigos,'idUsuario' => $usuarioPerfil->getId());
+        }catch(cassandra_NotFoundException $e){
+            $dadosView= array('success' => false, 'totalAmigos' => 0,'idUsuario'=>$usuarioPerfil->getId());
+        }
+
+        $dadosView['usuarioPerfil']= $usuarioPerfil;
+        $dadosView['usuarioAutenticado']= $this->autenticacao->getUsuarioAutenticado();
+        $this->_renderTemplatePerfil('usuario/amigos/index',$dadosView);
+
+
     }
 
-    public function dados_pessoais($idusuarioPerfil)
+    public function dados_pessoais($idUsuario='')
     {
-        $usuarioDAO = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-        $usuarioPerfil = $usuarioDAO->recuperar($idusuarioPerfil);
+        if( $idUsuario=='' ) {
+            show_404();
+        }
+
+        try{
+            $usuarioPerfil = $this->_usuarioDao->recuperar($idUsuario);
+        }catch(cassandra_NotFoundException $e){
+            show_404();
+        }
         $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
-        $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
-        $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
         try{
             $dadosPessoaisDao = WeLearn_DAO_DAOFactory::create('DadosPessoaisUsuarioDAO');
             $dadosPessoais = $dadosPessoaisDao->recuperar( $usuarioPerfil->getId() );
@@ -259,25 +239,25 @@ Tente novamente mais tarde.'
 
         $dados=array('usuarioPerfil' => $usuarioPerfil, 'usuarioAutenticado' => $usuarioAutenticado);
 
-            $saoAmigos=$amizadeUsuarioDao->SaoAmigos($usuarioAutenticado,$usuarioPerfil);
-            $dados['saoAmigos']=$saoAmigos;
-            if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
-            {
-                $convitePendente = $conviteCadastradoDao->recuperarPendentes($usuarioAutenticado,$usuarioPerfil);
-                $dados['convitePendente']=$convitePendente;
-            }
-            $dados['view']=$this->template->loadPartial('dados_pessoais',array('usuarioPerfil' => $usuarioPerfil,'dadosPessoais' => $dadosPessoais, 'pais' => $pais['descricao'], 'estado' => $estado['descricao']),'usuario/perfil');
+
+        $dados['view']=$this->template->loadPartial('dados_pessoais',array('usuarioPerfil' => $usuarioPerfil,'dadosPessoais' => $dadosPessoais, 'pais' => $pais['descricao'], 'estado' => $estado['descricao']),'usuario/perfil');
 
         $this->_renderTemplatePerfil('usuario/perfil/index',$dados);
+
     }
 
-    public function dados_profissionais($idusuarioPerfil)
+    public function dados_profissionais($idUsuario='')
     {
-        $usuarioDAO = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-        $usuarioPerfil = $usuarioDAO->recuperar($idusuarioPerfil);
+        if( $idUsuario=='' ) {
+            show_404();
+        }
+
+        try{
+            $usuarioPerfil = $this->_usuarioDao->recuperar($idUsuario);
+        }catch(cassandra_NotFoundException $e){
+            show_404();
+        }
         $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
-        $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
-        $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
         try {
             $dadosProfissionaisDAO = WeLearn_DAO_DAOFactory::create('DadosProfissionaisUsuarioDAO');
 
@@ -290,18 +270,170 @@ Tente novamente mais tarde.'
 
         $dados=array('usuarioPerfil' => $usuarioPerfil, 'usuarioAutenticado' => $usuarioAutenticado);
 
-        $saoAmigos=$amizadeUsuarioDao->SaoAmigos($usuarioAutenticado,$usuarioPerfil);
-        $dados['saoAmigos']=$saoAmigos;
-        if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
-        {
-            $convitePendente = $conviteCadastradoDao->recuperarPendentes($usuarioAutenticado,$usuarioPerfil);
-            $dados['convitePendente']=$convitePendente;
-        }
+
         $dados['view']=$this->template->loadPartial('dados_profissionais',array('usuarioPerfil' => $usuarioPerfil, 'dadosProfissionais' => $dadosProfissionais),'usuario/perfil');
 
         $this->_renderTemplatePerfil('usuario/perfil/index',$dados);
+
     }
 
+
+    public function meus_cursos_criador($idUsuario='')
+    {
+        if( $idUsuario=='' ) {
+            show_404();
+        }
+
+        try{
+            $usuarioPerfil = $this->_usuarioDao->recuperar($idUsuario);
+        }catch(cassandra_NotFoundException $e){
+            show_404();
+        }
+        try {
+            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+            $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+            $criador = $this->_usuarioDao->criarGerenciadorPrincipal(
+                $usuarioPerfil
+            );
+
+            try {
+                $listaCursos = $cursoDao->recuperarTodosPorCriador($criador, '', '', 1000000);
+            } catch (cassandra_NotFoundException $e) {
+                $listaCursos = array();
+            }
+
+            $dadosView = array(
+                'haCursos' =>  !empty($listaCursos),
+                'totalCursos' => count( $listaCursos ),
+                'listaCursos' => $listaCursos,
+                'usuarioPerfil' => $usuarioPerfil,
+                'usuarioAutenticado' => $usuarioAutenticado
+            );
+
+
+            $this->_renderTemplatePerfil('usuario/cursos/meus_cursos_criador', $dadosView);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao exibir lista de cursos que o usuário criou: '
+                . create_exception_description($e));
+            show_404();
+        }
+
+    }
+
+
+    public function meus_cursos_aluno($idUsuario='')
+    {
+        if( $idUsuario=='' ) {
+            show_404();
+        }
+        try{
+            $usuarioPerfil = $this->_usuarioDao->recuperar($idUsuario);
+        }catch(cassandra_NotFoundException $e){
+            show_404();
+        }
+        try {
+            $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+            $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+            $aluno = $this->_usuarioDao->criarAluno(
+                $usuarioPerfil
+            );
+
+            try {
+                $listaCursos = $cursoDao->recuperarTodosPorAluno($aluno, '', '', 1000000);
+            } catch (cassandra_NotFoundException $e) {
+                $listaCursos = array();
+            }
+
+            $dadosView = array(
+                'haCursos' =>  !empty($listaCursos),
+                'totalCursos' => count( $listaCursos ),
+                'listaCursos' => $listaCursos,
+                'usuarioPerfil' => $usuarioPerfil,
+                'usuarioAutenticado' => $usuarioAutenticado
+            );
+            $this->_renderTemplatePerfil('usuario/cursos/meus_cursos_aluno', $dadosView);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao exibir lista de cursos em que o usuário é aluno: '
+                . create_exception_description($e));
+            show_404();
+        }
+
+    }
+
+    public function enviar_mensagem(){
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        $this->load->library('form_validation');
+
+        if ($this->form_validation->run() === FALSE) {
+
+            $json = create_json_feedback(false, validation_errors_json());
+
+            exit($json);
+        }
+
+        $mensagem = $this->input->post('mensagem');
+        $idDestinatario = $this->input->post('destinatario');
+
+        $remetente = $this->autenticacao->getUsuarioAutenticado();
+        $destinatario = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idDestinatario);
+
+
+        $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+        $saoAmigos = $amizadeUsuarioDao->SaoAmigos($remetente,$destinatario);
+        $this->load->helper('notificacao_js');
+        if($destinatario->configuracao->privacidadeMP == WeLearn_Usuarios_PrivacidadeMP::LIVRE ||
+            ($destinatario->configuracao->privacidadeMP == WeLearn_Usuarios_PrivacidadeMP::SO_AMIGOS
+                && $saoAmigos == WeLearn_Usuarios_StatusAmizade::AMIGOS))
+        {
+            try{
+                $mensagemDao = WeLearn_DAO_DAOFactory::create('MensagemPessoalDAO');
+                $mensagemObj = $mensagemDao->criarNovo();
+                $mensagemObj->setMensagem($mensagem);
+                $mensagemObj->setDestinatario($destinatario);
+                $mensagemObj->setRemetente($remetente);
+                $mensagemObj->setStatus(WeLearn_Usuarios_StatusMP::NOVO);
+                $mensagemDao->salvar($mensagemObj);
+
+                $response = array(
+                    'success' => true,
+                    'mensagemId'=>$mensagemObj->getId(),
+                    'remetente'=>$mensagemObj->getRemetente()->toHTML('imagem_pequena'),
+                    'mensagemTexto'=>$mensagemObj->getMensagem(),
+                    'dataEnvio'=>date('d/m/Y à\s H:i',$mensagemObj->getDataEnvio()),
+                    'notificacao'=> create_notificacao_array(
+                        'sucesso',
+                        'Mensagem enviada com sucesso'
+                    )
+                );
+                $json = Zend_Json::encode($response);
+
+                //enviar notificação ao usuário;
+                $notificacao = new WeLearn_Notificacoes_NotificacaoMensagemPessoal();
+                $notificacao->setMensagemPessoal( $mensagemObj );
+                $notificacao->setDestinatario( $destinatario );
+                $notificacao->adicionarNotificador( new WeLearn_Notificacoes_NotificadorCassandra() );
+                $notificacao->notificar();
+                //fim da notificação;
+
+            }catch(Exception $e){
+                $error = create_json_feedback_error_json("Erro, a mensagem não pode ser enviada!");
+                $json = create_json_feedback(false,$error);
+            }
+        }else{
+            $error = create_json_feedback_error_json("Erro, as configurações de privacidade não permitem que a mensagem seja enviada");
+            $json = create_json_feedback(false,$error);
+        }
+
+
+
+        echo $json;
+
+    }
 
 }
 

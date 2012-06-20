@@ -415,11 +415,13 @@ class Perfil_Controller extends WL_Controller
 
     public function _renderTemplatePerfil( $view = '', $dados = null )
     {
+        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
         $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
         $usuarioPerfil = $usuarioDao->recuperar($dados['usuarioPerfil']->getId());
         $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
+        $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
+        $conviteCadastradoDao = WeLearn_DAO_DAOFactory::create('ConviteCadastradoDAO');
         try{
-            $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
 
             $listaRandonicaAmigos = $amizadeUsuarioDao->recuperarAmigosAleatorios(
                 $usuarioPerfil,
@@ -459,25 +461,66 @@ class Perfil_Controller extends WL_Controller
         $widgets = array();
 
         if(!is_null($listaRandonicaAmigos)){
+            if($usuarioAutenticado->getId()== $usuarioPerfil->getId())
+            {
+               $link = 'usuario/amigos/listar';
+               $legenda = 'Meus Amigos';
+            }
+            else{
+                $link = 'usuario/perfil/listar_amigos/'.$usuarioPerfil->id;
+                $legenda = 'Amigos de '.$usuarioPerfil->getNome();
+            }
             $widgets[] = $this->template->loadPartial(
                 'widget_amigos',
-                array('legenda' =>'Amigos de '.$usuarioPerfil->getNome(),'link'=>'usuario/perfil/listar_amigos/'.$usuarioPerfil->id,'listaRandonicaAmigos' => $listaRandonicaAmigos),
+                array('legenda' => $legenda,'link'=>$link ,'listaRandonicaAmigos' => $listaRandonicaAmigos),
                 'usuario/amigos'
             );
         }
         if(!is_null($listaRandonicaCursosCriados)){
+            if($usuarioAutenticado->getId()== $usuarioPerfil->getId())
+            {
+                $link = 'curso/meus_cursos_criador';
+                $legenda = 'Cursos criados por mim';
+            }
+            else{
+                $link = 'usuario/perfil/meus_cursos_criador/'.$usuarioPerfil->id;
+                $legenda = 'Cursos criados por '.$usuarioPerfil->getNome();
+            }
             $widgets[] = $this->template->loadPartial(
                 'widget_cursos_criados',
-                array('legenda' => 'Cursos criados por '.$usuarioPerfil->getNome(),'link'=>'link para curso','listaRandonicaCursosCriados' => $listaRandonicaCursosCriados),
+                array('legenda' => $legenda ,'link'=> $link,'listaRandonicaCursosCriados' => $listaRandonicaCursosCriados),
                 'usuario/cursos'
             );
         }
         if(!is_null($listaRandonicaCursosInscritos)){
+            if($usuarioAutenticado->getId()== $usuarioPerfil->getId())
+            {
+                $link = 'curso/meus_cursos_aluno';
+                $legenda = 'Cursos em que participo';
+            }
+            else{
+                $link = 'usuario/perfil/meus_cursos_aluno/'.$usuarioPerfil->id;
+                $legenda = 'Cursos em que '.$usuarioPerfil->getNome().' participa';
+            }
             $widgets[] = $this->template->loadPartial(
               'widget_cursos_aluno',
-                array('legenda' => 'Cursos em que '.$usuarioPerfil->getNome().' participa','link'=>'link para curso','listaRandonicaCursosInscritos' => $listaRandonicaCursosInscritos),
+                array('legenda' => $legenda,'link' => $link,'listaRandonicaCursosInscritos' => $listaRandonicaCursosInscritos),
                 'usuario/cursos'
             );
+        }
+
+        if($usuarioPerfil->getId() != $usuarioAutenticado->getId() )
+        {
+            $saoAmigos=$amizadeUsuarioDao->SaoAmigos($usuarioAutenticado,$usuarioPerfil);
+            $dados['saoAmigos']=$saoAmigos;
+
+
+
+            if($saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA )// se houver requisicoes de amizade em espera, carrega a partial convites
+            {
+                $convitePendente = $conviteCadastradoDao->recuperarPendentes($usuarioAutenticado,$usuarioPerfil);
+                $dados['convitePendente']=$convitePendente;
+            }
         }
 
         $this->_setTemplate( 'perfil' )
