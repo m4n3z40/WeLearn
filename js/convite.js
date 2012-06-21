@@ -15,7 +15,17 @@
     var tipoView;
     var url;
 
-    $('#remover-convite').dialog(
+    var confirmarRemover = $('<div id="remover-convite" title="Remover Convite">'+
+                            'Você Tem Certeza Que Deseja Remover Este Convite?'+
+                            '</div>');
+
+
+    var confirmarAmizade = $('<div id="confirmar-amizade" title="Aceitar Convite">'+
+                            'Você Tem Certeza Que Deseja Aceitar Este Convite?'+
+                            '</div>');
+
+
+    confirmarRemover.dialog(
         {
             autoOpen: false,
             modal: true,
@@ -45,7 +55,7 @@
 
 
 
-    $('#confirmar-amizade').dialog(
+   confirmarAmizade.dialog(
         {
             autoOpen: false,
             modal:true,

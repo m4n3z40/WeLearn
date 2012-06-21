@@ -12,7 +12,6 @@
             <?php if($usuarioPerfil->getId() != $usuarioAutenticado->getId()):?>
                <input type='hidden' id='id-usuario-perfil' value='<?echo $usuarioPerfil->id ?>'>
                <input type='hidden' id='nome-usuario-perfil' value='<?echo $usuarioPerfil->nome?>'>
-               <a href='#' id='denunciar-perfil' data-id = '<?echo $usuarioPerfil->id?>'>Denunciar</a>
                 <?php if($saoAmigos == WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS):?>
                     <li><?= anchor('','Adicionar Amigo',array('id' => 'enviar-convite')) ?></li>
                 <?php elseif($saoAmigos == WeLearn_Usuarios_StatusAmizade::AMIGOS):?>

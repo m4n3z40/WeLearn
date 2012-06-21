@@ -14,18 +14,8 @@
     </hgroup>
 </header>
 
-
-
 <ul id="lista-convites">
     <?=$partialListaConvites?>
-
-    <div id="remover-convite" title="Remover Convite" style="display: none;">
-        Você Tem Certeza Que Deseja Remover Este Convite?
-    </div>
-
-    <div id="confirmar-amizade" title="Aceitar Convite" style="display: none;">
-        Você Tem Certeza Que Deseja Aceitar Este Convite?
-    </div>
 </ul>
     <footer>
             <nav id="paginacao-enquete">
