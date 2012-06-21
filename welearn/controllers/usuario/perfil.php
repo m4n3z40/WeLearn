@@ -436,6 +436,45 @@ Tente novamente mais tarde.'
 
     }
 
+    public function listar_certificados($idUsuarioPerfil)
+    {
+        try {
+            $this->template->appendJSImport('certificado_aluno.js');
+            $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+            $certificadoDao = WeLearn_DAO_DAOFactory::create('CertificadoDAO');
+            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+            $usuarioPerfil = $usuarioDao->recuperar($idUsuarioPerfil);
+            $aluno = $usuarioDao->criarAluno( $usuarioPerfil );
+
+            try {
+                $listaCertificados = $certificadoDao->recuperarTodosPorAluno(
+                    $aluno,
+                    '',
+                    '',
+                    1000000
+                );
+            } catch( cassandra_NotFoundException $e ) {
+                $listaCertificados = array();
+            }
+
+            $dadosView = array(
+                'haCertificados' => !empty($listaCertificados),
+                'totalCertificados' => count($listaCertificados),
+                'usuarioPerfil' => $usuarioPerfil,
+                'usuarioAutenticado' => $usuarioAutenticado,
+                'listaCertificados' => $listaCertificados
+            );
+
+
+            $this->_renderTemplatePerfil('usuario/cursos/perfil_certificados', $dadosView);
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao exibir lista de certificados do usuário: '
+                . create_exception_description($e));
+            show_404();
+        }
+
+    }
+
 }
 
 /* End of file perfil.php */
