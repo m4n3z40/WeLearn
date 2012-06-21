@@ -48,6 +48,9 @@
                         }
 
                     });
+            },
+            "Cancelar": function(){
+                formConvite.dialog("close");
             }
 
         }
@@ -56,6 +59,7 @@
 
     $( "#enviar-convite" ).click(function(e) {
         e.preventDefault();
+        formConvite.children('#txt-convite');
         formConvite.dialog( "open");
         return false;
     });
@@ -196,13 +200,14 @@
 
             },
             "Cancelar": function(){
-                formMensagem.dialog("close");
+                formMensagem.dialog('close');
             }
         }
     });
 
     $( "#enviar-mensagem" ).click(function(e) {
         e.preventDefault();
+        formMensagem.children('#txt-mensagem').val('');
         formMensagem.dialog( "open");
     });
 
@@ -235,39 +240,6 @@
                 }
             });
             divRemoverAmizade.dialog('open');
-        }
-    );
-
-
-
-    $('#denunciar-perfil').click(
-        function(e)
-        {
-
-            var containerDenuncia = $('<form action="'+WeLearn.url.siteURL('denuncia/criar')+'" method="post" accept-charset="utf-8" id="form-criar-denuncia">'+
-                                        'Descreva o motivo da Denuncia de forma Clara e Objetiva!'+
-                                        '<textarea rows="5" cols="20"></textarea>'+
-                                        '</form>');
-
-            containerDenuncia.dialog({
-                    autoOpen: false,
-                    modal: true,
-                    draggable: false,
-                    resizable: false,
-                    title: 'Denucia de Perfil',
-                    width: 400,
-                    height: 170,
-                    buttons: {
-                        "Cancelar": function() {
-                            $( this ).dialog( "close" );
-                        },
-                        "Envia Denuncia": function(){
-
-                            $( this ).dialog( "close" );
-                        }
-                    }
-                });
-            containerDenuncia.dialog('open');
         }
     );
 
