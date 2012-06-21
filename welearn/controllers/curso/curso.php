@@ -1009,7 +1009,7 @@ class Curso extends Curso_Controller
                 ) {
 
                     $totalPaginas = WeLearn_DAO_DAOFactory::create('PaginaDAO')->recuperarQtdTotalPorCurso($curso);
-                    $totalAvaliacoes = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO')->recuperarQtdTotalPorCurso($curso);
+                    $totalAvaliacoes = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO')->recuperarQtdTotalAtivas($curso);
 
                     try {
 
@@ -1027,9 +1027,9 @@ class Curso extends Curso_Controller
 
                         if ( $totalAvaliacoes == 0 ) {
 
-                            $avisos[] = 'Seu curso não possui nenhuma avaliação. Não é'
+                            $avisos[] = 'Seu curso não possui nenhuma avaliação ativa. Não é'
                                 .' possível abrir o conteúdo do curso até que seja criada'
-                                .' pelo menos uma avaliação.';
+                                .' e ativada, pelo menos uma avaliação.';
 
                         }
 

@@ -41,7 +41,6 @@
 
             idIntervalFrequenciaTimer = setInterval(function(){
                 tempoFrequenciaTimer++;
-                log(tempoFrequenciaTimer);
             }, 1000);
         },
         finalizarCronometro = function(onComplete){

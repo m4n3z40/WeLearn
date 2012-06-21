@@ -208,7 +208,7 @@ class Exibicao extends Curso_Controller
                 $curso
             );
 
-            $tipoConteudo = $this->input->get('t');
+            $tipoConteudo = (int)$this->input->get('t');
 
             switch ( $tipoConteudo ) {
                 case WeLearn_Cursos_Conteudo_TipoConteudo::PAGINA:
@@ -220,7 +220,7 @@ class Exibicao extends Curso_Controller
                 case WeLearn_Cursos_Conteudo_TipoConteudo::NENHUM:
                 default:
                     throw new WeLearn_Base_Exception('Tipo de conteúdo incorreto!');
-            }            
+            }
         } catch (Exception $e) {
             log_message('error', 'Erro ao tentar exibir conteúdo para aluno na sala de aula: '
                 . create_exception_description($e));
@@ -878,9 +878,16 @@ class Exibicao extends Curso_Controller
     {
         if ( $proximaAula ) {
 
-            $this->_participacaoCursoDao->getControleAulaDAO()->acessar( $participacaoCurso, $proximaAula );
-
             $proximaPagina = $this->_paginaDao->recuperarProxima( $proximaAula );
+
+            if ( $proximaPagina ) {
+
+                $this->_participacaoCursoDao->getControleAulaDAO()->acessar(
+                    $participacaoCurso,
+                    $proximaAula
+                );
+
+            }
 
             return $this->_retornarJSONProximaPagina( $participacaoCurso, $proximaPagina );
 

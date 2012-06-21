@@ -79,7 +79,7 @@ class AvaliacaoDAO extends WeLearn_DAO_AbstractDAO
      * @param WeLearn_Cursos_Curso $curso
      * @return int
      */
-    public function recuperarQtdTotalPorCurso(WeLearn_Cursos_Curso $curso)
+    public function recuperarQtdTotalAtivas(WeLearn_Cursos_Curso $curso)
     {
         try {
 
@@ -91,9 +91,13 @@ class AvaliacaoDAO extends WeLearn_DAO_AbstractDAO
 
                 try {
 
-                    $this->_cf->get( UUID::import( $modulo->getId() )->bytes );
+                    $column = $this->_cf->get( UUID::import( $modulo->getId() )->bytes );
 
-                    $qtdTotal++;
+                    if ( (int)$column['qtdQuestoesExibir'] > 0 ) {
+
+                        $qtdTotal++;
+
+                    }
 
                 } catch ( cassandra_NotFoundException $e ) { }
 

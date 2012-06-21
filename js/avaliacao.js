@@ -104,7 +104,7 @@
                             var $siblings = $parent.children();
                             $siblings.first().remove();
                             $siblings.last().remove();
-                            $parent.prepend($('<span/>', {text: qtd}));
+                            $parent.prepend($('<span/>', {text: res.qtdQuestoesExibir}));
                             $this.text('Alterar').data('acao', 'alterar');
                         } else {
                             WeLearn.notificar({

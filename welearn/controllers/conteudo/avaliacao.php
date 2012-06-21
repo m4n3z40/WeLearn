@@ -594,8 +594,18 @@ class Avaliacao extends Curso_Controller
         try {
             $avaliacaoDao = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO');
             $avaliacao = $avaliacaoDao->recuperar( $idAvaliacao );
-            
-            $avaliacao->setQtdQuestoesExibir( $this->input->get('qtd') );
+
+            $questaoDao = WeLearn_DAO_DAOFactory::create('QuestaoAvaliacaoDAO');
+
+            $qtdQuestoes = $questaoDao->recuperarQtdTotalPorAvaliacao( $avaliacao );
+
+            $qtdQuestoesExibir = (int)$this->input->get('qtd');
+
+            if ( $qtdQuestoesExibir > $qtdQuestoes ) {
+                $qtdQuestoesExibir = $qtdQuestoes;
+            }
+
+            $avaliacao->setQtdQuestoesExibir( $qtdQuestoesExibir );
             $avaliacaoDao->salvar( $avaliacao );
             
             $this->load->helper('notificacao_js');
@@ -605,7 +615,8 @@ class Avaliacao extends Curso_Controller
                     'sucesso',
                     'A quantidade de questões à serem aplicadas para avaliação <em>"'
                         . $avaliacao->getNome() . '"</em> foi alterada com sucesso!'
-                )
+                ),
+                'qtdQuestoesExibir' => $qtdQuestoesExibir
             ));
 
             $json = create_json_feedback(true, '', $response);
