@@ -17,6 +17,7 @@
             <li><?php echo anchor('/notificacao', 'Notificações') ?></li>
             <li><?php echo anchor('/usuario/configuracao', 'Configurações') ?></li>
             <li><?php echo anchor('/administracao','Adminstração')?></li>
+            <li><?php echo anchor('/curso/meus_certificados','Certificados')?></li>
         </ul>
     </nav>
 </section>

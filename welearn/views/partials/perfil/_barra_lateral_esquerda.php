@@ -42,6 +42,7 @@
                     && $saoAmigos == WeLearn_Usuarios_StatusAmizade::AMIGOS)):?>
                 <li><?= anchor('perfil/dados_pessoais/'.$usuarioPerfil->id,'Dados Pessoais')?></li>
                 <li><?= anchor('perfil/dados_profissionais/'.$usuarioPerfil->id,'Dados Profissionais')?></li>
+                <li><?= anchor('/perfil/listar_certificados/'.$usuarioPerfil->id,'Certificados')?></li>
             <?php endif?>
         </ul>
     </nav>
