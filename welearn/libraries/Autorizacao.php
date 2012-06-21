@@ -18,10 +18,25 @@ class WL_Autorizacao extends WeLearn_Usuarios_Autorizacao_ControleAcesso
         $this->_ci =& get_instance();
     }
 
+    /**
+     * @param WeLearn_Usuarios_Autorizacao_Papel $papel
+     * @return bool
+     */
     public function isAutorizadoNaAcaoAtual(WeLearn_Usuarios_Autorizacao_Papel $papel)
     {
         $funcao = $this->_ci->router->class . '/' . $this->_ci->router->method;
 
-        return parent::isAutorizado($papel, $funcao);
+        return parent::isAutorizado( $papel, $funcao );
+    }
+
+    /**
+     * @param WeLearn_Usuarios_Usuario $autorDoConteudo
+     * @return bool
+     */
+    public function isAutorUsuarioAtual(WeLearn_Usuarios_Usuario $autorDoConteudo)
+    {
+        $usuarioAtual = $this->_ci->autenticacao->getUsuarioAutenticado();
+
+        return parent::isAutor( $usuarioAtual, $autorDoConteudo );
     }
 }

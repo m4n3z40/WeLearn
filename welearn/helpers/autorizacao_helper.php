@@ -15,10 +15,9 @@ function is_autorizado ( WeLearn_Usuarios_Autorizacao_Papel $usuario, $acao = ''
     }
 }
 
-function is_autor ( WeLearn_Usuarios_Usuario $usuarioAComparar,
-                    WeLearn_Usuarios_Usuario $usuarioCriador )
+function is_autor ( WeLearn_Usuarios_Usuario $autorDoConteudo )
 {
     $ci =& get_instance();
 
-    return $ci->autorizacao->isAutor( $usuarioAComparar, $usuarioCriador );
+    return $ci->autorizacao->isAutorUsuarioAtual( $autorDoConteudo );
 }
