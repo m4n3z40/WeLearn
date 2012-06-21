@@ -37,71 +37,79 @@ class Feed extends Home_Controller
             $json = create_json_feedback(false, validation_errors_json());
             exit($json);
         }else{
-
+            $this->load->helper('notificacao_js');
             switch($tipo)
             {
                 case WeLearn_Compartilhamento_TipoFeed::VIDEO:
                      $isValid = $this->validar_video();
                      if(!$isValid)
                      {
+                         $notificacoesFlash = create_notificacao_json(
+                             'erro',
+                             'A url do video enviado não é valida, verifique se a url está correta.'
+                         );
+                         $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
                          log_message(
                              'error',
                              'A url do video enviado nao é valida'
                          );
 
-                         $error = create_json_feedback_error_json(
-                             'A url do video enviado não é valida, verifique se a url está correta.'
-                         );
-
-                         $json = create_json_feedback(false, $error);
+                         $json = create_json_feedback(false);
                      }
                      break;
                 case WeLearn_Compartilhamento_TipoFeed::IMAGEM:
                     $isValid = $this->validar_imagem();
                     if(!$isValid)
                     {
+                        $notificacoesFlash = create_notificacao_json(
+                            'erro',
+                            'A url da imagem enviada não é valida, verifique se a url está correta.'
+                        );
+                        $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
                         log_message(
                             'error',
                             'A url da imagem enviada nao é valida'
                         );
 
-                        $error = create_json_feedback_error_json(
-                            'A url da imagem enviada não é valida, verifique se a url está correta.'
-                        );
-
-                        $json = create_json_feedback(false, $error);
+                        $json = create_json_feedback(false);
                     }
                     break;
                 case WeLearn_Compartilhamento_TipoFeed::LINK;
                     $isValid = $this->validar_url();
                     if(!$isValid)
                     {
+                        $notificacoesFlash = create_notificacao_json(
+                            'erro',
+                            'A url da imagem enviada não é valida, verifique se a url está correta.'
+                        );
+                        $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
                         log_message(
                             'error',
                             'A url enviada nao é valida'
                         );
 
-                        $error = create_json_feedback_error_json(
-                            'A url enviada não é valida, verifique se a url está correta.'
-                        );
-
-                        $json = create_json_feedback(false, $error);
+                        $json = create_json_feedback(false);
                     }
                     break;
                 case WeLearn_Compartilhamento_TipoFeed::STATUS:
                     $isValid = true;
                     if(!$isValid)
                     {
+                        $notificacoesFlash = create_notificacao_json(
+                            'erro',
+                            'A url da imagem enviada não é valida, verifique se a url está correta.'
+                        );
+                        $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
                         log_message(
                             'error',
                             'O status enviado nao é valida'
                         );
 
-                        $error = create_json_feedback_error_json(
-                            'O status enviado não é valido, por favor corrija- o.'
-                        );
-
-                        $json = create_json_feedback(false, $error);
+                        $json = create_json_feedback(false);
                     }
                     break;
 
@@ -124,7 +132,6 @@ class Feed extends Home_Controller
                 $feedUsuario->setTipo($tipo);
                 $feedUsuario->setCriador($criador);
                 $feedUsuario->setDataEnvio(time());
-                $this->load->helper('notificacao_js');
                 try{
 
                     $feedDao->salvar($feedUsuario);
@@ -201,64 +208,72 @@ class Feed extends Home_Controller
                         $isValid = $this->validar_video();
                         if(!$isValid)
                         {
+                            $notificacoesFlash = create_notificacao_json(
+                                'erro',
+                                'A url do video enviado não é valida, verifique se a url está correta.'
+                            );
+                            $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
                             log_message(
                                 'error',
                                 'A url do video enviado nao é valida'
                             );
 
-                            $error = create_json_feedback_error_json(
-                                'A url do video enviado não é valida, verifique se a url está correta.'
-                            );
-
-                            $json = create_json_feedback(false, $error);
+                            $json = create_json_feedback(false);
                         }
                         break;
                     case WeLearn_Compartilhamento_TipoFeed::IMAGEM:
                         $isValid = $this->validar_imagem();
                         if(!$isValid)
                         {
+                            $notificacoesFlash = create_notificacao_json(
+                                'erro',
+                                'A url da imagem enviada não é valida, verifique se a url está correta.'
+                            );
+                            $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
                             log_message(
                                 'error',
                                 'A url da imagem enviada nao é valida'
                             );
 
-                            $error = create_json_feedback_error_json(
-                                'A url da imagem enviada não é valida, verifique se a url está correta.'
-                            );
-
-                            $json = create_json_feedback(false, $error);
+                            $json = create_json_feedback(false);
                         }
                         break;
                     case WeLearn_Compartilhamento_TipoFeed::LINK;
                         $isValid = $this->validar_url();
                         if(!$isValid)
                         {
+                            $notificacoesFlash = create_notificacao_json(
+                                'erro',
+                                'A url da imagem enviada não é valida, verifique se a url está correta.'
+                            );
+                            $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
                             log_message(
                                 'error',
                                 'A url enviada nao é valida'
                             );
 
-                            $error = create_json_feedback_error_json(
-                                'A url enviada não é valida, verifique se a url está correta.'
-                            );
-
-                            $json = create_json_feedback(false, $error);
+                            $json = create_json_feedback(false);
                         }
                         break;
                     case WeLearn_Compartilhamento_TipoFeed::STATUS:
                         $isValid = true;
                         if(!$isValid)
                         {
+                            $notificacoesFlash = create_notificacao_json(
+                                'erro',
+                                'A url da imagem enviada não é valida, verifique se a url está correta.'
+                            );
+                            $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+
                             log_message(
                                 'error',
                                 'O status enviado nao é valida'
                             );
 
-                            $error = create_json_feedback_error_json(
-                                'O status enviado não é valido, por favor corrija- o.'
-                            );
-
-                            $json = create_json_feedback(false, $error);
+                            $json = create_json_feedback(false);
                         }
                         break;
 
