@@ -13,7 +13,10 @@
             <h3>
                 Lista de Convites
             </h3>
-            <ul id="ul-lista-usuarios-convidar" data-id-curso="<?php echo $idCurso ?>" data-lista-convite="">
+            <ul id="ul-lista-usuarios-convidar"
+                class="ul-grid-cursos-alunos"
+                data-id-curso="<?php echo $idCurso ?>"
+                data-lista-convite="">
                 <li>Não há convites, por enquanto.</li>
             </ul>
             <a href="#" style="display: none;" id="a-confirmar-usuarios-convidar" class="button">Confirmar!</a>
@@ -23,7 +26,7 @@
             <?php echo form_open($formAction, $extraOpenForm, $formHidden) ?>
             <input type="text" name="termo" id="txt-termo" placeholder="Buscar">
             <?php echo form_close() ?>
-            <ul id="ul-lista-usuarios-resultado-busca">
+            <ul id="ul-lista-usuarios-resultado-busca" class="ul-grid-cursos-alunos">
                 <li>Não há resultados para exibir.</li>
             </ul>
             <a href="#" style="display: none;" id="a-paginacao-usuarios-convidar" data-proximo="0">Mais resultados...</a>

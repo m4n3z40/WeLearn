@@ -38,7 +38,7 @@
         <h4 id="forum-lista-posts-vazio">Nenhum post foi criado neste fórum até o momento. Aguarde ou <a href="#" class="a-forum-post-criar">Seja o primeiro a postar!</a></h4>
         <?php endif; ?>
         <footer>
-            <a href="#" class="a-forum-post-criar button">Postar neste fórum</a>
+            <a href="#" class="a-forum-post-criar button big-button">Postar neste fórum</a>
         </footer>
     </div>
     <hr />

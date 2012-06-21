@@ -10,11 +10,7 @@
                                                          . $modulo->curso->id,
                                                      'Clique aqui para voltar para index de Avaliações') ?>
         </p>
-    </header>
-    <div>
-    <?php if ($modulo->existeAvaliacao): ?>
-        <input type="hidden" id="hdn-id-avaliacao" name="avaliacaoId" value="<?php echo $avaliacao->id ?>">
-        <h3><?php echo $avaliacao->nome ?></h3>
+        <?php if ($modulo->existeAvaliacao): ?>
         <nav>
             <ul>
                 <li><?php echo anchor('/curso/conteudo/avaliacao/alterar/' . $avaliacao->id,
@@ -25,10 +21,16 @@
                                       'class="a-remover-avaliacao"')?></li>
             </ul>
         </nav>
-        <div>
+        <?php endif; ?>
+    </header>
+    <div>
+    <?php if ($modulo->existeAvaliacao): ?>
+        <input type="hidden" id="hdn-id-avaliacao" name="avaliacaoId" value="<?php echo $avaliacao->id ?>">
+        <div id="div-avaliacao-info">
+            <h3><?php echo $avaliacao->nome ?></h3>
             <h4>Informações da Avaliação</h4>
             <?php if ($avaliacao->qtdQuestoesExibir <= 0): ?>
-            <p>Obs.: <strong>Esta avaliação ainda não está ativa!</strong>
+            <p class="obs">Obs.: <strong>Esta avaliação ainda não está ativa!</strong>
                 <br>
                 Para ativá-la altere a <em>"Qtd. de Questões Aplicadas"</em> para um
                 valor maior que "0".</p>
@@ -55,8 +57,7 @@
                 </tr>
             </table>
         </div>
-        <hr>
-        <div>
+        <div id="div-avaliacao-questoes">
             <h4>Questões da Avaliação</h4>
             <p>Não se preocupe com a ordem das questões, elas serão "embaralhadas"
                 na aplicação da avaliação.</p>
@@ -64,7 +65,7 @@
                 <ul>
                     <li><?php echo anchor('/curso/conteudo/avaliacao/adicionar_questao/' . $avaliacao->id,
                                           'Adicionar uma Questão',
-                                          'class="a-adicionar-questao"') ?></li>
+                                          'class="a-adicionar-questao button big-button"') ?></li>
                 </ul>
             </nav>
             <h4>Exibindo <em class="avaliacao-qtd-questoes"><?php echo $avaliacao->qtdQuestoes ?>
@@ -76,8 +77,6 @@
                 <tr>
                     <th>Enunciado</th>
                     <th></th>
-                    <th></th>
-                    <th></th>
                 </tr>
                 <?php echo $listaQuestoes ?>
             </table>
@@ -86,7 +85,7 @@
                 <ul>
                     <li><?php echo anchor('/curso/conteudo/avaliacao/adicionar_questao/' . $avaliacao->id,
                                           'Adicionar uma Questão',
-                                          'class="a-adicionar-questao"') ?></li>
+                                          'class="a-adicionar-questao button big-button"') ?></li>
                 </ul>
             </nav>
         </div>

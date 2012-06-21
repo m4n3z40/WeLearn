@@ -1,7 +1,7 @@
 <fieldset id="fds-config-avancadas">
     <legend>Configurações Avançadas</legend>
     <dl>
-        <dt><span>Status do Conteúdo do Curso</span></dt>
+        <dt><h4>Status do Conteúdo do Curso</h4></dt>
         <dd>
             <ul>
                 <li>
@@ -20,7 +20,7 @@
         </dd>
         <dt><label for="txt-tempo-duracao-max">Tempo máximo de duração do curso (Em horas)</label></dt>
         <dd><input type="number" name="tempoDuracaoMax" id="txt-tempo-duracao-max" step="any" value="<?php echo $tempoDuracaoMaxAtual ?>"/></dd>
-        <dt><label for="ul-privacidade">Opções de Privacidade</label></dt>
+        <dt><h4>Opções de Privacidade</h4></dt>
         <dd>
             <ul id="ul-privacidade">
                 <li>

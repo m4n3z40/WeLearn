@@ -7,10 +7,10 @@
         <p>Comentários de Aulas estão disponíveis para o aluno em cada página de aulas,
             onde os alunos podem discutir o conteúdo daquela página, agregando muito mais
             informação a ela!</p>
-    </header>
-    <div>
-        <a href="#" id="a-exibir-select-local-comentario"
-           style="display: none;">Exibir comentários de outra página</a>
+        <div>
+            <a href="#" id="a-exibir-select-local-comentario"
+                       style="display: none;">Exibir comentários de outra página</a>
+        </div>
         <nav id="nav-select-local-comentario">
             <ul>
                 <li>
@@ -29,7 +29,8 @@
             <a href="#" id="a-esconder-select-local-comentario"
                style="display: none;">Esconder estas opções</a>
         </nav>
-        <hr>
+    </header>
+    <div>
         <h4 id="h4-msg-escolher-pagina">Escolha uma página acima para exibir os
             comentários contidos nela.</h4>
         <div id="div-comentario-lista-container" style="display: none;">
@@ -50,7 +51,7 @@
                 <ul style="display: none;" id="ul-lista-comentario"></ul>
             </div>
             <footer>
-                <a href="#" class="a-exibir-form-criar-comentario">Postar comentário nesta
+                <a href="#" class="a-exibir-form-criar-comentario button big-button">Postar comentário nesta
                     página</a>
                 <div id="div-form-criar-comentario-container" style="display: none;">
                     <?php echo $formCriar ?>

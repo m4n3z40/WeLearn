@@ -17,7 +17,6 @@
                 <th>Data de Criação</th>
                 <th>Criador</th>
                 <th></th>
-                <th></th>
             </tr>
             <?php echo $listaCategorias ?>
         </table>

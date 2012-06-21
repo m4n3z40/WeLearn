@@ -13,8 +13,8 @@
     </header>
     <div>
     <?php if ($haCategorias): ?>
+        <h3>Categorias</h3>
         <table id="forum-lista-categorias">
-            <tr><th colspan="2"><h3>Categorias</h3></th></tr>
             <?php echo $listaCategorias ?>
         </table>
         <footer>

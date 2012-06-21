@@ -12,11 +12,13 @@
             Assim, esses recursos ficarão disponíveis para download de acordo com seu
             tipo:
          </p>
-        <ul>
-            <li>Recursos Gerais: Disponíveis para qualquer aluno do curso.</li>
-            <li>Recursos Restritos: Disponíveis somente para os alunos que já alcançaram
-                a aula a que o recurso pertence.</li>
-        </ul>
+        <div>
+            <ul>
+                <li>Recursos Gerais: Disponíveis para qualquer aluno do curso.</li>
+                <li>Recursos Restritos: Disponíveis somente para os alunos que já alcançaram
+                    a aula a que o recurso pertence.</li>
+            </ul>
+        </div>
         <p>
             Não queria estar aqui?
             <?php echo anchor('/curso/conteudo/recurso/' . $idCurso,

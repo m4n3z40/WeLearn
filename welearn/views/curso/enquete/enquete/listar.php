@@ -1,7 +1,9 @@
 <div id="enquete-listar-content">
     <header>
-        <h1>Lista de Enquetes do Curso <?php echo $tituloLista ?></h1>
-        <h3>Abaixo são listada todas as enquetes contidas neste curso</h3>
+        <hgroup>
+            <h1>Lista de Enquetes do Curso <?php echo $tituloLista ?></h1>
+            <h3>Abaixo são listada todas as enquetes contidas neste curso</h3>
+        </hgroup>
         <p>
             Quer adicionar uma nova enquete ao curso? <?php echo anchor('/curso/enquete/criar/' . $idCurso, 'Clique aqui!') ?>
             <br>

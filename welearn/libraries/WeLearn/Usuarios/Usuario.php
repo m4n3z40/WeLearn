@@ -484,9 +484,9 @@ class WeLearn_Usuarios_Usuario extends WeLearn_DTO_AbstractDTO
         $nomeCompleto = $this->getNome() . ' ' . $this->getSobrenome();
 
         if ( $linkPara ) {
-            return "<figure><a href=\"{$linkPara}\" title=\"{$nomeCompleto}\">{$htmlImagem}<span>{$nomeCompleto}</span></a></figure>";
+            return "<figure class=\"fig-usuario\"><a href=\"{$linkPara}\" title=\"{$nomeCompleto}\">{$htmlImagem}<span>{$nomeCompleto}</span></a></figure>";
         } else {
-            return "<figure>{$htmlImagem}<figcaption>{$nomeCompleto}</figcaption></figure>";
+            return "<figure class=\"fig-usuario\">{$htmlImagem}<span>{$nomeCompleto}</span></figure>";
         }
     }
 

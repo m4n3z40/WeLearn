@@ -1027,25 +1027,25 @@ class Curso extends Curso_Controller
 
                         if ( $totalAvaliacoes == 0 ) {
 
-                            $avisos[] = 'Seu curso não possui nenhuma avaliação. Não é
-                                possível abrir o conteúdo do curso até que seja criada
-                                pelo menos uma avaliação.';
+                            $avisos[] = 'Seu curso não possui nenhuma avaliação. Não é'
+                                .' possível abrir o conteúdo do curso até que seja criada'
+                                .' pelo menos uma avaliação.';
 
                         }
 
                         if ( $totalPaginas == 0 ) {
 
-                            $avisos[] = 'Seu curso não possui conteúdo para passar para os alunos.
-                                Não é possível abrir o conteúdo do curso até que seja criada
-                                pelo menos uma página de conteúdo.';
+                            $avisos[] = 'Seu curso não possui conteúdo para passar para os alunos.'
+                                .' Não é possível abrir o conteúdo do curso até que seja criada'
+                                .' pelo menos uma página de conteúdo.';
 
                         }
 
                         if ( !$haCertificadoAtivo ) {
 
-                            $avisos[] = 'Seu curso não possui um certificado ativo.
-                                Não é possível abrir o conteúdo do curso até que exista
-                                um certificado ativo vinculado a este curso.';
+                            $avisos[] = 'Seu curso não possui um certificado ativo.'
+                                .' Não é possível abrir o conteúdo do curso até que exista'
+                                .' um certificado ativo vinculado a este curso.';
 
                         }
 
@@ -1069,8 +1069,8 @@ class Curso extends Curso_Controller
 
                 } else {//Se ouve, mostrá-los
 
-                    $msg = '<div><p>As alterações nas configurações do curso foram
-                        salvas, mas houve alguns problemas:</p><ul>';
+                    $msg = '<div><p>As alterações nas configurações do curso foram'
+                        . ' salvas, mas houve alguns problemas:</p><ul>';
 
                     for ($i = 0; $i < $qtdAvisos; $i++) {
 
@@ -1092,9 +1092,16 @@ class Curso extends Curso_Controller
 
                 $json = create_json_feedback(true);
             } catch (Exception $e) {
-                log_message('error', 'Ocorreu um erro ao tentar salvar as configurações do curso' . create_exception_description($e));
+                log_message(
+                    'error',
+                    'Ocorreu um erro ao tentar salvar as configurações do curso'
+                        . create_exception_description($e)
+                );
 
-                $error = create_json_feedback_error_json('Ocorreu um erro desconhecido, já estamos verificando. Tente novamente mais tarde.');
+                $error = create_json_feedback_error_json(
+                    'Ocorreu um erro desconhecido, já estamos verificando. Tente novamente mais tarde.'
+                );
+
                 $json = create_json_feedback(false, $error);
             }
         }

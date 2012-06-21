@@ -1,9 +1,9 @@
 <section id="curso-right-bar" class="inner-sidebar-container inner-sidebar-container-right">
     <header>
-        <figure>
+        <figure class="fig-curso">
             <?php echo anchor(
                 '/curso/' . $idCurso,
-                "<img src=\"{$imagemUrl}\" alt=\"{$descricao}\" /><figcaption>{$nome}</figcaption>",
+                "<img src=\"{$imagemUrl}\" alt=\"{$descricao}\" /><span>{$nome}</span>",
                 "title=\"{$descricao}\""
             ) ?>
         </figure>
@@ -27,7 +27,7 @@
         <?php elseif( $tipoVinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_AUXILIAR ): ?>
             <?php echo anchor(
                 '/curso/sair/' . $idCurso,
-                'Abandonar Gerência do Curso',
+                'Abandonar Gerência',
                 'title="Sair do Curso" id="a-curso-desvincular" class="button"'
             ) ?>
         <?php elseif( $tipoVinculo === WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_PRINCIPAL ): ?>

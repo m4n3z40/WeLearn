@@ -204,34 +204,6 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
         return $this->_mediaQualidade;
     }
 
-
-    /**
-     * @param array $opcoes
-     * @return void
-     */
-    public function alterarOpcoesPrivacidade(array $opcoes)
-    {
-        //@TODO: Implementar este método!!
-    }
-
-    /**
-     * @param array $opcoes
-     * @return void
-     */
-    public function alterarOpcoesEnquete(array $opcoes)
-    {
-        //@TODO: Implementar este método!!
-    }
-
-    /**
-     * @param array $opcoes
-     * @return void
-     */
-    public function alterarOpcoesForum(array $opcoes)
-    {
-        //@TODO: Implementar este método!!
-    }
-
     /**
      * @return int
      */
@@ -327,9 +299,9 @@ class WeLearn_Cursos_Curso extends WeLearn_Cursos_CursoBasico
         $nome = $this->getNome();
         $descricao = $this->getDescricao();
 
-        return "<figure><a href=\"{$url}\" title=\"{$descricao}\">
+        return "<figure class=\"fig-curso\"><a href=\"{$url}\" title=\"{$descricao}\">
                 <img src=\"{$urlImagem}\" alt=\"{$nome}\" {$tam}>
-                <figcaption>{$nome}</figcaption></a></figure>";
+                <span>{$nome}</span></a></figure>";
     }
 
     function __toString() {

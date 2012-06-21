@@ -9,7 +9,7 @@
     <div>
         <?php if ($haCursos): ?>
         <h4>Exibindo <em><?php echo $totalCursos ?></em> Cursos em que você é aluno.</h4>
-        <ul>
+        <ul class="ul-grid-home-cursos">
             <?php foreach ($listaCursos as $curso): ?>
             <li>
                 <?php echo $curso->toHTML(true) ?>

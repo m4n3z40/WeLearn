@@ -80,7 +80,7 @@
         </div>
         <div>
             <h3><?php echo $iniciouCurso ? $finalizouCurso ? 'Curso Concluido!' : 'Continuar Curso:' : 'Iniciar Curso:' ?></h3>
-            <button id="btn-iniciar-visualizacao-conteudo">
+            <button id="btn-iniciar-visualizacao-conteudo" class="big-button">
                 <?php echo $iniciouCurso ? $finalizouCurso ? 'Continuar visualizando as Aulas' : 'Continuar de onde parei!' : 'Começar meu Aprendizado!' ?>
             </button>
         </div>

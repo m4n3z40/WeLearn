@@ -10,7 +10,7 @@
     <div>
     <?php if ($haConvites): ?>
         <h4>Exibindo <em class="em-qtd-convites"><?php echo $qtdConvites ?></em> de <em class="em-total-convites"><?php echo $totalConvites ?></em> Convite(s).</h4>
-        <ul id="ul-lista-convites">
+        <ul id="ul-lista-convites" class="ul-grid-cursos-alunos">
             <?php echo $listaConvites ?>
         </ul>
         <?php if ($haMaisPaginas): ?>

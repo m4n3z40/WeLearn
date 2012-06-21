@@ -11,8 +11,6 @@
             Ou <?php echo anchor('/curso/conteudo/recurso/criar/' . $idCurso,
                                  'Clique aqui para criar um novo recurso.') ?>
         </p>
-    </header>
-    <div>
         <nav>
             <ul>
                 <li>
@@ -25,7 +23,8 @@
                 </li>
             </ul>
         </nav>
-        <hr>
+    </header>
+    <div>
         <div id="div-container-recurso-listar-datatable" style="display: none;">
         </div>
     </div>

@@ -20,19 +20,19 @@
                 array('class' => 'a-adicionar-pagina')
             ) ?>
         </p>
-    </header>
-    <div>
-    <?php if ($haPaginas): ?>
         <p>
             Sinta-se livre para mudar a ordem das páginas da maneira que preferir.
             Para isso, basta clicar e arrastar a página que quiser para posição
             de sua preferência e então clicar no botão "Salvar ordem das páginas",
             que aparecerá logo acima e abaixo da lista.
         </p>
-        <p id="p-pagina-listar-qtdTotal">
+    </header>
+    <div>
+    <?php if ($haPaginas): ?>
+        <h4 id="p-pagina-listar-qtdTotal">
             Exibindo <strong><?php echo $totalPaginas ?></strong> Página(s) -
             (Máximo permitido: <strong><?php echo PaginaDAO::MAX_PAGINAS ?></strong>)
-        </p>
+        </h4>
         <div class="div-pagina-gerenciar-posicoes">
             <button>Salvar ordem das páginas</button>
         </div>

@@ -21,8 +21,6 @@
             <li><?php echo anchor('/curso/enquete/exibir/' . $enquete->id, 'Participar desta enquete!') ?></li>
             <?php endif; ?>
         </ul>
-    </header>
-    <div>
         <nav id="enquete-exibir-adminpanel" class="enquete-adminpanel">
             <ul>
                 <li><?php echo anchor('curso/enquete/alterar/' . $enquete->id, 'Alterar') ?></li>
@@ -36,6 +34,8 @@
                     array('class' => 'a-enquete-alterarsituacao')) ?></li>
             </ul>
         </nav>
+    </header>
+    <div>
         <div class="barchart">
             <header>
                 <h2><?php echo $enquete->questao ?></h2>

@@ -15,8 +15,6 @@
             <li>Total de participações: <?php echo $enquete->totalVotos ?></li>
             <li><?php echo anchor('/curso/enquete/exibir_resultados/' . $enquete->id, 'Visualizar resultados!') ?></li>
         </ul>
-    </header>
-    <div>
         <nav id="enquete-exibir-adminpanel" class="enquete-adminpanel">
             <ul>
                 <li><?php echo anchor('curso/enquete/alterar/' . $enquete->id, 'Alterar') ?></li>
@@ -30,6 +28,8 @@
                     array('class' => 'a-enquete-alterarsituacao')) ?></li>
             </ul>
         </nav>
+    </header>
+    <div>
         <?php echo form_open($formAction, $extraOpenForm, $formHidden); ?>
             <h2><?php echo $enquete->questao ?></h2>
             <ul id="ul-enquete-alternativas" class="selectable-radios">

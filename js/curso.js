@@ -115,7 +115,6 @@
 
                 var $fdsAtual = $($(this).attr('href')),
                     exibirAtual = function($atual) {
-                        log($atual.data('ativo'));
                         if (typeof $atual.data('ativo') == 'undefined' || $atual.data('ativo') === 0) {
 
                             if ($fdsAtivo != null) {

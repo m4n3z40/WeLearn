@@ -29,7 +29,7 @@
         </div>
     </header>
     <div>
-        <ul>
+        <ul class="ul-tipos-recurso-simples">
             <li>
                 <?php echo anchor('/curso/conteudo/recurso/geral/' . $idCurso,
                                   'Recursos Gerais') ?>

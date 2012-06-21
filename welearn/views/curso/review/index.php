@@ -12,7 +12,7 @@
     </header>
     <div>
         <h3>Até agora, o curso foi avaliado <em><?php echo $totalReviews ?> vez(es)</em></h3>
-        <table>
+        <table id="tbl-reputacao-curso">
             <tr>
                 <th>Média da Qualidade do Curso</th>
                 <th>Média da Dificuldade do Curso</th>
@@ -28,9 +28,9 @@
         <?php echo anchor(
             '/curso/review/listar/' . $idCurso,
             'Exibir Todas as Avaliações',
-            'class="button"'
+            'class="button big-button"'
         ) ?>
-        <ul>
+        <ul id="ul-lista-reviews">
             <?php echo $listaUltimasReviews; ?>
         </ul>
         <?php else: ?>

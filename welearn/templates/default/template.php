@@ -25,7 +25,7 @@
 <body>
 
 <div id="container">
-	<header>
+	<header id="header-splash-screen">
         <div class="center-container">
             <section id="logo">
                 <h1>WeLearn</h1>
@@ -34,10 +34,12 @@
             {$formLoginOpen}
                 <fieldset>
                     <legend>Log in</legend>
-                    <label for="login">Nome de usuário ou email</label>
-                    <input type="text" name="login" id="login" placeholder="login" />
-                    <label for="password">Senha</label>
-                    <input type="password" name="password" id="password" placeholder="password" />
+                    <dl>
+                        <dt><label for="login">Nome de usuário ou email</label></dt>
+                        <dd><input type="text" name="login" id="login" placeholder="login" /></dd>
+                        <dt><label for="password">Senha</label></dt>
+                        <dd><input type="password" name="password" id="password" placeholder="password" /></dd>
+                    </dl>
                     <button type="submit" name="submitLogin">Entrar</button>
                 </fieldset>
             {$formLoginClose}

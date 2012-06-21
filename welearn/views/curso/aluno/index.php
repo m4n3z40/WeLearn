@@ -11,7 +11,7 @@
             <h3>Últimas Requisições de Inscrição</h3>
             <p>Os usuários abaixo estão querendo sua permissão para participar do curso.</p>
             <?php if ($haInscricoes): ?>
-            <ul id="ul-lista-requisicoes">
+            <ul id="ul-lista-requisicoes" class="ul-grid-cursos-alunos">
                 <?php echo $ultimasRequisicoes ?>
             </ul>
             <?php echo anchor('/curso/aluno/requisicoes/' . $idCurso, 'Exibir todas as requisições') ?>

@@ -9,7 +9,7 @@
     <div>
         <h3>Cursos recomedados a você!</h3>
         <?php if ($haRecomendados): ?>
-        <ul id="ul-lista-cursos-recomendados">
+        <ul id="ul-lista-cursos-recomendados" class="ul-grid-home-cursos">
             <?php foreach ($listaRecomendados as $curso): ?>
             <li>
                 <?php echo $curso->toHTML(true) ?>

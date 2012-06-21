@@ -9,7 +9,7 @@
     <div>
         <?php if ($haCertificados): ?>
         <h4>Exibindo <em><?php echo $totalCertificados ?></em> Certificado(s).</h4>
-        <ul>
+        <ul class="ul-grid-home-cursos">
             <?php foreach ($listaCertificados as $certificado): ?>
             <li>
                 <figure>

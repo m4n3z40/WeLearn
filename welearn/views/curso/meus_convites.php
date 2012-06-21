@@ -9,7 +9,7 @@
     <div>
         <?php if ($haCursos): ?>
         <h4>Exibindo <em id="em-total-convite-gerenciamento"><?php echo $totalCursos ?></em> Convite(s) para o gerenciamento de Curso.</h4>
-        <ul>
+        <ul class="ul-grid-home-cursos">
             <?php foreach ($listaCursos as $curso): ?>
             <li>
                 <?php echo $curso->toHTML(true) ?>

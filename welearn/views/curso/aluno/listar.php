@@ -9,7 +9,7 @@
     <div>
     <?php if ($haAlunos): ?>
         <h4>Exibindo <em id="em-qtd-alunos"><?php echo $qtdAlunos ?></em> de <em id="em-total-alunos"><?php echo $totalAlunos ?></em> Aluno(s).</h4>
-        <ul id="ul-lista-alunos">
+        <ul id="ul-lista-alunos" class="ul-grid-cursos-alunos">
             <?php echo $listaAlunos ?>
         </ul>
         <?php if ($haMaisPaginas): ?>

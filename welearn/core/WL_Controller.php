@@ -287,10 +287,12 @@ class Curso_Controller extends WL_Controller
      * @var int
      */
     private $_nivelAcesso;
+
     /**
      * @var string
      */
     private $_nivelAcessoCursoId;
+
     /**
      * @var WeLearn_Usuarios_Autorizacao_Papel
      */
@@ -334,36 +336,61 @@ class Curso_Controller extends WL_Controller
 
     /**
      * @param WeLearn_Cursos_Curso $curso
+     */
+    protected function _setPapel(WeLearn_Cursos_Curso $curso)
+    {
+        $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+        $nivelAcesso = $this->_getNivelAcesso( $curso );
+        $usuario = $this->autenticacao->getUsuarioAutenticado();
+
+        switch ( $nivelAcesso ) {
+            case WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_PRINCIPAL:
+                $this->_papel = $usuarioDao->criarGerenciadorPrincipal( $usuario );
+                break;
+            case WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_AUXILIAR:
+                $this->_papel = $usuarioDao->criarGerenciadorAuxiliar( $usuario );
+                break;
+            case WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO:
+                $this->_papel = $usuarioDao->criarAluno( $usuario );
+                break;
+            case WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE:
+            case WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE:
+            case WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO:
+            default:
+                $this->_papel = $usuario;
+        }
+    }
+
+    /**
+     * @param WeLearn_Cursos_Curso $curso
      * @return WeLearn_Usuarios_Autorizacao_Papel
      */
-    protected function _getPapel(WeLearn_Cursos_Curso $curso)
+    protected function _getPapel(WeLearn_Cursos_Curso $curso = null)
     {
-        if ( null === $this->_papel || $this->_nivelAcessoCursoId != $curso->getId() ) {
+        if ( $curso instanceof WeLearn_Cursos_Curso &&
+            ( null === $this->_papel ||
+              $this->_nivelAcessoCursoId != $curso->getId() )
+        ) {
 
-            $usuarioDao = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
-            $nivelAcesso = $this->_getNivelAcesso( $curso );
-            $usuario = $this->autenticacao->getUsuarioAutenticado();
-
-            switch ( $nivelAcesso ) {
-                case WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_PRINCIPAL:
-                    $this->_papel = $usuarioDao->criarGerenciadorPrincipal( $usuario );
-                    break;
-                case WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_AUXILIAR:
-                    $this->_papel = $usuarioDao->criarGerenciadorAuxiliar( $usuario );
-                    break;
-                case WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO:
-                    $this->_papel = $usuarioDao->criarAluno( $usuario );
-                    break;
-                case WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE:
-                case WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE:
-                case WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO:
-                default:
-                    $this->_papel = $usuario;
-            }
+            $this->_setPapel( $curso );
 
         }
 
         return $this->_papel;
+    }
+
+    /**
+     * @param WeLearn_Cursos_Curso $doCurso
+     */
+    protected function _expulsarNaoAutorizados(WeLearn_Cursos_Curso $doCurso)
+    {
+        if ( ! $this->autorizacao->isAutorizadoNaAcaoAtual( $this->_getPapel( $doCurso ) ) ) {
+
+            show_404();
+
+            exit;
+
+        }
     }
 
     /**
@@ -387,6 +414,7 @@ class Curso_Controller extends WL_Controller
              ->_setBarraDireitaPath( 'curso/barra_lateral_direita' )
 
              ->_barraEsquerdaSetVar( 'idCurso', $curso->getId() )
+             ->_barraEsquerdaSetVar( 'papelUsuarioAtual', $this->_getPapel( $curso ) )
 
              ->_barraDireitaSetVar( 'nome' , $curso->getNome() )
              ->_barraDireitaSetVar( 'imagemUrl', $urlImagem )

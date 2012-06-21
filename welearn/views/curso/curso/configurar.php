@@ -1,4 +1,4 @@
-<section id="curso-config-content">
+<div id="curso-config-content">
     <header>
         <hgroup>
             <h1>Configurar Curso</h1>
@@ -11,19 +11,23 @@
     </header>
     <div id="curso-config-form-container">
         <header>
-            <ul id="curso-config-form-tab">
-                <li><a href="#fds-dados-principais">Dados Principais</a></li>
-                <li><a href="#fds-imagem">Imagem do Curso</a></li>
-                <li><a href="#fds-config-avancadas">Configurações Avançadas</a></li>
-            </ul>
+            <nav id="curso-config-form-tab">
+                <ul>
+                    <li><a href="#fds-dados-principais">Dados Principais</a></li>
+                    <li><a href="#fds-imagem">Imagem do Curso</a></li>
+                    <li><a href="#fds-config-avancadas">Configurações Avançadas</a></li>
+                </ul>
+            </nav>
         </header>
-        <?php echo form_open_multipart($formAction, $extraOpenForm, $hiddenFormData) ?>
-            <div id="curso-config-form-wraper" style="display: none;">
-                <?php echo $formDadosPrincipais ?>
-                <?php echo $formImagem ?>
-                <?php echo $formConfiguracoesAvancadas ?>
-                <button type="submit" id="btn-config-curso" style="display: none"><?php echo $textoBotaoSubmit ?></button>
-            </div>
-        <?php echo form_close() ?>
+        <div id="div-form-configurar-wrapper">
+            <?php echo form_open_multipart($formAction, $extraOpenForm, $hiddenFormData) ?>
+                <div id="curso-config-form-wraper" style="display: none;">
+                    <?php echo $formDadosPrincipais ?>
+                    <?php echo $formImagem ?>
+                    <?php echo $formConfiguracoesAvancadas ?>
+                    <button type="submit" id="btn-config-curso" style="display: none"><?php echo $textoBotaoSubmit ?></button>
+                </div>
+            <?php echo form_close() ?>
+        </div>
     </div>
-</section>
+</div>

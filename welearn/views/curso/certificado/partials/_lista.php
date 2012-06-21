@@ -2,7 +2,7 @@
 <li>
     <article>
         <?php echo $certificado; ?>
-        <nav>
+        <nav class="certificado-adminpanel">
             <ul>
                 <li><?php echo anchor(
                     '/curso/certificado/exibir/' . $certificado->id,

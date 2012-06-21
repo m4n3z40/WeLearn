@@ -18,22 +18,22 @@
             Quer gerenciar as aulas de outro módulo?
             <?php echo anchor('#', 'Clique aqui!', array('id' => 'a-aula-alterar-modulo')) ?>
         </p>
-        <div id="div-aula-alterar-modulo" style="display: none;">
-            <?php echo $selectModulo ?>
-        </div>
-    </header>
-    <div>
-    <?php if ($haAulas): ?>
         <p>
             Sinta-se livre para mudar a ordem das aulas da maneira que preferir.
             Para isso, basta clicar e arrastar a aula que quiser para posição
             de sua preferência e então clicar no botão "Salvar ordem das aulas",
             que aparecerá logo acima e abaixo da lista.
         </p>
-        <p id="p-aula-listar-qtdTotal">
+        <div id="div-aula-alterar-modulo" style="display: none;">
+            <?php echo $selectModulo ?>
+        </div>
+    </header>
+    <div>
+    <?php if ($haAulas): ?>
+        <h4 id="p-aula-listar-qtdTotal">
             Exibindo <strong><?php echo $totalAulas ?></strong> Aulas(s) -
             (Máximo permitido: <strong><?php echo AulaDAO::MAX_AULAS ?></strong>)
-        </p>
+        </h4>
         <div class="div-aula-gerenciar-posicoes">
             <button>Salvar ordem das aulas</button>
         </div>
@@ -44,6 +44,12 @@
             <button>Salvar ordem das aulas</button>
         </div>
     <?php else: ?>
+        <?php if ($modulo->curso->status === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO): ?>
+        <h4>
+        Não é possível adicionar uma nova aula, o conteúdo do curso está aberto.
+        O gerenciamento de conteúdo está limitado.
+        </h4>
+        <?php else: ?>
         <h4>
             Nenhuma aula foi criada neste módulo até o momento.
             <?php echo anchor(
@@ -51,6 +57,7 @@
                 'Crie a primeira!'
             ) ?>
         </h4>
+        <?php endif; ?>
     <?php endif; ?>
     </div>
 </div>

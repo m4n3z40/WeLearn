@@ -8,8 +8,10 @@
         <li>
             <section id="search-section">
                 <?php echo form_open('usuario/busca/buscar')?>
-                <input type="text" name="txt-search" id="txt-search"/>
-                <?php echo form_submit('enviar','procurar', 'id="btn-submit-search"')?>
+                <ul>
+                    <li><input type="text" name="txt-search" id="txt-search"/></li>
+                    <li><?php echo form_submit('enviar','procurar', 'id="btn-submit-search"')?></li>
+                </ul>
                 <?php echo form_close();?>
             </section>
         </li>

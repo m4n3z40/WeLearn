@@ -14,7 +14,7 @@
     <div>
     <?php if ($haGerenciadores): ?>
         <h4>Exibindo <em class="em-qtd-gerenciadores"><?php echo $qtdGerenciadores ?></em> de <em class="em-total-gerenciadores"><?php echo $totalGerenciadores ?></em> Gerenciadores do Curso.</h4>
-        <ul id="ul-lista-gerenciadores">
+        <ul id="ul-lista-gerenciadores" class="ul-grid-cursos-alunos">
             <?php echo $listaGerenciadores ?>
         </ul>
         <?php if ($haMaisPaginas): ?>

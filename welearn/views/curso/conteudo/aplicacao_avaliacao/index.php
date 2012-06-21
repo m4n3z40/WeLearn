@@ -10,7 +10,7 @@
         <?php if ($conteudoBloqueado): ?>
         <h3>O conteúdo deste curso está bloqueado para os alunos, notifique os gerenciadores.</h3>
         <?php elseif ($haAvaliacoesDisponiveis): ?>
-        <table>
+        <table id="tbl-lista-controleavaliacao">
             <tr>
                 <th>Referente ao Módulo</th>
                 <th>Nome</th>

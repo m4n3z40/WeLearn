@@ -18,7 +18,7 @@
             (Max. <?php echo $maxCertificados ?>)</h4>
         <h4>Certificado Ativo:</h4>
             <?php if ($certificadoAtivo): ?>
-            <ul>
+            <ul id="ul-lista-certificado-ativo" class="ul-lista-certificados">
                 <?php echo $certificadoAtivo ?>
             </ul>
             <?php else: ?>
@@ -27,7 +27,7 @@
         <hr>
         <h4>Certificado(s) Inativo(s):</h4>
             <?php if ($certificadosInativos): ?>
-            <ul>
+            <ul id="ul-lista-certificados-inativo" class="ul-lista-certificados">
                 <?php echo $certificadosInativos ?>
             </ul>
             <?php else: ?>

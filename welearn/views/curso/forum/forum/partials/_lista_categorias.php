@@ -13,10 +13,10 @@
     </td>
     <td>
         <div>
-            <p>
-                Fóruns nesta categoria: <span><?php echo $categoria->qtdForuns ?></span><br>
-                Criada em: <span><?php echo date('d/m/Y, H:i:s', $categoria->dataCriacao) ?></span>
-            </p>
+            <ul>
+                <li>Fóruns nesta categoria: <span><?php echo $categoria->qtdForuns ?></span></li>
+                <li>Criada em: <span><?php echo date('d/m/Y, H:i:s', $categoria->dataCriacao) ?></span></li>
+            </ul>
         </div>
     </td>
 </tr>

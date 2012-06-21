@@ -465,12 +465,12 @@ class WeLearn_Cursos_Recursos_Recurso extends WeLearn_DTO_AbstractDTO
 
         return
 
-            "<dl class='{$class}'>
+            "<dl class='dl-recurso-info {$class}'>
                 <dt>Arquivo:</dt>
                 <dd>{$link}</dd>
                 <dt>Extensão do arquivo:</dt>
                 <dd>{$extensao}</dd>
-                <dt>Tipo do Arquivo</dt>
+                <dt>Tipo do Arquivo:</dt>
                 <dd>{$tipo}</dd>
                 <dt>Tamanho do arquivo:</dt>
                 <dd>{$tamanho}</dd>

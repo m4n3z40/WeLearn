@@ -41,7 +41,7 @@
         </fieldset>
         <fieldset>
             <legend>Informações não alteráveis</legend>
-            <dl>
+            <dl class="dl-recurso-info">
                 <dt>Informações do Arquivo:</dt>
                 <dd><?php echo $recurso ?></dd>
                 <dt>Tipo do Recurso</dt>
@@ -51,7 +51,7 @@
                 <dd><?php echo $recurso->aula->nome ?></dd>
             <?php endif; ?>
                 <dt>Enviado por: </dt>
-                <dd><?php echo anchor('/usuario/' . $recurso->criador->id,
+                <dd><?php echo anchor('/perfil/' . $recurso->criador->id,
                                       $recurso->criador->nome) ?></dd>
                 <dt>Enviado em: </dt>
                 <dd><?php echo date('d/m/Y H:i:s', $recurso->dataInclusao) ?></dd>

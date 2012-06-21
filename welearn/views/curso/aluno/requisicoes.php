@@ -10,7 +10,7 @@
     <div>
     <?php if ($haRequisicoes): ?>
         <h4>Exibindo <em class="em-qtd-requisicoes"><?php echo $qtdRequisicoes ?></em> de <em class="em-total-requisicoes"><?php echo $totalRequisicoes ?></em> Requisição(ões).</h4>
-        <ul id="ul-lista-requisicoes">
+        <ul id="ul-lista-requisicoes" class="ul-grid-cursos-alunos">
             <?php echo $listaRequisicoes ?>
         </ul>
         <?php if ($haMaisPaginas): ?>

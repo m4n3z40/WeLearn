@@ -63,7 +63,7 @@
         <div>
         <?php if ($haResultados): ?>
             <h3>Resultados para busca de <em>"<?php echo $txtBusca ?>"</em></h3>
-            <ul id="ul-lista-resultados-busca-cursos">
+            <ul id="ul-lista-resultados-busca-cursos" class="ul-grid-home-cursos">
                 <?php echo $resultadosBusca ?>
             </ul>
             <?php if ($haMaisPaginas): ?>

@@ -11,7 +11,7 @@
     <div>
         <?php if ($haModulos): ?>
         <h4>Exibindo <?php echo $totalModulos ?> módulos.</h4>
-        <ul>
+        <ul class="ul-lista-modulos-simples">
             <?php foreach ($listaModulos as $modulo): ?>
             <li><?php echo anchor('/curso/conteudo/aula/listar/' . $modulo->id,
                 'Módulo ' . $modulo->nroOrdem . ': ' . $modulo->nome)
