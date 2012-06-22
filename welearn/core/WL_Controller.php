@@ -381,16 +381,28 @@ class Curso_Controller extends WL_Controller
 
     /**
      * @param WeLearn_Cursos_Curso $doCurso
+     * @param bool $retornarJson
+     * @return bool|string
      */
-    protected function _expulsarNaoAutorizados(WeLearn_Cursos_Curso $doCurso)
+    protected function _expulsarNaoAutorizados(WeLearn_Cursos_Curso $doCurso, $retornarJson = false)
     {
         if ( ! $this->autorizacao->isAutorizadoNaAcaoAtual( $this->_getPapel( $doCurso ) ) ) {
+
+            if ( $retornarJson ) {
+
+                $error = create_json_feedback_error_json('Você não é autorizado a realizar esta ação.');
+
+                return create_json_feedback(false, $error);
+
+            }
 
             show_404();
 
             exit;
 
         }
+
+        return false;
     }
 
     /**
