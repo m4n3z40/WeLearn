@@ -87,6 +87,8 @@ class Exibicao extends Curso_Controller
 
             $curso = $this->_cursoDao->recuperar( $idCurso );
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $participacaoCurso = $this->_participacaoCursoDao->recuperarPorCurso(
                 $this->_alunoAtual,
                 $curso
@@ -202,6 +204,8 @@ class Exibicao extends Curso_Controller
     {
         try {
             $curso = $this->_cursoDao->recuperar( $idCurso );
+
+            $this->_expulsarNaoAutorizados($curso);
 
             $participacaoCurso = $this->_participacaoCursoDao->recuperarPorCurso(
                 $this->_alunoAtual,

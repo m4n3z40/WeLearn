@@ -11,6 +11,7 @@
         <h4>O que quer configurar?</h4>
         <nav>
             <ul>
+                <li><?php echo anchor('/usuario/configuracao/dados_principais', 'Dados Principais') ?></li>
                 <li><?php echo anchor('/usuario/configuracao/dados_pessoais', 'Dados Pessoais') ?></li>
                 <li><?php echo anchor('/usuario/configuracao/dados_profissionais', 'Dados Profissionais') ?></li>
                 <li><?php echo anchor('/usuario/configuracao/imagem', 'Imagem de Exibição') ?></li>

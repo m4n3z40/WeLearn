@@ -21,6 +21,8 @@ class Aluno extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar($idCurso);
 
+            $this->_expulsarNaoAutorizados($curso);
+
             try {
                 $ultimasRequisicoes = $this->_alunoDao->recuperarTodasInscricoesPorCurso($curso, '', '', 5);
             } catch (cassandra_NotFoundException $e) {
@@ -205,6 +207,8 @@ class Aluno extends Curso_Controller
             $count = 20;
 
             $curso = $this->_cursoDao->recuperar($idCurso);
+
+            $this->_expulsarNaoAutorizados($curso);
 
             try {
                 $listaRequisicoes = $this->_alunoDao->recuperarTodasInscricoesPorCurso($curso, '', '', $count + 1);

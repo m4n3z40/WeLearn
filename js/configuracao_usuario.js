@@ -23,7 +23,8 @@
         formDadosPessoais = document.getElementById('form-dados-pessoais'),
         formDadosProfissionais = document.getElementById('form-dados-profissionais'),
         formImagem = document.getElementById('form-imagem-usuario'),
-        formPrivacidade = document.getElementById('form-privacidade');
+        formPrivacidade = document.getElementById('form-privacidade'),
+        formDadosPrincipais = document.getElementById('form-dados-principais');
 
     $('#btn-salvar-dados-pessoais').click(function(e){
         e.preventDefault();
@@ -47,6 +48,12 @@
         e.preventDefault();
 
         enviarForm( formPrivacidade );
+    });
+
+    $('#btn-salvar-dados-principais').click(function(e){
+        e.preventDefault();
+
+        enviarForm( formDadosPrincipais );
     });
 
 })();

@@ -27,6 +27,59 @@ class Configuracao extends Home_Controller
         }
     }
 
+   public function dados_principais()
+    {
+        try {
+            $this->template->appendJSImport( 'dados_profissionais.js' );
+
+            $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
+
+            $segmentoDao = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
+
+            $this->load->helper(array('area', 'segmento'));
+            $listaAreas = lista_areas_para_dados_dropdown();
+            $listaSegmentos = lista_segmentos_para_dados_dropdown(
+                $segmentoDao->recuperarTodos(
+                    '',
+                    '',
+                    array(
+                        'areaId' => $usuarioAtual->getSegmentoInteresse()->getArea()->getId()
+                    )
+                )
+            );
+
+            unset($listaAreas['0'], $listaSegmentos['0']);
+
+
+            $dadosViewDadosPrincipais = array(
+                'formAction' => '/usuario/salvar_dados_principais',
+                'extraOpenForm' => 'id="form-dados-principais"',
+                'nome' => $usuarioAtual->getNome(),
+                'sobreNome' => $usuarioAtual->getSobreNome(),
+                'senha' => $usuarioAtual->getSenha(),
+                'areaAtual' => $usuarioAtual->getSegmentoInteresse()->getArea()->getId(),
+                'segmentoAtual' => $usuarioAtual->getSegmentoInteresse()->getId(),
+                'listaAreas' => $listaAreas,
+                'listaSegmentos' => $listaSegmentos
+             );
+
+            $dadosView = array(
+                'formDadosPrincipais' => $this->template->loadPartial(
+                    'form_dados_principais',
+                    $dadosViewDadosPrincipais,
+                    'usuario'
+                )
+            );
+
+            $this->_renderTemplateHome( 'usuario/configuracao/dados_principais', $dadosView );
+        } catch (Exception $e) {
+            log_message('error', 'Erro ao tentar exibir alteração de dados principais: '
+                . create_exception_description($e));
+
+            show_404();
+        }
+    }
+
     public function dados_pessoais()
     {
         try {

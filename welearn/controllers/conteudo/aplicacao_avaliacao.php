@@ -85,6 +85,8 @@ class Aplicacao_avaliacao extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar( $idCurso );
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $participacaoCurso = $this->_participacaoCursoDao->recuperarPorCurso(
                 $this->_alunoAtual,
                 $curso

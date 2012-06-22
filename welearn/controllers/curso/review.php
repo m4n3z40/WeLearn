@@ -14,6 +14,8 @@ class Review extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar( $idCurso );
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $resenhaDao = WeLearn_DAO_DAOFactory::create('ResenhaDAO');
 
             if ( $resenhaDao->recuperarReputacaoCurso( $curso ) ) {
@@ -66,6 +68,8 @@ class Review extends Curso_Controller
             $resenhaDao = WeLearn_DAO_DAOFactory::create('ResenhaDAO');
 
             $curso = $this->_cursoDao->recuperar( $idCurso );
+
+            $this->_expulsarNaoAutorizados($curso);
 
             $totalReviews = $resenhaDao->recuperarQtdTotalPorCurso( $curso );
 
@@ -179,6 +183,8 @@ class Review extends Curso_Controller
     {
         try {
             $curso = $this->_cursoDao->recuperar( $idCurso );
+
+            $this->_expulsarNaoAutorizados($curso);
 
             $resenhaDao = WeLearn_DAO_DAOFactory::create('ResenhaDAO');
 

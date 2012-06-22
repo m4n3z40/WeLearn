@@ -110,6 +110,8 @@ class Pagina extends Curso_Controller
             $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
             $aula = $aulaDao->recuperar( $idAula );
 
+            $this->_expulsarNaoAutorizados($aula->getModulo()->getCurso());
+
             $curso = $aula->getModulo()->getCurso();
 
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');

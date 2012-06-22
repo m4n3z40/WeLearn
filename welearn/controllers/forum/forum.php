@@ -195,6 +195,8 @@ class Forum extends Curso_Controller
             $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
             $categoria = $categoriaDao->recuperar($idCategoria);
 
+            $this->_expulsarNaoAutorizados($categoria->getCurso());
+
             $dadosFormCriar = array(
                 'tituloAtual' => '',
                 'descricaoAtual' => ''
@@ -222,6 +224,7 @@ class Forum extends Curso_Controller
         try {
             $forumDao = WeLearn_DAO_DAOFactory::create('ForumDAO');
             $forum = $forumDao->recuperar($idForum);
+            $this->_expulsarNaoAutorizados($forum->getCategoria()->getCurso());
 
             $dadosFormAlterar = array(
                 'tituloAtual' => $forum->getTitulo(),

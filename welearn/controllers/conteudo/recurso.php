@@ -20,6 +20,8 @@ class Recurso extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar($idCurso);
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $dadosView = array(
                 'idCurso' => $curso->getId()
             );
@@ -39,6 +41,8 @@ class Recurso extends Curso_Controller
             $count = 20;
 
             $curso = $this->_cursoDao->recuperar($idCurso);
+
+            $this->_expulsarNaoAutorizados($curso);
 
             $recursoDao = WeLearn_DAO_DAOFactory::create('RecursoDAO');
 
@@ -88,6 +92,8 @@ class Recurso extends Curso_Controller
     {
         try {
             $curso = $this->_cursoDao->recuperar($idCurso);
+
+            $this->_expulsarNaoAutorizados($curso);
 
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             try {
@@ -390,6 +396,8 @@ class Recurso extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar( $idCurso );
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             try {
                 $listaModulos = $moduloDao->recuperarTodosPorCurso($curso);
@@ -466,6 +474,8 @@ class Recurso extends Curso_Controller
             $curso = ($recurso instanceof WeLearn_Cursos_Recursos_RecursoRestrito)
                       ? $recurso->getAula()->getModulo()->getCurso()
                       : $recurso->getCurso();
+
+            $this->_expulsarNaoAutorizados($curso);
 
             $dadosView = array(
                 'idCurso' => $curso->getId(),
