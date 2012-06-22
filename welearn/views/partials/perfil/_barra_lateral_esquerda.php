@@ -1,13 +1,10 @@
-
 <section id="perfil-left-bar" class="inner-sidebar-container inner-sidebar-container-left">
+    <header>
+            <?php echo anchor('/usuario/' . $usuarioPerfil->id, $usuarioPerfil->toHTML('imagem_grande')) ?>
+    </header>
+    <hr>
     <nav>
-        <header>
-            <figure>
-                <figcaption>
-                    <?php echo anchor('/usuario/' . $usuarioPerfil->id, $usuarioPerfil->toHTML('imagem_grande')) ?>
-                </figcaption>
-            </figure>
-        </header>
+        <h3>Ações com <?php echo $usuarioPerfil->nome ?></h3>
         <ul>
             <?php if($usuarioPerfil->getId() != $usuarioAutenticado->getId()):?>
                <input type='hidden' id='id-usuario-perfil' value='<?echo $usuarioPerfil->id ?>'>

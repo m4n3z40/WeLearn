@@ -465,7 +465,7 @@ class Perfil_Controller extends WL_Controller
 
             $listaRandonicaAmigos = $amizadeUsuarioDao->recuperarAmigosAleatorios(
                 $usuarioPerfil,
-                10
+                3
             );
 
         }catch(cassandra_NotFoundException $e){
@@ -478,7 +478,7 @@ class Perfil_Controller extends WL_Controller
             $gerenciadorPrincipal = $usuarioDao->criarGerenciadorPrincipal($usuarioPerfil);
             $listaRandonicaCursosCriados = $cursoDao->recuperarTodosPorCriadorAleatorios(
                 $gerenciadorPrincipal,
-                10
+                3
             );
 
         }catch(cassandra_NotFoundException $e){
@@ -491,7 +491,7 @@ class Perfil_Controller extends WL_Controller
             $aluno = $usuarioDao->criarAluno($usuarioPerfil);
             $listaRandonicaCursosInscritos = $cursoDao->recuperarTodosPorAlunoAleatorios(
                $aluno,
-               10
+               3
             );
         }catch(cassandra_NotFoundException $e)
         {

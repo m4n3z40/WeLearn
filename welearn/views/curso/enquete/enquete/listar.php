@@ -4,6 +4,7 @@
             <h1>Lista de Enquetes do Curso <?php echo $tituloLista ?></h1>
             <h3>Abaixo são listada todas as enquetes contidas neste curso</h3>
         </hgroup>
+        <?php if ( $alunoAutorizado ): ?>
         <?php echo gerar_menu_autorizado(array(
             array(
                 'uri' => '/curso/enquete/criar/' . $idCurso,
@@ -12,6 +13,7 @@
                 'papel' => $papelUsuarioAtual
             ),
         ), array('<p>Quer adicionar uma nova enquete ao curso? ', '</p>')) ?>
+        <?php endif; ?>
         <p>
             Fique à vontade para navegar pelos filtros.
         </p>
@@ -47,6 +49,7 @@
     <?php else: ?>
         <h4>
             Nenhuma enquete foi criada neste fórum até o momento.
+            <?php if ( $alunoAutorizado ): ?>
             <?php echo gerar_menu_autorizado(array(
                 array(
                     'uri' => '/curso/enquete/criar/' . $idCurso,
@@ -55,6 +58,7 @@
                     'papel' => $papelUsuarioAtual
                 )
             )) ?>
+            <?php endif; ?>
         </h4>
     <?php endif; ?>
     </div>

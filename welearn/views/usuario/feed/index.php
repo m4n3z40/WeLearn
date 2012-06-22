@@ -1,9 +1,16 @@
-
 <div id='feed-content'>
-    <h1>Compartilhe Algo Com Seus Amigos</h1>
-    <?=$criarFeed?>
-    <hr>
-    <h1>Publicações Recentes</h1>
+    <header>
+        <hgroup>
+            <h1>Compartilhe Algo Com Seus Amigos</h1>
+            <h3>... E fique em dia com o que eles compartilham!</h3>
+        </hgroup>
+    </header>
+    <div>
+        <div>
+            <?=$criarFeed?>
+        </div>
+        <hr>
+        <h1>Publicações Recentes</h1>
         <ul id='feed-lista-feeds'>
             <?=$listarFeed?>
         </ul>
@@ -19,5 +26,6 @@
                 Não Existem Novas Publicações Para Exibição!
             </h4>
         <?php endif;?>
+    </div>
 </div>
 

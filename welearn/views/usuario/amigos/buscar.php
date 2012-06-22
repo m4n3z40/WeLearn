@@ -27,7 +27,7 @@
 <div>
     <?php if ($haResultados): ?>
     <h3>Resultados para busca de <em>"<?php echo $txtBusca ?>"</em></h3>
-    <ul id="ul-lista-resultados-busca-usuarios">
+    <ul id="ul-lista-resultados-busca-usuarios" class="ul-grid-cursos-alunos">
         <?php echo $resultadosBusca ?>
     </ul>
     <?php if ($haMaisPaginas): ?>

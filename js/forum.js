@@ -70,7 +70,7 @@
                                 WeLearn.notificar(res.notificacao);
 
                                 if (visualizandoListaForuns) {
-                                    $this.parent().parent().parent().parent().fadeOut('slow', function(){
+                                    $this.parent().parent().parent().parent().parent().fadeOut('slow', function(){
                                         $( this ).remove();
                                     });
                                 } else {
@@ -122,7 +122,7 @@
                         function(res) {
                             if (res.success) {
                                 if (visualizandoListaForuns) {
-                                    $this.parent().parent().parent().parent().fadeOut('slow', function(){
+                                    $this.parent().parent().parent().parent().parent().fadeOut('slow', function(){
                                         $( this ).remove();
                                     });
                                 } else {

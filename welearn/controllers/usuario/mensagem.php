@@ -201,10 +201,15 @@ Tente novamente mais tarde.'
 
             $response = array(
                 'success' => true,
-                'mensagemId'=>$mensagemObj->getId(),
-                'remetente'=>$mensagemObj->getRemetente()->toHTML('imagem_pequena'),
-                'mensagemTexto'=>$mensagemObj->getMensagem(),
-                'dataEnvio'=>date('d/m/Y à\s H:i',$mensagemObj->getDataEnvio()),
+                'htmlNovaMensagem' => $this->template->loadPartial(
+                    'lista',
+                    array(
+                        'idAmigo' => $mensagemObj->getDestinatario(),
+                        'haMensagens'=> !empty($dadosPaginados),
+                        'mensagens' => array($mensagemObj)
+                    ),
+                    'usuario/mensagem'
+                ),
                 'notificacao'=> create_notificacao_array(
                     'sucesso',
                     'Mensagem enviada com sucesso'

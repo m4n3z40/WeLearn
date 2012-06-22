@@ -130,7 +130,7 @@ nav ul, nav ol { list-style: none; margin: 0; padding: 0; }
  * code.flickr.com/blog/2008/11/12/on-ui-quality-the-little-things-client-side-image-resizing/
  */
 
-img { border: 0; -ms-interpolation-mode: bicubic; }
+img { border: 0; -ms-interpolation-mode: bicubic; outline: solid 1px #e8e1b5; }
 
 /*
  * Correct overflow displayed oddly in IE9 
@@ -440,6 +440,10 @@ h1, h2, h3, h4, h5, h6 {
 .inner-sidebar-container {
     width: 170px;
     float: left;
+}
+
+.inner-sidebar-container header figure {
+    text-align: center;
 }
 
 .inner-sidebar-container nav > h3 {
@@ -882,6 +886,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .ul-grid-cursos-alunos > li figure {
     text-align: center;
+}
+
+.ul-grid-home-cursos > li:hover, .ul-grid-cursos-alunos > li:hover {
+    background: #fcf0ba url(images/ui-bg_glass_55_fcf0ba_1x400.png) 50% 20% repeat-x;
+}
+
+.widget .ul-grid-home-cursos > li, .widget .ul-grid-cursos-alunos > li {
+    margin: 5px 0;
+    padding: 5px 0;
+    width: 100%;
 }
 
 #enquete-listar-datatable {
@@ -1383,7 +1397,7 @@ ul.ul-lista-modulos-simples li a {
 }
 
 #curso-config-form-tab ul {
-    width: 410px;
+    width: 430px;
     margin: auto;
 }
 
@@ -1499,6 +1513,128 @@ ul.ul-lista-modulos-simples li a {
     white-space: nowrap;
 }
 
+
+/***************************************************************/
+/* USUÁRIOS */
+/**************************************************************/
+
+
+#ul-lista-usuarios-mensagens {
+    list-style: none;
+    padding-left: 0;
+}
+
+#ul-lista-usuarios-mensagens li a {
+    display: block;
+    padding: 10px;
+}
+
+#ul-lista-usuarios-mensagens li a span {
+    font-size: 13pt;
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 10px;
+    margin-top: 30px;
+}
+
+
+#mensagem-lista-mensagens {
+    list-style: none;
+    padding-left: 0;
+    overflow: hidden;
+}
+
+#mensagem-lista-mensagens > li {
+    clear: both;
+    display: block;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-top: 1px dashed #D4CCB0;
+}
+
+#mensagem-lista-mensagens > li article aside {
+    width: 150px;
+    text-align: center;
+    border-right: 1px solid #D4CCB0;
+    margin-right: 10px;
+}
+
+#mensagem-lista-mensagens > li article aside nav a {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#mensagem-lista-mensagens > li article .data-envio {
+    margin-bottom: 10px;
+    color: #777;
+}
+
+#ul-lista-notificacoes {
+    list-style: circle;
+    padding-left: 20px;
+}
+
+#ul-lista-notificacoes li p span {
+    color: #777;
+}
+
+#configuracao-privacidade-content ul {
+    list-style: none;
+}
+
+#feed-lista-feeds {
+    list-style: none;
+    padding-left: 0;
+    overflow: hidden;
+}
+
+#feed-lista-feeds li {
+    clear: both;
+    display: block;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-top: 1px dashed #D4CCB0;
+}
+
+#feed-lista-feeds > li:first-child {
+    border-top: none;
+}
+
+#feed-lista-feeds > li article aside {
+    width: 90px;
+    text-align: center;
+    border-right: 1px solid #D4CCB0;
+    padding: 5px;
+    margin-right: 10px;
+}
+
+#feed-lista-feeds > li article aside div.feed-data {
+    margin-top: 10px;
+    color: #777;
+}
+
+#feed-lista-feeds > li article div.feed-content {
+    padding: 10px;
+}
+
+#feed-lista-feeds > li article div.feed-content div {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#feed-lista-feeds ul.ul-lista-comentarios-feed {
+    padding-left: 100px;
+}
+
+#feed-lista-feeds ul.ul-lista-comentarios-feed li {
+    overflow: hidden;
+    background: #ECE8DA url(images/ui-bg_gloss-wave_100_ece8da_500x100.png) 50% 10% repeat-x;
+}
+
+#feed-lista-feeds ul.ul-lista-comentarios-feed div > span {
+    color: #777;
+}
 
 /* =============================================================================
    Non-semantic helper classes

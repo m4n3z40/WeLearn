@@ -47,7 +47,7 @@
                         function(res) {
                             if (res.success) {
                                 WeLearn.notificar(res.notificacao);
-                                $this.parent().parent().fadeOut('slow', function(){
+                                $this.parent().parent().parent().parent().parent().fadeOut('slow', function(){
                                     $(this).remove();
                                 });
                             } else {

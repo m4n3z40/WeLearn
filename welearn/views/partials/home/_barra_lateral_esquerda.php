@@ -1,10 +1,6 @@
 <section id="home-left-bar" class="inner-sidebar-container inner-sidebar-container-left">
     <header>
-        <figure>
-            <figcaption>
-                <?php echo anchor('/usuario/' . $usuario->id, $usuario->toHTML('imagem_grande')) ?>
-            </figcaption>
-        </figure>
+        <?php echo anchor('/usuario/' . $usuario->id, $usuario->toHTML('imagem_grande')) ?>
     </header>
     <hr>
     <nav>
@@ -17,7 +13,6 @@
             <li><?php echo anchor('/notificacao', 'Notificações') ?></li>
             <li><?php echo anchor('/usuario/configuracao', 'Configurações') ?></li>
             <li><?php echo anchor('/administracao','Adminstração')?></li>
-            <li><?php echo anchor('/curso/meus_certificados','Certificados')?></li>
         </ul>
     </nav>
 </section>

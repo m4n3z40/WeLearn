@@ -1,6 +1,6 @@
-
-<?=form_open($formAction , array('id' => 'form-criar-feed'))?>
+<fieldset>
     <legend>Selecione o tipo de Feed</legend>
+<?=form_open($formAction , array('id' => 'form-criar-feed'))?>
     <div>
         <?= form_radio('tipo-feed',WeLearn_Compartilhamento_TipoFeed::STATUS,true,'id = "feed-status"')?><label for="feed-status">Status</label>
         <?= form_radio('tipo-feed',WeLearn_Compartilhamento_TipoFeed::LINK,false,'id = "feed-link"')?><label for="feed-link">Link</label>
@@ -11,3 +11,4 @@
     <?=form_textarea( array('name' => 'conteudo-feed' , 'id' => 'conteudo-feed', 'rows' => '1' ,'cols' =>'50','placeholder' => 'Entre com o status'))?>
     <?=form_submit(array('name' => 'feed-submit' , 'id' => 'feed-submit' , 'value' => 'Enviar'))?>
 <?=form_close();?>
+</fieldset>

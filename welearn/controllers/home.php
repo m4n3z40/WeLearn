@@ -133,7 +133,7 @@ Tente novamente mais tarde.'
             {
                 if($row->getTipo() == WeLearn_Compartilhamento_TipoFeed::VIDEO)
                 {
-                    $isValid=$this->autoembed->parseUrl($row->getConteudo());
+                    $this->autoembed->parseUrl($row->getConteudo());
                     $row->setConteudo($this->autoembed->getEmbedCode());
                 }
             }
@@ -154,7 +154,7 @@ Tente novamente mais tarde.'
 
             $listaRandonicaAmigos = $amizadeUsuarioDao->recuperarAmigosAleatorios(
                 $usuarioAutenticado,
-                10
+                3
             );
 
         }catch(cassandra_NotFoundException $e){
@@ -169,7 +169,7 @@ Tente novamente mais tarde.'
 
             $listaRandonicaCursosCriados = $cursoDao->recuperarTodosPorCriadorAleatorios(
                 $gerenciadorPrincipal,
-                10
+                3
             );
 
         }catch(cassandra_NotFoundException $e){
@@ -184,7 +184,7 @@ Tente novamente mais tarde.'
 
             $listaRandonicaCursosInscritos = $cursoDao->recuperarTodosPorAlunoAleatorios(
                 $aluno,
-                10
+                3
             );
 
         }catch(cassandra_NotFoundException $e){

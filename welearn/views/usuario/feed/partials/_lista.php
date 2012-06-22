@@ -1,8 +1,30 @@
 
 <?for ($i = 0; $i < $qtdFeeds; $i++):?>
     <li id="item-feed-<?echo $feeds_usuario[$i]->id?>">
-        <input type='hidden' id='id-feed' value='<?echo $feeds_usuario[$i]->id?>'/>
-        <?echo $feeds_usuario[$i]->criador->toHTML('imagem_pequena')?>
+        <article>
+            <aside>
+                <?echo $feeds_usuario[$i]->criador->toHTML('imagem_pequena')?>
+                <div class="feed-data">
+                    <div>Criado em:</div>
+                    <span><?echo date('d/m/Y à\s H:i',$feeds_usuario[$i]->dataEnvio)?></span>
+                </div>
+                <div>
+                <?php
+                    if(isset($usuarioPerfil))
+                    {
+                        if($usuarioAutenticado == $usuarioPerfil || $usuarioAutenticado->id == $feeds_usuario[$i]->criador->id){
+                            echo anchor('feed/remover_timeline/'.$feeds_usuario[$i]->id.'/'.$usuarioPerfil->id,'Remover Post',array('id' => 'remover'));
+                        }
+                    }else{
+                        if($usuarioAutenticado->id == $feeds_usuario[$i]->criador->id){
+                            echo anchor('feed/remover_feed/'.$feeds_usuario[$i]->id,'Remover Post',array('id' => 'remover'));
+                        }
+                    }
+                ?>
+                </div>
+            </aside>
+            <div>
+                <div class="feed-content">
         <?php
             switch ($feeds_usuario[$i]->tipo) {
                 case WeLearn_Compartilhamento_TipoFeed::IMAGEM:
@@ -25,32 +47,24 @@
                     break;
             }
         ?>
-        <div id="feed-data">
-            <div>Criado em:</div>
-            <span><?echo date('d/m/Y à\s H:i',$feeds_usuario[$i]->dataEnvio)?></span>
-        </div>
+                </div>
 
-        <?php
-            if(isset($usuarioPerfil))
-            {
-                if($usuarioAutenticado == $usuarioPerfil || $usuarioAutenticado->id == $feeds_usuario[$i]->criador->id){
-                    echo anchor('feed/remover_timeline/'.$feeds_usuario[$i]->id.'/'.$usuarioPerfil->id,'remover',array('id' => 'remover'));
-                }
-            }else{
-                if($usuarioAutenticado->id == $feeds_usuario[$i]->criador->id){
-                    echo anchor('feed/remover_feed/'.$feeds_usuario[$i]->id,'remover',array('id' => 'remover'));
-                }
-            }
-        ?>
-        <?echo anchor('#','comentar',array('id' => 'exibir-barra-de-comentario'))?>
+                <div>
         <?if(count($comentarios_feed[$i])>0):?>
             <?php if ($comentarios_feed[$i]['haMaisPaginas']): ?>
                 <a href="comentario_feed/proxima_pagina/"  id="paginacao-comentario" data-proximo="<?echo $comentarios_feed[$i]['paginacao']['inicio_proxima_pagina']?>" data-id-feed="<?php echo $feeds_usuario[$i]->id ?>" >Comentarios mais Antigos</a>
             <?php endif; ?>
-            <ul>
+            <ul class="ul-lista-comentarios-feed">
                 <?echo $comentarios_feed[$i]['HTMLcomentarios'] ?>
             </ul>
+            </div>
+            <div>
+                <input type='hidden' id='id-feed' value='<?echo $feeds_usuario[$i]->id?>'/>
+                <?echo anchor('#','Comentar',array('id' => 'exibir-barra-de-comentario'))?>
+            </div>
         <?endif;?>
+            </div>
+        </article>
     </li>
 <?endfor;?>
 

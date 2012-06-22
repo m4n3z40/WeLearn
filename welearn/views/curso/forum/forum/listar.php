@@ -7,6 +7,7 @@
         <p>
             Todas as discussões desta categoria estão listadas abaixo. Participe.
         </p>
+        <?php if ( $alunoAutorizado ): ?>
         <?php echo gerar_menu_autorizado(array(
             array(
                 'uri' => '/curso/forum/criar/' . $categoria->id,
@@ -15,6 +16,7 @@
                 'papel' => $papelUsuarioAtual
             )
         ), array('<p>Ou, você pode criar outro fórum nesta categoria, ', '</p>')) ?>
+        <?php endif; ?>
         <nav id="nav-filtros-lista-forums">
             <ul>
                 <li><?php echo anchor('/curso/forum/listar/' . $categoria->id . '?f=todos', 'Todos os fóruns') ?> -
@@ -41,7 +43,16 @@
         </footer>
     <?php else: ?>
         <h4>Nenhuma discussão foi criada nesta categoria até o momento,
-            <?php echo anchor('/curso/forum/criar/' . $categoria->id, 'Seja o primeiro!') ?></h4>
+            <?php if ( $alunoAutorizado ): ?>
+            <?php echo gerar_menu_autorizado(array(
+                array(
+                    'uri' => '/curso/forum/criar/' . $categoria->id,
+                    'texto' => 'Seja o primeiro!',
+                    'acao' => 'forum/criar',
+                    'papel' => $papelUsuarioAtual
+                )
+            ), array('<p>Ou, você pode criar outro fórum nesta categoria, ', '</p>')) ?>
+            <?php endif; ?></h4>
     <?php endif; ?>
     </div>
 </div>

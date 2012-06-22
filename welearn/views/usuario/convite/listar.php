@@ -14,17 +14,16 @@
     </hgroup>
 </header>
 
-<ul id="lista-convites">
+<ul id="lista-convites" class="ul-grid-cursos-alunos">
     <?=$partialListaConvites?>
 </ul>
     <footer>
-            <nav id="paginacao-enquete">
-                <?php if($haMaisPaginas): ?>
-                <div>
-                    <a href="convite/proxima_pagina/" data-proximo="<?php echo $inicioProxPagina ?>" id="paginacao-convite">convites mais antigos</a>
-                    <input type='hidden' value='<?=$inicioProxPagina?>' id='id-prox-pagina'/>
-                </div>
-            <?php endif;?>
+        <?php if($haMaisPaginas): ?>
+        <div>
+            <a href="convite/proxima_pagina/" data-proximo="<?php echo $inicioProxPagina ?>" id="paginacao-convite">convites mais antigos</a>
+            <input type='hidden' value='<?=$inicioProxPagina?>' id='id-prox-pagina'/>
+        </div>
+        <?php endif;?>
     </footer>
 </ul>
 <?php else: ?>

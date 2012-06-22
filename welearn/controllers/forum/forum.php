@@ -23,6 +23,12 @@ class Forum extends Curso_Controller
             $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
             $categoria = $categoriaDao->recuperar($idCategoria);
 
+            $curso = $categoria->getCurso();
+
+            $alunoAutorizado = ! ( $curso->getConfiguracao()->getPermissaoCriacaoForum() === WeLearn_Cursos_PermissaoCurso::RESTRITO &&
+                                   $this->_getNivelAcesso($curso) != WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_AUXILIAR &&
+                                   $this->_getNivelAcesso($curso) != WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_PRINCIPAL );
+
             $forumDao = WeLearn_DAO_DAOFactory::create('ForumDAO');
 
             $filtro = $this->input->get('f');
@@ -43,6 +49,7 @@ class Forum extends Curso_Controller
             $partialLista = $this->template->loadPartial('lista', $dadosPartialLista, 'curso/forum/forum');
 
             $dadosView = array(
+                'alunoAutorizado' => $alunoAutorizado,
                 'tituloLista' => $this->_tituloLista($filtro),
                 'categoria' => $categoria,
                 'qtdTodos' => $forumDao->recuperarQtdTotalPorCategoria($categoria),
@@ -114,6 +121,10 @@ class Forum extends Curso_Controller
 
             $curso = $this->_cursoDao->recuperar($idCurso);
 
+            $alunoAutorizado = ! ( $curso->getConfiguracao()->getPermissaoCriacaoForum() === WeLearn_Cursos_PermissaoCurso::RESTRITO &&
+                                  $this->_getNivelAcesso($curso) != WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_AUXILIAR &&
+                                  $this->_getNivelAcesso($curso) != WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_PRINCIPAL );
+
             $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
 
             try {
@@ -133,6 +144,7 @@ class Forum extends Curso_Controller
             $partialListaCategorias = $this->template->loadPartial(
                 'lista_categorias',
                 array(
+                    'alunoAutorizado' => $alunoAutorizado,
                     'papelUsuarioAtual' => $this->_getPapel( $curso ),
                     'listaCategorias' => $listaCategorias
                 ),
@@ -210,7 +222,17 @@ class Forum extends Curso_Controller
             $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
             $categoria = $categoriaDao->recuperar($idCategoria);
 
-            $this->_expulsarNaoAutorizados($categoria->getCurso());
+            $curso = $categoria->getCurso();
+
+            if (
+                $curso->getConfiguracao()->getPermissaoCriacaoForum() === WeLearn_Cursos_PermissaoCurso::RESTRITO &&
+                $this->_getNivelAcesso($curso) != WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_AUXILIAR &&
+                $this->_getNivelAcesso($curso) != WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_PRINCIPAL
+            ) {
+                show_404();
+            }
+
+            $this->_expulsarNaoAutorizados($curso);
 
             $dadosFormCriar = array(
                 'tituloAtual' => '',

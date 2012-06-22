@@ -22,6 +22,10 @@ class Enquete extends Curso_Controller
 
             $curso = $this->_cursoDao->recuperar($idCurso);
 
+            $alunoAutorizado = ! ( $curso->getConfiguracao()->getPermissaoCriacaoEnquete() === WeLearn_Cursos_PermissaoCurso::RESTRITO &&
+                                   $this->_getNivelAcesso($curso) != WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_AUXILIAR &&
+                                   $this->_getNivelAcesso($curso) != WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_PRINCIPAL );
+
             $filtro = $this->input->get('f');
 
             $enqueteDao = WeLearn_DAO_DAOFactory::create('EnqueteDAO');
@@ -42,6 +46,7 @@ class Enquete extends Curso_Controller
             $partialLista = $this->template->loadPartial('lista', $dadosPartialLista, 'curso/enquete/enquete');
 
             $dadosView = array(
+                'alunoAutorizado' => $alunoAutorizado,
                 'tituloLista' => $this->_tituloLista($filtro),
                 'idCurso' => $curso->getId(),
                 'qtdTodas' => $enqueteDao->recuperarQtdTotalPorCurso($curso),
@@ -178,6 +183,14 @@ class Enquete extends Curso_Controller
     {
         try {
             $curso = $this->_cursoDao->recuperar($idCurso);
+
+            if (
+                $curso->getConfiguracao()->getPermissaoCriacaoEnquete() === WeLearn_Cursos_PermissaoCurso::RESTRITO &&
+                $this->_getNivelAcesso($curso) != WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_AUXILIAR &&
+                $this->_getNivelAcesso($curso) != WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_PRINCIPAL
+            ) {
+                show_404();
+            }
 
             $this->_expulsarNaoAutorizados($curso);
 

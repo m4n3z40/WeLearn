@@ -40,21 +40,9 @@
             formPost,
             $(formPost).attr('action'),
             function(res){
-                $('#mensagem-lista-mensagens').append(
-                    '<li class="item-lista-mensagem">'+
-                        '<input type="hidden" id="id-mensagem" value="'
-                        +res.mensagemId+'">'+
-                        '<div class="remetente">'+res.remetente+'</div>'+
-                        '<div class="mensagem-texto">'+res.mensagemTexto+'</div>'+
-                        '<div class="data-envio">'+res.dataEnvio+'</div>'+
-                        '<a href="usuario/mensagem/remover" class="remover-mensagem">'
-                        +'remover</a>'+
-                        '</li>'+
-                        '</div>'
-                );
+                $('#mensagem-lista-mensagens').append( res.htmlNovaMensagem );
                 $('#txt-mensagem').val('');
                 WeLearn.notificar(res.notificacao);
-
             },
             function(res){
                 $(formPost).remove();
@@ -67,7 +55,7 @@
         e.preventDefault();
         var url=$(this).attr('href');
         var mensagem=$(this).parent();// elemento item-lista-mensagem a ser removido
-        var idMensagem=$(this).parent().children('#id-mensagem').val();
+        var idMensagem=$(this).parent().children('.id-mensagem').val();
         var idAmigo=$('#id-amigo-mensagens').val();
         url+='/'+idMensagem+'/'+idAmigo;
         $.post(

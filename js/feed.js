@@ -120,7 +120,7 @@ $('<div id="dialogo-aviso-remover-compartilhamento""><p>Tem certeza que deseja r
 
 $('#remover').live('click',function(e){
         e.preventDefault();
-        feed=$(this).parent();
+        feed=$(this).parent().parent().parent();
         url= $(this).attr('href');
         $('#dialogo-aviso-remover-compartilhamento').dialog( "open");
     }
@@ -148,10 +148,12 @@ $('#comentario-submit').live('click',function(e){
             url,
             function(result){
                if(result.success){
-                    if($('#item-feed-'+result.idfeed+'>ul').length){
-                        $('#item-feed-'+result.idfeed+'>ul').append(result.htmlComentario);
+                   var $liItemFeed = $('#item-feed-'+result.idfeed),
+                       $ulComentarios = $liItemFeed.find('ul');
+                    if($ulComentarios.length){
+                        $ulComentarios.append(result.htmlComentario);
                     }else{
-                        $('#item-feed-'+result.idfeed).append('<ul>'+result.htmlComentario+'</ul>')
+                        $liItemFeed.append('<ul class="ul-lista-comentarios-feed">'+result.htmlComentario+'</ul>')
                     }
                     $('#form-comentario-criar').hide();
                     WeLearn.notificar(result.notificacao);
@@ -165,7 +167,7 @@ $('#comentario-submit').live('click',function(e){
 $('#remover-comentario').live('click',function(e){
     e.preventDefault();
     var url = $(this).attr('href');
-    var comentario = $(this).parent();
+    var comentario = $(this).parent().parent();
     $.post(
         WeLearn.url.siteURL(url),
         function(result){
@@ -187,12 +189,12 @@ $('#paginacao-comentario').live('click',
             (WeLearn.url.queryString != '') ? WeLearn.url.queryString : null,
             function(res) {
                 if (res.success) {
-                    $('#item-feed-'+idFeed).children('ul').prepend(res.htmlListaComentarios);
+                    $('#item-feed-'+idFeed).find('ul').prepend(res.htmlListaComentarios);
                     if(res.paginacao.proxima_pagina) {
-                        $('#item-feed-'+idFeed).children('#paginacao-comentario').val(res.paginacao.inicio_proxima_pagina);
+                        $('#item-feed-'+idFeed).find('#paginacao-comentario').val(res.paginacao.inicio_proxima_pagina);
                     } else {
-                        $('#item-feed-'+idFeed).children('#paginacao-comentario').parent().children('ul').prepend('<h4>Não existem mais comentários para exibição.</h4>');
-                        $('#item-feed-'+idFeed).children('#paginacao-comentario').remove();
+                        $('#item-feed-'+idFeed).find('#paginacao-comentario').parent().children('ul').prepend('<h4>Não existem mais comentários para exibição.</h4>');
+                        $('#item-feed-'+idFeed).find('#paginacao-comentario').remove();
                     }
                 }else {
                     WeLearn.notificar({
