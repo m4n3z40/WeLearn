@@ -9,6 +9,8 @@ class Perfil extends Perfil_Controller {
      */
     private $_count = 30;
     private $_usuarioDao;
+    private $_amizadeUsuarioDao;
+    private $_saoAmigos;
 
     function __construct()
     {
@@ -17,6 +19,7 @@ class Perfil extends Perfil_Controller {
         $this->template->appendJSImport('perfil.js')
             ->appendJSImport('feed.js')
             ->appendJSImport('amizade.js');
+        $this->_amizadeUsuarioDao= WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
     }
 
     public function index($idUsuario='')
@@ -212,6 +215,18 @@ Tente novamente mais tarde.'
         }catch(cassandra_NotFoundException $e){
             show_404();
         }
+
+        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+        if($usuarioAutenticado->getId() != $usuarioPerfil->getId()){
+            $saoAmigos=$this->_amizadeUsuarioDao->SaoAmigos($usuarioPerfil,$usuarioAutenticado);
+            if(($usuarioPerfil->configuracao->privacidadePerfil == WeLearn_Usuarios_PrivacidadePerfil::PRIVADO
+                && ($saoAmigos == WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS || $saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA ))
+                || ($usuarioPerfil->getId() == $usuarioAutenticado->getId()))
+            {
+                show_404();
+            }
+        }
+
         $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
         try{
             $dadosPessoaisDao = WeLearn_DAO_DAOFactory::create('DadosPessoaisUsuarioDAO');
@@ -257,6 +272,18 @@ Tente novamente mais tarde.'
         }catch(cassandra_NotFoundException $e){
             show_404();
         }
+
+        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+        if($usuarioAutenticado->getId() != $usuarioPerfil->getId()){
+            $saoAmigos=$this->_amizadeUsuarioDao->SaoAmigos($usuarioPerfil,$usuarioAutenticado);
+            if(($usuarioPerfil->configuracao->privacidadePerfil == WeLearn_Usuarios_PrivacidadePerfil::PRIVADO
+                && ($saoAmigos == WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS || $saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA ))
+                || ($usuarioPerfil->getId() == $usuarioAutenticado->getId()))
+            {
+                show_404();
+            }
+        }
+
         $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
         try {
             $dadosProfissionaisDAO = WeLearn_DAO_DAOFactory::create('DadosProfissionaisUsuarioDAO');
@@ -278,10 +305,28 @@ Tente novamente mais tarde.'
     }
 
 
-    public function meus_cursos_criador($idUsuario='')
+    public function cursos_criador($idUsuario='')
     {
+
         if( $idUsuario=='' ) {
             show_404();
+        }
+
+        try{
+            $usuarioPerfil = $this->_usuarioDao->recuperar($idUsuario);
+        }catch(cassandra_NotFoundException $e){
+            show_404();
+        }
+
+        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+        if($usuarioAutenticado->getId() != $usuarioPerfil->getId()){
+            $saoAmigos=$this->_amizadeUsuarioDao->SaoAmigos($usuarioPerfil,$usuarioAutenticado);
+            if(($usuarioPerfil->configuracao->privacidadePerfil == WeLearn_Usuarios_PrivacidadePerfil::PRIVADO
+                && ($saoAmigos == WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS || $saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA ))
+                || ($usuarioPerfil->getId() == $usuarioAutenticado->getId()))
+            {
+                show_404();
+            }
         }
 
         try{
@@ -321,16 +366,28 @@ Tente novamente mais tarde.'
     }
 
 
-    public function meus_cursos_aluno($idUsuario='')
+    public function cursos_aluno($idUsuario='')
     {
         if( $idUsuario=='' ) {
             show_404();
         }
+
         try{
             $usuarioPerfil = $this->_usuarioDao->recuperar($idUsuario);
         }catch(cassandra_NotFoundException $e){
             show_404();
         }
+        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+        if($usuarioAutenticado->getId() != $usuarioPerfil->getId()){
+            $saoAmigos=$this->_amizadeUsuarioDao->SaoAmigos($usuarioPerfil,$usuarioAutenticado);
+            if(($usuarioPerfil->configuracao->privacidadePerfil == WeLearn_Usuarios_PrivacidadePerfil::PRIVADO
+                && ($saoAmigos == WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS || $saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA ))
+                || ($usuarioPerfil->getId() == $usuarioAutenticado->getId()))
+            {
+                show_404();
+            }
+        }
+
         try {
             $cursoDao = WeLearn_DAO_DAOFactory::create('CursoDAO');
             $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
@@ -381,10 +438,7 @@ Tente novamente mais tarde.'
 
         $remetente = $this->autenticacao->getUsuarioAutenticado();
         $destinatario = WeLearn_DAO_DAOFactory::create('UsuarioDAO')->recuperar($idDestinatario);
-
-
-        $amizadeUsuarioDao = WeLearn_DAO_DAOFactory::create('AmizadeUsuarioDAO');
-        $saoAmigos = $amizadeUsuarioDao->SaoAmigos($remetente,$destinatario);
+        $saoAmigos = $this->_amizadeUsuarioDao->SaoAmigos($remetente,$destinatario);
         $this->load->helper('notificacao_js');
         if($destinatario->configuracao->privacidadeMP == WeLearn_Usuarios_PrivacidadeMP::LIVRE ||
             ($destinatario->configuracao->privacidadeMP == WeLearn_Usuarios_PrivacidadeMP::SO_AMIGOS
@@ -438,6 +492,26 @@ Tente novamente mais tarde.'
 
     public function listar_certificados($idUsuarioPerfil)
     {
+        if( $idUsuarioPerfil=='' ) {
+            show_404();
+        }
+
+        try{
+            $usuarioPerfil = $this->_usuarioDao->recuperar($idUsuarioPerfil);
+        }catch(cassandra_NotFoundException $e){
+            show_404();
+        }
+
+        $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();
+        if($usuarioPerfil->getId() != $usuarioAutenticado->getId()){
+            $saoAmigos=$this->_amizadeUsuarioDao->SaoAmigos($usuarioPerfil,$usuarioAutenticado);
+            if(($usuarioPerfil->configuracao->privacidadePerfil == WeLearn_Usuarios_PrivacidadePerfil::PRIVADO
+                && ($saoAmigos == WeLearn_Usuarios_StatusAmizade::NAO_AMIGOS || $saoAmigos == WeLearn_Usuarios_StatusAmizade::REQUISICAO_EM_ESPERA ))
+                || ($usuarioPerfil->getId() == $usuarioAutenticado->getId()))
+            {
+                show_404();
+            }
+        }
         try {
             $this->template->appendJSImport('certificado_aluno.js');
             $usuarioAutenticado = $this->autenticacao->getUsuarioAutenticado();

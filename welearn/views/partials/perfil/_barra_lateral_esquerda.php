@@ -35,17 +35,23 @@
                 ):?>
                     <li><?= anchor('usuario/mensagem/criar','Enviar Mensagem',array('id' => 'enviar-mensagem'))?></li>
                 <?php endif;?>
-
-            <?php endif; ?>
-            <?php if(($usuarioPerfil->configuracao->privacidadePerfil == WeLearn_Usuarios_PrivacidadePerfil::PUBLICO) ||
-                    ($usuarioPerfil->configuracao->privacidadePerfil == WeLearn_Usuarios_PrivacidadePerfil::PRIVADO
+                <?php if(($usuarioPerfil->configuracao->privacidadePerfil == WeLearn_Usuarios_PrivacidadePerfil::PUBLICO) ||
+                ($usuarioPerfil->configuracao->privacidadePerfil == WeLearn_Usuarios_PrivacidadePerfil::PRIVADO
                     && $saoAmigos == WeLearn_Usuarios_StatusAmizade::AMIGOS)):?>
                 <li><?= anchor('perfil/dados_pessoais/'.$usuarioPerfil->id,'Dados Pessoais')?></li>
                 <li><?= anchor('perfil/dados_profissionais/'.$usuarioPerfil->id,'Dados Profissionais')?></li>
-                <li><?= anchor('/perfil/meus_cursos_criador/'.$usuarioPerfil->id,'Cursos Criados')?></li>
-                <li><?= anchor('/perfil/meus_cursos_aluno/'.$usuarioPerfil->id,'Cursos que Participo')?></li>
+                <li><?= anchor('/perfil/cursos_criador/'.$usuarioPerfil->id,'Cursos Criados')?></li>
+                <li><?= anchor('/perfil/cursos_aluno/'.$usuarioPerfil->id,'Cursos que Participo')?></li>
                 <li><?= anchor('/perfil/listar_certificados/'.$usuarioPerfil->id,'Certificados')?></li>
-            <?php endif?>
+                <?php endif?>
+            <?php else:?>
+                <li><?= anchor('perfil/dados_pessoais/'.$usuarioPerfil->id,'Dados Pessoais')?></li>
+                <li><?= anchor('perfil/dados_profissionais/'.$usuarioPerfil->id,'Dados Profissionais')?></li>
+                <li><?= anchor('/perfil/cursos_criador/'.$usuarioPerfil->id,'Cursos Criados')?></li>
+                <li><?= anchor('/perfil/cursos_aluno/'.$usuarioPerfil->id,'Cursos que Participo')?></li>
+                <li><?= anchor('/perfil/listar_certificados/'.$usuarioPerfil->id,'Certificados')?></li>
+            <?php endif; ?>
+
         </ul>
     </nav>
 </section>
