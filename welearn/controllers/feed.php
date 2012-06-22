@@ -366,10 +366,10 @@ class Feed extends Home_Controller
         $descricao = trim($descricao);
         if (empty($descricao))
         {
-            $this->form_validation->set_message('validar_descricao', 'The %s field is required');
+            $this->form_validation->set_message('validar_descricao', 'O campo %s é necessario');
             return FALSE;
         }else if(strlen($descricao)>1000){
-            $this->form_validation->set_message('validar_descricao', 'The %s field can not exceed 1000 characters in length');
+            $this->form_validation->set_message('validar_descricao', 'O campo %s não pode exceder 1000 caracteres');
             return FALSE;
         }
         else
