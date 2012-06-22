@@ -796,7 +796,10 @@ class Avaliacao extends Curso_Controller
             'menuContexto',
             $this->template->loadPartial(
                 'menu',
-                array( 'idCurso' => $curso->getId() ),
+                array(
+                    'papelUsuarioAtual' => $this->_getPapel( $curso ),
+                    'idCurso' => $curso->getId()
+                ),
                 'curso/conteudo'
             )
         );

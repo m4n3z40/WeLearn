@@ -1,19 +1,70 @@
 <section id="curso-left-bar" class="inner-sidebar-container inner-sidebar-container-left">
-    <nav>
-        <h3>Principal</h3>
-        <ul>
-            <li><?php echo anchor('/curso/' . $idCurso, 'Home') ?></li>
-            <li><?php echo anchor('/curso/conteudo/exibicao/' . $idCurso, 'Sala de Aula') ?></li>
-            <li><?php echo anchor('/curso/aluno/' . $idCurso, 'Alunos') ?></li>
-            <li><?php echo anchor('/curso/enquete/' . $idCurso, 'Enquetes') ?></li>
-            <li><?php echo anchor('/curso/forum/' . $idCurso, 'Fóruns') ?></li>
-            <li><?php echo anchor('/curso/gerenciador/' . $idCurso, 'Gerenciadores') ?></li>
-            <li><?php echo anchor('/curso/conteudo/' . $idCurso, 'Gerenciamento de Conteúdo') ?></li>
-            <li><?php echo anchor('/curso/certificado/' . $idCurso, 'Gerenciamento de Certificados') ?></li>
-            <li><?php echo anchor('/curso/review/' . $idCurso, 'Reputação do Curso') ?></li>
-            <li><?php echo anchor('/curso/configurar/' . $idCurso, 'Configurações do Curso') ?></li>
-        </ul>
-    </nav>
+<?php echo gerar_menu_autorizado(
+    array(
+        array(
+            'uri' => '/curso/' . $idCurso,
+            'texto' => 'Home',
+            'acao' => 'curso/index',
+            'papel' => $papelUsuarioAtual
+        ),
+        array(
+            'uri' => '/curso/conteudo/exibicao/' . $idCurso,
+            'texto' => 'Sala de Aula',
+            'acao' => 'exibicao/index',
+            'papel' => $papelUsuarioAtual
+        ),
+        array(
+            'uri' => '/curso/aluno/' . $idCurso,
+            'texto' => 'Alunos',
+            'acao' => 'aluno/index',
+            'papel' => $papelUsuarioAtual
+        ),
+        array(
+            'uri' => '/curso/enquete/' . $idCurso,
+            'texto' => 'Enquetes',
+            'acao' => 'enquete/index',
+            'papel' => $papelUsuarioAtual
+        ),
+        array(
+            'uri' => '/curso/forum/' . $idCurso,
+            'texto' => 'Fóruns',
+            'acao' => 'forum/index',
+            'papel' => $papelUsuarioAtual
+        ),
+        array(
+            'uri' => '/curso/gerenciador/' . $idCurso,
+            'texto' => 'Gerenciadores',
+            'acao' => 'gerenciador/index',
+            'papel' => $papelUsuarioAtual
+        ),
+        array(
+            'uri' => '/curso/conteudo/' . $idCurso,
+            'texto' => 'Gerenciamento de Conteúdo',
+            'acao' => 'conteudo/index',
+            'papel' => $papelUsuarioAtual
+        ),
+        array(
+            'uri' => '/curso/certificado/' . $idCurso,
+            'texto' => 'Gerenciamento de Certificados',
+            'acao' => 'certificado/index',
+            'papel' => $papelUsuarioAtual
+        ),
+        array(
+            'uri' => '/curso/review/' . $idCurso,
+            'texto' => 'Reputação do Curso',
+            'acao' => 'review/index',
+            'papel' => $papelUsuarioAtual
+        ),
+        array(
+            'uri' => '/curso/configurar/' . $idCurso,
+            'texto' => 'Configurações do Curso',
+            'acao' => 'curso/configurar',
+            'papel' => $papelUsuarioAtual
+        ),
+    ),
+    array('<li>','</li>'),
+    array('<nav><h3>Principal</h3><ul>','</ul></nav>')
+) ?>
     <hr>
     <div id="curso-left-bar-contexto">
         <?php if (! empty($menuContexto)): ?>
