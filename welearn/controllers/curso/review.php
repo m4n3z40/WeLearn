@@ -38,13 +38,17 @@ class Review extends Curso_Controller
             }
 
             $dadosView = array(
+                'papelUsuarioAtual' => $this->_getPapel( $curso ),
                 'idCurso' => $curso->getId(),
                 'totalReviews' => $resenhaDao->recuperarQtdTotalPorCurso( $curso ),
                 'mediaQualidade' => round($mediaQualidade, 1),
                 'mediaDificuldade' => round($mediaDificuldade, 1),
                 'listaUltimasReviews' => $this->template->loadPartial(
                     'lista',
-                    array('listaResenhas' => $listaUltimasReviews),
+                    array(
+                        'papelUsuarioAtual' => $this->_getPapel( $curso ),
+                        'listaResenhas' => $listaUltimasReviews
+                    ),
                     'curso/review'
                 )
             );
@@ -95,7 +99,10 @@ class Review extends Curso_Controller
                 'totalReviews' => $totalReviews,
                 'listaReviews' => $this->template->loadPartial(
                     'lista',
-                    array('listaResenhas' => $listaReviews),
+                    array(
+                        'papelUsuarioAtual' => $this->_getPapel( $curso ),
+                        'listaResenhas' => $listaReviews
+                    ),
                     'curso/review'
                 ),
                 'haMaisPaginas' => $paginacao['proxima_pagina'],
@@ -152,7 +159,10 @@ class Review extends Curso_Controller
             $response = Zend_Json::encode(array(
                 'htmlListaReviews' => $this->template->loadPartial(
                     'lista',
-                    array('listaResenhas' => $listaReviews),
+                    array(
+                        'papelUsuarioAtual' => $this->_getPapel( $curso ),
+                        'listaResenhas' => $listaReviews
+                    ),
                     'curso/review'
                 ),
                 'qtdReviews' => $qtdReviews,
@@ -584,6 +594,8 @@ class Review extends Curso_Controller
         $resenhaDao->salvar( $resenha );
 
         $dadosResposta = array(
+            'papelUsuarioAtual' => $this->_getPapel( $resenha->getCurso() ),
+            'autor' => $resposta->getCriador(),
             'gerenciadorId' => $resposta->getCriador()->getId(),
             'gerenciadorNome' => $resposta->getCriador()->getNome(),
             'conteudoResposta' => $resposta->getConteudo(),
@@ -619,11 +631,16 @@ class Review extends Curso_Controller
         $respostaDao = WeLearn_DAO_DAOFactory::create('RespostaResenhaDAO');
         $resposta = $respostaDao->recuperar( $post['resenhaId'] );
 
+        $resenhaDao = WeLearn_DAO_DAOFactory::create('ResenhaDAO');
+        $resenha = $resenhaDao->recuperar( $post['resenhaId'] );
+
         $resposta->preencherPropriedades( $post );
 
         $respostaDao->salvar( $resposta );
 
         $dadosResposta = array(
+            'papelUsuarioAtual' => $this->_getPapel( $resenha->getCurso() ),
+            'autor' => $resenha->getCriador(),
             'gerenciadorId' => $resposta->getCriador()->getId(),
             'gerenciadorNome' => $resposta->getCriador()->getNome(),
             'conteudoResposta' => $resposta->getConteudo(),

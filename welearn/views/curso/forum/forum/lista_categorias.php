@@ -7,9 +7,14 @@
         <p>
             Entre em uma das categorias listadas abaixo para visualizar seus fóruns.
         </p>
-        <p>
-            Ou, você pode criar outra categoria de fóruns, <?php echo anchor('/curso/forum/categoria/criar/' . $idCurso, 'clicando aqui!') ?>
-        </p>
+        <?php echo gerar_menu_autorizado(array(
+            array(
+                'uri' => '/curso/forum/categoria/criar/' . $idCurso,
+                'texto' => 'clicando aqui!',
+                'acao' => 'categoria/criar',
+                'papel' => $papelUsuarioAtual
+            ),
+        ), array('<p>Ou, você pode criar outra categoria de fóruns, ', '</p>')) ?>
     </header>
     <div>
     <?php if ($haCategorias): ?>

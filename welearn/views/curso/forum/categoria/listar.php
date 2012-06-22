@@ -4,9 +4,14 @@
             <h1>Lista de Categorias de fórum do Curso</h1>
             <h3>Abaixo você verá todas as categorias de fórum dinponíveis</h3>
         </hgroup>
-        <p>
-            Quer adicionar uma categoria de fórum? <?php echo anchor('/curso/forum/categoria/criar/' . $idCurso, 'É por aqui!') ?>
-        </p>
+        <?php echo gerar_menu_autorizado(array(
+            array(
+                'uri' => '/curso/forum/categoria/criar/' . $idCurso,
+                'texto' => 'É por aqui!',
+                'acao' => 'categoria/criar',
+                'papel' => $papelUsuarioAtual
+            )
+        ), array('<p>Quer adicionar uma categoria de fórum? ', '</p>')) ?>
     </header>
     <div>
     <?php if ($haCategorias): ?>

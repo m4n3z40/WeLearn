@@ -21,6 +21,16 @@ class Aluno extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar($idCurso);
 
+            switch ($this->_getNivelAcesso( $curso )) {
+                case WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO:
+                case WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE:
+                case WeLearn_Usuarios_Autorizacao_NivelAcesso::GERENCIADOR_CONVITE_PENDENTE:
+                case WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO:
+                    $this->listar( $idCurso );
+                    return;
+                default:
+            }
+
             try {
                 $ultimasRequisicoes = $this->_alunoDao->recuperarTodasInscricoesPorCurso($curso, '', '', 5);
             } catch (cassandra_NotFoundException $e) {
@@ -74,6 +84,7 @@ class Aluno extends Curso_Controller
                 'listaAlunos' => $this->template->loadPartial(
                     'lista',
                     array(
+                        'papelUsuarioAtual' => $this->_getPapel( $curso ),
                         'listaAlunos' => $listaAlunos,
                         'idCurso' => $curso->getId()
                     ),
@@ -121,6 +132,7 @@ class Aluno extends Curso_Controller
                 'htmlListaAlunos' => $this->template->loadPartial(
                     'lista',
                     array(
+                        'papelUsuarioAtual' => $this->_getPapel( $curso ),
                         'listaAlunos' => $listaAlunos,
                         'idCurso' => $curso->getId()
                     ),
@@ -450,6 +462,7 @@ class Aluno extends Curso_Controller
             $this->template->loadPartial(
                 'menu',
                 array(
+                    'papelUsuarioAtual' => $this->_getPapel( $curso ),
                     'idCurso' => $curso->getId(),
                     'totalAlunos' => $this->_alunoDao->recuperarQtdTotalPorCurso($curso),
                     'totalRequisicoes' => $this->_alunoDao->recuperarQtdTotalInscricoesPorCurso($curso)

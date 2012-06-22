@@ -13,14 +13,26 @@
                 <li>Nunca foi alterado.</li>
                 <?php endif; ?>
             </ul>
-            <footer>
-                <nav id="post-forum-adminpanel">
-                    <ul>
-                        <li><?php echo anchor('/curso/forum/post/alterar/' . $post->id, 'Alterar Post', 'class="a-alterar-post"') ?></li>
-                        <li><?php echo anchor('/curso/forum/post/remover/' . $post->id, 'Remover Post', 'class="a-remover-post"') ?></li>
-                    </ul>
-                </nav>
-            </footer>
+            <?php echo gerar_menu_autorizado(
+                array(
+                    array(
+                        'uri' => '/curso/forum/post/alterar/' . $post->id,
+                        'texto' => 'Alterar Post',
+                        'attr' => 'class="a-alterar-post"',
+                        'autor' => $post->criador
+                    ),
+                    array(
+                        'uri' => '/curso/forum/post/remover/' . $post->id,
+                        'texto' => 'Remover Post',
+                        'attr' => 'class="a-remover-post"',
+                        'autor' => $post->criador,
+                        'acao' => 'post/remover',
+                        'papel' => $papelUsuarioAtual
+                    ),
+                ),
+                array('<li>','</li>'),
+                array('<footer><nav id="post-forum-adminpanel"><ul>','</ul></nav></footer>')
+            ) ?>
         </aside>
         <div>
             <?php if ($post->titulo): ?>

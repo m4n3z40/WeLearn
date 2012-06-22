@@ -34,10 +34,12 @@ class Categoria extends Curso_Controller
             $dados_paginacao = create_paginacao_cassandra($listaCategorias, $count);
 
             $dadosLista = array(
+                'papelUsuarioAtual' => $this->_getPapel( $curso ),
                 'listaCategorias' => $listaCategorias
             );
 
             $dadosViewListar = array(
+                'papelUsuarioAtual' => $this->_getPapel( $curso ),
                 'idCurso' => $curso->getId(),
                 'haCategorias' => !empty($listaCategorias),
                 'listaCategorias' => $this->template->loadPartial('lista', $dadosLista, 'curso/forum/categoria'),
@@ -74,6 +76,7 @@ class Categoria extends Curso_Controller
             $dados_paginacao = create_paginacao_cassandra($listaCategorias, $count);
 
             $dadosLista = array(
+                'papelUsuarioAtual' => $this->_getPapel( $curso ),
                 'listaCategorias' => $listaCategorias
             );
 
@@ -256,7 +259,10 @@ class Categoria extends Curso_Controller
             'menuContexto',
             $this->template->loadPartial(
                 'menu',
-                array( 'idCurso' => $curso->getId() ),
+                array(
+                    'papelUsuarioAtual' => $this->_getPapel( $curso ),
+                    'idCurso' => $curso->getId()
+                ),
                 'curso/forum'
             )
         );

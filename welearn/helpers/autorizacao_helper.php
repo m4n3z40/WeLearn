@@ -26,8 +26,7 @@ function gerar_menu_autorizado (
     array $dados,
     $itemWrapper = array('',''),
     $containerWrapper = array('','')
-)
-{
+) {
     if ( empty( $dados ) ) {
         return '';
     }
@@ -65,7 +64,7 @@ function gerar_menu_autorizado (
 
         } elseif ( isset( $dados[$i]['autor'] ) ) {
 
-            if ( is_autor( $dados[$i]['auto'] ) ) {
+            if ( is_autor( $dados[$i]['autor'] ) ) {
 
                 $menuStr .= _gerar_item_hiperlink( $dados[$i], $itemWrapper );
 
@@ -88,7 +87,13 @@ function gerar_menu_autorizado (
     return $menuStr;
 }
 
-function _gerar_item_hiperlink(array $dados, $itemWrapper = array('','')) {
+function _gerar_item_hiperlink(array $dados, $itemWrapper = array('',''))
+{
+    $uri = isset( $dados['uri'] ) ? $dados['uri'] : '';
+
+    if ( ! $uri ) {
+        return '';
+    }
 
     return $itemWrapper[0] . anchor(
         isset( $dados['uri'] ) ? $dados['uri'] : '',

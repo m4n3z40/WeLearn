@@ -40,6 +40,7 @@ class Gerenciador extends Curso_Controller
             $paginacao = create_paginacao_cassandra($listaGerenciadores, $count);
 
             $dadosView = array(
+                'papelUsuarioAtual' => $this->_getPapel( $curso ),
                 'idCurso' => $curso->getId(),
                 'haGerenciadores' => $totalGerenciadores > 0,
                 'qtdGerenciadores' => count( $listaGerenciadores ),
@@ -47,6 +48,7 @@ class Gerenciador extends Curso_Controller
                 'listaGerenciadores' => $this->template->loadPartial(
                     'lista_gerenciadores',
                     array(
+                        'papelUsuarioAtual' => $this->_getPapel( $curso ),
                         'idCurso' => $curso->getId(),
                         'listaGerenciadores' => $listaGerenciadores
                     ),
@@ -93,6 +95,7 @@ class Gerenciador extends Curso_Controller
                 'htmlGerenciadores' => $this->template->loadPartial(
                     'lista_gerenciadores',
                     array(
+                        'papelUsuarioAtual' => $this->_getPapel( $curso ),
                         'listaGerenciadores' => $listaGerenciadores,
                         'idCurso' => $curso->getId()
                     ),
@@ -599,6 +602,7 @@ class Gerenciador extends Curso_Controller
             $this->template->loadPartial(
                 'menu',
                 array(
+                    'papelUsuarioAtual' => $this->_getPapel( $curso ),
                     'idCurso' => $curso->getId(),
                     'totalGerenciadores' => $this->_gerenciadorDao->recuperarQtdTotalPorCurso( $curso ),
                     'totalConvites' => $this->_gerenciadorDao->recuperarQtdTotalConvitesPorCurso( $curso )

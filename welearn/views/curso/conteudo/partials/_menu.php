@@ -33,4 +33,4 @@
     ),
     array('<li>','</li>'),
     array('<h3>Ações em Conteúdo</h3><ul>','</ul>')
-) ?>
+);

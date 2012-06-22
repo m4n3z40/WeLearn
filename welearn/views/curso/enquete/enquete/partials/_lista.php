@@ -20,19 +20,39 @@
         </ul>
     </td>
     <td>
-        <nav class="enquete-adminpanel">
-            <ul>
-                <li><?php echo anchor('curso/enquete/alterar/' . $enquete->id, 'Alterar') ?></li>
-                <li><?php echo anchor('curso/enquete/remover/' . $enquete->id, 'Remover',
-                    array('class' => 'a-enquete-remover')) ?></li>
-                <li><?php echo anchor('curso/enquete/alterar_status/' . $enquete->id,
-                    ($enquete->status == WeLearn_Cursos_Enquetes_StatusEnquete::ATIVA) ? 'Desativar' : 'Ativar',
-                    array('class' => 'a-enquete-alterarstatus')) ?></li>
-                <li><?php echo anchor('curso/enquete/alterar_situacao/' . $enquete->id,
-                    ($enquete->situacao == WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA) ? 'Fechar' : 'Reabrir',
-                    array('class' => 'a-enquete-alterarsituacao')) ?></li>
-            </ul>
-        </nav>
+        <?php echo gerar_menu_autorizado(
+            array(
+                array(
+                    'uri' => 'curso/enquete/alterar/' . $enquete->id,
+                    'texto' => 'Alterar',
+                    'autor' => $enquete->criador
+                ),
+                array(
+                    'uri' => 'curso/enquete/remover/' . $enquete->id,
+                    'texto' => 'Remover',
+                    'attr' => 'class="a-enquete-remover"',
+                    'acao' => 'enquete/remover',
+                    'papel' => $papelUsuarioAtual,
+                    'autor' => $enquete->criador
+                ),
+                array(
+                    'uri' => 'curso/enquete/alterar_status/' . $enquete->id,
+                    'texto' => ($enquete->status == WeLearn_Cursos_Enquetes_StatusEnquete::ATIVA) ? 'Desativar' : 'Ativar',
+                    'attr' => 'class="a-enquete-alterarstatus"',
+                    'acao' => 'enquete/alterar_status',
+                    'papel' => $papelUsuarioAtual
+                ),
+                array(
+                    'uri' => 'curso/enquete/alterar_situacao/' . $enquete->id,
+                    'texto' => ($enquete->situacao == WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA) ? 'Fechar' : 'Reabrir',
+                    'attr' => 'class="a-enquete-alterarsituacao"',
+                    'acao' => 'enquete/remover',
+                    'papel' => $papelUsuarioAtual
+                )
+            ),
+            array('<li>','</li>'),
+            array('<nav class="enquete-adminpanel"><ul>','</ul></nav>')
+        ) ?>
     </td>
 </tr>
 <?php endforeach; ?>

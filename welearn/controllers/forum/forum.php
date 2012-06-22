@@ -36,7 +36,10 @@ class Forum extends Curso_Controller
             $this->load->helper('paginacao_cassandra');
             $dadosPaginacao = create_paginacao_cassandra($listaForuns, $count);
 
-            $dadosPartialLista = array( 'listaForuns' => $listaForuns );
+            $dadosPartialLista = array(
+                'papelUsuarioAtual' => $this->_getPapel( $categoria->getCurso() ),
+                'listaForuns' => $listaForuns
+            );
             $partialLista = $this->template->loadPartial('lista', $dadosPartialLista, 'curso/forum/forum');
 
             $dadosView = array(
@@ -80,7 +83,14 @@ class Forum extends Curso_Controller
 
             $response = array(
                 'success' => true,
-                'htmlListaForuns' => $this->template->loadPartial('lista', array('listaForuns'=>$listaForuns), 'curso/forum/forum'),
+                'htmlListaForuns' => $this->template->loadPartial(
+                    'lista',
+                    array(
+                        'papelUsuarioAtual' => $this->_getPapel( $categoria->getCurso() ),
+                        'listaForuns' => $listaForuns
+                    ),
+                    'curso/forum/forum'
+                ),
                 'paginacao' => $paginacao
             );
 
@@ -122,11 +132,15 @@ class Forum extends Curso_Controller
 
             $partialListaCategorias = $this->template->loadPartial(
                 'lista_categorias',
-                array('listaCategorias' => $listaCategorias),
+                array(
+                    'papelUsuarioAtual' => $this->_getPapel( $curso ),
+                    'listaCategorias' => $listaCategorias
+                ),
                 'curso/forum/forum'
             );
 
             $dadosView = array(
+                'papelUsuarioAtual' => $this->_getPapel( $curso ),
                 'idCurso' => $curso->getId(),
                 'haCategorias' => !empty($listaCategorias),
                 'listaCategorias' => $partialListaCategorias,
@@ -167,6 +181,7 @@ class Forum extends Curso_Controller
             $dados_paginacao = create_paginacao_cassandra($listaCategorias, $count);
 
             $dadosLista = array(
+                'papelUsuarioAtual' => $this->_getPapel( $curso ),
                 'listaCategorias' => $listaCategorias
             );
 
@@ -443,7 +458,10 @@ class Forum extends Curso_Controller
             'menuContexto',
             $this->template->loadPartial(
                 'menu',
-                array( 'idCurso' => $curso->getId() ),
+                array(
+                    'papelUsuarioAtual' => $this->_getPapel( $curso ),
+                    'idCurso' => $curso->getId()
+                ),
                 'curso/forum'
             )
         );

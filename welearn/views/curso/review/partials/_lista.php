@@ -25,47 +25,53 @@
             <p>
                 <?php echo nl2br($resenha->resposta->conteudo) ?>
             </p>
-            <footer>
-                <nav>
-                    <ul>
-                        <li><?php echo anchor(
-                            '/curso/review/alterar_resposta/' . $resenha->id,
-                            'Alterar Resposta',
-                            'class="a-alterar-resposta"'
-                        ) ?></li>
-                        <li><?php echo anchor(
-                            '/curso/review/remover_resposta/' . $resenha->id,
-                            'Remover Resposta',
-                            'class="a-remover-resposta"'
-                        ) ?></li>
-                    </ul>
-                </nav>
-            </footer>
+            <?php echo gerar_menu_autorizado(
+                array(
+                    array(
+                        'uri' => '/curso/review/alterar_resposta/' . $resenha->id,
+                        'texto' => 'Alterar Resposta',
+                        'attr' => 'class="a-alterar-resposta"',
+                        'autor' => $resenha->resposta->criador
+                    ),
+                    array(
+                        'uri' => '/curso/review/remover_resposta/' . $resenha->id,
+                        'texto' => 'Remover Resposta',
+                        'attr' => 'class="a-remover-resposta"',
+                        'autor' => $resenha->resposta->criador,
+                        'acao' => 'review/remover_resposta',
+                        'papel' => $papelUsuarioAtual
+                    ),
+                ),
+                array('<li>','</li>'),
+                array('<footer><nav><ul>','</ul></nav></footer>')
+            ) ?>
             <?php endif; ?>
         </div>
-        <footer>
-            <nav>
-                <ul>
-                    <li><?php echo anchor(
-                        '/curso/review/alterar/' . $resenha->id,
-                        'Alterar',
-                        'class="a-alterar-review"'
-                    ) ?></li>
-                    <li><?php echo anchor(
-                        '/curso/review/remover/' . $resenha->id,
-                        'Remover',
-                        'class="a-remover-review"'
-                    ) ?></li>
-                    <?php if ( ! $resenha->resposta ): ?>
-                    <li><?php echo anchor(
-                        '/curso/review/responder/' . $resenha->id,
-                        'Responder à Avaliação',
-                        'class="a-responder-review"'
-                    ) ?></li>
-                    <?php endif; ?>
-                </ul>
-            </nav>
-        </footer>
+        <?php echo gerar_menu_autorizado(
+            array(
+                array(
+                    'uri' => '/curso/review/alterar/' . $resenha->id,
+                    'texto' => 'Alterar',
+                    'attr' => 'class="a-alterar-review"',
+                    'autor' => $resenha->criador
+                ),
+                array(
+                    'uri' => '/curso/review/remover/' . $resenha->id,
+                    'texto' => 'Remover',
+                    'attr' => 'class="a-remover-review"',
+                    'autor' => $resenha->criador
+                ),
+                array(
+                    'uri' => '/curso/review/responder/' . $resenha->id,
+                    'texto' => 'Responder à Avaliação',
+                    'attr' => 'class="a-responder-review"',
+                    'acao' => 'review/remover_resposta',
+                    'papel' => $papelUsuarioAtual
+                ),
+            ),
+            array('<li>','</li>'),
+            array('<footer><nav><ul>','</ul></nav></footer>')
+        ) ?>
     </article>
 </li>
 <?php endforeach; ?>

@@ -169,6 +169,7 @@ class Comentario extends Curso_Controller
                                           ? $this->template->loadPartial(
                                                 'lista',
                                                 array(
+                                                    'papelUsuarioAtual' => $this->_getPapel( $pagina->getAula()->getModulo()->getCurso() ),
                                                     'listaComentarios' => $listaComentarios
                                                 ),
                                                 'curso/conteudo/comentario'
@@ -343,7 +344,10 @@ class Comentario extends Curso_Controller
         $response = Zend_Json::encode(array(
             'htmlNovoComentario' => $this->template->loadPartial(
                 'lista',
-                array( 'listaComentarios' => array($novoComentario) ),
+                array(
+                    'papelUsuarioAtual' => $this->_getPapel( $pagina->getAula()->getModulo()->getCurso() ),
+                    'listaComentarios' => array($novoComentario)
+                ),
                 'curso/conteudo/comentario'
             ),
             'notificacao' => create_notificacao_array(
@@ -369,7 +373,10 @@ class Comentario extends Curso_Controller
         $response = Zend_Json::encode(array(
             'htmlComentarioAlterado' => $this->template->loadPartial(
                 'lista',
-                array( 'listaComentarios' => array($comentario) ),
+                array(
+                    'papelUsuarioAtual' => $this->_getPapel( $comentario->getPagina()>getAula()->getModulo()->getCurso() ),
+                    'listaComentarios' => array($comentario)
+                ),
                 'curso/conteudo/comentario'
             ),
             'notificacao' => create_notificacao_array(

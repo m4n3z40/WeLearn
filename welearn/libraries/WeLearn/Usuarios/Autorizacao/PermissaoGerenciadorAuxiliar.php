@@ -9,7 +9,7 @@
 class WeLearn_Usuarios_Autorizacao_PermissaoGerenciadorAuxiliar extends WeLearn_Usuarios_Autorizacao_PermissaoAluno
 {
     public function __construct()
-        {
+    {
         parent::__construct();
 
         $this->_aplicarPermissoesGerenciadorAuxiliar();
@@ -33,7 +33,6 @@ class WeLearn_Usuarios_Autorizacao_PermissaoGerenciadorAuxiliar extends WeLearn_
                 'aplicacao_avaliacao/aplicar' => false,
                 'aplicacao_avaliacao/finalizar' => false,
                 'aplicacao_avaliacao/exibir_resultados' => false,
-                'aluno/index' => true,
                 'aluno/desvincular' => true,
                 'aluno/requisicoes' => true,
                 'aluno/mais_requisicoes' => true,
@@ -62,6 +61,8 @@ class WeLearn_Usuarios_Autorizacao_PermissaoGerenciadorAuxiliar extends WeLearn_
                 'certificado/salvar_upload_temporario' => true,
                 'certificado/remover_upload_temporario' => true,
                 'certificado/salvar' => true,
+                'review/enviar' => false,
+                'review/salvar' => false,
                 'review/responder' => true,
                 'review/salvar_resposta' => true,
                 'conteudo/index' => true,

@@ -3,12 +3,18 @@
     <div>
         <?php echo $gerenciador ->toHTML('imagem_pequena') ?>
     </div>
-    <ul>
-        <li><?php echo anchor(
-                '/curso/gerenciador/desvincular/' . $idCurso,
-                'Revogar Cargo de Gerenciador',
-                'class="a-desvincular-gerenciador"'
-        ) ?></li>
-    </ul>
+    <?php echo gerar_menu_autorizado(
+        array(
+            array(
+                'uri' => '/curso/gerenciador/desvincular/' . $idCurso,
+                'texto' => 'Revogar Cargo de Gerenciador',
+                'attr' => 'class="a-desvincular-gerenciador"',
+                'acao' => 'gerenciador/desvincular',
+                'papel' => $papelUsuarioAtual
+            )
+        ),
+        array('<li>', '</li>'),
+        array('<ul>','</ul>')
+    ) ?>
 </li>
 <?php endforeach; ?>

@@ -4,9 +4,15 @@
             <h1>Lista de Enquetes do Curso <?php echo $tituloLista ?></h1>
             <h3>Abaixo são listada todas as enquetes contidas neste curso</h3>
         </hgroup>
+        <?php echo gerar_menu_autorizado(array(
+            array(
+                'uri' => '/curso/enquete/criar/' . $idCurso,
+                'texto' => 'Clique aqui!',
+                'acao' => 'enquete/criar',
+                'papel' => $papelUsuarioAtual
+            ),
+        ), array('<p>Quer adicionar uma nova enquete ao curso? ', '</p>')) ?>
         <p>
-            Quer adicionar uma nova enquete ao curso? <?php echo anchor('/curso/enquete/criar/' . $idCurso, 'Clique aqui!') ?>
-            <br>
             Fique à vontade para navegar pelos filtros.
         </p>
         <nav id="nav-filtros-lista-enquetes">
@@ -40,7 +46,15 @@
         </footer>
     <?php else: ?>
         <h4>
-            Nenhuma enquete foi criada neste fórum até o momento. <?php echo anchor('/curso/enquete/criar/' . $idCurso, 'Seja o primeiro!') ?>
+            Nenhuma enquete foi criada neste fórum até o momento.
+            <?php echo gerar_menu_autorizado(array(
+                array(
+                    'uri' => '/curso/enquete/criar/' . $idCurso,
+                    'texto' => 'Seja o primeiro!',
+                    'acao' => 'enquete/criar',
+                    'papel' => $papelUsuarioAtual
+                )
+            )) ?>
         </h4>
     <?php endif; ?>
     </div>

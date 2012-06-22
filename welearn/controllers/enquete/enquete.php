@@ -35,7 +35,10 @@ class Enquete extends Curso_Controller
             $this->load->helper('paginacao_cassandra');
             $dadosPaginacao = create_paginacao_cassandra($listaEnquetes, $count);
 
-            $dadosPartialLista = array( 'listaEnquetes' => $listaEnquetes );
+            $dadosPartialLista = array(
+                'papelUsuarioAtual' => $this->_getPapel( $curso ),
+                'listaEnquetes' => $listaEnquetes
+            );
             $partialLista = $this->template->loadPartial('lista', $dadosPartialLista, 'curso/enquete/enquete');
 
             $dadosView = array(
@@ -86,7 +89,14 @@ class Enquete extends Curso_Controller
 
             $response = array(
                 'success' => true,
-                'htmlListaEnquetes' => $this->template->loadPartial('lista', array('listaEnquetes' => $listaEnquetes), 'curso/enquete/enquete'),
+                'htmlListaEnquetes' => $this->template->loadPartial(
+                    'lista',
+                    array(
+                        'papelUsuarioAtual' => $this->_getPapel( $curso ),
+                        'listaEnquetes' => $listaEnquetes
+                    ),
+                    'curso/enquete/enquete'
+                ),
                 'paginacao' => $paginacao
             );
 
@@ -118,6 +128,7 @@ class Enquete extends Curso_Controller
             $enqueteDao->recuperarAlternativas($enquete);
 
             $dadosView = array(
+                'papelUsuarioAtual' => $this->_getPapel( $enquete->getCurso() ),
                 'enquete' => $enquete,
                 'formAction' => 'enquete/enquete/votar',
                 'extraOpenForm' => 'id="form-enquete-votar"',
@@ -144,6 +155,7 @@ class Enquete extends Curso_Controller
             $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
 
             $dadosView = array(
+                'papelUsuarioAtual' => $this->_getPapel( $enquete->getCurso() ),
                 'textoSituacao' => ($enquete->getSituacao() ==
                     WeLearn_Cursos_Enquetes_SituacaoEnquete::ABERTA) ?
                     'Parciais' : 'Finais',

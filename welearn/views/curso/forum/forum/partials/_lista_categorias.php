@@ -4,11 +4,14 @@
         <div>
             <h4><?php echo anchor('/curso/forum/listar/' . $categoria->id, $categoria->nome) ?></h4>
             <p><?php echo $categoria->descricao ?></p>
-            <footer>
-                <p>
-                    <?php echo anchor('/curso/forum/criar/' . $categoria->id, 'Criar fórum nesta categoria') ?>
-                </p>
-            </footer>
+            <?php echo gerar_menu_autorizado(array(
+                array(
+                    'uri' => '/curso/forum/criar/' . $categoria->id,
+                    'texto' => 'Criar fórum nesta categoria',
+                    'acao' => 'categoria/criar',
+                    'papel' => $papelUsuarioAtual
+                )
+            ), array('<p>', '</p>')) ?>
         </div>
     </td>
     <td>

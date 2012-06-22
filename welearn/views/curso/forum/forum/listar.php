@@ -7,9 +7,14 @@
         <p>
             Todas as discussões desta categoria estão listadas abaixo. Participe.
         </p>
-        <p>
-            Ou, você pode criar outro fórum nesta categoria, <?php echo anchor('/curso/forum/criar/' . $categoria->id, 'clicando aqui!') ?>
-        </p>
+        <?php echo gerar_menu_autorizado(array(
+            array(
+                'uri' => '/curso/forum/criar/' . $categoria->id,
+                'texto' => 'clicando aqui!',
+                'acao' => 'forum/criar',
+                'papel' => $papelUsuarioAtual
+            )
+        ), array('<p>Ou, você pode criar outro fórum nesta categoria, ', '</p>')) ?>
         <nav id="nav-filtros-lista-forums">
             <ul>
                 <li><?php echo anchor('/curso/forum/listar/' . $categoria->id . '?f=todos', 'Todos os fóruns') ?> -

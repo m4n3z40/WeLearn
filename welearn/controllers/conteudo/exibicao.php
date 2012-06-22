@@ -1076,7 +1076,10 @@ class Exibicao extends Curso_Controller
             'menuContexto',
             $this->template->loadPartial(
                 'menu_frontend',
-                array( 'idCurso' => $curso->getId() ),
+                array(
+                    'papelUsuarioAtual' => $this->_getPapel( $curso ),
+                    'idCurso' => $curso->getId()
+                ),
                 'curso/conteudo'
             )
         );

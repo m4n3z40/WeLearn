@@ -2,13 +2,19 @@
 <li>
     <div>
         <?php echo $aluno->toHTML('imagem_pequena') ?>
-        <ul>
-            <li><?php echo anchor(
-                '/curso/aluno/desvincular/' . $idCurso,
-                'Desvincular aluno',
-                'class="a-desvincular-aluno" data-id-aluno="'. $aluno->id .'"'
-            ) ?></li>
-        </ul>
+        <?php echo gerar_menu_autorizado(
+            array(
+                array(
+                    'uri' => '/curso/aluno/desvincular/' . $idCurso,
+                    'texto' => 'Desvincular aluno',
+                    'attr' => 'class="a-desvincular-aluno" data-id-aluno="'. $aluno->id .'"',
+                    'acao' => 'aluno/desvincular',
+                    'papel' => $papelUsuarioAtual
+                )
+            ),
+            array('<li>','</li>'),
+            array('<ul>','</ul>')
+        ) ?>
     </div>
 </li>
 <?php endforeach; ?>

@@ -15,14 +15,26 @@
                     <?php endif; ?>
                 </p>
             </div>
-            <footer>
-                <nav>
-                    <ul>
-                        <li><?php echo anchor('/conteudo/comentario/alterar/' . $comentario->id, 'Alterar Comentário', 'class="a-alterar-comentario"') ?></a></li>
-                        <li><?php echo anchor('/conteudo/comentario/remover/' . $comentario->id, 'Remover Comentário', 'class="a-remover-comentario"') ?></li>
-                    </ul>
-                </nav>
-            </footer>
+            <?php echo gerar_menu_autorizado(
+                array(
+                    array(
+                        'uri' => '/conteudo/comentario/alterar/' . $comentario->id,
+                        'texto' => 'Alterar Comentário',
+                        'attr' => 'class="a-alterar-comentario"',
+                        'autor' => $comentario->criador
+                    ),
+                    array(
+                        'uri' => '/conteudo/comentario/remover/' . $comentario->id,
+                        'texto' => 'Remover Comentário',
+                        'attr' => 'class="a-remover-comentario"',
+                        'autor' => $comentario->criador,
+                        'acao' => 'comentario/remover',
+                        'papel' => $papelUsuarioAtual
+                    )
+                ),
+                array('<li>','</li>'),
+                array('<footer><nav><ul>', '</ul></nav></footer>')
+            ) ?>
         </aside>
         <div>
             <?php if ($comentario->assunto): ?>

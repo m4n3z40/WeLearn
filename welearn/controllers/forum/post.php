@@ -53,12 +53,14 @@ class Post extends Curso_Controller
             $listaPosts = array_reverse($listaPosts);
 
             $dadosListaView = array(
+                'papelUsuarioAtual' => $this->_getPapel( $forum->getCategoria()->getCurso() ),
                 'listaPosts' => $listaPosts
             );
 
             $htmlListaPost = $this->template->loadPartial('lista', $dadosListaView, 'curso/forum/post');
 
             $dadosListarView = array(
+                'papelUsuarioAtual' => $this->_getPapel( $forum->getCategoria()->getCurso() ),
                 'forum' => $forum,
                 'haPosts' => !empty($listaPosts),
                 'listaPosts' => $htmlListaPost,
@@ -99,7 +101,14 @@ class Post extends Curso_Controller
 
             $listaPosts = array_reverse($listaPosts);
 
-            $htmlListaPosts = $this->template->loadPartial('lista', array('listaPosts' => $listaPosts), 'curso/forum/post');
+            $htmlListaPosts = $this->template->loadPartial(
+                'lista',
+                array(
+                    'papelUsuarioAtual' => $this->_getPapel( $forum->getCategoria()->getCurso() ),
+                    'listaPosts' => $listaPosts
+                ),
+                'curso/forum/post'
+            );
 
             $json = create_json_feedback(true, '', Zend_Json::encode(array(
                 'htmlListaPosts' => $htmlListaPosts,
@@ -234,7 +243,10 @@ class Post extends Curso_Controller
         $extraFeedBackJson = Zend_Json::encode(array(
             'htmlNovoPost' => $this->template->loadPartial(
                 'lista',
-                array( 'listaPosts' => $listaPosts ),
+                array(
+                    'papelUsuarioAtual' => $this->_getPapel( $forum->getCategoria()->getCurso() ),
+                    'listaPosts' => $listaPosts
+                ),
                 'curso/forum/post'
             )
         ));
@@ -270,7 +282,10 @@ class Post extends Curso_Controller
             'menuContexto',
             $this->template->loadPartial(
                 'menu',
-                array( 'idCurso' => $curso->getId() ),
+                array(
+                    'papelUsuarioAtual' => $this->_getPapel( $curso ),
+                    'idCurso' => $curso->getId()
+                ),
                 'curso/forum'
             )
         );

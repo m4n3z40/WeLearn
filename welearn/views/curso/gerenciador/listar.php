@@ -8,8 +8,17 @@
         <p>os Gerenciadores colaboram para a administração do curso, eles não possuem
             mais privilégios que o próprio Criador do curso, mais tem bem mais
             privilégios que os Alunos.</p>
-        <p>Quer convidar mais usuários para colaborar com o gerenciamento deste Curso?
-            <?php echo anchor('/curso/gerenciador/convites/' . $idCurso, 'Clique aqui!') ?></p>
+        <?php echo gerar_menu_autorizado(
+            array(
+                array(
+                    '/curso/gerenciador/convites/' . $idCurso,
+                    'texto' => 'Clique aqui!',
+                    'acao' => 'gerenciador/convites',
+                    'papel' => $papelUsuarioAtual
+                )
+            ),
+            array('<p>Quer convidar mais usuários para colaborar com o gerenciamento deste Curso? ', '</p>')
+        ) ?>
     </header>
     <div>
     <?php if ($haGerenciadores): ?>
@@ -23,7 +32,18 @@
             <h4>Não há mais gerenciadores auxiliares a serem exibidos.</h4>
         <?php endif; ?>
     <?php else: ?>
-        <h4>Atualmente não há gerenciadores colaborando para o gerenciamento deste curso. <?php echo anchor('/curso/gerenciador/convites/' . $idCurso, 'Convide Usuários para Ajudá-lo!') ?></h4>
+        <h4>Atualmente não há gerenciadores colaborando para o gerenciamento deste curso.
+            <?php echo gerar_menu_autorizado(
+                array(
+                    array(
+                        '/curso/gerenciador/convites/' . $idCurso,
+                        'texto' => 'Convide Usuários para Ajudá-lo!',
+                        'acao' => 'gerenciador/convites',
+                        'papel' => $papelUsuarioAtual
+                    )
+                ),
+                array('<p>Quer convidar mais usuários para colaborar com o gerenciamento deste Curso? ', '</p>')
+            ) ?></h4>
     <?php endif; ?>
     </div>
 </div>

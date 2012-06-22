@@ -30,6 +30,8 @@ class WeLearn_Usuarios_Autorizacao_PermissaoAluno extends WeLearn_Usuarios_Autor
                 'enquete/salvar' => true,
                 'forum/criar' => true,
                 'forum/salvar' => true,
+                'post/criar' => true,
+                'post/salvar' => true,
                 'exibicao/index' => true,
                 'exibicao/exibir' => true,
                 'exibicao/salvar_frequencia' => true,
@@ -47,6 +49,7 @@ class WeLearn_Usuarios_Autorizacao_PermissaoAluno extends WeLearn_Usuarios_Autor
                 'pagina/recuperar_lista' => true,
                 'recurso/recuperar_recursos_aluno' => true,
                 'comentario/recuperar_lista' => true,
+                'comentario/criar' => true,
                 'comentario/salvar' => true
             )
         );

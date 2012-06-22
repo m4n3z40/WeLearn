@@ -7,8 +7,17 @@
         <p>As opniões dos alunos influenciam na reputação e popularidade do curso,
            onde os cursos com as melhores reputações terão prioridade nas buscas
            dos usuários do serviço.</p>
-        <p>Deseja avaliar o curso?
-            <?php echo anchor('/curso/review/enviar/' . $idCurso, 'Clique Aqui!') ?>
+        <?php echo gerar_menu_autorizado(
+            array(
+                array(
+                    'uri' => '/curso/review/enviar/' . $idCurso,
+                    'texto' => 'Clique Aqui!',
+                    'acao' => 'review/enviar',
+                    'papel' => $papelUsuarioAtual
+                )
+            ),
+            array('<p>Deseja avaliar o curso? ','</p>')
+        ) ?>
     </header>
     <div>
         <h3>Até agora, o curso foi avaliado <em><?php echo $totalReviews ?> vez(es)</em></h3>
