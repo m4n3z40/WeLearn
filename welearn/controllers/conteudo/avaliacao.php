@@ -21,6 +21,8 @@ class Avaliacao extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar( $idCurso );
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
 
             try {
@@ -64,6 +66,8 @@ class Avaliacao extends Curso_Controller
         try {
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             $modulo = $moduloDao->recuperar( $idModulo );
+
+            $this->_expulsarNaoAutorizados($modulo->getCurso());
 
             $avaliacaoDao = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO');
             $questaoDao = WeLearn_DAO_DAOFactory::create('QuestaoAvaliacaoDAO');
@@ -124,6 +128,8 @@ class Avaliacao extends Curso_Controller
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             $modulo = $moduloDao->recuperar( $idModulo );
 
+            $this->_expulsarNaoAutorizados($modulo->getCurso());
+
             if ( $modulo->getCurso()->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO ) {
 
                 show_404();
@@ -182,6 +188,8 @@ class Avaliacao extends Curso_Controller
         try {
             $avaliacaoDao = WeLearn_DAO_DAOFactory::create('AvaliacaoDAO');
             $avaliacao = $avaliacaoDao->recuperar( $idAvaliacao );
+
+            $this->_expulsarNaoAutorizados($avaliacao->getModulo()->getCurso());
 
             $dadosForm = array(
                 'formAction' => '/conteudo/avaliacao/salvar',

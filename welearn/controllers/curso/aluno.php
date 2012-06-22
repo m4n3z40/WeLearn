@@ -21,6 +21,8 @@ class Aluno extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar($idCurso);
 
+            $this->_expulsarNaoAutorizados($curso);
+
             switch ($this->_getNivelAcesso( $curso )) {
                 case WeLearn_Usuarios_Autorizacao_NivelAcesso::USUARIO:
                 case WeLearn_Usuarios_Autorizacao_NivelAcesso::ALUNO_INSCRICAO_PENDENTE:
@@ -217,6 +219,8 @@ class Aluno extends Curso_Controller
             $count = 20;
 
             $curso = $this->_cursoDao->recuperar($idCurso);
+
+            $this->_expulsarNaoAutorizados($curso);
 
             try {
                 $listaRequisicoes = $this->_alunoDao->recuperarTodasInscricoesPorCurso($curso, '', '', $count + 1);

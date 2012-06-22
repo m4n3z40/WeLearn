@@ -75,6 +75,8 @@ class Aula extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar($idCurso);
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
 
@@ -113,6 +115,8 @@ class Aula extends Curso_Controller
         try {
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             $modulo = $moduloDao->recuperar($idModulo);
+
+            $this->_expulsarNaoAutorizados($modulo->getCurso());
 
             try{
                 $listaModulos = $moduloDao->recuperarTodosPorCurso( $modulo->getCurso() );
@@ -194,6 +198,8 @@ class Aula extends Curso_Controller
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             $modulo = $moduloDao->recuperar($idModulo);
 
+            $this->_expulsarNaoAutorizados($modulo->getCurso());
+
             if ( $modulo->getCurso()->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO ) {
 
                 show_404();
@@ -245,6 +251,8 @@ class Aula extends Curso_Controller
         try {
             $aulaDao = WeLearn_DAO_DAOFactory::create('AulaDAO');
             $aula = $aulaDao->recuperar($idAula);
+
+            $this->_expulsarNaoAutorizados($aula->getModulo()->getCurso());
 
             $dadosPartial = array(
                 'formAction' => 'conteudo/aula/salvar',

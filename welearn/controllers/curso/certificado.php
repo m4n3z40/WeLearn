@@ -26,6 +26,8 @@ class Certificado extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar( $idCurso );
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $certificadoDao = WeLearn_DAO_DAOFactory::create('CertificadoDAO');
 
             try {
@@ -78,6 +80,8 @@ class Certificado extends Curso_Controller
 
             $curso = $this->_cursoDao->recuperar( $idCurso );
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $dadosForm = array(
                 'formAction' => '/curso/certificado/salvar',
                 'extraOpenForm' => 'id="certificado-form-criar"',
@@ -117,6 +121,8 @@ class Certificado extends Curso_Controller
         try {
             $certificadoDao = WeLearn_DAO_DAOFactory::create('CertificadoDAO');
             $certificado = $certificadoDao->recuperar( $idCertificado );
+
+            $this->_expulsarNaoAutorizados($certificado->getCurso());
 
             $dadosForm = array(
                 'formAction' => '/curso/certificado/salvar',

@@ -27,6 +27,8 @@ class Modulo extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar($idCurso);
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $moduloDAO = WeLearn_DAO_DAOFactory::create('ModuloDAO');
 
             try {
@@ -197,6 +199,8 @@ class Modulo extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar($idCurso);
 
+            $this->_expulsarNaoAutorizados($curso);
+
             if ( $curso->getStatus() === WeLearn_Cursos_StatusCurso::CONTEUDO_ABERTO ) {
 
                 show_404();
@@ -244,6 +248,8 @@ class Modulo extends Curso_Controller
         try {
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
             $modulo = $moduloDao->recuperar($idModulo);
+
+            $this->_expulsarNaoAutorizados($modulo->getCurso());
 
             $dadosPartial = array(
                 'formAction' => '/conteudo/modulo/salvar',

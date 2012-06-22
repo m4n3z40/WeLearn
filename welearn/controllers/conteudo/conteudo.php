@@ -18,6 +18,8 @@ class Conteudo extends Curso_Controller
     {
         $curso = $this->_cursoDao->recuperar($idCurso);
 
+        $this->_expulsarNaoAutorizados($curso);
+
         $this->_renderTemplateCurso($curso, 'curso/conteudo/index');
     }
 

@@ -13,6 +13,81 @@ class Usuario extends WL_Controller
         $this->_userpicDir = USER_IMG_DIR . 'userpics/';
     }
 
+    public function salvar_dados_principais()
+    {
+        if ( ! $this->input->is_ajax_request() ) {
+            show_404();
+        }
+
+        set_json_header();
+
+        $this->load->library('form_validation');
+
+        if ( ! $this->form_validation->run() ) {
+
+            $json = create_json_feedback(false, validation_errors_json());
+            exit($json);
+
+        } else {
+
+            try {
+
+                $usuarioAtual = $this->autenticacao->getUsuarioAutenticado();
+
+                $post = $this->input->post();
+
+                $senhaAtual = $post['senhaAtual'];
+
+                if ( $senhaAtual && md5($senhaAtual) != $usuarioAtual->getSenha() ) {
+
+                    $error = create_json_feedback_error_json('Senha Incorreta!','senhaAtual');
+
+                    echo create_json_feedback(false, $error);
+                    exit;
+
+                } elseif ( ! $senhaAtual ) {
+
+                    unset( $post['senha'] );
+
+                }
+
+                $segmentoDAO = WeLearn_DAO_DAOFactory::create('SegmentoDAO');
+
+                $post['segmentoInteresse'] = $segmentoDAO->recuperar( $post['segmento'] );
+                $usuarioAtual->preencherPropriedades($post);
+
+                $usuarioDAO = WeLearn_DAO_DAOFactory::create('UsuarioDAO');
+                $usuarioDAO->salvar($usuarioAtual);
+
+                $this->autenticacao->setUsuarioAutenticado($usuarioAtual);
+
+                $this->load->helper('notificacao_js');
+                $notificacoesFlash = create_notificacao_json(
+                    'sucesso',
+                    'Dados Principais alterados com sucesso!'
+                );
+
+                $this->session->set_flashdata('notificacoesFlash', $notificacoesFlash);
+                $json = create_json_feedback(true);
+
+            } catch (Exception $e) {
+
+                log_message('error', 'Erro ao tentar salvar dados pessoais de usuário. '
+                    . create_exception_description($e));
+
+                $errors =  create_json_feedback_error_json(
+                    'Ops! Ocorreu um erro no servidor, desculpe pelo incidente.<br/>'
+                        .'Já estamos verificando, tente novamente em breve.'
+                );
+
+                $json = create_json_feedback(false, $errors);
+
+            }
+        }
+
+        echo $json;
+    }
+
     public function salvar_dados_pessoais()
     {
         if ( ! $this->input->is_ajax_request() ) {

@@ -128,6 +128,8 @@ class Gerenciador extends Curso_Controller
 
             $curso = $this->_cursoDao->recuperar( $idCurso );
 
+            $this->_expulsarNaoAutorizados($curso);
+
             try {
                 $listaConvites = $this->_gerenciadorDao->recuperarTodosConvitesPorCurso( $curso, '', '', $count + 1 );
                 $totalConvites = $this->_gerenciadorDao->recuperarQtdTotalConvitesPorCurso( $curso );
@@ -405,6 +407,8 @@ class Gerenciador extends Curso_Controller
     {
         try {
             $curso = $this->_cursoDao->recuperar( $idCurso );
+
+            $this->_expulsarNaoAutorizados($curso);
 
             $dadosView = array(
                 'idCurso' => $curso->getId(),

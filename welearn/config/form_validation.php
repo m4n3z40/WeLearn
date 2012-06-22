@@ -425,6 +425,43 @@ $config = array(
             'rules'=>'is_natural|exact_length[4]'
         )
     ),
+    'usuario/salvar_dados_principais' => array(
+        array(
+            'field' => 'nome',
+            'label' => 'Nome',
+            'rules' => 'required|min_length[5]|max_length[45]|strip_tags'
+        ),
+        array(
+            'field' => 'sobrenome',
+            'label' => 'sobrenome',
+            'rules' => 'required|min_length[5]|max_length[60]|strip_tags'
+        ),
+        array(
+            'field' => 'senhaAtual',
+            'label' => 'Senha atual',
+            'rules' => 'min_length[6]|max_length[24]'
+        ),
+        array(
+            'field' => 'senha',
+            'label' => 'Nova Senha',
+            'rules' => 'min_length[6]|max_length[24]'
+        ),
+        array(
+            'field' => 'senhaConfirm',
+            'label' => 'Confirme a Senha',
+            'rules' => 'min_length[6]|max_length[24]|matches[senha]'
+        ),
+        array(
+            'field' => 'area',
+            'label' => 'Área de interesse',
+            'rules' => 'required|max_length[80]'
+        ),
+        array(
+            'field' => 'segmento',
+            'label' => 'Segmento de interesse',
+            'rules' => 'required|max_length[80]'
+        )
+    ),
     'usuario/salvar_configuracao' => array(
         array(
             'field'=>'privacidadePerfil',

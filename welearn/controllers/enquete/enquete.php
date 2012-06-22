@@ -179,6 +179,8 @@ class Enquete extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar($idCurso);
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $dadosPartialForm = array(
                 'formAction' => 'enquete/enquete/salvar',
                 'extraOpenForm' => 'id="form-criar-enquete"',

@@ -22,6 +22,8 @@ class Categoria extends Curso_Controller
 
             $curso = $this->_cursoDao->recuperar($idCurso);
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
 
             try {
@@ -104,6 +106,8 @@ class Categoria extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar($idCurso);
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $dadosFormCriar = array(
                 'nomeAtual' => '',
                 'descricaoAtual' => ''
@@ -132,6 +136,8 @@ class Categoria extends Curso_Controller
 
             $categoriaDao = WeLearn_DAO_DAOFactory::create('CategoriaForumDAO');
             $categoria = $categoriaDao->recuperar($UUID);
+
+            $this->_expulsarNaoAutorizados($categoria->getCurso());
 
             $dadosFormAlterar = array(
                 'nomeAtual' => $categoria->getNome(),

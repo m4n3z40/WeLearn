@@ -20,6 +20,8 @@ class Comentario extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar($idCurso);
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $moduloDao = WeLearn_DAO_DAOFactory::create('ModuloDAO');
 
             try {

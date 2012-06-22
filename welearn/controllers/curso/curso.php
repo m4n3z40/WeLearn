@@ -626,6 +626,8 @@ class Curso extends Curso_Controller
         try {
             $curso = $this->_cursoDao->recuperar( $id );
 
+            $this->_expulsarNaoAutorizados($curso);
+
             $this->load->helper('area');
             $listaAreas = lista_areas_para_dados_dropdown();
 
