@@ -551,7 +551,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #header-splash-screen form {
-    width: 340px;
+    width: 300px;
     margin-left: 10px;
     float: left;
 }
@@ -563,7 +563,7 @@ h1, h2, h3, h4, h5, h6 {
 
 #signup-form {
     margin-left: 10px;
-    width: 340px;
+    width: 300px;
 }
 
     #signup-form input[type=text], #signup-form input[type=password], #signup-form select {

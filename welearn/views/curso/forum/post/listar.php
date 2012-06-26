@@ -57,15 +57,19 @@
             <?php echo $listaPosts ?>
         </ul>
         <?php else: ?>
-        <h4 id="forum-lista-posts-vazio">Nenhum post foi criado neste fórum até o momento. Aguarde ou <a href="#" class="a-forum-post-criar">Seja o primeiro a postar!</a></h4>
+        <h4 id="forum-lista-posts-vazio">Nenhum post foi criado neste fórum até o momento.
+        <?php if ( is_autorizado($papelUsuarioAtual, 'post/criar') && $forum->status != WeLearn_Cursos_Foruns_StatusForum::INATIVO ): ?>
+            Aguarde ou <a href="#" class="a-forum-post-criar">Seja o primeiro a postar!</a>
         <?php endif; ?>
-        <?php if ( is_autorizado($papelUsuarioAtual, 'post/criar') ): ?>
+        </h4>
+        <?php endif; ?>
+        <?php if ( is_autorizado($papelUsuarioAtual, 'post/criar') && $forum->status != WeLearn_Cursos_Foruns_StatusForum::INATIVO ): ?>
         <footer>
             <a href="#" class="a-forum-post-criar button big-button">Postar neste fórum</a>
         </footer>
         <?php endif; ?>
     </div>
-    <?php if ( is_autorizado($papelUsuarioAtual, 'post/criar') ): ?>
+    <?php if ( is_autorizado($papelUsuarioAtual, 'post/criar') && $forum->status != WeLearn_Cursos_Foruns_StatusForum::INATIVO ): ?>
     <hr />
     <div id="form-criar-post-container" style="display: none;">
         <header><a href="#" id="a-fechar-form-criar-post" class="button">Cancelar</a></header>

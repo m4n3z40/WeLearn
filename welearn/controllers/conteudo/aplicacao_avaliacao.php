@@ -230,9 +230,14 @@ class Aplicacao_avaliacao extends Curso_Controller
                 $controleAvaliacao->isStatusDesativada()
             ) {
 
+                $totalAvaliacoesDisponiveis = $this->_controleAvaliacaoDao
+                                                   ->recuperarQtdTotalPorParticipacao(
+                                                       $participacaoCurso
+                                                   );
+
                 $participacaoCurso->atualizarCR(
                     $controleAvaliacao->getNota(),
-                    $avaliacao->getModulo()->getNroOrdem() === 1
+                    $totalAvaliacoesDisponiveis <= 1
                 );
 
             }

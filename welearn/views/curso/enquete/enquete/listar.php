@@ -21,10 +21,13 @@
             <ul>
                 <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=todas', 'Todas as enquetes') ?> -
                     <span>(<?php echo $qtdTodas ?>)</span></li>
+
                 <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=ativas', 'Somente enquetes ativas') ?> -
                     <span>(<?php echo $qtdAtivas ?>)</span></li>
+                <?php if (is_autorizado( $papelUsuarioAtual, 'enquete/alterar_status' )): ?>
                 <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=inativas', 'Somente enquetes inativas') ?> -
                     <span>(<?php echo $qtdInativas ?>)</span></li>
+                <?php endif; ?>
                 <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=abertas', 'Somente enquetes abertas') ?> -
                     <span>(<?php echo $qtdAbertas ?>)</span></li>
                 <li><?php echo anchor('/curso/enquete/listar/' . $idCurso . '?f=fechadas', 'Somente enquetes fechadas') ?> -
